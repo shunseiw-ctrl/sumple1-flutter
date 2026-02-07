@@ -1,0 +1,10 @@
+class JobDetailBody extends StatelessWidget {
+  final Map<String, dynamic> job;
+  const JobDetailBody({super.key, required this.job});
+
+  @override
+  Widget build(BuildContext context) {
+    // title/location/price/date/description/notes を描画
+    // （あなたの JobDetailPage の body(ListView) の中身をここへ移す）
+  }
+}

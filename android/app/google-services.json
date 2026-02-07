@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "319960355608",
+    "project_id": "alba-work",
+    "storage_bucket": "alba-work.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319960355608:android:acddd0bec19a47f48c846d",
+        "android_client_info": {
+          "package_name": "com.example.sumple1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmLkg-2SEUk_LrDMnViKNH0Rm7CTNd3CA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
