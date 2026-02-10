@@ -20,6 +20,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _index = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // ログイン状態が用意された後にFCMトークン同期（1回）
+    Future.microtask(() => PushTokenService.syncFcmToken());
+  }
+
   Future<bool> _isAdmin() async {
     final user = FirebaseAuth.instance.currentUser;
     final email = user?.email;
@@ -34,11 +41,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   late final List<Widget> _pages = const [
-    JobListPage(),   // 0: 検索
-    WorkPage(),      // 1: はたらく
-    MessagesPage(),  // 2: メッセージ（✅統一）
-    SalesPage(),     // 3: 売上
-    ProfilePage(),   // 4: マイページ
+    JobListPage(), // 0: 検索
+    WorkPage(), // 1: はたらく
+    MessagesPage(), // 2: メッセージ（✅統一）
+    SalesPage(), // 3: 売上
+    ProfilePage(), // 4: マイページ
   ];
 
   Future<void> _goToPost() async {

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomPage extends StatefulWidget {
-  final String applicationId;
+  final String applicationId; // = chatId = applications docId
   const ChatRoomPage({super.key, required this.applicationId});
 
   @override
@@ -17,7 +17,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool _ready = false;
   String? _readyError;
 
-  bool _clearingUnread = false; // 未読0リセット中フラグ（連打防止）
+  bool _clearingUnread = false;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -27,12 +27,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   DocumentReference<Map<String, dynamic>> get _chatRef =>
       FirebaseFirestore.instance.collection('chats').doc(widget.applicationId);
 
-  CollectionReference<Map<String, dynamic>> get _msgRef => _chatRef.collection('messages');
+  CollectionReference<Map<String, dynamic>> get _msgRef =>
+      _chatRef.collection('messages');
 
   @override
   void initState() {
     super.initState();
-    _ensureChatDocAndClearUnread();
+    _initializeChatRoom();
   }
 
   @override
@@ -41,9 +42,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.dispose();
   }
 
-  /// 1) chats/{appId} を merge 作成して当事者が読める状態にする
-  /// 2) 入室時に未読を 0 に戻す（自分側の unreadCount をクリア）
-  Future<void> _ensureChatDocAndClearUnread() async {
+  Future<void> _initializeChatRoom() async {
     try {
       if (_uid.isEmpty) {
         setState(() {
@@ -53,12 +52,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         return;
       }
 
+      // applications/{chatId} を正として当事者・必須情報を確定
       final appSnap = await _appRef.get();
       final app = appSnap.data();
-
       if (app == null) {
         setState(() {
-          _readyError = '応募データが見つかりません（application が存在しません）';
+          _readyError = '応募データが見つかりません（applications が存在しません）';
           _ready = false;
         });
         return;
@@ -68,18 +67,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       final adminUid = (app['adminUid'] ?? '').toString();
       final jobId = (app['jobId'] ?? '').toString();
 
-      // ✅ タイトルは物件名（projectNameSnapshot）優先
       final titleSnapshot = (app['projectNameSnapshot'] ??
           app['jobTitleSnapshot'] ??
           '案件チャット')
           .toString();
 
-      // 当事者チェック
       final amApplicant = _uid == applicantUid;
       final amAdmin = _uid == adminUid;
-      final amParty = amApplicant || amAdmin;
 
-      if (!amParty) {
+      if (!amApplicant && !amAdmin) {
         setState(() {
           _readyError = 'このチャットを開く権限がありません（当事者ではありません）';
           _ready = false;
@@ -87,34 +83,38 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         return;
       }
 
-      // Rules create 条件（最低限）
       if (applicantUid.isEmpty || adminUid.isEmpty || jobId.isEmpty) {
         setState(() {
-          _readyError =
-          'チャット作成に必要な情報が不足しています（applicantUid/adminUid/jobId）\n'
-              'applications のデータを確認してください。';
+          _readyError = '必要情報が不足しています（applicantUid/adminUid/jobId）';
           _ready = false;
         });
         return;
       }
 
-      // ✅ 親chatを安全に用意（既存なら上書きしない）
-      // - createdAt が無いケースをケア（mergeでも後から作れるように）
-      await _chatRef.set({
-        'applicationId': widget.applicationId,
-        'applicantUid': applicantUid,
-        'adminUid': adminUid,
-        'jobId': jobId,
-        'titleSnapshot': titleSnapshot,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      // chats/{chatId} が無ければ rules の create(keys固定) に完全一致する7キーで作る
+      final chatSnap = await _chatRef.get();
+      if (!chatSnap.exists) {
+        await _chatRef.set({
+          'applicationId': widget.applicationId, // chatId と一致必須
+          'applicantUid': applicantUid,
+          'adminUid': adminUid,
+          'jobId': jobId,
+          'titleSnapshot': titleSnapshot,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // 既存なら update許可キーだけ更新（titleSnapshot/updatedAt）
+        // ※ updateルールの changedKeys に titleSnapshot/updatedAt が含まれている前提（貼ってくれた rules と一致）
+        try {
+          await _chatRef.update({
+            'titleSnapshot': titleSnapshot,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        } catch (_) {}
+      }
 
-      // ✅ 未読0リセット（自分側だけ）
-      await _clearUnreadCountIfNeeded(
-        amApplicant: amApplicant,
-        amAdmin: amAdmin,
-      );
+      await _clearUnreadCountIfNeeded(amApplicant: amApplicant, amAdmin: amAdmin);
 
       if (mounted) {
         setState(() {
@@ -161,7 +161,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         await _chatRef.update(update);
       }
     } catch (_) {
-      // MVP：失敗してもチャットは使えるよう握りつぶす
+      // MVP: 失敗しても致命傷にしない
     } finally {
       _clearingUnread = false;
     }
@@ -174,12 +174,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     setState(() => _sending = true);
 
     try {
-      // 念のため：送信前に親docが準備できていること
       if (!_ready) {
-        await _ensureChatDocAndClearUnread();
-        if (!_ready) {
-          throw Exception(_readyError ?? 'チャットの準備ができていません');
-        }
+        await _initializeChatRoom();
+        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
       }
 
       final appSnap = await _appRef.get();
@@ -194,7 +191,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // 親更新（Rulesで許可されているキーのみ）
       final update = <String, dynamic>{
         'lastMessageText': text,
         'lastMessageAt': FieldValue.serverTimestamp(),
@@ -202,7 +198,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      // 相手側未読を +1
       if (_uid == applicantUid) {
         update['unreadCountAdmin'] = FieldValue.increment(1);
       } else if (_uid == adminUid) {
@@ -233,36 +228,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             ? StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: _chatRef.snapshots(),
           builder: (context, snap) {
-            final title = (snap.data?.data()?['titleSnapshot'] ?? 'チャット').toString();
+            final title =
+            (snap.data?.data()?['titleSnapshot'] ?? 'チャット').toString();
             return Text(title);
           },
         )
             : const Text('チャット'),
-        actions: [
-          IconButton(
-            tooltip: '未読をリセット',
-            onPressed: _ready
-                ? () async {
-              try {
-                final appSnap = await _appRef.get();
-                final app = appSnap.data() ?? {};
-                final applicantUid = (app['applicantUid'] ?? '').toString();
-                final adminUid = (app['adminUid'] ?? '').toString();
-                await _clearUnreadCountIfNeeded(
-                  amApplicant: myUid == applicantUid,
-                  amAdmin: myUid == adminUid,
-                );
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('未読をリセットしました')),
-                  );
-                }
-              } catch (_) {}
-            }
-                : null,
-            icon: const Icon(Icons.mark_chat_read_outlined),
-          )
-        ],
       ),
       body: !_ready
           ? Center(
@@ -274,14 +245,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               if (_readyError == null)
                 const CircularProgressIndicator()
               else
-                Text(
-                  _readyError!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.black87),
-                ),
+                Text(_readyError!, textAlign: TextAlign.center),
               const SizedBox(height: 12),
               OutlinedButton(
-                onPressed: _ensureChatDocAndClearUnread,
+                onPressed: _initializeChatRoom,
                 child: const Text('再試行'),
               )
             ],
@@ -292,7 +259,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _msgRef.orderBy('createdAt', descending: true).limit(50).snapshots(),
+              stream: _msgRef
+                  .orderBy('createdAt', descending: true)
+                  .limit(50)
+                  .snapshots(),
               builder: (context, snap) {
                 if (snap.hasError) {
                   return Center(child: Text('読み込みエラー: ${snap.error}'));
@@ -316,13 +286,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     final mine = sender == myUid;
 
                     return Align(
-                      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment:
+                      mine ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
                         constraints: const BoxConstraints(maxWidth: 280),
                         decoration: BoxDecoration(
-                          color: mine ? Colors.blue.shade50 : Colors.grey.shade200,
+                          color:
+                          mine ? Colors.blue.shade50 : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(text),

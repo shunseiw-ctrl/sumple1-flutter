@@ -60,7 +60,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   String _two(int n) => n.toString().padLeft(2, '0');
 
-  // ✅ 右上の日付を yyyy/MM/dd で固定（KANNA寄せ）
+  // ✅ 右上の日付を yyyy/MM/dd で固定
   String _formatYmd(DateTime? dt) {
     if (dt == null) return '';
     return '${dt.year}/${_two(dt.month)}/${_two(dt.day)}';
@@ -104,6 +104,75 @@ class _MessagesPageState extends State<MessagesPage> {
     final ad = _toDate(a.data()['createdAt']);
     final bd = _toDate(b.data()['createdAt']);
     return bd.compareTo(ad);
+  }
+
+  void _log(String message, {Map<String, dynamic>? extra}) {
+    if (!kDebugMode) return;
+    final base = '[MessagesPage] $message';
+    if (extra == null || extra.isEmpty) {
+      debugPrint(base);
+    } else {
+      debugPrint('$base  extra=$extra');
+    }
+  }
+
+  /// ✅ ルール完全適合（update維持＋存在チェック＋ログ）
+  /// - chats/{chatId} update は changedKeys 制限があるため、許可キーのみ更新
+  /// - doc が無い場合は create しない（create は 7キー必須で MessagesPage からは事故りやすい）
+  Future<void> _resetUnreadIfPossible(String chatId) async {
+    if (_myUid.isEmpty) return;
+
+    final chatRef = _db.collection('chats').doc(chatId);
+    final unreadKey = _isAdmin ? 'unreadCountAdmin' : 'unreadCountApplicant';
+
+    try {
+      final snap = await chatRef.get();
+
+      if (!snap.exists) {
+        _log('skip unread reset (chat doc not exists)', extra: {
+          'chatId': chatId,
+          'unreadKey': unreadKey,
+        });
+        return;
+      }
+
+      // 既に0なら書かない（無駄な書き込み削減）
+      final data = snap.data() ?? <String, dynamic>{};
+      final cur = data[unreadKey];
+      final curInt = (cur is int) ? cur : 0;
+      if (curInt == 0) {
+        _log('skip unread reset (already 0)', extra: {
+          'chatId': chatId,
+          'unreadKey': unreadKey,
+        });
+        return;
+      }
+
+      // ✅ rules で許可されているキーのみ
+      await chatRef.update({
+        unreadKey: 0,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      _log('unread reset ok', extra: {
+        'chatId': chatId,
+        'unreadKey': unreadKey,
+        'from': curInt,
+        'to': 0,
+      });
+    } on FirebaseException catch (e) {
+      // permission-denied / not-found などをログに残す（MVP: UIは止めない）
+      _log('unread reset failed (FirebaseException)', extra: {
+        'chatId': chatId,
+        'code': e.code,
+        'message': e.message ?? '',
+      });
+    } catch (e) {
+      _log('unread reset failed (unknown)', extra: {
+        'chatId': chatId,
+        'error': e.toString(),
+      });
+    }
   }
 
   @override
@@ -220,15 +289,13 @@ class _MessagesPageState extends State<MessagesPage> {
                         final lastText = _lastMessageTextFromChat(chatData);
                         final lastAt = _lastMessageAtFromChat(chatData);
 
-                        // ✅ yyyy/MM/dd に統一（KANNA寄せ）
                         final ymdText = _formatYmd(lastAt);
 
                         // ✅ キャッシュ更新（次回ビルドの並び替えに反映）
-                        final newLastAt = lastAt;
-                        if (newLastAt != null) {
+                        if (lastAt != null) {
                           final prev = _lastAtCache[appId];
-                          if (prev == null || prev != newLastAt) {
-                            _lastAtCache[appId] = newLastAt;
+                          if (prev == null || prev != lastAt) {
+                            _lastAtCache[appId] = lastAt;
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               if (mounted) setState(() {});
                             });
@@ -293,15 +360,11 @@ class _MessagesPageState extends State<MessagesPage> {
                             ],
                           ),
                           onTap: () async {
-                            // ✅ 一覧タップ時点で未読0（KANNA運用に近い）
-                            try {
-                              await _db.collection('chats').doc(appId).update({
-                                _isAdmin ? 'unreadCountAdmin' : 'unreadCountApplicant': 0,
-                                'updatedAt': FieldValue.serverTimestamp(),
-                              });
-                            } catch (_) {}
+                            // ✅ ルール適合：存在する時だけ update（create しない）
+                            await _resetUnreadIfPossible(appId);
 
                             if (!context.mounted) return;
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
