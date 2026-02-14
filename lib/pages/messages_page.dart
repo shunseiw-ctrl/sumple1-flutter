@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import 'chat_room_page.dart';
+import '../core/constants/app_constants.dart';
+import '../core/utils/logger.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
@@ -19,7 +21,7 @@ class _MessagesPageState extends State<MessagesPage> {
   String _query = '';
 
   // 固定ADMIN UID（MVP）
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  static const String _adminUid = AppConstants.adminUid;
 
   String get _myUid => _auth.currentUser?.uid ?? '';
   String get _myEmail => _auth.currentUser?.email ?? '';
@@ -107,13 +109,7 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   void _log(String message, {Map<String, dynamic>? extra}) {
-    if (!kDebugMode) return;
-    final base = '[MessagesPage] $message';
-    if (extra == null || extra.isEmpty) {
-      debugPrint(base);
-    } else {
-      debugPrint('$base  extra=$extra');
-    }
+    Logger.debug(message, tag: 'MessagesPage', data: extra);
   }
 
   /// ✅ ルール完全適合（update維持＋存在チェック＋ログ）
