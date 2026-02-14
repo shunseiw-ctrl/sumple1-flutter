@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'pages/home_page.dart';
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
+import 'core/services/firestore_setup.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Firestoreのオフライン対応を初期化
+  await FirestoreSetup.initialize();
 
   Logger.info('Firebase initialized', tag: 'main');
 

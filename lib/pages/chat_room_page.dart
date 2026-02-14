@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../core/services/chat_service.dart';
+import '../core/utils/error_handler.dart';
+import '../core/utils/logger.dart';
+
 class ChatRoomPage extends StatefulWidget {
   final String applicationId; // = chatId = applications docId
   const ChatRoomPage({super.key, required this.applicationId});
@@ -12,17 +16,16 @@ class ChatRoomPage extends StatefulWidget {
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
   final _controller = TextEditingController();
-  bool _sending = false;
+  final _chatService = ChatService();
 
+  bool _sending = false;
   bool _ready = false;
   String? _readyError;
 
-  bool _clearingUnread = false;
+  // 初期化結果を保持
+  ChatRoomInitResult? _initResult;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
-
-  DocumentReference<Map<String, dynamic>> get _appRef =>
-      FirebaseFirestore.instance.collection('applications').doc(widget.applicationId);
 
   DocumentReference<Map<String, dynamic>> get _chatRef =>
       FirebaseFirestore.instance.collection('chats').doc(widget.applicationId);
@@ -43,178 +46,86 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   Future<void> _initializeChatRoom() async {
-    try {
-      if (_uid.isEmpty) {
-        setState(() {
-          _readyError = 'ログインしてください';
-          _ready = false;
-        });
-        return;
-      }
+    Logger.info('Initializing chat room', tag: 'ChatRoomPage');
 
-      // applications/{chatId} を正として当事者・必須情報を確定
-      final appSnap = await _appRef.get();
-      final app = appSnap.data();
-      if (app == null) {
-        setState(() {
-          _readyError = '応募データが見つかりません（applications が存在しません）';
-          _ready = false;
-        });
-        return;
-      }
+    setState(() {
+      _ready = false;
+      _readyError = null;
+    });
 
-      final applicantUid = (app['applicantUid'] ?? '').toString();
-      final adminUid = (app['adminUid'] ?? '').toString();
-      final jobId = (app['jobId'] ?? '').toString();
+    final result = await _chatService.initializeChatRoom(widget.applicationId);
 
-      final titleSnapshot = (app['projectNameSnapshot'] ??
-          app['jobTitleSnapshot'] ??
-          '案件チャット')
-          .toString();
+    if (!mounted) return;
 
-      final amApplicant = _uid == applicantUid;
-      final amAdmin = _uid == adminUid;
-
-      if (!amApplicant && !amAdmin) {
-        setState(() {
-          _readyError = 'このチャットを開く権限がありません（当事者ではありません）';
-          _ready = false;
-        });
-        return;
-      }
-
-      if (applicantUid.isEmpty || adminUid.isEmpty || jobId.isEmpty) {
-        setState(() {
-          _readyError = '必要情報が不足しています（applicantUid/adminUid/jobId）';
-          _ready = false;
-        });
-        return;
-      }
-
-      // chats/{chatId} が無ければ rules の create(keys固定) に完全一致する7キーで作る
-      final chatSnap = await _chatRef.get();
-      if (!chatSnap.exists) {
-        await _chatRef.set({
-          'applicationId': widget.applicationId, // chatId と一致必須
-          'applicantUid': applicantUid,
-          'adminUid': adminUid,
-          'jobId': jobId,
-          'titleSnapshot': titleSnapshot,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      } else {
-        // 既存なら update許可キーだけ更新（titleSnapshot/updatedAt）
-        // ※ updateルールの changedKeys に titleSnapshot/updatedAt が含まれている前提（貼ってくれた rules と一致）
-        try {
-          await _chatRef.update({
-            'titleSnapshot': titleSnapshot,
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
-        } catch (_) {}
-      }
-
-      await _clearUnreadCountIfNeeded(amApplicant: amApplicant, amAdmin: amAdmin);
-
-      if (mounted) {
-        setState(() {
-          _readyError = null;
-          _ready = true;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _readyError = 'チャットの初期化に失敗: $e';
-          _ready = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _clearUnreadCountIfNeeded({
-    required bool amApplicant,
-    required bool amAdmin,
-  }) async {
-    if (_clearingUnread) return;
-    _clearingUnread = true;
-
-    try {
-      final snap = await _chatRef.get();
-      final data = snap.data() ?? <String, dynamic>{};
-
-      final update = <String, dynamic>{};
-
-      if (amApplicant) {
-        final cur = data['unreadCountApplicant'];
-        final curInt = (cur is int) ? cur : 0;
-        if (curInt != 0) update['unreadCountApplicant'] = 0;
-      }
-      if (amAdmin) {
-        final cur = data['unreadCountAdmin'];
-        final curInt = (cur is int) ? cur : 0;
-        if (curInt != 0) update['unreadCountAdmin'] = 0;
-      }
-
-      if (update.isNotEmpty) {
-        update['updatedAt'] = FieldValue.serverTimestamp();
-        await _chatRef.update(update);
-      }
-    } catch (_) {
-      // MVP: 失敗しても致命傷にしない
-    } finally {
-      _clearingUnread = false;
+    if (result.success) {
+      setState(() {
+        _initResult = result;
+        _ready = true;
+        _readyError = null;
+      });
+      Logger.info('Chat room ready', tag: 'ChatRoomPage');
+    } else {
+      setState(() {
+        _ready = false;
+        _readyError = result.errorMessage;
+      });
+      Logger.warning(
+        'Chat room initialization failed',
+        tag: 'ChatRoomPage',
+        data: {'error': result.errorMessage},
+      );
     }
   }
 
   Future<void> _send() async {
     final text = _controller.text.trim();
-    if (text.isEmpty || _uid.isEmpty) return;
+    if (text.isEmpty) return;
 
+    // UIをロック
     setState(() => _sending = true);
 
+    Logger.debug('Sending message', tag: 'ChatRoomPage');
+
     try {
+      // チャットが準備できていない場合は初期化を試行
       if (!_ready) {
         await _initializeChatRoom();
-        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
+        if (!_ready) {
+          throw Exception(_readyError ?? 'チャットの準備ができていません');
+        }
       }
 
-      final appSnap = await _appRef.get();
-      final app = appSnap.data() ?? {};
+      // メッセージ送信（リトライ機能付き）
+      final result = await _chatService.sendMessage(
+        applicationId: widget.applicationId,
+        text: text,
+      );
 
-      final applicantUid = (app['applicantUid'] ?? '').toString();
-      final adminUid = (app['adminUid'] ?? '').toString();
+      if (!mounted) return;
 
-      await _msgRef.add({
-        'senderUid': _uid,
-        'text': text,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      final update = <String, dynamic>{
-        'lastMessageText': text,
-        'lastMessageAt': FieldValue.serverTimestamp(),
-        'lastMessageSenderUid': _uid,
-        'updatedAt': FieldValue.serverTimestamp(),
-      };
-
-      if (_uid == applicantUid) {
-        update['unreadCountAdmin'] = FieldValue.increment(1);
-      } else if (_uid == adminUid) {
-        update['unreadCountApplicant'] = FieldValue.increment(1);
-      }
-
-      await _chatRef.update(update);
-
-      _controller.clear();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('送信に失敗: $e')),
+      if (result.success) {
+        _controller.clear();
+        Logger.info('Message sent successfully', tag: 'ChatRoomPage');
+      } else {
+        ErrorHandler.showError(
+          context,
+          result.errorMessage ?? 'メッセージの送信に失敗しました',
         );
       }
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Error sending message',
+        tag: 'ChatRoomPage',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      if (!mounted) return;
+      ErrorHandler.showError(context, e);
     } finally {
-      if (mounted) setState(() => _sending = false);
+      if (mounted) {
+        setState(() => _sending = false);
+      }
     }
   }
 
