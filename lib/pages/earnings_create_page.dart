@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../core/constants/app_constants.dart';
+
 class EarningsCreatePage extends StatefulWidget {
   const EarningsCreatePage({super.key});
 
@@ -13,7 +15,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   final _db = FirebaseFirestore.instance;
 
   // 固定ADMIN UID（MVP）
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  static const String _adminUid = AppConstants.adminUid;
 
   String get _myUid => FirebaseAuth.instance.currentUser?.uid ?? '';
   bool get _isAdmin => _myUid.isNotEmpty && _myUid == _adminUid;

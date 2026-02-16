@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'admin_login_page.dart';
+import 'email_login_page.dart';
 import 'my_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -220,8 +221,15 @@ class _ProfilePageState extends State<ProfilePage> {
             _InfoBanner(
               title: 'ログインが必要です',
               message: '応募・チャットなど一部機能を利用するにはログインが必要です。',
-              buttonText: 'ログインする',
-              onPressed: _showEmailAuthDialog,
+              buttonText: 'ログイン / 新規登録',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EmailLoginPage()),
+                ).then((_) {
+                  if (mounted) setState(() {});
+                });
+              },
             ),
             const SizedBox(height: 16),
           ],

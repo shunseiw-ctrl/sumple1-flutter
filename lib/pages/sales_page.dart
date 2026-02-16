@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'earnings_create_page.dart';
+import '../core/constants/app_constants.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -12,7 +13,7 @@ class SalesPage extends StatefulWidget {
 }
 
 class _SalesPageState extends State<SalesPage> {
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  static const String _adminUid = AppConstants.adminUid;
 
   DateTime? _selectedMonth; // DateTime(year, month, 1)
 

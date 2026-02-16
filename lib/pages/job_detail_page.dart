@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'job_edit_page.dart';
+import '../core/constants/app_constants.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -73,7 +74,7 @@ class _DetailScaffold extends StatelessWidget {
   });
 
   // 固定ADMIN UID（MVP）
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  static const String _adminUid = AppConstants.adminUid;
 
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
