@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/utils/error_handler.dart';
 import '../../core/utils/logger.dart';
+import '../../../pages/email_login_page.dart';
 
 /// 未登録ユーザー（ゲスト）用のホーム画面
 class GuestHomePage extends StatefulWidget {
@@ -48,8 +49,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
   /// メールアドレスログイン画面へ遷移
   void _goToEmailLogin() {
     Logger.info('Navigate to email login', tag: 'GuestHomePage');
-    // TODO: メールログイン画面を実装したら遷移
-    ErrorHandler.showInfo(context, 'メールログイン画面は準備中です');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EmailLoginPage()),
+    );
   }
 
   @override
