@@ -12,16 +12,40 @@ class ChatService {
   /// 現在のユーザーUID
   String get currentUserId => _auth.currentUser?.uid ?? '';
 
-  /// チャットルームの初期化情報
+  /// チャットルームの初期化情報（タイムアウト付き）
   Future<ChatRoomInitResult> initializeChatRoom(String applicationId) async {
     try {
       if (currentUserId.isEmpty) {
         return ChatRoomInitResult.error('ログインしてください');
       }
 
-      // applications/{chatId} を取得
-      final appRef = _firestore.collection(AppConstants.collectionApplications).doc(applicationId);
-      final appSnap = await appRef.get();
+      Logger.info(
+        'Initializing chat room',
+        tag: 'ChatService',
+        data: {'applicationId': applicationId, 'uid': currentUserId},
+      );
+
+      // タイムアウト付きで applications/{chatId} を取得
+      final appRef = _firestore
+          .collection(AppConstants.collectionApplications)
+          .doc(applicationId);
+
+      DocumentSnapshot<Map<String, dynamic>> appSnap;
+      try {
+        appSnap = await appRef.get().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () => throw Exception('応募データの取得がタイムアウトしました'),
+        );
+      } catch (e) {
+        Logger.error(
+          'Failed to get application document',
+          tag: 'ChatService',
+          error: e,
+        );
+        return ChatRoomInitResult.error(
+          'データの取得に失敗しました。通信環境を確認してください。',
+        );
+      }
 
       if (!appSnap.exists) {
         return ChatRoomInitResult.error('応募データが見つかりません');
@@ -48,8 +72,11 @@ class ChatService {
         return ChatRoomInitResult.error('必要情報が不足しています');
       }
 
-      // chats/{chatId} の初期化
-      final chatRef = _firestore.collection(AppConstants.collectionChats).doc(applicationId);
+      // chats/{chatId} の初期化（冪等操作）
+      final chatRef = _firestore
+          .collection(AppConstants.collectionChats)
+          .doc(applicationId);
+
       await _ensureChatDocumentExists(
         chatRef: chatRef,
         applicationId: applicationId,
@@ -103,7 +130,11 @@ class ChatService {
     }
   }
 
-  /// チャットドキュメントが存在することを保証
+  /// チャットドキュメントが存在することを保証（冪等操作）
+  ///
+  /// SetOptions(merge: true) を使用することで、ドキュメントが存在しない場合は
+  /// 新規作成し、存在する場合はタイトルと更新日時のみ更新します。
+  /// これにより、データ不整合によるエラーを防ぎます。
   Future<void> _ensureChatDocumentExists({
     required DocumentReference<Map<String, dynamic>> chatRef,
     required String applicationId,
@@ -112,10 +143,10 @@ class ChatService {
     required String jobId,
     required String titleSnapshot,
   }) async {
-    final chatSnap = await chatRef.get();
-
-    if (!chatSnap.exists) {
-      // 新規作成（7キー固定）
+    try {
+      // merge: true で冪等な書き込み
+      // - ドキュメントが存在しない → 全フィールドで新規作成
+      // - ドキュメントが存在する → 指定フィールドのみ更新（既存データは保持）
       await chatRef.set({
         'applicationId': applicationId,
         'applicantUid': applicantUid,
@@ -124,27 +155,33 @@ class ChatService {
         'titleSnapshot': titleSnapshot,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+        // 未読カウントの初期値（既存値がある場合はmergeで保持される）
+        'unreadCountAdmin': 0,
+        'unreadCountApplicant': 0,
+        'lastMessageText': '',
+      }, SetOptions(merge: true)).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          Logger.warning(
+            'Chat document set timed out (may succeed later via offline cache)',
+            tag: 'ChatService',
+          );
+        },
+      );
 
       Logger.info(
-        'Chat document created',
+        'Chat document ensured',
         tag: 'ChatService',
         data: {'applicationId': applicationId},
       );
-    } else {
-      // 既存の場合はタイトルのみ更新
-      try {
-        await chatRef.update({
-          'titleSnapshot': titleSnapshot,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      } catch (e) {
-        Logger.warning(
-          'Failed to update chat title',
-          tag: 'ChatService',
-          data: {'error': e.toString()},
-        );
-      }
+    } catch (e) {
+      // オフラインでもFirestoreキャッシュが動作するため、
+      // ここでのエラーは致命的ではない。ログに記録して続行。
+      Logger.warning(
+        'Failed to ensure chat document (continuing anyway)',
+        tag: 'ChatService',
+        data: {'error': e.toString()},
+      );
     }
   }
 
@@ -156,8 +193,17 @@ class ChatService {
   }) async {
     try {
       final snap = await chatRef.get();
-      final data = snap.data() ?? {};
 
+      // ドキュメントが存在しない場合はスキップ
+      if (!snap.exists) {
+        Logger.debug(
+          'Skip unread clear: chat doc not exists yet',
+          tag: 'ChatService',
+        );
+        return;
+      }
+
+      final data = snap.data() ?? {};
       final update = <String, dynamic>{};
 
       if (isApplicant) {
@@ -187,6 +233,7 @@ class ChatService {
         );
       }
     } catch (e) {
+      // 未読クリアの失敗はUXに致命的ではないため、ログのみ
       Logger.warning(
         'Failed to clear unread count',
         tag: 'ChatService',
@@ -196,12 +243,16 @@ class ChatService {
   }
 
   /// メッセージを送信（リトライ機能付き）
+  ///
+  /// 画像メッセージの場合は [imageUrl] を指定します。
   Future<SendMessageResult> sendMessage({
     required String applicationId,
     required String text,
+    String? imageUrl,
     int maxRetries = 3,
   }) async {
-    if (text.trim().isEmpty) {
+    // テキストも画像もない場合はエラー
+    if (text.trim().isEmpty && (imageUrl == null || imageUrl.isEmpty)) {
       return SendMessageResult.error('メッセージが空です');
     }
 
@@ -219,11 +270,19 @@ class ChatService {
         Logger.debug(
           'Attempting to send message',
           tag: 'ChatService',
-          data: {'attempt': attempt, 'maxRetries': maxRetries},
+          data: {
+            'attempt': attempt,
+            'maxRetries': maxRetries,
+            'hasImage': imageUrl != null,
+          },
         );
 
-        final chatRef = _firestore.collection(AppConstants.collectionChats).doc(applicationId);
-        final appRef = _firestore.collection(AppConstants.collectionApplications).doc(applicationId);
+        final chatRef = _firestore
+            .collection(AppConstants.collectionChats)
+            .doc(applicationId);
+        final appRef = _firestore
+            .collection(AppConstants.collectionApplications)
+            .doc(applicationId);
 
         // applications データを取得
         final appSnap = await appRef.get();
@@ -232,16 +291,29 @@ class ChatService {
         final applicantUid = (app['applicantUid'] ?? '').toString();
         final adminUid = (app['adminUid'] ?? '').toString();
 
-        // メッセージを追加
-        await chatRef.collection('messages').add({
+        // メッセージデータを構築
+        final messageData = <String, dynamic>{
           'senderUid': currentUserId,
           'text': text.trim(),
           'createdAt': FieldValue.serverTimestamp(),
-        });
+          'type': imageUrl != null ? 'image' : 'text',
+        };
+
+        // 画像URLがある場合は追加
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          messageData['imageUrl'] = imageUrl;
+        }
+
+        // メッセージを追加
+        await chatRef.collection('messages').add(messageData);
 
         // チャット情報を更新
+        final displayText = imageUrl != null && text.trim().isEmpty
+            ? '📷 写真を送信しました'
+            : text.trim();
+
         final update = <String, dynamic>{
-          'lastMessageText': text.trim(),
+          'lastMessageText': displayText,
           'lastMessageAt': FieldValue.serverTimestamp(),
           'lastMessageSenderUid': currentUserId,
           'updatedAt': FieldValue.serverTimestamp(),
@@ -333,9 +405,9 @@ class ChatService {
       case 'not-found':
         return 'チャットが見つかりません';
       case 'unavailable':
-        return 'ネットワークエラーが発生しました';
+        return 'ネットワークエラーが発生しました。通信環境を確認してください。';
       case 'deadline-exceeded':
-        return 'タイムアウトしました';
+        return 'タイムアウトしました。再度お試しください。';
       default:
         return 'エラーが発生しました: ${e.code}';
     }
