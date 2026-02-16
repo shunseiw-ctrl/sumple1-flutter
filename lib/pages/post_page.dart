@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/services/image_upload_service.dart';
+import '../core/utils/logger.dart';
+
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
 
@@ -14,11 +17,17 @@ class _PostPageState extends State<PostPage> {
   final _locationController = TextEditingController();
   final _priceController = TextEditingController();
   final _dateController = TextEditingController(); // YYYY-MM-DD
+  final _descriptionController = TextEditingController();
 
   bool _isLoading = false;
-
   bool _checkedAdmin = false;
   bool _isAdminUser = false;
+
+  // 画像関連
+  final _imageService = ImageUploadService();
+  final List<String> _imageUrls = [];
+  bool _uploadingImage = false;
+  static const int _maxImages = 5;
 
   Future<bool> _isAdmin() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -28,7 +37,8 @@ class _PostPageState extends State<PostPage> {
     final doc = await FirebaseFirestore.instance.doc('config/admins').get();
     final data = doc.data() as Map<String, dynamic>?;
     final emails =
-        (data?['emails'] as List?)?.map((e) => e.toString()).toList() ?? const [];
+        (data?['emails'] as List?)?.map((e) => e.toString()).toList() ??
+            const [];
     return emails.contains(email);
   }
 
@@ -65,14 +75,14 @@ class _PostPageState extends State<PostPage> {
 
   String _guessPrefecture(String location) {
     const prefs = [
-      '千葉県','東京都','神奈川県',
-      '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
-      '茨城県','栃木県','群馬県','埼玉県',
-      '新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県',
-      '三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
-      '鳥取県','島根県','岡山県','広島県','山口県',
-      '徳島県','香川県','愛媛県','高知県',
-      '福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県',
+      '千葉県', '東京都', '神奈川県',
+      '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+      '茨城県', '栃木県', '群馬県', '埼玉県',
+      '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県',
+      '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+      '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+      '徳島県', '香川県', '愛媛県', '高知県',
+      '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県',
       '沖縄県',
     ];
 
@@ -87,7 +97,6 @@ class _PostPageState extends State<PostPage> {
     return '未設定';
   }
 
-  // YYYY-MM-DD
   String _dateKey(DateTime d) {
     final y = d.year.toString();
     final m = d.month.toString().padLeft(2, '0');
@@ -95,9 +104,7 @@ class _PostPageState extends State<PostPage> {
     return '$y-$m-$day';
   }
 
-  // YYYY-MM
   String _monthKeyFromDateKey(String dateKey) {
-    // dateKey is YYYY-MM-DD
     if (dateKey.length >= 7) return dateKey.substring(0, 7);
     return '';
   }
@@ -122,8 +129,131 @@ class _PostPageState extends State<PostPage> {
     );
 
     if (picked == null) return;
-
     _dateController.text = _dateKey(picked);
+  }
+
+  /// 画像を追加
+  Future<void> _addImage() async {
+    if (_imageUrls.length >= _maxImages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('画像は最大${_maxImages}枚までです')),
+      );
+      return;
+    }
+
+    final source = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(
+                  '写真を追加',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.camera_alt, color: Colors.blue),
+                ),
+                title: const Text('カメラで撮影'),
+                onTap: () => Navigator.pop(context, 'camera'),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.photo_library, color: Colors.green),
+                ),
+                title: const Text('ギャラリーから選択'),
+                onTap: () => Navigator.pop(context, 'gallery'),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('キャンセル'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null || !mounted) return;
+
+    setState(() => _uploadingImage = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final docId = 'job_${DateTime.now().millisecondsSinceEpoch}';
+
+      ImageUploadResult result;
+      if (source == 'camera') {
+        result = await _imageService.captureAndUploadImage(
+          userId: user.uid,
+          folder: 'jobs',
+          documentId: docId,
+        );
+      } else {
+        result = await _imageService.pickAndUploadImage(
+          userId: user.uid,
+          folder: 'jobs',
+          documentId: docId,
+        );
+      }
+
+      if (!mounted) return;
+
+      if (result.success && result.downloadUrl != null) {
+        setState(() {
+          _imageUrls.add(result.downloadUrl!);
+        });
+        Logger.info('Image added to post', tag: 'PostPage',
+            data: {'count': _imageUrls.length});
+      } else if (!result.cancelled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.errorMessage ?? '画像のアップロードに失敗しました')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('画像のアップロードに失敗しました')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
+    }
+  }
+
+  /// 画像を削除
+  void _removeImage(int index) {
+    setState(() {
+      _imageUrls.removeAt(index);
+    });
   }
 
   @override
@@ -132,6 +262,7 @@ class _PostPageState extends State<PostPage> {
     _locationController.dispose();
     _priceController.dispose();
     _dateController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -154,8 +285,9 @@ class _PostPageState extends State<PostPage> {
     final title = _titleController.text.trim();
     final location = _locationController.text.trim();
     final priceText = _priceController.text.trim();
-    final dateKey = _dateController.text.trim(); // YYYY-MM-DD
+    final dateKey = _dateController.text.trim();
     final prefecture = _guessPrefecture(location);
+    final description = _descriptionController.text.trim();
 
     if (title.isEmpty || location.isEmpty || priceText.isEmpty || dateKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -198,20 +330,16 @@ class _PostPageState extends State<PostPage> {
         'location': location,
         'prefecture': prefecture,
         'price': price,
-
-        // 表示＆検索キー
-        'date': dateKey, // 表示用（今の実装に合わせる）
-        'workDateKey': dateKey, // YYYY-MM-DD
-        'workMonthKey': monthKey, // ✅ YYYY-MM（月絞り込み用）
-
+        'date': dateKey,
+        'workDateKey': dateKey,
+        'workMonthKey': monthKey,
         'ownerId': user.uid,
-
-        // ✅ serverTimestamp推奨（端末時刻ズレ防止）
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
-
-        'description': '',
+        'description': description,
         'notes': '',
+        // 画像URL配列
+        'imageUrls': _imageUrls,
       });
 
       if (!mounted) return;
@@ -265,17 +393,17 @@ class _PostPageState extends State<PostPage> {
               ),
               child: _isLoading
                   ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.4,
-                  color: Colors.white,
-                ),
-              )
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.4,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text(
-                '投稿する',
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
+                      '投稿する',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
             ),
           ),
         ),
@@ -335,9 +463,157 @@ class _PostPageState extends State<PostPage> {
               ),
             ),
             const SizedBox(height: 10),
+            _WhiteCard(
+              child: _LabeledField(
+                label: '仕事内容',
+                hint: '例）現場作業の補助、清掃、資材運搬など',
+                controller: _descriptionController,
+                textInputAction: TextInputAction.newline,
+                maxLines: 5,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // 写真セクション
+            _WhiteCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        '写真',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${_imageUrls.length}/$_maxImages',
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 100,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        // 既存の画像
+                        for (int i = 0; i < _imageUrls.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    _imageUrls[i],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, progress) {
+                                      if (progress == null) return child;
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(Icons.broken_image,
+                                            color: Colors.grey),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () => _removeImage(i),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        // 追加ボタン
+                        if (_imageUrls.length < _maxImages)
+                          GestureDetector(
+                            onTap: _uploadingImage ? null : _addImage,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF2F3F5),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFE6E8EB),
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                              child: _uploadingImage
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_photo_alternate,
+                                            color: Colors.black54, size: 28),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          '追加',
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             const _HintCard(
               title: 'ヒント',
-              body: '日程はカレンダーから選択できます。',
+              body: '日程はカレンダーから選択できます。写真は最大5枚まで添付できます。',
             ),
           ],
         ),
@@ -358,9 +634,13 @@ class _SectionTitle extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+        Text(title,
+            style:
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+        Text(subtitle,
+            style: const TextStyle(
+                color: Colors.black54, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -407,9 +687,9 @@ class _LabeledField extends StatelessWidget {
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
   final ValueChanged<String>? onSubmitted;
-
   final bool readOnly;
   final VoidCallback? onTap;
+  final int? maxLines;
 
   const _LabeledField({
     required this.label,
@@ -421,6 +701,7 @@ class _LabeledField extends StatelessWidget {
     this.onSubmitted,
     this.readOnly = false,
     this.onTap,
+    this.maxLines,
   });
 
   @override
@@ -437,12 +718,15 @@ class _LabeledField extends StatelessWidget {
           onSubmitted: onSubmitted,
           readOnly: readOnly,
           onTap: onTap,
+          maxLines: maxLines ?? 1,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
+            prefixIcon:
+                prefixIcon == null ? null : Icon(prefixIcon, size: 18),
             filled: true,
             fillColor: const Color(0xFFF2F3F5),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -471,9 +755,14 @@ class _HintCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
+          Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFFE65100))),
           const SizedBox(height: 6),
-          Text(body, style: const TextStyle(color: Colors.black87, height: 1.35)),
+          Text(body,
+              style: const TextStyle(
+                  color: Colors.black87, height: 1.35)),
         ],
       ),
     );

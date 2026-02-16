@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../core/services/image_upload_service.dart';
+import '../core/utils/logger.dart';
 
 class JobEditPage extends StatefulWidget {
   final String jobId;
@@ -26,6 +30,12 @@ class _JobEditPageState extends State<JobEditPage> {
 
   bool _isLoading = false;
 
+  // 画像関連
+  final _imageService = ImageUploadService();
+  final List<String> _imageUrls = [];
+  bool _uploadingImage = false;
+  static const int _maxImages = 5;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +53,16 @@ class _JobEditPageState extends State<JobEditPage> {
         TextEditingController(text: widget.jobData['description']?.toString() ?? '');
     _notesController =
         TextEditingController(text: widget.jobData['notes']?.toString() ?? '');
+
+    // 既存の画像URLを読み込み
+    final existingImages = widget.jobData['imageUrls'];
+    if (existingImages is List) {
+      for (final url in existingImages) {
+        if (url is String && url.isNotEmpty) {
+          _imageUrls.add(url);
+        }
+      }
+    }
   }
 
   @override
@@ -118,6 +138,128 @@ class _JobEditPageState extends State<JobEditPage> {
     _dateController.text = _dateKey(picked);
   }
 
+  /// 画像を追加
+  Future<void> _addImage() async {
+    if (_imageUrls.length >= _maxImages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('画像は最大${_maxImages}枚までです')),
+      );
+      return;
+    }
+
+    final source = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(
+                  '写真を追加',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.camera_alt, color: Colors.blue),
+                ),
+                title: const Text('カメラで撮影'),
+                onTap: () => Navigator.pop(context, 'camera'),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.photo_library, color: Colors.green),
+                ),
+                title: const Text('ギャラリーから選択'),
+                onTap: () => Navigator.pop(context, 'gallery'),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('キャンセル'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null || !mounted) return;
+
+    setState(() => _uploadingImage = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      ImageUploadResult result;
+      if (source == 'camera') {
+        result = await _imageService.captureAndUploadImage(
+          userId: user.uid,
+          folder: 'jobs',
+          documentId: widget.jobId,
+        );
+      } else {
+        result = await _imageService.pickAndUploadImage(
+          userId: user.uid,
+          folder: 'jobs',
+          documentId: widget.jobId,
+        );
+      }
+
+      if (!mounted) return;
+
+      if (result.success && result.downloadUrl != null) {
+        setState(() {
+          _imageUrls.add(result.downloadUrl!);
+        });
+        Logger.info('Image added to edit', tag: 'JobEditPage',
+            data: {'count': _imageUrls.length});
+      } else if (!result.cancelled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.errorMessage ?? '画像のアップロードに失敗しました')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('画像のアップロードに失敗しました')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
+    }
+  }
+
+  /// 画像を削除
+  void _removeImage(int index) {
+    setState(() {
+      _imageUrls.removeAt(index);
+    });
+  }
+
   Future<void> _update() async {
     if (_isLoading) return;
 
@@ -171,6 +313,9 @@ class _JobEditPageState extends State<JobEditPage> {
 
         'description': description,
         'notes': notes,
+
+        // 画像URL配列
+        'imageUrls': _imageUrls,
 
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -313,9 +458,144 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
+
+            // 写真セクション
+            _WhiteCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        '写真',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${_imageUrls.length}/$_maxImages',
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 100,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        // 既存の画像
+                        for (int i = 0; i < _imageUrls.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    _imageUrls[i],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, progress) {
+                                      if (progress == null) return child;
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(Icons.broken_image, color: Colors.grey),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () => _removeImage(i),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        // 追加ボタン
+                        if (_imageUrls.length < _maxImages)
+                          GestureDetector(
+                            onTap: _uploadingImage ? null : _addImage,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF2F3F5),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFE6E8EB),
+                                  style: BorderStyle.solid,
+                                ),
+                              ),
+                              child: _uploadingImage
+                                  ? const Center(
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_photo_alternate,
+                                            color: Colors.black54, size: 28),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          '追加',
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             const _HintCard(
               title: 'ヒント',
-              body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。',
+              body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。写真は最大5枚まで添付できます。',
             ),
           ],
         ),

@@ -308,6 +308,17 @@ class JobDetailBody extends StatelessWidget {
     final ownerId = data['ownerId']?.toString();
     final badges = <_BadgeSpec>[];
 
+    // 画像URLリストを取得
+    final imageUrls = <String>[];
+    final rawImages = data['imageUrls'];
+    if (rawImages is List) {
+      for (final url in rawImages) {
+        if (url is String && url.isNotEmpty) {
+          imageUrls.add(url);
+        }
+      }
+    }
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
       children: [
@@ -315,14 +326,36 @@ class JobDetailBody extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 86,
-                height: 86,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF1F4),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(Icons.photo, color: Colors.black38),
+              // サムネイル画像（あれば最初の画像、なければプレースホルダー）
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: imageUrls.isNotEmpty
+                    ? Image.network(
+                        imageUrls.first,
+                        width: 86,
+                        height: 86,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 86,
+                            height: 86,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF1F4),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(Icons.photo, color: Colors.black38),
+                          );
+                        },
+                      )
+                    : Container(
+                        width: 86,
+                        height: 86,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF1F4),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(Icons.photo, color: Colors.black38),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -441,6 +474,80 @@ class JobDetailBody extends StatelessWidget {
             ],
           ),
         ),
+
+        // 画像ギャラリー（画像がある場合のみ表示）
+        if (imageUrls.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _WhiteCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('写真', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${imageUrls.length}枚',
+                      style: const TextStyle(color: Colors.black54, fontSize: 13),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 120,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: imageUrls.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => _FullScreenImageViewer(
+                                imageUrls: imageUrls,
+                                initialIndex: index,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrls[index],
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return Container(
+                                width: 120,
+                                height: 120,
+                                color: Colors.grey.shade200,
+                                child: const Center(
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 120,
+                                height: 120,
+                                color: Colors.grey.shade200,
+                                child: const Icon(Icons.broken_image, color: Colors.grey),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -506,6 +613,92 @@ class _InfoRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// フルスクリーン画像ビューア（スワイプで切り替え可能）
+class _FullScreenImageViewer extends StatefulWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+
+  const _FullScreenImageViewer({
+    required this.imageUrls,
+    required this.initialIndex,
+  });
+
+  @override
+  State<_FullScreenImageViewer> createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
+  late final PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        title: Text(
+          '${_currentIndex + 1} / ${widget.imageUrls.length}',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: PageView.builder(
+        controller: _pageController,
+        itemCount: widget.imageUrls.length,
+        onPageChanged: (index) {
+          setState(() => _currentIndex = index);
+        },
+        itemBuilder: (context, index) {
+          return Center(
+            child: InteractiveViewer(
+              child: Image.network(
+                widget.imageUrls[index],
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                        SizedBox(height: 8),
+                        Text(
+                          '画像を読み込めません',
+                          style: TextStyle(color: Colors.white54),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
