@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sumple1/core/services/auth_service.dart';
+import 'package:sumple1/core/services/line_auth_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/core/utils/logger.dart';
 
@@ -158,6 +159,34 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : () {
+                      LineAuthService().startLineLogin();
+                    },
+                    icon: const Icon(Icons.chat_bubble, size: 24),
+                    label: const Text(
+                      'LINEでログイン',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF06C755),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                     ),
                   ),
                 ),

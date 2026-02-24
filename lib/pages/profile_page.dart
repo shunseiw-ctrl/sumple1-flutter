@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'admin_login_page.dart';
 import 'my_profile_page.dart';
+import '../core/services/line_auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -245,6 +246,29 @@ class _ProfilePageState extends State<ProfilePage> {
               message: '応募・チャットなど一部機能を利用するにはログインが必要です。',
               buttonText: 'ログインする',
               onPressed: _showEmailAuthDialog,
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  LineAuthService().startLineLogin();
+                },
+                icon: const Icon(Icons.chat_bubble, size: 20),
+                label: const Text(
+                  'LINEでログイン',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF06C755),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
           ],

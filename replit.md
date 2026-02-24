@@ -6,41 +6,62 @@ A Flutter-based job matching application for the construction industry (建設�
 ## Project Architecture
 - **Framework**: Flutter 3.32.0 (Dart 3.8.0)
 - **Backend**: Firebase (Firestore, Auth, Storage, Messaging)
+- **Server**: Node.js (server.js) - static file server + LINE OAuth handler
 - **Cloud Functions**: Node.js 18, Firebase Functions v2
 - **Platform**: Web (adapted from mobile-only project)
 
 ### Directory Structure
 - `lib/` - Main Dart source code
   - `core/` - Services, utils, constants, enums
+  - `core/services/line_auth_service.dart` - LINE login client-side handler
+  - `core/services/web_redirect.dart` - Web redirect with conditional import (web/stub)
   - `data/` - Models and repositories
   - `pages/` - Page widgets
   - `presentation/` - Presentation layer (guest pages, widgets)
   - `services/` - Additional services (push notifications)
 - `web/` - Flutter web platform files
 - `functions/` - Firebase Cloud Functions (Node.js)
+- `server.js` - Node.js server: static files + LINE OAuth + token exchange
 - `android/` - Android platform files
 - `ios/` - iOS platform files
 - `build/web/` - Built Flutter web output (served on port 5000)
 
 ## Running the App
-- The workflow runs `serve.sh` which builds Flutter web and serves it on port 5000
+- The workflow runs `serve.sh` which builds Flutter web and runs `server.js` on port 5000
 - Firebase is used for authentication, data storage, and cloud functions
 - The app starts with a guest login page (anonymous auth)
 
+## LINE Login Integration
+- OAuth 2.0 flow via server.js (LINE Login v2.1)
+- Flow: User clicks LINE button → server redirects to LINE → LINE callback → server exchanges code for token → server creates Firebase custom token → one-time exchange code returned to client via URL fragment → client exchanges code for Firebase token via POST /auth/line/exchange → signInWithCustomToken
+- Requires: LINE_CHANNEL_ID, LINE_CHANNEL_SECRET (secrets), FIREBASE_SERVICE_ACCOUNT (secret, JSON string)
+- LINE Channel ID: 2009209066
+- Callback URL must be configured in LINE Developer Console
+- Security: CSRF state parameter, one-time token exchange (not passed in URL), server-side token validation
+
 ## Admin Management
 - Admin status is determined by Firestore document `config/admins`
-- The document contains `uids[]` and `emails[]` arrays
+- The document contains `adminUids[]` and `emails[]` arrays
 - AuthService.getCurrentUserRole() checks both arrays to determine admin role
 - No hardcoded admin UIDs in the codebase (removed for security)
 
 ## Security Measures
-- Server: Path traversal prevention, security headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy), GET/HEAD only
+- Server: Path traversal prevention, security headers (X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy), GET/HEAD only for static files
+- LINE OAuth: CSRF state parameter, one-time exchange codes (5min expiry), no tokens in URL params
 - Auth: Client-side login rate limiting (5 attempts, 3 min lockout) on both admin and user login
 - Error messages: Generic auth error messages to prevent user enumeration (user-not-found/wrong-password merged)
 - Logging: Debug/info logs suppressed in release builds, error/warning logs retained
 - Firebase API key: Public by design (Firebase Web SDK), should be restricted via Firebase Console (HTTP referrer restrictions)
 
 ## Recent Changes
+- 2026-02-24: LINE Login integration
+  - server.js: Full Node.js server replacing inline serve.sh, handles LINE OAuth flow + static serving
+  - LINE OAuth: Authorization code flow, token exchange, Firebase custom token generation
+  - One-time exchange code pattern for secure token delivery (no tokens in URL)
+  - LINE login button on guest_home_page.dart and profile_page.dart (green LINE color #06C755)
+  - LineAuthService: Handles callback processing, token exchange via HTTP POST
+  - Web redirect conditional import (web_redirect.dart/web_redirect_impl.dart/web_redirect_stub.dart)
+  - Dependencies added: web, http packages in pubspec.yaml; firebase-admin, axios in package.json
 - 2026-02-24: Security hardening
   - serve.sh: Path traversal prevention, security headers, method restriction, malformed URI handling
   - Login rate limiting: 5 attempts max, 3 min lockout on admin_login_page and profile_page
@@ -56,8 +77,8 @@ A Flutter-based job matching application for the construction industry (建設�
   - job_detail_page: adminUid fallback chain for legacy data
 - 2026-02-24: Adapted project for Replit environment
   - Flutter web platform support, Firebase config, API compatibility fixes
-  - serve.sh for building and serving on port 5000
 
 ## User Preferences
 - Japanese language UI (日本語)
 - Firebase project: alba-work
+- Multi-platform target: Web, iOS, Android (App Store/Google Play)
