@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'chat_room_page.dart';
-import 'job_detail_page.dart'; // ★ JobDetailBody を使うため追加
+import 'job_detail_page.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class WorkDetailPage extends StatefulWidget {
   final String applicationId;
@@ -108,18 +109,14 @@ class _WorkDetailPageState extends State<WorkDetailPage>
         final canStart = status == 'assigned' || status == 'applied';
         final canComplete = status == 'in_progress';
 
-        // ★ 重要：jobs を引くための jobId（無いと概要を揃えられない）
         final jobId = (app['jobId'] ?? '').toString();
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF4F5F7),
+          backgroundColor: AppColors.background,
           appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0.5,
-            iconTheme: const IconThemeData(color: Colors.black),
             title: Text(
               title,
-              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
             ),
             actions: [
               IconButton(
@@ -137,9 +134,9 @@ class _WorkDetailPageState extends State<WorkDetailPage>
             ],
             bottom: TabBar(
               controller: _tabController,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black54,
-              indicatorColor: Colors.black,
+              labelColor: AppColors.ruri,
+              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: AppColors.ruri,
               tabs: const [
                 Tab(text: '概要'),
                 Tab(text: '写真'),
@@ -149,7 +146,6 @@ class _WorkDetailPageState extends State<WorkDetailPage>
           ),
           body: Column(
             children: [
-              // ===== 赤線より上（このUIは維持）=====
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
@@ -204,22 +200,17 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                         }
                       }
                           : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                      ),
                       child: const Text('完了'),
                     ),
                   ],
                 ),
               ),
 
-              // ===== 赤線より下（タブ中身）=====
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _OverviewTab(app: app, jobId: jobId), // ★ここが差し替え点
+                    _OverviewTab(app: app, jobId: jobId),
                     const _PhotosTab(),
                     const _DocsTab(),
                   ],
@@ -241,7 +232,6 @@ class _OverviewTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // jobId が無い旧データ対策（最低限のフォールバック）
     if (jobId.trim().isEmpty) {
       final title = (app['jobTitleSnapshot'] ?? '').toString();
       final location = (app['jobLocationSnapshot'] ?? '').toString();
@@ -262,9 +252,9 @@ class _OverviewTab extends StatelessWidget {
                 Text('報酬: ${price.isNotEmpty ? price : "-"}'),
                 Text('日程: ${date.isNotEmpty ? date : "未定"}'),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   '※jobIdが無いデータのため、詳細本文を表示できません',
-                  style: TextStyle(color: Colors.black54),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -273,7 +263,6 @@ class _OverviewTab extends StatelessWidget {
       );
     }
 
-    // ★ここが「検索の案件詳細と同じ本文」にする肝
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance.collection('jobs').doc(jobId).snapshots(),
       builder: (context, snap) {
@@ -290,7 +279,6 @@ class _OverviewTab extends StatelessWidget {
 
         final jobData = doc.data() ?? <String, dynamic>{};
 
-        // ✅ 赤線より下が検索の「案件詳細」と一致（JobDetailBodyのUIを使い回す）
         return JobDetailBody(data: jobData);
       },
     );
@@ -313,19 +301,19 @@ class _DocsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(12),
-      children: const [
+      children: [
         _Card(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('資料（準備中）', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              SizedBox(height: 8),
-              Text('・御見積書（0）'),
-              Text('・図面（0）'),
-              Text('・仕様（0）'),
-              Text('・工程（0）'),
-              SizedBox(height: 8),
-              Text('KANNA風にフォルダ分け＋追加ボタンを実装予定', style: TextStyle(color: Colors.black54)),
+              const Text('資料（準備中）', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+              const SizedBox(height: 8),
+              const Text('・御見積書（0）'),
+              const Text('・図面（0）'),
+              const Text('・仕様（0）'),
+              const Text('・工程（0）'),
+              const SizedBox(height: 8),
+              Text('KANNA風にフォルダ分け＋追加ボタンを実装予定', style: TextStyle(color: AppColors.textSecondary)),
             ],
           ),
         ),

@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class ChatRoomPage extends StatefulWidget {
-  final String applicationId; // = chatId = applications docId
+  final String applicationId;
   const ChatRoomPage({super.key, required this.applicationId});
 
   @override
@@ -22,7 +23,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool _ready = false;
   String? _readyError;
 
-  // 初期化結果を保持
   ChatRoomInitResult? _initResult;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -81,13 +81,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    // UIをロック
     setState(() => _sending = true);
 
     Logger.debug('Sending message', tag: 'ChatRoomPage');
 
     try {
-      // チャットが準備できていない場合は初期化を試行
       if (!_ready) {
         await _initializeChatRoom();
         if (!_ready) {
@@ -95,7 +93,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         }
       }
 
-      // メッセージ送信（リトライ機能付き）
       final result = await _chatService.sendMessage(
         applicationId: widget.applicationId,
         text: text,
@@ -207,7 +204,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         constraints: const BoxConstraints(maxWidth: 280),
                         decoration: BoxDecoration(
                           color:
-                          mine ? Colors.blue.shade50 : Colors.grey.shade200,
+                          mine ? AppColors.ruriPale : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(text),
@@ -246,7 +243,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                        : const Icon(Icons.send),
+                        : Icon(Icons.send, color: AppColors.ruri),
                   ),
                 ],
               ),

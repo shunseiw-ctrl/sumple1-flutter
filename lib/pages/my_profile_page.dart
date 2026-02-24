@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -12,16 +13,15 @@ class MyProfilePage extends StatefulWidget {
 class _MyProfilePageState extends State<MyProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   final _familyNameCtrl = TextEditingController();
   final _givenNameCtrl = TextEditingController();
   final _familyNameKanaCtrl = TextEditingController();
   final _givenNameKanaCtrl = TextEditingController();
-  final _birthDateCtrl = TextEditingController(); // YYYY-MM-DD
+  final _birthDateCtrl = TextEditingController();
   final _postalCodeCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
 
-  String? _gender; // '男性' / '女性' / 'その他' / '未回答'
+  String? _gender;
   bool _isLoading = false;
   bool _loadedOnce = false;
 
@@ -151,7 +151,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'givenName': _givenNameCtrl.text.trim(),
       'familyNameKana': _familyNameKanaCtrl.text.trim(),
       'givenNameKana': _givenNameKanaCtrl.text.trim(),
-      'birthDate': _birthDateCtrl.text.trim(), // YYYY-MM-DD
+      'birthDate': _birthDateCtrl.text.trim(),
       'gender': _gender,
       'postalCode': _postalCodeCtrl.text.trim(),
       'address': _addressCtrl.text.trim(),
@@ -174,7 +174,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
         const SnackBar(content: Text('プロフィールを保存しました')),
       );
 
-      // ✅ pop後に finally の setState が走ると不安定になりやすいので、ここで return
       Navigator.pop(context);
       return;
     } catch (e) {
@@ -194,7 +193,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // ✅ 幅が狭い端末/分割表示/キーボード時などは縦に落としてoverflow回避
         final narrow = constraints.maxWidth < 420;
 
         if (narrow) {
@@ -372,10 +370,10 @@ class _SectionTitle extends StatelessWidget {
         padding: const EdgeInsets.only(left: 2, bottom: 10),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
-            color: Colors.black54,
+            color: AppColors.textSecondary,
           ),
         ),
       ),
@@ -397,16 +395,16 @@ class _Banner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.chipUnselected,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
-          Text(message, style: const TextStyle(color: Colors.black54)),
+          Text(message, style: TextStyle(color: AppColors.textSecondary)),
         ],
       ),
     );

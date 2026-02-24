@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'admin_login_page.dart';
 import 'my_profile_page.dart';
 import '../core/services/line_auth_service.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -58,10 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _showEmailAuthDialog() async {
-    // ✅ 前回入力の残りが嫌ならここでクリア
-    // _emailController.clear();
-    // _passController.clear();
-
     bool obscure = true;
     bool isLoading = false;
 
@@ -136,7 +133,6 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 final current = FirebaseAuth.instance.currentUser;
 
-                // ✅ 匿名なら同じ uid のままメールアカウントへ昇格（応募履歴などを守れる）
                 if (current != null && current.isAnonymous) {
                   final cred = EmailAuthProvider.credential(
                     email: email,
@@ -191,9 +187,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   if (isLoading) const LinearProgressIndicator(minHeight: 3),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     '新規登録もこの画面からできます',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -261,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF06C755),
+                  backgroundColor: AppColors.lineGreen,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -395,14 +391,14 @@ class _ProfileHeaderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 28,
-            backgroundColor: Colors.black12,
-            child: Icon(Icons.person, color: Colors.black54, size: 28),
+            backgroundColor: AppColors.divider,
+            child: Icon(Icons.person, color: AppColors.textSecondary, size: 28),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -416,7 +412,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(color: Colors.black54),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -426,13 +422,13 @@ class _ProfileHeaderCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isLoggedIn ? Colors.green.shade50 : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Colors.black12),
+              border: Border.all(color: AppColors.divider),
             ),
             child: Text(
               isLoggedIn ? 'ログイン済み' : 'ゲスト',
               style: TextStyle(
                 fontSize: 12,
-                color: isLoggedIn ? Colors.green.shade800 : Colors.black54,
+                color: isLoggedIn ? Colors.green.shade800 : AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -461,16 +457,16 @@ class _InfoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.chipUnselected,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
-          Text(message, style: const TextStyle(color: Colors.black54)),
+          Text(message, style: TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
@@ -495,7 +491,7 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.black54),
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.textSecondary),
       ),
     );
   }
@@ -518,9 +514,9 @@ class _MenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 6),
-      leading: Icon(icon, color: Colors.black54),
+      leading: Icon(icon, color: AppColors.textSecondary),
       title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle!, style: const TextStyle(color: Colors.black54)),
+      subtitle: subtitle == null ? null : Text(subtitle!, style: TextStyle(color: AppColors.textSecondary)),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );

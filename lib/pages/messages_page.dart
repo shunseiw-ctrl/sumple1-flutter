@@ -7,6 +7,7 @@ import 'chat_room_page.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
@@ -39,7 +40,6 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
-  // chats/{appId} の lastMessageAt をキャッシュ（並び替え用）
   final Map<String, DateTime> _lastAtCache = {};
 
   DateTime _toDate(dynamic v) {
@@ -57,7 +57,6 @@ class _MessagesPageState extends State<MessagesPage> {
     return null;
   }
 
-  // chats/{appId} から未読数を取得（自分側）
   int _unreadFromChat(Map<String, dynamic>? chat) {
     if (chat == null) return 0;
     final key = _isAdmin ? 'unreadCountAdmin' : 'unreadCountApplicant';
@@ -74,7 +73,6 @@ class _MessagesPageState extends State<MessagesPage> {
 
   String _two(int n) => n.toString().padLeft(2, '0');
 
-  // ✅ 右上の日付を yyyy/MM/dd で固定
   String _formatYmd(DateTime? dt) {
     if (dt == null) return '';
     return '${dt.year}/${_two(dt.month)}/${_two(dt.day)}';
@@ -105,7 +103,6 @@ class _MessagesPageState extends State<MessagesPage> {
       QueryDocumentSnapshot<Map<String, dynamic>> a,
       QueryDocumentSnapshot<Map<String, dynamic>> b,
       ) {
-    // キャッシュがあれば lastMessageAt、なければ applications.createdAt をフォールバック
     final aLast = _lastAtCache[a.id];
     final bLast = _lastAtCache[b.id];
 
@@ -124,9 +121,6 @@ class _MessagesPageState extends State<MessagesPage> {
     Logger.debug(message, tag: 'MessagesPage', data: extra);
   }
 
-  /// ✅ ルール完全適合（update維持＋存在チェック＋ログ）
-  /// - chats/{chatId} update は changedKeys 制限があるため、許可キーのみ更新
-  /// - doc が無い場合は create しない（create は 7キー必須で MessagesPage からは事故りやすい）
   Future<void> _resetUnreadIfPossible(String chatId) async {
     if (_myUid.isEmpty) return;
 
@@ -144,7 +138,6 @@ class _MessagesPageState extends State<MessagesPage> {
         return;
       }
 
-      // 既に0なら書かない（無駄な書き込み削減）
       final data = snap.data() ?? <String, dynamic>{};
       final cur = data[unreadKey];
       final curInt = (cur is int) ? cur : 0;
@@ -156,7 +149,6 @@ class _MessagesPageState extends State<MessagesPage> {
         return;
       }
 
-      // ✅ rules で許可されているキーのみ
       await chatRef.update({
         unreadKey: 0,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -169,7 +161,6 @@ class _MessagesPageState extends State<MessagesPage> {
         'to': 0,
       });
     } on FirebaseException catch (e) {
-      // permission-denied / not-found などをログに残す（MVP: UIは止めない）
       _log('unread reset failed (FirebaseException)', extra: {
         'chatId': chatId,
         'code': e.code,
@@ -191,7 +182,6 @@ class _MessagesPageState extends State<MessagesPage> {
       );
     }
 
-    // ✅ 母集団（applications）
     final applicationsQuery = _db
         .collection('applications')
         .where(_isAdmin ? 'adminUid' : 'applicantUid', isEqualTo: _myUid)
@@ -211,7 +201,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 'uid=${_myUid.substring(0, _myUid.length > 8 ? 8 : _myUid.length)}…  '
                     'isAdmin=$_isAdmin  '
                     '${_myEmail.isEmpty ? "" : "email=$_myEmail"}',
-                style: const TextStyle(fontSize: 12, color: Colors.black54),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ),
           ),
@@ -252,7 +242,6 @@ class _MessagesPageState extends State<MessagesPage> {
                   );
                 }
 
-                // ✅ 検索（物件名を最優先：projectNameSnapshot）
                 final filtered = docs.where((d) {
                   final data = d.data();
                   final title = (data['projectNameSnapshot'] ??
@@ -268,7 +257,6 @@ class _MessagesPageState extends State<MessagesPage> {
                   return const Center(child: Text('検索結果がありません'));
                 }
 
-                // ✅ 並び替え：lastMessageAt desc（キャッシュ使用）
                 filtered.sort(_compareByLastMessageAtDesc);
 
                 return ListView.separated(
@@ -279,7 +267,6 @@ class _MessagesPageState extends State<MessagesPage> {
                     final appId = doc.id;
                     final app = doc.data();
 
-                    // ✅ 表示タイトルも物件名優先
                     final title = (app['projectNameSnapshot'] ??
                         app['jobTitleSnapshot'] ??
                         app['titleSnapshot'] ??
@@ -299,7 +286,6 @@ class _MessagesPageState extends State<MessagesPage> {
 
                         final ymdText = _formatYmd(lastAt);
 
-                        // ✅ キャッシュ更新（次回ビルドの並び替えに反映）
                         if (lastAt != null) {
                           final prev = _lastAtCache[appId];
                           if (prev == null || prev != lastAt) {
@@ -318,7 +304,7 @@ class _MessagesPageState extends State<MessagesPage> {
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundColor: Colors.blueGrey.shade100,
-                            child: const Icon(Icons.work_outline, color: Colors.black54),
+                            child: Icon(Icons.work_outline, color: AppColors.textSecondary),
                           ),
                           title: Row(
                             children: [
@@ -334,9 +320,9 @@ class _MessagesPageState extends State<MessagesPage> {
                                   padding: const EdgeInsets.only(left: 8),
                                   child: Text(
                                     ymdText,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: Colors.black54,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
                                 ),
@@ -355,7 +341,7 @@ class _MessagesPageState extends State<MessagesPage> {
                                   sub2,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Colors.black54),
+                                  style: TextStyle(color: AppColors.textSecondary),
                                 ),
                             ],
                           ),
@@ -368,7 +354,6 @@ class _MessagesPageState extends State<MessagesPage> {
                             ],
                           ),
                           onTap: () async {
-                            // ✅ ルール適合：存在する時だけ update（create しない）
                             await _resetUnreadIfPossible(appId);
 
                             if (!context.mounted) return;

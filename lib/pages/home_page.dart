@@ -11,6 +11,7 @@ import '../services/push_token_service.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,11 +29,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _initializeUserRole();
-    // ログイン状態が用意された後にFCMトークン同期（1回）
     Future.microtask(() => PushTokenService.syncFcmToken());
   }
 
-  /// ユーザーロールを取得
   Future<void> _initializeUserRole() async {
     try {
       final role = await _authService.getCurrentUserRole();
@@ -49,15 +48,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  /// 管理者かどうか
   bool get _isAdmin => _userRole.isAdmin;
 
   late final List<Widget> _pages = const [
-    JobListPage(), // 0: 検索
-    WorkPage(), // 1: はたらく
-    MessagesPage(), // 2: メッセージ（✅統一）
-    SalesPage(), // 3: 売上
-    ProfilePage(), // 4: マイページ
+    JobListPage(),
+    WorkPage(),
+    MessagesPage(),
+    SalesPage(),
+    ProfilePage(),
   ];
 
   Future<void> _goToPost() async {

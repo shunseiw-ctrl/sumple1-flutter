@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -13,7 +14,7 @@ class _PostPageState extends State<PostPage> {
   final _titleController = TextEditingController();
   final _locationController = TextEditingController();
   final _priceController = TextEditingController();
-  final _dateController = TextEditingController(); // YYYY-MM-DD
+  final _dateController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -87,7 +88,6 @@ class _PostPageState extends State<PostPage> {
     return '未設定';
   }
 
-  // YYYY-MM-DD
   String _dateKey(DateTime d) {
     final y = d.year.toString();
     final m = d.month.toString().padLeft(2, '0');
@@ -95,9 +95,7 @@ class _PostPageState extends State<PostPage> {
     return '$y-$m-$day';
   }
 
-  // YYYY-MM
   String _monthKeyFromDateKey(String dateKey) {
-    // dateKey is YYYY-MM-DD
     if (dateKey.length >= 7) return dateKey.substring(0, 7);
     return '';
   }
@@ -154,7 +152,7 @@ class _PostPageState extends State<PostPage> {
     final title = _titleController.text.trim();
     final location = _locationController.text.trim();
     final priceText = _priceController.text.trim();
-    final dateKey = _dateController.text.trim(); // YYYY-MM-DD
+    final dateKey = _dateController.text.trim();
     final prefecture = _guessPrefecture(location);
 
     if (title.isEmpty || location.isEmpty || priceText.isEmpty || dateKey.isEmpty) {
@@ -199,14 +197,12 @@ class _PostPageState extends State<PostPage> {
         'prefecture': prefecture,
         'price': price,
 
-        // 表示＆検索キー
-        'date': dateKey, // 表示用（今の実装に合わせる）
-        'workDateKey': dateKey, // YYYY-MM-DD
-        'workMonthKey': monthKey, // ✅ YYYY-MM（月絞り込み用）
+        'date': dateKey,
+        'workDateKey': dateKey,
+        'workMonthKey': monthKey,
 
         'ownerId': user.uid,
 
-        // ✅ serverTimestamp推奨（端末時刻ズレ防止）
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
 
@@ -235,14 +231,11 @@ class _PostPageState extends State<PostPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
+        title: Text(
           '案件を投稿',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
         ),
       ),
       bottomNavigationBar: SafeArea(
@@ -256,9 +249,9 @@ class _PostPageState extends State<PostPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: AppColors.ruri,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.black54,
+                disabledBackgroundColor: AppColors.ruri.withOpacity(0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -360,7 +353,7 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+        Text(subtitle, style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -441,7 +434,7 @@ class _LabeledField extends StatelessWidget {
             hintText: hint,
             prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
             filled: true,
-            fillColor: const Color(0xFFF2F3F5),
+            fillColor: AppColors.chipUnselected,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -473,7 +466,7 @@ class _HintCard extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
           const SizedBox(height: 6),
-          Text(body, style: const TextStyle(color: Colors.black87, height: 1.35)),
+          Text(body, style: TextStyle(color: AppColors.textPrimary, height: 1.35)),
         ],
       ),
     );

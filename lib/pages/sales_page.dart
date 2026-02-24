@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'earnings_create_page.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -30,12 +31,11 @@ class _SalesPageState extends State<SalesPage> {
     }
   }
 
-  DateTime? _selectedMonth; // DateTime(year, month, 1)
+  DateTime? _selectedMonth;
 
   String _two(int n) => n.toString().padLeft(2, '0');
   String _ym(DateTime m) => '${m.year}/${_two(m.month)}';
 
-  // 桁区切り（intl無し）
   String _yen(int value) {
     final s = value.toString();
     final buf = StringBuffer();
@@ -59,7 +59,7 @@ class _SalesPageState extends State<SalesPage> {
     for (int i = n - 1; i >= 0; i--) {
       list.add(DateTime(cur.year, cur.month - i, 1));
     }
-    return list; // oldest -> newest
+    return list;
   }
 
   String _monthLabel(DateTime m) => '${m.month}月';
@@ -77,7 +77,7 @@ class _SalesPageState extends State<SalesPage> {
     final q = db.collection('earnings').where('uid', isEqualTo: uid);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('売上'),
         centerTitle: true,
@@ -127,13 +127,11 @@ class _SalesPageState extends State<SalesPage> {
             if (ts is Timestamp) confirmedAt = ts.toDate();
 
             if (confirmedAt != null) {
-              // 今月合計
               if (!confirmedAt.isBefore(thisMonthStart) &&
                   confirmedAt.isBefore(nextMonthStart)) {
                 thisMonth += amount;
               }
 
-              // 月別集計（直近6ヶ月のみ）
               final key = DateTime(confirmedAt.year, confirmedAt.month, 1);
               if (monthSums.containsKey(key)) {
                 monthSums[key] = (monthSums[key] ?? 0) + amount;
@@ -141,7 +139,6 @@ class _SalesPageState extends State<SalesPage> {
             }
           }
 
-          // 初回だけ今月を選択
           _selectedMonth ??= DateTime(now.year, now.month, 1);
 
           final selectedKey = _selectedMonth!;
@@ -160,19 +157,18 @@ class _SalesPageState extends State<SalesPage> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
             children: [
-              // 上段：今月/累計
               _ShadowCard(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '今月の売上',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black54,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -188,21 +184,21 @@ class _SalesPageState extends State<SalesPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             '獲得売上',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: Colors.black45,
+                              color: AppColors.textHint,
                             ),
                           ),
                           const SizedBox(width: 10),
                           Text(
                             _yen(total),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w900,
-                              color: Colors.black87,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -214,24 +210,22 @@ class _SalesPageState extends State<SalesPage> {
 
               const SizedBox(height: 14),
 
-              // 月別推移カード
               _ShadowCard(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '月別推移',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w900,
-                          color: Colors.black87,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 10),
 
-                      // ✅ A: 選択月の売上カードを「グラフの上」に配置
                       _SelectedMonthCard(
                         monthText:
                         '${_ym(selectedKey)}（${_monthLabel(selectedKey)}）',
@@ -263,12 +257,12 @@ class _SalesPageState extends State<SalesPage> {
                                       _selectedMonth?.month == m.month);
 
                                   final barColor = isSelected
-                                      ? Colors.black
-                                      : Colors.grey.shade500;
+                                      ? AppColors.ruri
+                                      : AppColors.textHint;
 
                                   final labelColor = isSelected
-                                      ? Colors.black
-                                      : Colors.black87;
+                                      ? AppColors.ruri
+                                      : AppColors.textPrimary;
 
                                   return Expanded(
                                     child: GestureDetector(
@@ -289,7 +283,6 @@ class _SalesPageState extends State<SalesPage> {
                                           ),
                                           const SizedBox(height: 10),
 
-                                          // ✅ C: 選択中ラベル強調（太字＋ドット下線）
                                           _MonthLabel(
                                             text: _monthLabel(m),
                                             selected: isSelected,
@@ -307,20 +300,20 @@ class _SalesPageState extends State<SalesPage> {
                       ),
 
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         '※売上は支払い確定日に反映されます',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.black45,
+                          color: AppColors.textHint,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         'データ件数: ${docs.length}件',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: Colors.black38,
+                          color: AppColors.textHint,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -352,9 +345,9 @@ class _SelectedMonthCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF6F7FB),
+        color: AppColors.ruriPale,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE8EAF0)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         children: [
@@ -362,20 +355,20 @@ class _SelectedMonthCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '選択月の売上',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black54,
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   monthText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black54,
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -384,10 +377,10 @@ class _SelectedMonthCard extends StatelessWidget {
           ),
           Text(
             amountText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
-              color: Colors.black87,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(width: 6),
@@ -433,7 +426,7 @@ class _MonthLabel extends StatelessWidget {
             width: 18,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: AppColors.ruri,
               borderRadius: BorderRadius.circular(999),
             ),
           ),
@@ -460,7 +453,7 @@ class _ShadowCard extends StatelessWidget {
             offset: Offset(0, 6),
           )
         ],
-        border: Border.all(color: const Color(0xFFE8EAF0)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: child,
     );

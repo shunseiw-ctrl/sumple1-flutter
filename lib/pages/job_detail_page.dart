@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'job_edit_page.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -25,14 +26,11 @@ class JobDetailPage extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Scaffold(
-            backgroundColor: const Color(0xFFF4F5F7),
+            backgroundColor: AppColors.background,
             appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0.5,
-              iconTheme: const IconThemeData(color: Colors.black),
-              title: const Text(
+              title: Text(
                 '案件詳細',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
               ),
             ),
             body: Center(child: Text('読み込みエラー: ${snapshot.error}')),
@@ -42,14 +40,11 @@ class JobDetailPage extends StatelessWidget {
         final liveDoc = snapshot.data;
         if (liveDoc == null || !liveDoc.exists) {
           return Scaffold(
-            backgroundColor: const Color(0xFFF4F5F7),
+            backgroundColor: AppColors.background,
             appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0.5,
-              iconTheme: const IconThemeData(color: Colors.black),
-              title: const Text(
+              title: Text(
                 '案件詳細',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
               ),
             ),
             body: const Center(child: Text('この案件は削除された可能性があります')),
@@ -141,7 +136,6 @@ class _DetailScaffold extends StatelessWidget {
     final price = data['price']?.toString().trim();
     final date = data['date']?.toString().trim();
 
-    // ✅ 物件名は projectName 確定。無ければ title にフォールバック。
     final projectNameSnapshot = (data['projectName'] ?? '').toString().trim();
     final resolvedProjectName = projectNameSnapshot.isNotEmpty
         ? projectNameSnapshot
@@ -153,10 +147,8 @@ class _DetailScaffold extends StatelessWidget {
       'adminUid': jobOwnerId,
       'jobId': jobId,
 
-      // ✅ KANNA風一覧/チャット表示の主キー
       'projectNameSnapshot': resolvedProjectName,
 
-      // 補助（残す）
       'jobTitleSnapshot': (title != null && title.isNotEmpty) ? title : resolvedProjectName,
       'jobLocationSnapshot': (location != null && location.isNotEmpty) ? location : '',
       'jobPriceSnapshot': (price != null && price.isNotEmpty) ? price : '',
@@ -192,14 +184,11 @@ class _DetailScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
+        title: Text(
           '案件詳細',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
         ),
         actions: [
           FutureBuilder<bool>(
@@ -219,10 +208,10 @@ class _DetailScaffold extends StatelessWidget {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.edit, size: 18, color: Colors.black),
-                    label: const Text(
+                    icon: Icon(Icons.edit, size: 18, color: AppColors.textPrimary),
+                    label: Text(
                       '編集',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
+                      style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900),
                     ),
                   ),
                   IconButton(
@@ -266,7 +255,7 @@ class _DetailScaffold extends StatelessWidget {
                       }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: enabled ? Colors.black : Colors.black26,
+                        backgroundColor: enabled ? AppColors.ruri : AppColors.ruri.withOpacity(0.4),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -290,7 +279,6 @@ class _DetailScaffold extends StatelessWidget {
   }
 }
 
-/// ✅ 検索詳細/WorkDetail概要で共通利用する本文Widget
 class JobDetailBody extends StatelessWidget {
   final Map<String, dynamic> data;
   const JobDetailBody({super.key, required this.data});
@@ -330,7 +318,7 @@ class JobDetailBody extends StatelessWidget {
                   color: const Color(0xFFEFF1F4),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.photo, color: Colors.black38),
+                child: Icon(Icons.photo, color: AppColors.textHint),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -378,17 +366,17 @@ class JobDetailBody extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       location,
-                      style: const TextStyle(
-                        color: Colors.black54,
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -402,16 +390,16 @@ class JobDetailBody extends StatelessWidget {
         _WhiteCard(
           child: Row(
             children: [
-              const Icon(Icons.currency_yen, color: Colors.black87),
+              Icon(Icons.currency_yen, color: AppColors.textPrimary),
               const SizedBox(width: 10),
               const Text('報酬', style: TextStyle(fontWeight: FontWeight.w800)),
               const Spacer(),
               Text(
                 '¥$price',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -434,7 +422,7 @@ class JobDetailBody extends StatelessWidget {
             children: [
               const Text('仕事内容', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 8),
-              Text(descriptionText, style: const TextStyle(color: Colors.black87, height: 1.4)),
+              Text(descriptionText, style: TextStyle(color: AppColors.textPrimary, height: 1.4)),
             ],
           ),
         ),
@@ -445,7 +433,7 @@ class JobDetailBody extends StatelessWidget {
             children: [
               const Text('注意事項', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
               const SizedBox(height: 8),
-              Text(notesText, style: const TextStyle(color: Colors.black87, height: 1.4)),
+              Text(notesText, style: TextStyle(color: AppColors.textPrimary, height: 1.4)),
             ],
           ),
         ),
@@ -497,20 +485,20 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.black54),
+        Icon(icon, size: 18, color: AppColors.textSecondary),
         const SizedBox(width: 10),
         SizedBox(
           width: 44,
           child: Text(
             label,
-            style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w800),
+            style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w800),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
+            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
           ),
         ),
       ],

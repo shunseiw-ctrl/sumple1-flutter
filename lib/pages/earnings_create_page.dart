@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class EarningsCreatePage extends StatefulWidget {
   const EarningsCreatePage({super.key});
@@ -225,10 +226,10 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                     return ListTile(
                       selected: selected,
                       leading: CircleAvatar(
-                        backgroundColor: selected ? Colors.deepPurple.shade50 : Colors.blueGrey.shade100,
+                        backgroundColor: selected ? AppColors.ruriPale : Colors.blueGrey.shade100,
                         child: Icon(
                           Icons.work_outline,
-                          color: selected ? Colors.deepPurple : Colors.black54,
+                          color: selected ? AppColors.ruri : AppColors.textSecondary,
                         ),
                       ),
                       title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -236,7 +237,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                         'status: $status  uid:${applicantUid.isNotEmpty ? applicantUid.substring(0, applicantUid.length > 8 ? 8 : applicantUid.length) : "-"}…',
                       ),
                       trailing: selected
-                          ? const Icon(Icons.check_circle, color: Colors.deepPurple)
+                          ? Icon(Icons.check_circle, color: AppColors.ruri)
                           : const Icon(Icons.chevron_right),
                       onTap: () {
                         setState(() {
@@ -255,12 +256,12 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey.shade200)),
+              border: Border(top: BorderSide(color: AppColors.divider)),
             ),
             child: _selectedApp == null
-                ? const Text(
+                ? Text(
               '上のリストから案件を選択してください',
-              style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w700),
+              style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700),
             )
                 : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,7 +295,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                           child: Text(
                             _pickedDate == null ? '選択' : _ymd(_pickedDate!),
                             style: TextStyle(
-                              color: _pickedDate == null ? Colors.black45 : Colors.black87,
+                              color: _pickedDate == null ? AppColors.textHint : AppColors.textPrimary,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -308,12 +309,6 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _saving ? null : _createEarning,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
                     child: Text(
                       _saving ? '登録中...' : '支払い確定を登録（earnings作成）',
                       style: const TextStyle(fontWeight: FontWeight.w900),
@@ -321,9 +316,9 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   '※売上は支払い確定日に反映されます（タイミー方式）',
-                  style: TextStyle(fontSize: 12, color: Colors.black45, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 12, color: AppColors.textHint, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -350,9 +345,9 @@ class _SelectedSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF6F7FB),
+        color: AppColors.ruriPale,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE8EAF0)),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,11 +355,11 @@ class _SelectedSummary extends StatelessWidget {
           Text(name, style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
           Text('appId: ${short(app.id)}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('applicantUid: ${short(uid)}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('status: $status',
-              style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'work_detail_page.dart';
 import 'chat_room_page.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 
 class WorkPage extends StatefulWidget {
   const WorkPage({super.key});
@@ -95,7 +96,6 @@ class _WorkPageState extends State<WorkPage>
 
     final uid = user!.uid;
 
-    // ✅ index 安全化
     final tabIndex = _statusTabController.index.clamp(0, _statusTabs.length - 1);
     final selectedStatusKey = _statusTabs[tabIndex].key;
 
@@ -108,9 +108,9 @@ class _WorkPageState extends State<WorkPage>
               child: TabBar(
                 controller: _statusTabController,
                 isScrollable: true,
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.black54,
-                indicatorColor: Colors.black,
+                labelColor: AppColors.ruri,
+                unselectedLabelColor: AppColors.textSecondary,
+                indicatorColor: AppColors.ruri,
                 tabs: _statusTabs.map((t) => Tab(text: t.label)).toList(),
               ),
             ),
@@ -146,7 +146,7 @@ class _WorkPageState extends State<WorkPage>
                         child: Text(
                           _emptyMessageFor(selectedStatusKey),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.black54),
+                          style: TextStyle(color: AppColors.textSecondary),
                         ),
                       ),
                     );
