@@ -18,6 +18,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'core/services/splash_remover.dart';
+import 'presentation/widgets/error_retry_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -453,19 +454,13 @@ class _AuthGateState extends State<AuthGate> {
             error: snapshot.error,
           );
           return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    '認証エラーが発生しました\n${snapshot.error}',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
+            body: ErrorRetryWidget.general(
+              onRetry: () {
+                _cachedRole = null;
+                _lastUid = null;
+                setState(() {});
+              },
+              message: '認証処理中にエラーが発生しました\nもう一度お試しください',
             ),
           );
         }
@@ -491,6 +486,20 @@ class _AuthGateState extends State<AuthGate> {
               return Scaffold(
                 body: Center(
                   child: CircularProgressIndicator(color: AppColors.ruri),
+                ),
+              );
+            }
+
+            if (roleSnap.hasError) {
+              Logger.error('Role resolution error', tag: 'AuthGate', error: roleSnap.error);
+              return Scaffold(
+                body: ErrorRetryWidget.general(
+                  onRetry: () {
+                    _cachedRole = null;
+                    _lastUid = null;
+                    setState(() {});
+                  },
+                  message: 'ユーザー情報の取得に失敗しました',
                 ),
               );
             }

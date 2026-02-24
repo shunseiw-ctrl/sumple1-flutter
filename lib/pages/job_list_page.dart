@@ -13,6 +13,7 @@ import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/presentation/widgets/scale_tap.dart';
+import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 
 class JobListPage extends StatefulWidget {
   const JobListPage({super.key});
@@ -477,11 +478,15 @@ class _JobListPageState extends State<JobListPage> {
                   })(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return EmptyState(
-                        icon: Icons.error_outline_rounded,
-                        title: 'エラーが発生しました',
-                        description: '${snapshot.error}',
-                        iconColor: AppColors.error,
+                      final errStr = '${snapshot.error}';
+                      if (errStr.contains('network') || errStr.contains('unavailable')) {
+                        return ErrorRetryWidget.network(
+                          onRetry: () => setState(() {}),
+                        );
+                      }
+                      return ErrorRetryWidget.general(
+                        onRetry: () => setState(() {}),
+                        message: 'データの読み込みに失敗しました\nしばらく経ってからお試しください',
                       );
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {

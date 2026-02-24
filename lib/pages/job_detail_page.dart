@@ -11,6 +11,7 @@ import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -37,7 +38,15 @@ class JobDetailPage extends StatelessWidget {
             appBar: AppBar(
               title: Text('案件詳細', style: AppTextStyles.appBarTitle),
             ),
-            body: Center(child: Text('読み込みエラー: ${snapshot.error}')),
+            body: ErrorRetryWidget.general(
+              onRetry: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => JobDetailPage(jobId: jobId, jobData: jobData),
+                ),
+              ),
+              message: 'データの読み込みに失敗しました',
+            ),
           );
         }
 

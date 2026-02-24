@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
+
+class AsyncValueBuilder<T> extends StatelessWidget {
+  final Stream<T> stream;
+  final Widget Function(BuildContext context, T data) builder;
+  final Widget Function()? loading;
+  final Widget Function(Object error, VoidCallback retry)? error;
+
+  const AsyncValueBuilder({
+    super.key,
+    required this.stream,
+    required this.builder,
+    this.loading,
+    this.error,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<T>(
+      stream: stream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          final errorWidget = error;
+          if (errorWidget != null) {
+            return errorWidget(snapshot.error!, () {});
+          }
+          return ErrorRetryWidget.general(
+            onRetry: () {},
+            message: _errorMessage(snapshot.error),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return loading?.call() ??
+              const Center(child: CircularProgressIndicator());
+        }
+
+        return builder(context, snapshot.data as T);
+      },
+    );
+  }
+
+  String _errorMessage(Object? error) {
+    if (error == null) return 'エラーが発生しました';
+    final msg = error.toString();
+    if (msg.contains('permission-denied')) return '権限がありません';
+    if (msg.contains('unavailable') || msg.contains('network')) {
+      return 'ネットワークエラーが発生しました';
+    }
+    return 'データの読み込みに失敗しました';
+  }
+}
+
+class FutureRetryBuilder<T> extends StatefulWidget {
+  final Future<T> Function() futureFactory;
+  final Widget Function(BuildContext context, T data) builder;
+  final Widget Function()? loading;
+
+  const FutureRetryBuilder({
+    super.key,
+    required this.futureFactory,
+    required this.builder,
+    this.loading,
+  });
+
+  @override
+  State<FutureRetryBuilder<T>> createState() => _FutureRetryBuilderState<T>();
+}
+
+class _FutureRetryBuilderState<T> extends State<FutureRetryBuilder<T>> {
+  late Future<T> _future;
+  int _retryCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = widget.futureFactory();
+  }
+
+  void _retry() {
+    setState(() {
+      _retryCount++;
+      _future = widget.futureFactory();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<T>(
+      key: ValueKey(_retryCount),
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          final error = snapshot.error;
+          if (error.toString().contains('network') ||
+              error.toString().contains('unavailable')) {
+            return ErrorRetryWidget.network(onRetry: _retry);
+          }
+          if (error.toString().contains('timeout') ||
+              error.toString().contains('deadline')) {
+            return ErrorRetryWidget.timeout(onRetry: _retry);
+          }
+          return ErrorRetryWidget.general(onRetry: _retry);
+        }
+
+        if (!snapshot.hasData) {
+          return widget.loading?.call() ??
+              const Center(child: CircularProgressIndicator());
+        }
+
+        return widget.builder(context, snapshot.data as T);
+      },
+    );
+  }
+}
