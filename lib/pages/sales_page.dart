@@ -7,6 +7,11 @@ import 'job_detail_page.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/presentation/widgets/empty_state.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class SalesPage extends StatefulWidget {
@@ -50,58 +55,12 @@ class _SalesPageState extends State<SalesPage>
       return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(title: const Text('売上'), centerTitle: true),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.ruriPale,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: const Icon(Icons.payments_outlined, size: 40, color: AppColors.ruri),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  '売上を確認するには\n登録が必要です',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'お仕事の報酬や支払い履歴を\nこのページで確認できます',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => RegistrationPromptModal.show(context, featureName: '売上を確認する'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ruri,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        body: EmptyState(
+          icon: Icons.payments_outlined,
+          title: '売上を確認するには\n登録が必要です',
+          description: 'お仕事の報酬や支払い履歴を\nこのページで確認できます',
+          actionText: '登録して始める',
+          onAction: () => RegistrationPromptModal.show(context, featureName: '売上を確認する'),
         ),
       );
     }
@@ -131,6 +90,8 @@ class _SalesPageState extends State<SalesPage>
           labelColor: AppColors.ruri,
           unselectedLabelColor: AppColors.textSecondary,
           indicatorColor: AppColors.ruri,
+          labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: AppColors.ruri),
+          unselectedLabelStyle: AppTextStyles.labelMedium,
           tabs: const [
             Tab(text: '売上'),
             Tab(icon: Icon(Icons.favorite, size: 18), text: 'お気に入り'),
@@ -256,51 +217,35 @@ class _SalesContentState extends State<_SalesContent> {
         }).toList();
 
         return ListView(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+          padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
           children: [
             _ShadowCard(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.lg, AppSpacing.base, AppSpacing.base),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       '今月の売上',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.sectionTitle,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       _yen(thisMonth),
-                      style: const TextStyle(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w900,
-                        height: 1.0,
-                      ),
+                      style: AppTextStyles.displayLarge,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           '獲得売上',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textHint,
-                          ),
+                          style: AppTextStyles.labelSmall,
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: AppSpacing.sm),
                         Text(
                           _yen(total),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
-                          ),
+                          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
                         ),
                       ],
                     ),
@@ -309,23 +254,19 @@ class _SalesContentState extends State<_SalesContent> {
               ),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSpacing.base),
 
             _ShadowCard(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+                padding: const EdgeInsets.all(AppSpacing.base),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       '月別推移',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSpacing.sm),
 
                     _SelectedMonthCard(
                       monthText:
@@ -338,7 +279,7 @@ class _SalesContentState extends State<_SalesContent> {
                       },
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
 
                     SizedBox(
                       height: 190,
@@ -400,23 +341,15 @@ class _SalesContentState extends State<_SalesContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       '※売上は支払い確定日に反映されます',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textHint,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTextStyles.labelSmall,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'データ件数: ${docs.length}件',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textHint,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTextStyles.labelSmall,
                     ),
                   ],
                 ),
@@ -424,12 +357,12 @@ class _SalesContentState extends State<_SalesContent> {
             ),
 
             if (widget.isAdmin) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.sectionGap),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text('支払い管理', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Text('支払い管理', style: AppTextStyles.headingSmall),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               const _PaymentSummarySection(),
             ],
           ],
@@ -460,27 +393,20 @@ class _FavoritesContent extends StatelessWidget {
         final jobIds = List<String>.from(favData?['jobIds'] ?? []);
 
         if (jobIds.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.favorite_border, size: 64, color: AppColors.textHint),
-                const SizedBox(height: 16),
-                Text('お気に入りはまだありません', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                const SizedBox(height: 8),
-                Text('案件の♡をタップして追加できます', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
-              ],
-            ),
+          return const EmptyState(
+            icon: Icons.favorite_border,
+            title: 'お気に入りはまだありません',
+            description: '案件の♡をタップして追加できます',
           );
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(AppSpacing.pagePadding),
           itemCount: jobIds.length,
           itemBuilder: (context, i) {
             final jobId = jobIds[i];
             return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance.collection('jobs').doc(jobId).snapshots(),
                 builder: (context, jobSnap) {
@@ -494,30 +420,31 @@ class _FavoritesContent extends StatelessWidget {
                   final date = (job['date'] ?? '').toString();
                   final imageUrl = (job['imageUrl'] ?? '').toString();
 
-                  return Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => JobDetailPage(jobId: jobId, jobData: job),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.divider),
-                        ),
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                      boxShadow: AppShadows.card,
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => JobDetailPage(jobId: jobId, jobData: job),
+                            ),
+                          );
+                        },
                         child: Row(
                           children: [
                             ClipRRect(
                               borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(14),
-                                bottomLeft: Radius.circular(14),
+                                topLeft: Radius.circular(AppSpacing.cardRadius),
+                                bottomLeft: Radius.circular(AppSpacing.cardRadius),
                               ),
                               child: SizedBox(
                                 width: 100,
@@ -537,28 +464,28 @@ class _FavoritesContent extends StatelessWidget {
                             ),
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(AppSpacing.md),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                    const SizedBox(height: 4),
+                                    Text(title, style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(height: AppSpacing.xs),
                                     if (location.isNotEmpty)
                                       Row(
                                         children: [
                                           Icon(Icons.location_on_outlined, size: 14, color: AppColors.textHint),
-                                          const SizedBox(width: 4),
-                                          Expanded(child: Text(location, style: TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                          const SizedBox(width: AppSpacing.xs),
+                                          Expanded(child: Text(location, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis)),
                                         ],
                                       ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: AppSpacing.xs),
                                     Row(
                                       children: [
                                         if (price.isNotEmpty)
-                                          Text('¥$price', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.ruri)),
+                                          Text('¥$price', style: AppTextStyles.salary.copyWith(fontSize: 14)),
                                         const Spacer(),
                                         if (date.isNotEmpty)
-                                          Text(date, style: TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                          Text(date, style: AppTextStyles.labelSmall),
                                       ],
                                     ),
                                   ],
@@ -566,7 +493,7 @@ class _FavoritesContent extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.only(right: AppSpacing.sm),
                               child: IconButton(
                                 icon: const Icon(Icons.favorite, color: Colors.red, size: 22),
                                 onPressed: () async {
@@ -606,10 +533,10 @@ class _SelectedMonthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
       decoration: BoxDecoration(
         color: AppColors.ruriPale,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
@@ -620,33 +547,21 @@ class _SelectedMonthCard extends StatelessWidget {
               children: [
                 Text(
                   '選択月の売上',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w900),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   monthText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
           Text(
             amountText,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
-            ),
+            style: AppTextStyles.headingSmall.copyWith(fontWeight: FontWeight.w900),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.xs),
           IconButton(
             tooltip: '今月に戻す',
             onPressed: onResetToThisMonth,
@@ -675,13 +590,12 @@ class _MonthLabel extends StatelessWidget {
       children: [
         Text(
           text,
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTextStyles.labelSmall.copyWith(
             fontWeight: selected ? FontWeight.w900 : FontWeight.w800,
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         AnimatedOpacity(
           duration: const Duration(milliseconds: 150),
           opacity: selected ? 1 : 0,
@@ -690,7 +604,7 @@ class _MonthLabel extends StatelessWidget {
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.ruri,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
             ),
           ),
         ),
@@ -708,15 +622,8 @@ class _ShadowCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 14,
-            offset: Offset(0, 6),
-          )
-        ],
-        border: Border.all(color: AppColors.divider),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
+        boxShadow: AppShadows.card,
       ),
       child: child,
     );
@@ -806,18 +713,18 @@ class _PaymentSummarySection extends StatelessWidget {
           .snapshots(),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()));
+          return const Center(child: Padding(padding: EdgeInsets.all(AppSpacing.base), child: CircularProgressIndicator()));
         }
         final docs = snap.data?.docs ?? [];
         if (docs.isEmpty) {
           return Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.divider),
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+              boxShadow: AppShadows.subtle,
             ),
-            child: Center(child: Text('支払いデータはまだありません', style: TextStyle(color: AppColors.textSecondary))),
+            child: Center(child: Text('支払いデータはまだありません', style: AppTextStyles.bodySmall)),
           );
         }
 
@@ -858,12 +765,12 @@ class _PaymentSummarySection extends StatelessWidget {
             final unpaid = info['unpaid'] as int;
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.base),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.divider),
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                boxShadow: AppShadows.card,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,13 +778,13 @@ class _PaymentSummarySection extends StatelessWidget {
                   Row(
                     children: [
                       Icon(Icons.calendar_month, size: 18, color: AppColors.ruri),
-                      const SizedBox(width: 8),
-                      Text(month, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(month, style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
                       const Spacer(),
-                      Text('$count件', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                      Text('$count件', style: AppTextStyles.labelMedium),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
@@ -924,9 +831,9 @@ class _MiniStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: AppColors.textHint, fontWeight: FontWeight.w600)),
+        Text(label, style: AppTextStyles.labelSmall),
         const SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color)),
+        Text(value, style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w800, color: color)),
       ],
     );
   }

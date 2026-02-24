@@ -8,6 +8,11 @@ import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/presentation/widgets/empty_state.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -86,16 +91,12 @@ class _MessagesPageState extends State<MessagesPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.redAccent,
-        borderRadius: BorderRadius.circular(999),
+        color: AppColors.error,
+        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w800,
-          fontSize: 12,
-        ),
+        style: AppTextStyles.badgeText.copyWith(color: Colors.white),
       ),
     );
   }
@@ -181,58 +182,12 @@ class _MessagesPageState extends State<MessagesPage> {
       return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(title: const Text('メッセージ')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.ruriPale,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: const Icon(Icons.chat_bubble_outline, size: 40, color: AppColors.ruri),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'メッセージを見るには\n登録が必要です',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '案件の担当者とチャットで\nやりとりできます',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => RegistrationPromptModal.show(context, featureName: 'メッセージを見る'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ruri,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        body: EmptyState(
+          icon: Icons.chat_bubble_outline,
+          title: 'メッセージを見るには\n登録が必要です',
+          description: '案件の担当者とチャットで\nやりとりできます',
+          actionText: '登録して始める',
+          onAction: () => RegistrationPromptModal.show(context, featureName: 'メッセージを見る'),
         ),
       );
     }
@@ -249,14 +204,14 @@ class _MessagesPageState extends State<MessagesPage> {
             ? PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'uid=${_myUid.substring(0, _myUid.length > 8 ? 8 : _myUid.length)}…  '
                     'isAdmin=$_isAdmin  '
                     '${_myEmail.isEmpty ? "" : "email=$_myEmail"}',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: AppTextStyles.labelSmall,
               ),
             ),
           ),
@@ -266,13 +221,13 @@ class _MessagesPageState extends State<MessagesPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
             child: TextField(
               decoration: InputDecoration(
                 hintText: '案件名で検索',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Icon(Icons.search, color: AppColors.textHint),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                 ),
                 isDense: true,
               ),
@@ -292,8 +247,10 @@ class _MessagesPageState extends State<MessagesPage> {
 
                 final docs = snap.data?.docs.toList() ?? [];
                 if (docs.isEmpty) {
-                  return Center(
-                    child: Text(_isAdmin ? '担当案件のメッセージはまだありません' : 'メッセージはまだありません'),
+                  return EmptyState(
+                    icon: Icons.chat_bubble_outline,
+                    title: _isAdmin ? '担当案件のメッセージはまだありません' : 'メッセージはまだありません',
+                    description: '案件に応募するとメッセージが届きます',
                   );
                 }
 
@@ -309,14 +266,19 @@ class _MessagesPageState extends State<MessagesPage> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return const Center(child: Text('検索結果がありません'));
+                  return EmptyState(
+                    icon: Icons.search_off,
+                    title: '検索結果がありません',
+                    description: '別のキーワードで検索してみてください',
+                  );
                 }
 
                 filtered.sort(_compareByLastMessageAtDesc);
 
                 return ListView.separated(
+                  padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, i) {
                     final doc = filtered[i];
                     final appId = doc.id;
@@ -356,70 +318,99 @@ class _MessagesPageState extends State<MessagesPage> {
                             : (status.isEmpty ? ' ' : 'ステータス: $status');
                         final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
 
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.blueGrey.shade100,
-                            child: Icon(Icons.work_outline, color: AppColors.textSecondary),
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: unread > 0 ? AppColors.ruriPale : Colors.white,
+                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                            boxShadow: AppShadows.subtle,
                           ),
-                          title: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (ymdText.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8),
-                                  child: Text(
-                                    ymdText,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondary,
-                                    ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                              onTap: () async {
+                                await _resetUnreadIfPossible(appId);
+
+                                if (!context.mounted) return;
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ChatRoomPage(applicationId: appId),
                                   ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.ruriPale,
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
+                                    ),
+                                    const SizedBox(width: AppSpacing.md),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  title,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: AppTextStyles.labelLarge.copyWith(
+                                                    fontWeight: unread > 0 ? FontWeight.w800 : FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (ymdText.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: AppSpacing.sm),
+                                                  child: Text(
+                                                    ymdText,
+                                                    style: AppTextStyles.labelSmall,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: AppSpacing.xs),
+                                          Text(
+                                            sub1,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTextStyles.bodySmall,
+                                          ),
+                                          if (sub2.isNotEmpty)
+                                            Text(
+                                              sub2,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTextStyles.labelSmall,
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    Column(
+                                      children: [
+                                        _unreadBadge(unread),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                sub1,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                              if (sub2.isNotEmpty)
-                                Text(
-                                  sub2,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color: AppColors.textSecondary),
-                                ),
-                            ],
+                            ),
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _unreadBadge(unread),
-                              const SizedBox(width: 10),
-                              const Icon(Icons.chevron_right),
-                            ],
-                          ),
-                          onTap: () async {
-                            await _resetUnreadIfPossible(appId);
-
-                            if (!context.mounted) return;
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ChatRoomPage(applicationId: appId),
-                              ),
-                            );
-                          },
                         );
                       },
                     );

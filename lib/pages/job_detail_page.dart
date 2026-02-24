@@ -4,7 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'job_edit_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 
@@ -31,10 +35,7 @@ class JobDetailPage extends StatelessWidget {
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AppBar(
-              title: Text(
-                '案件詳細',
-                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-              ),
+              title: Text('案件詳細', style: AppTextStyles.appBarTitle),
             ),
             body: Center(child: Text('読み込みエラー: ${snapshot.error}')),
           );
@@ -45,10 +46,7 @@ class JobDetailPage extends StatelessWidget {
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AppBar(
-              title: Text(
-                '案件詳細',
-                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-              ),
+              title: Text('案件詳細', style: AppTextStyles.appBarTitle),
             ),
             body: const Center(child: Text('この案件は削除された可能性があります')),
           );
@@ -208,10 +206,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
-          '案件詳細',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        ),
+        title: Text('案件詳細', style: AppTextStyles.appBarTitle),
         actions: [
           StreamBuilder<List<String>>(
             stream: _favoritesService.favoritesStream(),
@@ -237,9 +232,16 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                     );
                   }
                 },
-                icon: Icon(
-                  isFav ? Icons.favorite : Icons.favorite_border,
-                  color: isFav ? Colors.red : AppColors.textSecondary,
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(scale: animation, child: child);
+                  },
+                  child: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    key: ValueKey<bool>(isFav),
+                    color: isFav ? Colors.red : AppColors.textSecondary,
+                  ),
                 ),
               );
             },
@@ -281,8 +283,11 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
       bottomNavigationBar: SafeArea(
         top: false,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          color: Colors.white,
+          padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.md, AppSpacing.base, AppSpacing.md),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: AppShadows.bottomNav,
+          ),
           child: FutureBuilder<bool>(
             future: _hasApplied(),
             builder: (context, snap) {
@@ -294,30 +299,43 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
               return Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: enabled
-                          ? () async {
-                        try {
-                          await _applyToJob(context);
-                        } catch (e) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('応募に失敗しました: $e')),
-                          );
-                        }
-                      }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: enabled ? AppColors.ruri : AppColors.ruri.withOpacity(0.4),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: enabled ? AppColors.primaryGradient : null,
+                        color: enabled ? null : AppColors.divider,
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                        boxShadow: enabled ? AppShadows.button : [],
                       ),
-                      child: Text(
-                        isLoading ? '確認中...' : (hasApplied ? '応募済み' : '応募する'),
-                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      child: ElevatedButton(
+                        onPressed: enabled
+                            ? () async {
+                          try {
+                            await _applyToJob(context);
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('応募に失敗しました: $e')),
+                            );
+                          }
+                        }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          disabledForegroundColor: AppColors.textHint,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                          ),
+                        ),
+                        child: Text(
+                          isLoading ? '確認中...' : (hasApplied ? '応募済み' : '応募する'),
+                          style: AppTextStyles.button.copyWith(
+                            color: enabled ? Colors.white : AppColors.textHint,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -342,6 +360,8 @@ class JobDetailBody extends StatelessWidget {
     final location = data['location']?.toString() ?? '未設定';
     final price = data['price']?.toString() ?? '0';
     final date = data['date']?.toString() ?? '未定';
+    final imageUrl = data['imageUrl']?.toString();
+    final category = data['category']?.toString();
 
     final description = (data['description'] ?? '').toString().trim();
     final notes = (data['notes'] ?? '').toString().trim();
@@ -355,170 +375,201 @@ class JobDetailBody extends StatelessWidget {
         : '・遅刻／無断欠勤は評価に影響します\n・安全靴／作業着推奨\n・詳細はチャットで確認してください';
 
     final ownerId = data['ownerId']?.toString();
-    final badges = <_BadgeSpec>[];
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+      padding: EdgeInsets.zero,
       children: [
-        _WhiteCard(
-          child: Row(
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(AppSpacing.cardRadiusLg),
+            bottomRight: Radius.circular(AppSpacing.cardRadiusLg),
+          ),
+          child: SizedBox(
+            height: 200,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (hasImage)
+                  Image.network(
+                    imageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildGradientPlaceholder(),
+                  )
+                else
+                  _buildGradientPlaceholder(),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 80,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.5),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: AppSpacing.base,
+                  bottom: AppSpacing.md,
+                  child: Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      if (category != null && category.isNotEmpty)
+                        StatusBadge(
+                          label: category,
+                          color: AppColors.ruri,
+                          icon: Icons.category,
+                          filled: true,
+                        ),
+                      if (ownerId == null || ownerId.isEmpty)
+                        const StatusBadge(
+                          label: '旧データ',
+                          color: AppColors.warning,
+                          icon: Icons.warning_amber_rounded,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.pagePadding,
+            AppSpacing.base,
+            AppSpacing.pagePadding,
+            AppSpacing.lg,
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 86,
-                height: 86,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF1F4),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(Icons.photo, color: AppColors.textHint),
+              Text(title, style: AppTextStyles.headingLarge),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Icon(Icons.place, size: 16, color: AppColors.textSecondary),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(location, style: AppTextStyles.bodySmall),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
+              const SizedBox(height: AppSpacing.base),
+              _ModernCard(
+                color: AppColors.ruriPale,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.ruri.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
+                      ),
+                      child: const Icon(Icons.currency_yen, color: AppColors.ruri, size: 22),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('報酬', style: AppTextStyles.labelMedium),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text('¥$price', style: AppTextStyles.salaryLarge),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ModernCard(
+                child: Column(
+                  children: [
+                    _InfoRow(icon: Icons.event, label: '日程', value: date),
+                    Divider(height: AppSpacing.lg, color: AppColors.divider),
+                    _InfoRow(icon: Icons.place, label: '場所', value: location),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final b in badges)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: b.bg,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              b.label,
-                              style: TextStyle(
-                                color: b.fg,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        if (ownerId == null || ownerId.isEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF3E0),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: const Text(
-                              '旧データ',
-                              style: TextStyle(
-                                color: Color(0xFFE65100),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      location,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    Text('仕事内容', style: AppTextStyles.headingSmall),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(descriptionText, style: AppTextStyles.bodyMedium.copyWith(height: 1.6)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ModernCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('注意事項', style: AppTextStyles.headingSmall),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(notesText, style: AppTextStyles.bodyMedium.copyWith(height: 1.6)),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 10),
-        _WhiteCard(
-          child: Row(
-            children: [
-              Icon(Icons.currency_yen, color: AppColors.textPrimary),
-              const SizedBox(width: 10),
-              const Text('報酬', style: TextStyle(fontWeight: FontWeight.w800)),
-              const Spacer(),
-              Text(
-                '¥$price',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        _WhiteCard(
-          child: Column(
-            children: [
-              _InfoRow(icon: Icons.event, label: '日程', value: date),
-              const Divider(height: 18),
-              _InfoRow(icon: Icons.place, label: '場所', value: location),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        _WhiteCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('仕事内容', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              const SizedBox(height: 8),
-              Text(descriptionText, style: TextStyle(color: AppColors.textPrimary, height: 1.4)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        _WhiteCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('注意事項', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-              const SizedBox(height: 8),
-              Text(notesText, style: TextStyle(color: AppColors.textPrimary, height: 1.4)),
-            ],
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget _buildGradientPlaceholder() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.ruriPale,
+            Color(0xFFD0DFFA),
+            Color(0xFFBDD0F5),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.construction,
+          size: 64,
+          color: AppColors.ruri.withOpacity(0.3),
+        ),
+      ),
     );
   }
 }
 
-class _BadgeSpec {
-  final String label;
-  final Color bg;
-  final Color fg;
-  const _BadgeSpec({required this.label, required this.bg, required this.fg});
-}
-
-class _WhiteCard extends StatelessWidget {
+class _ModernCard extends StatelessWidget {
   final Widget child;
-  const _WhiteCard({required this.child});
+  final Color? color;
+  const _ModernCard({required this.child, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE6E8EB)),
-        ),
-        child: child,
+    return Container(
+      width: double.infinity,
+      padding: AppSpacing.cardInsets,
+      decoration: BoxDecoration(
+        color: color ?? Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppShadows.card,
       ),
+      child: child,
     );
   }
 }
@@ -538,21 +589,23 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textSecondary),
-        const SizedBox(width: 10),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.ruriPale,
+            borderRadius: BorderRadius.circular(AppSpacing.sm),
+          ),
+          child: Icon(icon, size: 18, color: AppColors.ruri),
+        ),
+        const SizedBox(width: AppSpacing.md),
         SizedBox(
           width: 44,
-          child: Text(
-            label,
-            style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w800),
-          ),
+          child: Text(label, style: AppTextStyles.labelMedium),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Text(
-            value,
-            style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-          ),
+          child: Text(value, style: AppTextStyles.labelLarge),
         ),
       ],
     );

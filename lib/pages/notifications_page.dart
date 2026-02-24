@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/presentation/widgets/empty_state.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 
 class NotificationsPage extends StatelessWidget {
@@ -13,7 +18,11 @@ class NotificationsPage extends StatelessWidget {
     if (uid.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('お知らせ')),
-        body: const Center(child: Text('ログインが必要です')),
+        body: const EmptyState(
+          icon: Icons.login,
+          title: 'ログインが必要です',
+          description: 'お知らせを表示するにはログインしてください',
+        ),
       );
     }
 
@@ -50,21 +59,16 @@ class NotificationsPage extends StatelessWidget {
           }
           final docs = snap.data?.docs ?? [];
           if (docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.notifications_none, size: 64, color: AppColors.textHint),
-                  const SizedBox(height: 16),
-                  Text('お知らせはまだありません', style: TextStyle(color: AppColors.textSecondary)),
-                ],
-              ),
+            return const EmptyState(
+              icon: Icons.notifications_none,
+              title: 'お知らせはまだありません',
+              description: '新しい通知が届くとここに表示されます',
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(AppSpacing.pagePadding),
             itemCount: docs.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
             itemBuilder: (context, i) {
               final doc = docs[i];
               final data = doc.data();
@@ -95,64 +99,65 @@ class NotificationsPage extends StatelessWidget {
                   iconColor = AppColors.textSecondary;
               }
 
-              return Material(
-                color: isRead ? Colors.white : AppColors.ruriPale,
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    if (!isRead) {
-                      NotificationService.markAsRead(doc.id);
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: iconColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(icon, color: iconColor, size: 20),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(title, style: TextStyle(
-                                fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
-                                color: AppColors.textPrimary,
-                              )),
-                              const SizedBox(height: 4),
-                              Text(body, style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textSecondary,
-                              )),
-                              if (timeText.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(timeText, style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textHint,
-                                )),
-                              ],
-                            ],
-                          ),
-                        ),
-                        if (!isRead)
+              return Container(
+                decoration: BoxDecoration(
+                  color: isRead ? Colors.white : AppColors.ruriPale,
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                  boxShadow: AppShadows.subtle,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                    onTap: () {
+                      if (!isRead) {
+                        NotificationService.markAsRead(doc.id);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.base),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 44,
+                            height: 44,
                             decoration: BoxDecoration(
-                              color: AppColors.ruri,
-                              borderRadius: BorderRadius.circular(4),
+                              color: iconColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(icon, color: iconColor, size: 22),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title, style: AppTextStyles.labelLarge.copyWith(
+                                  fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
+                                )),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(body, style: AppTextStyles.bodySmall),
+                                if (timeText.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(timeText, style: AppTextStyles.labelSmall),
+                                ],
+                              ],
                             ),
                           ),
-                      ],
+                          if (!isRead)
+                            Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(top: AppSpacing.xs),
+                              decoration: BoxDecoration(
+                                color: AppColors.ruri,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -6,6 +6,10 @@ import 'identity_verification_page.dart';
 import 'my_profile_page.dart';
 import '../core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -164,25 +168,60 @@ class _ProfilePageState extends State<ProfilePage> {
             }
 
             return AlertDialog(
-              title: const Text('メールでログイン'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+              ),
+              title: Text('メールでログイン', style: AppTextStyles.headingSmall),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'メールアドレス'),
+                    decoration: InputDecoration(
+                      labelText: 'メールアドレス',
+                      prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                        borderSide: BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                        borderSide: BorderSide(color: AppColors.ruri, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.ruriSurface.withOpacity(0.3),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _passController,
                     obscureText: obscure,
                     decoration: InputDecoration(
                       labelText: 'パスワード',
+                      prefixIcon: const Icon(Icons.lock_outline, size: 20),
                       suffixIcon: IconButton(
                         onPressed: () => setLocalState(() => obscure = !obscure),
                         icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                        borderSide: BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                        borderSide: BorderSide(color: AppColors.ruri, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.ruriSurface.withOpacity(0.3),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -190,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 8),
                   Text(
                     '新規登録もこの画面からできます',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    style: AppTextStyles.labelSmall,
                   ),
                 ],
               ),
@@ -231,14 +270,14 @@ class _ProfilePageState extends State<ProfilePage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.pagePadding, AppSpacing.pagePadding, 24),
         children: [
           _ProfileHeaderCard(
             displayName: displayName,
             subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
             isLoggedIn: !isAnon,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           if (isAnon) ...[
             _InfoBanner(
@@ -247,139 +286,175 @@ class _ProfilePageState extends State<ProfilePage> {
               buttonText: 'ログインする',
               onPressed: _showEmailAuthDialog,
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  LineAuthService().startLineLogin();
-                },
-                icon: const Icon(Icons.chat_bubble, size: 20),
-                label: const Text(
-                  'LINEでログイン',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lineGreen,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.lineGreen.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                  elevation: 0,
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    LineAuthService().startLineLogin();
+                  },
+                  icon: const Icon(Icons.chat_bubble, size: 20),
+                  label: Text(
+                    'LINEでログイン',
+                    style: AppTextStyles.button.copyWith(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.lineGreen,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    ),
+                    elevation: 0,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
           ],
 
           const _SectionHeader(title: 'アカウント'),
-          _MenuTile(
-            icon: Icons.settings_outlined,
-            title: 'アカウント設定',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('アカウント設定（準備中）')),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          _MenuTile(
-            icon: Icons.badge_outlined,
-            title: 'あなたのプロフィール',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const MyProfilePage()),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          _MenuTile(
-            icon: Icons.verified_user_outlined,
-            title: '本人確認',
-            subtitle: '身分証明書と顔写真を提出',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
-              );
-            },
+          _MenuGroup(
+            children: [
+              _MenuTile(
+                icon: Icons.settings_outlined,
+                iconColor: AppColors.ruri,
+                title: 'アカウント設定',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('アカウント設定（準備中）')),
+                  );
+                },
+              ),
+              _MenuTile(
+                icon: Icons.badge_outlined,
+                iconColor: AppColors.info,
+                title: 'あなたのプロフィール',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MyProfilePage()),
+                  );
+                },
+              ),
+              _MenuTile(
+                icon: Icons.verified_user_outlined,
+                iconColor: AppColors.success,
+                title: '本人確認',
+                subtitle: '身分証明書と顔写真を提出',
+                isLast: true,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
+                  );
+                },
+              ),
+            ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const _SectionHeader(title: 'サポート'),
-          _MenuTile(
-            icon: Icons.help_outline,
-            title: 'よくある質問',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('よくある質問（準備中）')),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          _MenuTile(
-            icon: Icons.mail_outline,
-            title: 'お問い合わせ',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('お問い合わせ（準備中）')),
-              );
-            },
+          _MenuGroup(
+            children: [
+              _MenuTile(
+                icon: Icons.help_outline,
+                iconColor: AppColors.warning,
+                title: 'よくある質問',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('よくある質問（準備中）')),
+                  );
+                },
+              ),
+              _MenuTile(
+                icon: Icons.mail_outline,
+                iconColor: AppColors.ruri,
+                title: 'お問い合わせ',
+                isLast: true,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('お問い合わせ（準備中）')),
+                  );
+                },
+              ),
+            ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const _SectionHeader(title: 'その他'),
-          _MenuTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'プライバシーポリシー',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('プライバシーポリシー（準備中）')),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          _MenuTile(
-            icon: Icons.description_outlined,
-            title: '利用規約',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('利用規約（準備中）')),
-              );
-            },
+          _MenuGroup(
+            children: [
+              _MenuTile(
+                icon: Icons.privacy_tip_outlined,
+                iconColor: AppColors.textSecondary,
+                title: 'プライバシーポリシー',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('プライバシーポリシー（準備中）')),
+                  );
+                },
+              ),
+              _MenuTile(
+                icon: Icons.description_outlined,
+                iconColor: AppColors.textSecondary,
+                title: '利用規約',
+                isLast: true,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('利用規約（準備中）')),
+                  );
+                },
+              ),
+            ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const _SectionHeader(title: '管理者'),
-          _MenuTile(
-            icon: Icons.admin_panel_settings_outlined,
-            title: '管理者ログイン',
-            subtitle: '案件の投稿・編集ができます',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AdminLoginPage()),
-              );
-            },
-          ),
-          const Divider(height: 1),
-          _MenuTile(
-            icon: Icons.logout,
-            title: '管理者ログアウト',
-            subtitle: isAnon ? '現在ログインしていません' : 'ログアウトして一般ユーザー表示に戻す',
-            onTap: () async {
-              final auth = FirebaseAuth.instance;
-              await auth.signOut();
-              await auth.signInAnonymously();
+          _MenuGroup(
+            children: [
+              _MenuTile(
+                icon: Icons.admin_panel_settings_outlined,
+                iconColor: AppColors.ruriDark,
+                title: '管理者ログイン',
+                subtitle: '案件の投稿・編集ができます',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminLoginPage()),
+                  );
+                },
+              ),
+              _MenuTile(
+                icon: Icons.logout,
+                iconColor: AppColors.error,
+                title: '管理者ログアウト',
+                subtitle: isAnon ? '現在ログインしていません' : 'ログアウトして一般ユーザー表示に戻す',
+                isLast: true,
+                onTap: () async {
+                  final auth = FirebaseAuth.instance;
+                  await auth.signOut();
+                  await auth.signInAnonymously();
 
-              if (!context.mounted) return;
-              setState(() {});
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('ログアウトしました（ゲストに戻りました）')),
-              );
-            },
+                  if (!context.mounted) return;
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('ログアウトしました（ゲストに戻りました）')),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -402,35 +477,44 @@ class _ProfileHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppShadows.card,
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: AppColors.divider,
-            child: Icon(Icons.person, color: AppColors.textSecondary, size: 28),
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: AppColors.primaryGradient,
+            ),
+            child: CircleAvatar(
+              radius: 32,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: AppColors.ruriPale,
+                child: Icon(Icons.person, color: AppColors.ruri, size: 30),
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   displayName,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  style: AppTextStyles.headingSmall,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: AppTextStyles.bodySmall,
                 ),
               ],
             ),
@@ -438,17 +522,38 @@ class _ProfileHeaderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: isLoggedIn ? Colors.green.shade50 : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: AppColors.divider),
+              color: isLoggedIn ? AppColors.successLight : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
             ),
-            child: Text(
-              isLoggedIn ? 'ログイン済み' : 'ゲスト',
-              style: TextStyle(
-                fontSize: 12,
-                color: isLoggedIn ? Colors.green.shade800 : AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isLoggedIn) ...[
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.success.withOpacity(0.4),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  isLoggedIn ? 'ログイン済み' : 'ゲスト',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: isLoggedIn ? AppColors.success : AppColors.textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -473,24 +578,41 @@ class _InfoBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.chipUnselected,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppShadows.card,
       ),
-      child: Column(
+      clipBehavior: Clip.antiAlias,
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 6),
-          Text(message, style: TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: onPressed,
-              child: Text(buttonText),
+          Container(
+            width: 4,
+            height: 140,
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.labelLarge),
+                  const SizedBox(height: 6),
+                  Text(message, style: AppTextStyles.bodySmall),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: onPressed,
+                      child: Text(buttonText),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -506,37 +628,91 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        title,
-        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.textSecondary),
+      padding: const EdgeInsets.only(left: 4, bottom: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 14,
+            decoration: BoxDecoration(
+              color: AppColors.ruri,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title.toUpperCase(),
+            style: AppTextStyles.sectionTitle,
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _MenuGroup extends StatelessWidget {
+  final List<Widget> children;
+  const _MenuGroup({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppShadows.subtle,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: children),
     );
   }
 }
 
 class _MenuTile extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
+  final bool isLast;
 
   const _MenuTile({
     required this.icon,
     required this.title,
     required this.onTap,
+    this.iconColor = const Color(0xFF6B7280),
     this.subtitle,
+    this.isLast = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 6),
-      leading: Icon(icon, color: AppColors.textSecondary),
-      title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle!, style: TextStyle(color: AppColors.textSecondary)),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          leading: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          title: Text(title, style: AppTextStyles.bodyMedium),
+          subtitle: subtitle == null
+              ? null
+              : Text(subtitle!, style: AppTextStyles.labelSmall),
+          trailing: Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+          onTap: onTap,
+        ),
+        if (!isLast)
+          Padding(
+            padding: const EdgeInsets.only(left: 66),
+            child: Divider(height: 1, color: AppColors.borderLight),
+          ),
+      ],
     );
   }
 }

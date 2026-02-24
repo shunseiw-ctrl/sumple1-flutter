@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'work_detail_page.dart';
 import 'chat_room_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/presentation/widgets/empty_state.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class WorkPage extends StatefulWidget {
@@ -98,58 +103,12 @@ class _WorkPageState extends State<WorkPage>
       return Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppColors.ruriPale,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: const Icon(Icons.work_outline, size: 40, color: AppColors.ruri),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    '「はたらく」を使うには\n登録が必要です',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '応募・受託した案件の進捗を\nこのページで管理できます',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () => RegistrationPromptModal.show(context, featureName: 'はたらく機能を使う'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.ruri,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
-                      child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          child: EmptyState(
+            icon: Icons.work_outline,
+            title: '「はたらく」を使うには\n登録が必要です',
+            description: '応募・受託した案件の進捗を\nこのページで管理できます',
+            actionText: '登録して始める',
+            onAction: () => RegistrationPromptModal.show(context, featureName: 'はたらく機能を使う'),
           ),
         ),
       );
@@ -166,12 +125,16 @@ class _WorkPageState extends State<WorkPage>
           children: [
             Material(
               color: Colors.white,
+              elevation: 0,
               child: TabBar(
                 controller: _statusTabController,
                 isScrollable: true,
                 labelColor: AppColors.ruri,
                 unselectedLabelColor: AppColors.textSecondary,
                 indicatorColor: AppColors.ruri,
+                indicatorWeight: 3,
+                labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: AppColors.ruri),
+                unselectedLabelStyle: AppTextStyles.labelMedium,
                 tabs: _statusTabs.map((t) => Tab(text: t.label)).toList(),
               ),
             ),
@@ -208,15 +171,10 @@ class _WorkPageState extends State<WorkPage>
                   }
 
                   if (filtered.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          _emptyMessageFor(selectedStatusKey),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                      ),
+                    return EmptyState(
+                      icon: Icons.inbox_outlined,
+                      title: _emptyMessageFor(selectedStatusKey),
+                      description: '',
                     );
                   }
 
@@ -237,7 +195,7 @@ class _WorkPageState extends State<WorkPage>
                     }).toList();
 
                     return ListView(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                      padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                       children: [
                         _StatusGroup(
                           title: '応募中',
@@ -247,7 +205,7 @@ class _WorkPageState extends State<WorkPage>
                           docs: pending,
                           onTapItem: (appId) => _navigateToDetail(context, appId),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.base),
                         _StatusGroup(
                           title: '承認済み（着工前・着工中）',
                           icon: Icons.check_circle_outline,
@@ -256,7 +214,7 @@ class _WorkPageState extends State<WorkPage>
                           docs: approved,
                           onTapItem: (appId) => _navigateToDetail(context, appId),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.base),
                         _StatusGroup(
                           title: '完了（施工完了・検収・是正・完了）',
                           icon: Icons.done_all,
@@ -270,9 +228,9 @@ class _WorkPageState extends State<WorkPage>
                   }
 
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                    padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
                     itemBuilder: (context, i) {
                       final appDoc = filtered[i];
                       final applicationId = appDoc.id;
@@ -289,9 +247,12 @@ class _WorkPageState extends State<WorkPage>
                         child: ListTile(
                           title: Text(
                             titleSnap.isNotEmpty ? titleSnap : '案件',
-                            style: const TextStyle(fontWeight: FontWeight.w900),
+                            style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
                           ),
-                          subtitle: Text('状態: $statusKey'),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: StatusBadge.fromStatus(statusKey),
+                          ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -344,17 +305,20 @@ class _WhiteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE6E8EB)),
-        ),
-        child: child,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
+      child: child,
     );
   }
 }
@@ -376,19 +340,6 @@ class _StatusGroup extends StatelessWidget {
     required this.onTapItem,
   });
 
-  String _statusLabel(String key) {
-    switch (key) {
-      case 'applied': return '応募中';
-      case 'assigned': return '着工前';
-      case 'in_progress': return '着工中';
-      case 'completed': return '施工完了';
-      case 'inspection': return '検収中';
-      case 'fixing': return '是正中';
-      case 'done': return '完了';
-      default: return key;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -397,31 +348,32 @@ class _StatusGroup extends StatelessWidget {
         Row(
           children: [
             Container(
-              width: 32, height: 32,
+              width: 36, height: 36,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 18, color: color),
             ),
-            const SizedBox(width: 10),
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(title, style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w800)),
+            ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
               ),
-              child: Text('$count', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
+              child: Text('$count', style: AppTextStyles.badgeText.copyWith(color: color)),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         if (docs.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-            child: Text('案件はありません', style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
+            child: Text('案件はありません', style: AppTextStyles.bodySmall),
           )
         else
           ...docs.map((appDoc) {
@@ -429,16 +381,19 @@ class _StatusGroup extends StatelessWidget {
             final titleSnap = (app['jobTitleSnapshot'] ?? app['projectNameSnapshot'] ?? '').toString();
             final statusKey = (app['status'] ?? 'applied').toString();
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: _WhiteCard(
                 child: ListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   title: Text(
                     titleSnap.isNotEmpty ? titleSnap : '案件',
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
-                  subtitle: Text(_statusLabel(statusKey), style: TextStyle(fontSize: 12, color: color)),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                    child: StatusBadge.fromStatus(statusKey),
+                  ),
                   trailing: const Icon(Icons.chevron_right, size: 20),
                   onTap: () => onTapItem(appDoc.id),
                 ),
