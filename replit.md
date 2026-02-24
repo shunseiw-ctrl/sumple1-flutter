@@ -75,6 +75,11 @@ A Flutter-based job matching application for the construction industry (建設�
   - Firestore cache size limits for Web
   - Admin login page: removed "create admin" button, added form validation
   - job_detail_page: adminUid fallback chain for legacy data
+- 2026-02-24: Brand color theme update (瑠璃色 #1E50A2)
+  - Created lib/core/constants/app_colors.dart with centralized color definitions
+  - Updated ThemeData in main.dart: ruri accent, white/light base
+  - Updated all 16 page files to use AppColors instead of hardcoded colors
+  - LINE green button preserved, text readability maintained
 - 2026-02-24: Adapted project for Replit environment
   - Flutter web platform support, Firebase config, API compatibility fixes
 
