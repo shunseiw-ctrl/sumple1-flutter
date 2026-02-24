@@ -24,6 +24,13 @@ class _JobListPageState extends State<JobListPage> {
   final _favoritesService = FavoritesService();
   Set<String> _guestFavorites = {};
 
+  RangeValues _priceRange = const RangeValues(0, 100000);
+  String _areaFilter = '';
+  Set<String> _qualFilter = {};
+  String? _dateFromFilter;
+  String? _dateToFilter;
+  bool _hasActiveFilters = false;
+
   final List<String> _prefs = const [
     '千葉県',
     '東京都',
@@ -85,6 +92,222 @@ class _JobListPageState extends State<JobListPage> {
     }
   }
 
+  void _showFilterSheet() {
+    var tempPrice = _priceRange;
+    var tempArea = _areaFilter;
+    var tempQuals = Set<String>.from(_qualFilter);
+    var tempDateFrom = _dateFromFilter;
+    var tempDateTo = _dateToFilter;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setLocal) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.75,
+              minChildSize: 0.5,
+              maxChildSize: 0.9,
+              expand: false,
+              builder: (ctx, scrollController) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40, height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.textHint,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Text('絞り込み', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              setLocal(() {
+                                tempPrice = const RangeValues(0, 100000);
+                                tempArea = '';
+                                tempQuals = {};
+                                tempDateFrom = null;
+                                tempDateTo = null;
+                              });
+                            },
+                            child: const Text('リセット'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      const Text('エリア（市区町村）', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: TextEditingController(text: tempArea),
+                        decoration: InputDecoration(
+                          hintText: '例）渋谷区、横浜市',
+                          prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
+                          isDense: true,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onChanged: (v) => tempArea = v.trim(),
+                      ),
+                      const SizedBox(height: 20),
+
+                      Text('金額範囲: ¥${tempPrice.start.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')} ~ ¥${tempPrice.end.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')}${tempPrice.end >= 100000 ? '+' : ''}',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                      RangeSlider(
+                        values: tempPrice,
+                        min: 0,
+                        max: 100000,
+                        divisions: 20,
+                        activeColor: AppColors.ruri,
+                        labels: RangeLabels(
+                          '¥${tempPrice.start.toInt()}',
+                          tempPrice.end >= 100000 ? '¥100,000+' : '¥${tempPrice.end.toInt()}',
+                        ),
+                        onChanged: (v) => setLocal(() => tempPrice = v),
+                      ),
+                      const SizedBox(height: 16),
+
+                      const Text('必要資格', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8, runSpacing: 8,
+                        children: ['足場組立', '玉掛け', 'フォークリフト', '電気工事士', '溶接', '危険物取扱者', '土木施工管理', '建築施工管理'].map((q) {
+                          final selected = tempQuals.contains(q);
+                          return FilterChip(
+                            label: Text(q),
+                            selected: selected,
+                            onSelected: (v) {
+                              setLocal(() {
+                                if (v) { tempQuals.add(q); } else { tempQuals.remove(q); }
+                              });
+                            },
+                            selectedColor: AppColors.ruriPale,
+                            checkmarkColor: AppColors.ruri,
+                            labelStyle: TextStyle(
+                              color: selected ? AppColors.ruri : AppColors.textPrimary,
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+
+                      const Text('日付範囲', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: ctx,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                                );
+                                if (picked != null) {
+                                  setLocal(() => tempDateFrom = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}');
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.border),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(tempDateFrom ?? '開始日', style: TextStyle(color: tempDateFrom != null ? AppColors.textPrimary : AppColors.textHint)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Text('〜'),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: ctx,
+                                  initialDate: DateTime.now().add(const Duration(days: 30)),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                                );
+                                if (picked != null) {
+                                  setLocal(() => tempDateTo = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}');
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.border),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(tempDateTo ?? '終了日', style: TextStyle(color: tempDateTo != null ? AppColors.textPrimary : AppColors.textHint)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _priceRange = tempPrice;
+                              _areaFilter = tempArea;
+                              _qualFilter = tempQuals;
+                              _dateFromFilter = tempDateFrom;
+                              _dateToFilter = tempDateTo;
+                              _hasActiveFilters = tempArea.isNotEmpty || tempQuals.isNotEmpty || tempDateFrom != null || tempDateTo != null || tempPrice.start > 0 || tempPrice.end < 100000;
+                            });
+                            Navigator.pop(ctx);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.ruri,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                          child: const Text('この条件で検索', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -125,12 +348,12 @@ class _JobListPageState extends State<JobListPage> {
                     ),
                     const Spacer(),
                     TextButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('絞り込みは一部のみ実装（都道府県＋月）')),
-                        );
-                      },
-                      icon: const Icon(Icons.tune, size: 18),
+                      onPressed: _showFilterSheet,
+                      icon: Badge(
+                        isLabelVisible: _hasActiveFilters,
+                        smallSize: 8,
+                        child: const Icon(Icons.tune, size: 18),
+                      ),
                       label: const Text('絞り込み'),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.textPrimary,
@@ -194,11 +417,50 @@ class _JobListPageState extends State<JobListPage> {
                     }).toList()
                         : rawDocs;
 
+                    final filteredDocs = docs.where((d) {
+                      final data = d.data() as Map<String, dynamic>;
+
+                      if (_areaFilter.isNotEmpty) {
+                        final location = (data['location'] ?? '').toString().toLowerCase();
+                        if (!location.contains(_areaFilter.toLowerCase())) return false;
+                      }
+
+                      if (_priceRange.start > 0 || _priceRange.end < 100000) {
+                        final price = int.tryParse(data['price']?.toString() ?? '0') ?? 0;
+                        if (price < _priceRange.start) return false;
+                        if (_priceRange.end < 100000 && price > _priceRange.end) return false;
+                      }
+
+                      if (_dateFromFilter != null || _dateToFilter != null) {
+                        final dateStr = (data['date'] ?? '').toString();
+                        if (dateStr.isNotEmpty) {
+                          if (_dateFromFilter != null && dateStr.compareTo(_dateFromFilter!) < 0) return false;
+                          if (_dateToFilter != null && dateStr.compareTo(_dateToFilter!) > 0) return false;
+                        }
+                      }
+
+                      return true;
+                    }).toList();
+
+                    if (_sortLabel == '金額が高い順') {
+                      filteredDocs.sort((a, b) {
+                        final aData = a.data() as Map<String, dynamic>;
+                        final bData = b.data() as Map<String, dynamic>;
+                        final aPrice = int.tryParse(aData['price']?.toString() ?? '0') ?? 0;
+                        final bPrice = int.tryParse(bData['price']?.toString() ?? '0') ?? 0;
+                        return bPrice.compareTo(aPrice);
+                      });
+                    }
+
+                    if (filteredDocs.isEmpty) {
+                      return const _CenterMessage(text: '条件に一致する案件がありません');
+                    }
+
                     return ListView.builder(
                       padding: const EdgeInsets.fromLTRB(12, 6, 12, 20),
-                      itemCount: docs.length,
+                      itemCount: filteredDocs.length,
                       itemBuilder: (context, index) {
-                        final doc = docs[index];
+                        final doc = filteredDocs[index];
                         final data = doc.data() as Map<String, dynamic>;
 
                         final title = data['title']?.toString() ?? 'タイトルなし';

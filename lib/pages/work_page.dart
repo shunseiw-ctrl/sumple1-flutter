@@ -21,6 +21,7 @@ class _WorkPageState extends State<WorkPage>
   late final TabController _statusTabController;
 
   static const _statusTabs = <_StatusTab>[
+    _StatusTab(key: 'my_applications', label: '応募状況'),
     _StatusTab(key: 'assigned', label: '着工前'),
     _StatusTab(key: 'in_progress', label: '着工中'),
     _StatusTab(key: 'completed', label: '施工完了'),
@@ -46,6 +47,8 @@ class _WorkPageState extends State<WorkPage>
 
   String _emptyMessageFor(String statusKey) {
     switch (statusKey) {
+      case 'my_applications':
+        return '応募した案件はまだありません';
       case 'assigned':
         return '着工前の案件はまだありません';
       case 'in_progress':
@@ -76,6 +79,15 @@ class _WorkPageState extends State<WorkPage>
       final bd = _toDate(b.data()['createdAt']) ?? DateTime.fromMillisecondsSinceEpoch(0);
       return bd.compareTo(ad);
     });
+  }
+
+  void _navigateToDetail(BuildContext context, String applicationId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => WorkDetailPage(applicationId: applicationId),
+      ),
+    );
   }
 
   @override
@@ -180,13 +192,20 @@ class _WorkPageState extends State<WorkPage>
                   final allDocs = snap.data!.docs.toList();
                   _sortByCreatedAtDesc(allDocs);
 
-                  final filtered = allDocs.where((d) {
-                    final status = (d.data()['status'] ?? 'applied').toString();
-                    if (selectedStatusKey == 'assigned') {
+                  List<QueryDocumentSnapshot<Map<String, dynamic>>> filtered;
+                  if (selectedStatusKey == 'my_applications') {
+                    filtered = allDocs;
+                  } else if (selectedStatusKey == 'assigned') {
+                    filtered = allDocs.where((d) {
+                      final status = (d.data()['status'] ?? 'applied').toString();
                       return status == 'assigned' || status == 'applied';
-                    }
-                    return status == selectedStatusKey;
-                  }).toList();
+                    }).toList();
+                  } else {
+                    filtered = allDocs.where((d) {
+                      final status = (d.data()['status'] ?? 'applied').toString();
+                      return status == selectedStatusKey;
+                    }).toList();
+                  }
 
                   if (filtered.isEmpty) {
                     return Center(
@@ -198,6 +217,55 @@ class _WorkPageState extends State<WorkPage>
                           style: TextStyle(color: AppColors.textSecondary),
                         ),
                       ),
+                    );
+                  }
+
+                  if (selectedStatusKey == 'my_applications') {
+                    final pending = filtered.where((d) {
+                      final s = (d.data()['status'] ?? 'applied').toString();
+                      return s == 'applied';
+                    }).toList();
+
+                    final approved = filtered.where((d) {
+                      final s = (d.data()['status'] ?? '').toString();
+                      return s == 'assigned' || s == 'in_progress';
+                    }).toList();
+
+                    final completed = filtered.where((d) {
+                      final s = (d.data()['status'] ?? '').toString();
+                      return s == 'completed' || s == 'inspection' || s == 'fixing' || s == 'done';
+                    }).toList();
+
+                    return ListView(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                      children: [
+                        _StatusGroup(
+                          title: '応募中',
+                          icon: Icons.hourglass_empty,
+                          color: AppColors.warning,
+                          count: pending.length,
+                          docs: pending,
+                          onTapItem: (appId) => _navigateToDetail(context, appId),
+                        ),
+                        const SizedBox(height: 16),
+                        _StatusGroup(
+                          title: '承認済み（着工前・着工中）',
+                          icon: Icons.check_circle_outline,
+                          color: AppColors.ruri,
+                          count: approved.length,
+                          docs: approved,
+                          onTapItem: (appId) => _navigateToDetail(context, appId),
+                        ),
+                        const SizedBox(height: 16),
+                        _StatusGroup(
+                          title: '完了（施工完了・検収・是正・完了）',
+                          icon: Icons.done_all,
+                          color: AppColors.success,
+                          count: completed.length,
+                          docs: completed,
+                          onTapItem: (appId) => _navigateToDetail(context, appId),
+                        ),
+                      ],
                     );
                   }
 
@@ -287,6 +355,97 @@ class _WhiteCard extends StatelessWidget {
         ),
         child: child,
       ),
+    );
+  }
+}
+
+class _StatusGroup extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final int count;
+  final List<QueryDocumentSnapshot<Map<String, dynamic>>> docs;
+  final void Function(String applicationId) onTapItem;
+
+  const _StatusGroup({
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.count,
+    required this.docs,
+    required this.onTapItem,
+  });
+
+  String _statusLabel(String key) {
+    switch (key) {
+      case 'applied': return '応募中';
+      case 'assigned': return '着工前';
+      case 'in_progress': return '着工中';
+      case 'completed': return '施工完了';
+      case 'inspection': return '検収中';
+      case 'fixing': return '是正中';
+      case 'done': return '完了';
+      default: return key;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 32, height: 32,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(width: 10),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text('$count', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (docs.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+            child: Text('案件はありません', style: TextStyle(color: AppColors.textHint, fontSize: 13)),
+          )
+        else
+          ...docs.map((appDoc) {
+            final app = appDoc.data();
+            final titleSnap = (app['jobTitleSnapshot'] ?? app['projectNameSnapshot'] ?? '').toString();
+            final statusKey = (app['status'] ?? 'applied').toString();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _WhiteCard(
+                child: ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    titleSnap.isNotEmpty ? titleSnap : '案件',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
+                  subtitle: Text(_statusLabel(statusKey), style: TextStyle(fontSize: 12, color: color)),
+                  trailing: const Icon(Icons.chevron_right, size: 20),
+                  onTap: () => onTapItem(appDoc.id),
+                ),
+              ),
+            );
+          }),
+      ],
     );
   }
 }

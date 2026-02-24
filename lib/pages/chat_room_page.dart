@@ -17,7 +17,9 @@ class ChatRoomPage extends StatefulWidget {
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
   final _controller = TextEditingController();
+  final _scrollController = ScrollController();
   final _chatService = ChatService();
+  final _focusNode = FocusNode();
 
   bool _sending = false;
   bool _ready = false;
@@ -42,38 +44,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   Future<void> _initializeChatRoom() async {
     Logger.info('Initializing chat room', tag: 'ChatRoomPage');
-
-    setState(() {
-      _ready = false;
-      _readyError = null;
-    });
+    setState(() { _ready = false; _readyError = null; });
 
     final result = await _chatService.initializeChatRoom(widget.applicationId);
-
     if (!mounted) return;
 
     if (result.success) {
-      setState(() {
-        _initResult = result;
-        _ready = true;
-        _readyError = null;
-      });
-      Logger.info('Chat room ready', tag: 'ChatRoomPage');
+      setState(() { _initResult = result; _ready = true; _readyError = null; });
     } else {
-      setState(() {
-        _ready = false;
-        _readyError = result.errorMessage;
-      });
-      Logger.warning(
-        'Chat room initialization failed',
-        tag: 'ChatRoomPage',
-        data: {'error': result.errorMessage},
-      );
+      setState(() { _ready = false; _readyError = result.errorMessage; });
     }
   }
 
@@ -82,15 +68,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (text.isEmpty) return;
 
     setState(() => _sending = true);
-
-    Logger.debug('Sending message', tag: 'ChatRoomPage');
-
     try {
       if (!_ready) {
         await _initializeChatRoom();
-        if (!_ready) {
-          throw Exception(_readyError ?? 'チャットの準備ができていません');
-        }
+        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
       }
 
       final result = await _chatService.sendMessage(
@@ -99,31 +80,48 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       );
 
       if (!mounted) return;
-
       if (result.success) {
         _controller.clear();
-        Logger.info('Message sent successfully', tag: 'ChatRoomPage');
       } else {
-        ErrorHandler.showError(
-          context,
-          result.errorMessage ?? 'メッセージの送信に失敗しました',
-        );
+        ErrorHandler.showError(context, result.errorMessage ?? 'メッセージの送信に失敗しました');
       }
     } catch (e, stackTrace) {
-      Logger.error(
-        'Error sending message',
-        tag: 'ChatRoomPage',
-        error: e,
-        stackTrace: stackTrace,
-      );
-
+      Logger.error('Error sending message', tag: 'ChatRoomPage', error: e, stackTrace: stackTrace);
       if (!mounted) return;
       ErrorHandler.showError(context, e);
     } finally {
-      if (mounted) {
-        setState(() => _sending = false);
-      }
+      if (mounted) setState(() => _sending = false);
     }
+  }
+
+  String _formatTime(Timestamp? ts) {
+    if (ts == null) return '';
+    final d = ts.toDate();
+    return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatDate(Timestamp? ts) {
+    if (ts == null) return '';
+    final d = ts.toDate();
+    final now = DateTime.now();
+    if (d.year == now.year && d.month == now.month && d.day == now.day) {
+      return '今日';
+    }
+    final yesterday = now.subtract(const Duration(days: 1));
+    if (d.year == yesterday.year && d.month == yesterday.month && d.day == yesterday.day) {
+      return '昨日';
+    }
+    return '${d.month}/${d.day}';
+  }
+
+  bool _shouldShowDate(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs, int index) {
+    if (index == docs.length - 1) return true;
+    final current = docs[index].data()['createdAt'] as Timestamp?;
+    final next = docs[index + 1].data()['createdAt'] as Timestamp?;
+    if (current == null || next == null) return false;
+    final cd = current.toDate();
+    final nd = next.toDate();
+    return cd.year != nd.year || cd.month != nd.month || cd.day != nd.day;
   }
 
   @override
@@ -131,126 +129,215 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     final myUid = _uid;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF8CABD9),
       appBar: AppBar(
+        backgroundColor: AppColors.ruri,
+        foregroundColor: Colors.white,
+        elevation: 0,
         title: _ready
             ? StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: _chatRef.snapshots(),
-          builder: (context, snap) {
-            final title =
-            (snap.data?.data()?['titleSnapshot'] ?? 'チャット').toString();
-            return Text(title);
-          },
-        )
+                stream: _chatRef.snapshots(),
+                builder: (context, snap) {
+                  final title = (snap.data?.data()?['titleSnapshot'] ?? 'チャット').toString();
+                  return Text(title, style: const TextStyle(fontWeight: FontWeight.w700));
+                },
+              )
             : const Text('チャット'),
       ),
       body: !_ready
           ? Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (_readyError == null)
-                const CircularProgressIndicator()
-              else
-                Text(_readyError!, textAlign: TextAlign.center),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _initializeChatRoom,
-                child: const Text('再試行'),
-              )
-            ],
-          ),
-        ),
-      )
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_readyError == null)
+                      CircularProgressIndicator(color: AppColors.ruri)
+                    else
+                      Text(_readyError!, textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    OutlinedButton(onPressed: _initializeChatRoom, child: const Text('再試行')),
+                  ],
+                ),
+              ),
+            )
           : Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _msgRef
-                  .orderBy('createdAt', descending: true)
-                  .limit(50)
-                  .snapshots(),
-              builder: (context, snap) {
-                if (snap.hasError) {
-                  return Center(child: Text('読み込みエラー: ${snap.error}'));
-                }
-                if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              children: [
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: _msgRef.orderBy('createdAt', descending: true).limit(100).snapshots(),
+                    builder: (context, snap) {
+                      if (snap.hasError) return Center(child: Text('読み込みエラー'));
+                      if (!snap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.ruri));
 
-                final docs = snap.data!.docs;
-                if (docs.isEmpty) {
-                  return const Center(child: Text('まだメッセージはありません'));
-                }
+                      final docs = snap.data!.docs;
+                      if (docs.isEmpty) {
+                        return Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text('メッセージを始めましょう', style: TextStyle(color: Colors.white, fontSize: 13)),
+                          ),
+                        );
+                      }
 
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: docs.length,
-                  itemBuilder: (context, i) {
-                    final m = docs[i].data();
-                    final sender = (m['senderUid'] ?? '').toString();
-                    final text = (m['text'] ?? '').toString();
-                    final mine = sender == myUid;
+                      return ListView.builder(
+                        controller: _scrollController,
+                        reverse: true,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        itemCount: docs.length,
+                        itemBuilder: (context, i) {
+                          final m = docs[i].data();
+                          final sender = (m['senderUid'] ?? '').toString();
+                          final text = (m['text'] ?? '').toString();
+                          final createdAt = m['createdAt'] as Timestamp?;
+                          final mine = sender == myUid;
+                          final showDate = _shouldShowDate(docs, i);
 
-                    return Align(
-                      alignment:
-                      mine ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        constraints: const BoxConstraints(maxWidth: 280),
-                        decoration: BoxDecoration(
-                          color:
-                          mine ? AppColors.ruriPale : Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(text),
+                          return Column(
+                            children: [
+                              if (showDate)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black26,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      _formatDate(createdAt),
+                                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  mainAxisAlignment: mine ? MainAxisAlignment.end : MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (!mine) ...[
+                                      CircleAvatar(
+                                        radius: 16,
+                                        backgroundColor: AppColors.ruriPale,
+                                        child: Icon(Icons.person, size: 18, color: AppColors.ruri),
+                                      ),
+                                      const SizedBox(width: 6),
+                                    ],
+                                    if (mine)
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 4, bottom: 2),
+                                        child: Text(
+                                          _formatTime(createdAt),
+                                          style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                        ),
+                                      ),
+                                    Flexible(
+                                      child: Container(
+                                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: mine ? const Color(0xFF7BC67E) : Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: const Radius.circular(18),
+                                            topRight: const Radius.circular(18),
+                                            bottomLeft: Radius.circular(mine ? 18 : 4),
+                                            bottomRight: Radius.circular(mine ? 4 : 18),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.06),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          text,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: mine ? Colors.white : AppColors.textPrimary,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (!mine)
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 4, bottom: 2),
+                                        child: Text(
+                                          _formatTime(createdAt),
+                                          style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  color: Colors.white,
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.chipUnselected,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: TextField(
+                                controller: _controller,
+                                focusNode: _focusNode,
+                                minLines: 1,
+                                maxLines: 4,
+                                textInputAction: TextInputAction.send,
+                                onSubmitted: (_) => _send(),
+                                decoration: InputDecoration(
+                                  hintText: 'メッセージを入力',
+                                  hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Material(
+                            color: _sending ? AppColors.textHint : AppColors.ruri,
+                            shape: const CircleBorder(),
+                            child: InkWell(
+                              onTap: _sending ? null : _send,
+                              customBorder: const CircleBorder(),
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                alignment: Alignment.center,
+                                child: _sending
+                                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                    : const Icon(Icons.send, color: Colors.white, size: 20),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        hintText: 'メッセージを入力',
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                      onSubmitted: (_) => _send(),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: _sending ? null : _send,
-                    icon: _sending
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                        : Icon(Icons.send, color: AppColors.ruri),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

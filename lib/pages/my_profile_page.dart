@@ -254,7 +254,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
           ),
         ],
       ),
-      body: AbsorbPointer(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: AbsorbPointer(
         absorbing: _isLoading,
         child: Form(
           key: _formKey,
@@ -268,6 +271,42 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 const SizedBox(height: 12),
               ],
+
+              const _SectionTitle('プロフィール写真'),
+              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance.collection('profiles').doc(FirebaseAuth.instance.currentUser?.uid ?? '').snapshots(),
+                builder: (context, snap) {
+                  final data = snap.data?.data();
+                  final photoUrl = (data?['profilePhotoUrl'] ?? '').toString();
+                  final locked = data?['profilePhotoLocked'] == true;
+
+                  return Center(
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppColors.chipUnselected,
+                          backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                          child: photoUrl.isEmpty ? Icon(Icons.person, size: 50, color: AppColors.textHint) : null,
+                        ),
+                        const SizedBox(height: 8),
+                        if (locked)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.lock, size: 14, color: AppColors.success),
+                              const SizedBox(width: 4),
+                              Text('本人確認済み', style: TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w600)),
+                            ],
+                          )
+                        else
+                          Text('本人確認で写真が設定されます', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
 
               const _SectionTitle('基本情報'),
 
@@ -459,6 +498,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
             ],
           ),
+        ),
+      ),
         ),
       ),
     );

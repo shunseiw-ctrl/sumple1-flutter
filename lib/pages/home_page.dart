@@ -164,13 +164,17 @@ class _HomePageState extends State<HomePage> {
             ),
         ],
       ),
-      body: IndexedStack(
-        index: _index,
-        children: _pages,
+      body: SafeArea(
+        child: IndexedStack(
+          index: _index,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         type: BottomNavigationBarType.fixed,
+        selectedFontSize: 12,
+        unselectedFontSize: 11,
         onTap: (i) => setState(() => _index = i),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.search), label: '検索'),

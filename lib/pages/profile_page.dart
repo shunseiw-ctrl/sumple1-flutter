@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'admin_login_page.dart';
+import 'identity_verification_page.dart';
 import 'my_profile_page.dart';
 import '../core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -226,7 +227,10 @@ class _ProfilePageState extends State<ProfilePage> {
         : (user?.email?.trim().isNotEmpty == true ? user!.email!.trim() : 'ログインユーザー'));
 
     return Scaffold(
-      body: ListView(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
           _ProfileHeaderCard(
@@ -287,6 +291,18 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const MyProfilePage()),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          _MenuTile(
+            icon: Icons.verified_user_outlined,
+            title: '本人確認',
+            subtitle: '身分証明書と顔写真を提出',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
               );
             },
           ),
@@ -366,6 +382,8 @@ class _ProfilePageState extends State<ProfilePage> {
             },
           ),
         ],
+      ),
+        ),
       ),
     );
   }

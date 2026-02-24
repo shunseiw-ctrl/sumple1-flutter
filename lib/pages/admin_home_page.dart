@@ -824,191 +824,327 @@ class _JobCard extends StatelessWidget {
   }
 }
 
-class _ApplicantsTab extends StatelessWidget {
+class _ApplicantsTab extends StatefulWidget {
   const _ApplicantsTab();
+
+  @override
+  State<_ApplicantsTab> createState() => _ApplicantsTabState();
+}
+
+class _ApplicantsTabState extends State<_ApplicantsTab> {
+  String _filterStatus = 'all';
 
   String _statusLabel(String key) {
     switch (key) {
-      case 'assigned':
-        return '着工前';
-      case 'applied':
-        return '応募中';
-      case 'in_progress':
-        return '着工中';
-      case 'completed':
-        return '施工完了';
-      case 'inspection':
-        return '検収中';
-      case 'fixing':
-        return '是正中';
-      case 'done':
-        return '完了';
-      default:
-        return key;
+      case 'assigned': return '着工前';
+      case 'applied': return '応募中';
+      case 'in_progress': return '着工中';
+      case 'completed': return '施工完了';
+      case 'inspection': return '検収中';
+      case 'fixing': return '是正中';
+      case 'done': return '完了';
+      default: return key;
     }
   }
 
   Color _statusColor(String key) {
     switch (key) {
-      case 'applied':
-        return AppColors.warning;
+      case 'applied': return AppColors.warning;
       case 'assigned':
-      case 'in_progress':
-        return AppColors.ruri;
+      case 'in_progress': return AppColors.ruri;
       case 'completed':
-      case 'done':
-        return AppColors.success;
+      case 'done': return AppColors.success;
       case 'inspection':
-      case 'fixing':
-        return AppColors.error;
-      default:
-        return AppColors.textSecondary;
+      case 'fixing': return AppColors.error;
+      default: return AppColors.textSecondary;
+    }
+  }
+
+  Future<void> _updateStatus(String appId, String newStatus, String jobTitle) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('ステータス変更'),
+        content: Text('「$jobTitle」を「${_statusLabel(newStatus)}」に変更しますか？'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('キャンセル')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('変更する'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await FirebaseFirestore.instance.collection('applications').doc(appId).update({
+        'status': newStatus,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      final appDoc = await FirebaseFirestore.instance.collection('applications').doc(appId).get();
+      final applicantUid = (appDoc.data()?['applicantUid'] ?? '').toString();
+      if (applicantUid.isNotEmpty) {
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'targetUid': applicantUid,
+          'title': 'ステータス更新',
+          'body': '「$jobTitle」が「${_statusLabel(newStatus)}」になりました',
+          'type': 'status_update',
+          'read': false,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('「$jobTitle」を${_statusLabel(newStatus)}に変更しました')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('変更に失敗しました: $e')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('applications')
-          .orderBy('createdAt', descending: true)
-          .snapshots(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snap.hasError) {
-          return Center(child: Text('読み込みエラー: ${snap.error}'));
-        }
-        final docs = snap.data?.docs ?? [];
-        if (docs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+    return Column(
+      children: [
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               children: [
-                Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
-                const SizedBox(height: 12),
-                const Text(
-                  '応募者はまだいません',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                _filterChip('all', 'すべて'),
+                _filterChip('applied', '応募中'),
+                _filterChip('assigned', '着工前'),
+                _filterChip('in_progress', '着工中'),
+                _filterChip('done', '完了'),
               ],
             ),
-          );
-        }
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance
+                .collection('applications')
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
+            builder: (context, snap) {
+              if (snap.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snap.hasError) {
+                return Center(child: Text('読み込みエラー: ${snap.error}'));
+              }
+              var docs = snap.data?.docs ?? [];
 
-        return ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          itemCount: docs.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final doc = docs[index];
-            final data = doc.data();
-            final jobTitle = (data['jobTitleSnapshot'] ?? '案件名なし').toString();
-            final status = (data['status'] ?? 'applied').toString();
-            final applicantUid = (data['applicantUid'] ?? '').toString();
-            final createdAt = data['createdAt'];
-            String dateStr = '';
-            if (createdAt is Timestamp) {
-              final d = createdAt.toDate();
-              dateStr = '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
-            }
+              if (_filterStatus != 'all') {
+                docs = docs.where((d) {
+                  final s = (d.data()['status'] ?? 'applied').toString();
+                  if (_filterStatus == 'done') {
+                    return s == 'completed' || s == 'inspection' || s == 'fixing' || s == 'done';
+                  }
+                  return s == _filterStatus;
+                }).toList();
+              }
 
-            return Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => WorkDetailPage(applicationId: doc.id),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.divider),
-                  ),
-                  child: Row(
+              if (docs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
-                        radius: 22,
-                        backgroundColor: AppColors.ruriPale,
-                        child: const Icon(Icons.person, color: AppColors.ruri, size: 22),
+                      Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
+                      const SizedBox(height: 12),
+                      Text(
+                        _filterStatus == 'all' ? '応募者はまだいません' : '${_statusLabel(_filterStatus)}の応募はありません',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                itemCount: docs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final doc = docs[index];
+                  final data = doc.data();
+                  final jobTitle = (data['jobTitleSnapshot'] ?? '案件名なし').toString();
+                  final status = (data['status'] ?? 'applied').toString();
+                  final applicantUid = (data['applicantUid'] ?? '').toString();
+                  final createdAt = data['createdAt'];
+                  String dateStr = '';
+                  if (createdAt is Timestamp) {
+                    final d = createdAt.toDate();
+                    dateStr = '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
+                  }
+
+                  return Material(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (_) => WorkDetailPage(applicationId: doc.id),
+                        ));
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.divider),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              jobTitle,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
                             Row(
                               children: [
-                                Text(
-                                  'UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textHint,
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: AppColors.ruriPale,
+                                  child: const Icon(Icons.person, color: AppColors.ruri, size: 20),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(jobTitle, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                          if (dateStr.isNotEmpty) ...[
+                                            const SizedBox(width: 8),
+                                            Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                          ],
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                if (dateStr.isNotEmpty) ...[
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    dateStr,
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textHint,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: _statusColor(status).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(_statusLabel(status), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _statusColor(status))),
+                                ),
+                              ],
+                            ),
+                            if (status == 'applied') ...[
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () => _updateStatus(doc.id, 'rejected', jobTitle),
+                                      icon: const Icon(Icons.close, size: 18),
+                                      label: const Text('却下'),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.error,
+                                        side: BorderSide(color: AppColors.error),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => _updateStatus(doc.id, 'assigned', jobTitle),
+                                      icon: const Icon(Icons.check, size: 18),
+                                      label: const Text('承認'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.success,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        elevation: 0,
+                                      ),
                                     ),
                                   ),
                                 ],
-                              ],
-                            ),
+                              ),
+                            ],
+                            if (status == 'assigned') ...[
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _updateStatus(doc.id, 'in_progress', jobTitle),
+                                  icon: const Icon(Icons.play_arrow, size: 18),
+                                  label: const Text('着工開始'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.ruri,
+                                    side: BorderSide(color: AppColors.ruri),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (status == 'in_progress') ...[
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _updateStatus(doc.id, 'completed', jobTitle),
+                                  icon: const Icon(Icons.check_circle_outline, size: 18),
+                                  label: const Text('施工完了'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.success,
+                                    side: BorderSide(color: AppColors.success),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: _statusColor(status).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          _statusLabel(status),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _statusColor(status),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _filterChip(String key, String label) {
+    final selected = _filterStatus == key;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (v) => setState(() => _filterStatus = key),
+        selectedColor: AppColors.ruri,
+        labelStyle: TextStyle(
+          color: selected ? Colors.white : AppColors.textPrimary,
+          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          fontSize: 13,
+        ),
+        backgroundColor: AppColors.chipUnselected,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        side: BorderSide.none,
+      ),
     );
   }
 }
