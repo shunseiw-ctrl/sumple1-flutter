@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'pages/home_page.dart';
 import 'pages/admin_home_page.dart';
+import 'pages/onboarding_page.dart';
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
 import 'core/services/auth_service.dart';
@@ -14,6 +16,8 @@ import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'core/services/splash_remover.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +33,12 @@ Future<void> main() async {
   await LineAuthService().handleLineCallbackIfNeeded();
 
   runApp(const MyApp());
+
+  if (kIsWeb) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      removeSplashScreen();
+    });
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -204,6 +214,169 @@ class MyApp extends StatelessWidget {
           },
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        primaryColor: AppColors.ruri,
+        colorSchemeSeed: AppColors.ruri,
+        scaffoldBackgroundColor: AppDarkColors.background,
+        textTheme: baseTextTheme,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppDarkColors.surface,
+          foregroundColor: AppDarkColors.textPrimary,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          centerTitle: false,
+          titleTextStyle: GoogleFonts.notoSansJp(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppDarkColors.textPrimary,
+          ),
+          shape: Border(
+            bottom: BorderSide(color: AppDarkColors.divider, width: 0.5),
+          ),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: AppColors.ruri,
+          unselectedItemColor: AppDarkColors.textHint,
+          backgroundColor: AppDarkColors.surface,
+          type: BottomNavigationBarType.fixed,
+          selectedLabelStyle: GoogleFonts.notoSansJp(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: GoogleFonts.notoSansJp(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.ruri,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            textStyle: GoogleFonts.notoSansJp(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            ),
+            minimumSize: const Size(0, 52),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.ruri,
+            side: BorderSide(color: AppColors.ruri, width: 1.5),
+            textStyle: GoogleFonts.notoSansJp(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            ),
+            minimumSize: const Size(0, 52),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.ruri,
+            textStyle: GoogleFonts.notoSansJp(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+            minimumSize: const Size(0, 44),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppDarkColors.surfaceElevated,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            borderSide: BorderSide(color: AppDarkColors.border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            borderSide: BorderSide(color: AppDarkColors.border),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            borderSide: BorderSide(color: AppColors.ruri, width: 1.5),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          hintStyle: GoogleFonts.notoSansJp(
+            color: AppDarkColors.textHint,
+            fontSize: 14,
+          ),
+          labelStyle: GoogleFonts.notoSansJp(
+            color: AppDarkColors.textSecondary,
+            fontSize: 14,
+          ),
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: AppDarkColors.chipUnselected,
+          selectedColor: AppDarkColors.ruriPale,
+          labelStyle: GoogleFonts.notoSansJp(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+          ),
+          side: BorderSide.none,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+        dividerTheme: DividerThemeData(
+          color: AppDarkColors.divider,
+          thickness: 0.5,
+          space: 0,
+        ),
+        cardTheme: CardThemeData(
+          color: AppDarkColors.surface,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          ),
+          margin: EdgeInsets.zero,
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: AppDarkColors.surfaceElevated,
+          contentTextStyle: GoogleFonts.notoSansJp(
+            color: AppDarkColors.textPrimary,
+            fontSize: 14,
+          ),
+        ),
+        tabBarTheme: TabBarThemeData(
+          labelColor: AppColors.ruri,
+          unselectedLabelColor: AppDarkColors.textSecondary,
+          indicatorColor: AppColors.ruri,
+          labelStyle: GoogleFonts.notoSansJp(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: GoogleFonts.notoSansJp(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+          },
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: const AuthGate(),
     );
   }
@@ -220,6 +393,23 @@ class _AuthGateState extends State<AuthGate> {
   final _authService = AuthService();
   UserRole? _cachedRole;
   String? _lastUid;
+  bool? _onboardingComplete;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboarding();
+  }
+
+  Future<void> _checkOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    final done = prefs.getBool('onboarding_complete') ?? false;
+    if (mounted) {
+      setState(() {
+        _onboardingComplete = done;
+      });
+    }
+  }
 
   Future<UserRole> _resolveRole(User user) async {
     if (_lastUid == user.uid && _cachedRole != null) {
@@ -233,6 +423,18 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
+    if (_onboardingComplete == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.ruri),
+        ),
+      );
+    }
+
+    if (_onboardingComplete == false) {
+      return const OnboardingPage();
+    }
+
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {

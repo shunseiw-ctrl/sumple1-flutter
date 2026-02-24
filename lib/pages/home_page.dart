@@ -87,13 +87,16 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              'ALBAWORK',
-              style: GoogleFonts.poppins(
-                fontSize: 21,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
-                color: AppColors.textPrimary,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Text(
+                'ALBAWORK',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
             if (_isAdmin)

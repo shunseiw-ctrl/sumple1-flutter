@@ -251,6 +251,7 @@ class _MessagesPageState extends State<MessagesPage> {
                     icon: Icons.chat_bubble_outline,
                     title: _isAdmin ? '担当案件のメッセージはまだありません' : 'メッセージはまだありません',
                     description: '案件に応募するとメッセージが届きます',
+                    imagePath: 'assets/images/empty_messages.png',
                   );
                 }
 

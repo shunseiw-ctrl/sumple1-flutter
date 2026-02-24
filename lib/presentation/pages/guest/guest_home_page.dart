@@ -89,20 +89,34 @@ class _GuestHomePageState extends State<GuestHomePage> {
                       children: [
                         const SizedBox(height: 24),
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 88,
+                          height: 88,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.25),
-                              width: 1.5,
-                            ),
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.15),
+                                blurRadius: 32,
+                                spreadRadius: 8,
+                              ),
+                            ],
                           ),
-                          child: const Icon(
-                            Icons.construction_rounded,
-                            size: 44,
-                            color: Colors.white,
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.25),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.construction_rounded,
+                              size: 44,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 28),
@@ -110,9 +124,9 @@ class _GuestHomePageState extends State<GuestHomePage> {
                           'ALBAWORK',
                           style: AppTextStyles.displayLarge.copyWith(
                             color: Colors.white,
-                            fontSize: 38,
+                            fontSize: 42,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 2.0,
+                            letterSpacing: 3.0,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -123,6 +137,15 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             fontSize: 15,
                           ),
                           textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          width: 40,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
                         const SizedBox(height: 40),
                         Row(
@@ -354,7 +377,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
   }) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.12),
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
@@ -374,7 +397,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
               ),
               child: Icon(
                 icon,
-                size: 24,
+                size: 28,
                 color: Colors.white,
               ),
             ),

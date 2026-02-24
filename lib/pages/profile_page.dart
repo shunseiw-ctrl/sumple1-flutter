@@ -10,6 +10,7 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -272,19 +273,25 @@ class _ProfilePageState extends State<ProfilePage> {
           child: ListView(
         padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.pagePadding, AppSpacing.pagePadding, 24),
         children: [
-          _ProfileHeaderCard(
-            displayName: displayName,
-            subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
-            isLoggedIn: !isAnon,
+          StaggeredFadeSlide(
+            index: 0,
+            child: _ProfileHeaderCard(
+              displayName: displayName,
+              subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
+              isLoggedIn: !isAnon,
+            ),
           ),
           const SizedBox(height: 16),
 
           if (isAnon) ...[
-            _InfoBanner(
-              title: 'ログインが必要です',
-              message: '応募・チャットなど一部機能を利用するにはログインが必要です。',
-              buttonText: 'ログインする',
-              onPressed: _showEmailAuthDialog,
+            StaggeredFadeSlide(
+              index: 1,
+              child: _InfoBanner(
+                title: 'ログインが必要です',
+                message: '応募・チャットなど一部機能を利用するにはログインが必要です。',
+                buttonText: 'ログインする',
+                onPressed: _showEmailAuthDialog,
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -324,137 +331,180 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
           ],
 
-          const _SectionHeader(title: 'アカウント'),
-          _MenuGroup(
-            children: [
-              _MenuTile(
-                icon: Icons.settings_outlined,
-                iconColor: AppColors.ruri,
-                title: 'アカウント設定',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('アカウント設定（準備中）')),
-                  );
-                },
-              ),
-              _MenuTile(
-                icon: Icons.badge_outlined,
-                iconColor: AppColors.info,
-                title: 'あなたのプロフィール',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyProfilePage()),
-                  );
-                },
-              ),
-              _MenuTile(
-                icon: Icons.verified_user_outlined,
-                iconColor: AppColors.success,
-                title: '本人確認',
-                subtitle: '身分証明書と顔写真を提出',
-                isLast: true,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
-                  );
-                },
-              ),
-            ],
+          StaggeredFadeSlide(
+            index: isAnon ? 3 : 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: 'アカウント'),
+                _MenuGroup(
+                  children: [
+                    _MenuTile(
+                      icon: Icons.settings_outlined,
+                      iconColor: AppColors.ruri,
+                      title: 'アカウント設定',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('アカウント設定（準備中）')),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.badge_outlined,
+                      iconColor: AppColors.info,
+                      title: 'あなたのプロフィール',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const MyProfilePage()),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.verified_user_outlined,
+                      iconColor: AppColors.success,
+                      title: '本人確認',
+                      subtitle: '身分証明書と顔写真を提出',
+                      isLast: true,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 20),
-          const _SectionHeader(title: 'サポート'),
-          _MenuGroup(
-            children: [
-              _MenuTile(
-                icon: Icons.help_outline,
-                iconColor: AppColors.warning,
-                title: 'よくある質問',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('よくある質問（準備中）')),
-                  );
-                },
-              ),
-              _MenuTile(
-                icon: Icons.mail_outline,
-                iconColor: AppColors.ruri,
-                title: 'お問い合わせ',
-                isLast: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('お問い合わせ（準備中）')),
-                  );
-                },
-              ),
-            ],
+          StaggeredFadeSlide(
+            index: isAnon ? 4 : 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: 'サポート'),
+                _MenuGroup(
+                  children: [
+                    _MenuTile(
+                      icon: Icons.help_outline,
+                      iconColor: AppColors.warning,
+                      title: 'よくある質問',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('よくある質問（準備中）')),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.mail_outline,
+                      iconColor: AppColors.ruri,
+                      title: 'お問い合わせ',
+                      isLast: true,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('お問い合わせ（準備中）')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 20),
-          const _SectionHeader(title: 'その他'),
-          _MenuGroup(
-            children: [
-              _MenuTile(
-                icon: Icons.privacy_tip_outlined,
-                iconColor: AppColors.textSecondary,
-                title: 'プライバシーポリシー',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('プライバシーポリシー（準備中）')),
-                  );
-                },
-              ),
-              _MenuTile(
-                icon: Icons.description_outlined,
-                iconColor: AppColors.textSecondary,
-                title: '利用規約',
-                isLast: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('利用規約（準備中）')),
-                  );
-                },
-              ),
-            ],
+          StaggeredFadeSlide(
+            index: isAnon ? 5 : 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: 'その他'),
+                _MenuGroup(
+                  children: [
+                    _MenuTile(
+                      icon: Icons.dark_mode_outlined,
+                      iconColor: AppColors.ruri,
+                      title: 'ダークモード',
+                      subtitle: 'システム設定に従う',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('ダークモードはシステム設定に従います')),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.privacy_tip_outlined,
+                      iconColor: AppColors.textSecondary,
+                      title: 'プライバシーポリシー',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('プライバシーポリシー（準備中）')),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.description_outlined,
+                      iconColor: AppColors.textSecondary,
+                      title: '利用規約',
+                      isLast: true,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('利用規約（準備中）')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 20),
-          const _SectionHeader(title: '管理者'),
-          _MenuGroup(
-            children: [
-              _MenuTile(
-                icon: Icons.admin_panel_settings_outlined,
-                iconColor: AppColors.ruriDark,
-                title: '管理者ログイン',
-                subtitle: '案件の投稿・編集ができます',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AdminLoginPage()),
-                  );
-                },
-              ),
-              _MenuTile(
-                icon: Icons.logout,
-                iconColor: AppColors.error,
-                title: '管理者ログアウト',
-                subtitle: isAnon ? '現在ログインしていません' : 'ログアウトして一般ユーザー表示に戻す',
-                isLast: true,
-                onTap: () async {
-                  final auth = FirebaseAuth.instance;
-                  await auth.signOut();
-                  await auth.signInAnonymously();
+          StaggeredFadeSlide(
+            index: isAnon ? 6 : 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: '管理者'),
+                _MenuGroup(
+                  children: [
+                    _MenuTile(
+                      icon: Icons.admin_panel_settings_outlined,
+                      iconColor: AppColors.ruriDark,
+                      title: '管理者ログイン',
+                      subtitle: '案件の投稿・編集ができます',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AdminLoginPage()),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.logout,
+                      iconColor: AppColors.error,
+                      title: '管理者ログアウト',
+                      subtitle: isAnon ? '現在ログインしていません' : 'ログアウトして一般ユーザー表示に戻す',
+                      isLast: true,
+                      onTap: () async {
+                        final auth = FirebaseAuth.instance;
+                        await auth.signOut();
+                        await auth.signInAnonymously();
 
-                  if (!context.mounted) return;
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('ログアウトしました（ゲストに戻りました）')),
-                  );
-                },
-              ),
-            ],
+                        if (!context.mounted) return;
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('ログアウトしました（ゲストに戻りました）')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

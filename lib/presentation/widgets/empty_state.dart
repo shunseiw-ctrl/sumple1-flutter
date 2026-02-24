@@ -10,6 +10,7 @@ class EmptyState extends StatelessWidget {
   final String? actionText;
   final VoidCallback? onAction;
   final Color? iconColor;
+  final String? imagePath;
 
   const EmptyState({
     super.key,
@@ -19,6 +20,7 @@ class EmptyState extends StatelessWidget {
     this.actionText,
     this.onAction,
     this.iconColor,
+    this.imagePath,
   });
 
   @override
@@ -31,22 +33,43 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    color.withOpacity(0.08),
-                    color.withOpacity(0.15),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            if (imagePath != null) ...[
+              Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(32),
                 ),
-                borderRadius: BorderRadius.circular(24),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: Image.asset(
+                    imagePath!,
+                    width: 140,
+                    height: 140,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Icon(icon, size: 40, color: color),
+                  ),
+                ),
               ),
-              child: Icon(icon, size: 40, color: color),
-            ),
+            ] else ...[
+              Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      color.withOpacity(0.08),
+                      color.withOpacity(0.15),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Icon(icon, size: 40, color: color),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
             Text(
               title,

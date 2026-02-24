@@ -11,6 +11,8 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
+import 'package:sumple1/presentation/widgets/staggered_animation.dart';
+import 'package:sumple1/presentation/widgets/scale_tap.dart';
 
 class JobListPage extends StatefulWidget {
   const JobListPage({super.key});
@@ -359,6 +361,29 @@ class _JobListPageState extends State<JobListPage> {
       body: Column(
         children: [
           Container(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
+            color: Colors.white,
+            child: GestureDetector(
+              onTap: _showFilterSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: AppColors.textHint, size: 20),
+                    const SizedBox(width: 12),
+                    Text('エリア・条件で検索', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
+                    const Spacer(),
+                    const Icon(Icons.tune_rounded, color: AppColors.textSecondary, size: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Container(
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: AppShadows.subtle,
@@ -467,6 +492,7 @@ class _JobListPageState extends State<JobListPage> {
                         icon: Icons.work_off_outlined,
                         title: '案件がありません',
                         description: '現在この条件に合う案件はありません。\n別の条件で検索してみてください。',
+                        imagePath: 'assets/images/empty_jobs.png',
                       );
                     }
 
@@ -555,7 +581,9 @@ class _JobListPageState extends State<JobListPage> {
                             ? firestoreFavs.contains(doc.id)
                             : _guestFavorites.contains(doc.id);
 
-                        return Padding(
+                        return StaggeredFadeSlide(
+                          index: index,
+                          child: Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.base),
                           child: _JobCard(
                             title: title,
@@ -566,6 +594,7 @@ class _JobListPageState extends State<JobListPage> {
                             category: category,
                             badges: badges,
                             showLegacyWarning: !hasOwnerId,
+                            data: data,
                             isOwner: isOwner,
                             isFavorite: isFav,
                             onToggleFavorite: () {
@@ -607,6 +636,7 @@ class _JobListPageState extends State<JobListPage> {
                                 : null,
                             onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
                           ),
+                        ),
                         );
                       },
                     );
@@ -866,6 +896,7 @@ class _JobCard extends StatelessWidget {
   final String? category;
   final List<_BadgeSpec> badges;
   final bool showLegacyWarning;
+  final Map<String, dynamic> data;
 
   final bool isOwner;
   final bool isFavorite;
@@ -883,6 +914,7 @@ class _JobCard extends StatelessWidget {
     this.category,
     required this.badges,
     required this.showLegacyWarning,
+    required this.data,
     required this.isOwner,
     this.isFavorite = false,
     required this.onTap,
@@ -916,7 +948,7 @@ class _JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
-    return GestureDetector(
+    return ScaleTap(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
@@ -1087,11 +1119,72 @@ class _JobCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.headingSmall,
                   ),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  Builder(
+                    builder: (context) {
+                      final totalSlots = int.tryParse((data['slots'] ?? '5').toString()) ?? 5;
+                      final applicantCount = int.tryParse((data['applicantCount'] ?? '0').toString()) ?? 0;
+                      final remaining = (totalSlots - applicantCount).clamp(1, totalSlots);
+                      final isUrgent = remaining <= 2;
+                      final dateDiff = DateTime.tryParse(data['date'] ?? '')?.difference(DateTime.now()).inDays ?? 999;
+                      final showQuickStart = (data['quickStart'] ?? false) == true || dateDiff.abs() <= 3;
+
+                      return Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isUrgent ? AppColors.errorLight : AppColors.warningLight,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isUrgent ? Icons.local_fire_department : Icons.people_outline,
+                                  size: 12,
+                                  color: isUrgent ? AppColors.error : AppColors.warning,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '残り${remaining}枠',
+                                  style: AppTextStyles.badgeText.copyWith(
+                                    color: isUrgent ? AppColors.error : AppColors.warning,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (showQuickStart)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.successLight,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '即日勤務OK',
+                                style: AppTextStyles.badgeText.copyWith(color: AppColors.success),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: AppSpacing.md),
 
-                  Text(
-                    priceText,
-                    style: AppTextStyles.salary,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        priceText,
+                        style: AppTextStyles.salary,
+                      ),
+                      Text(' /日', style: AppTextStyles.bodySmall),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.md),
 

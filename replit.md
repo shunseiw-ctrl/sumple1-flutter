@@ -84,6 +84,20 @@ A Flutter-based job matching application for the construction industry (建設�
 - `ChatService` - Chat room initialization, message sending with retry, unread count management
 
 ## Recent Changes
+- 2026-02-24: World-class UI Polish & Micro-interactions
+  - Branded splash screen: CSS gradient with animated logo, spinner, fade-out transition (web/splash.css, web/index.html)
+  - Splash removal: conditional import pattern (splash_remover.dart/web/stub), 10s fallback timer
+  - Service worker disabled for dev (--pwa-strategy=none, unregister in index.html)
+  - 3-page onboarding flow: PageView with dot indicators, SharedPreferences persistence, gradient CTA
+  - Custom onboarding illustrations: onboarding_search/earn/safety.png (assets/images/)
+  - EmptyState illustrations: empty_jobs/messages.png for empty state screens
+  - StaggeredFadeSlide widget: staggered list entry animations (50ms delay, 400ms duration, 30px slide)
+  - ScaleTap widget: press-scale feedback (0.97x, 100ms), used on interactive cards
+  - Job card urgency badges: "残りX枠" (red when ≤2), "即日勤務OK", "/日" salary units
+  - Dark mode support: AppDarkColors class, ThemeMode.system, dark surface/background colors
+  - Typography refinement: tighter letter-spacing, larger display sizes (42px/900w), new caption/overline
+  - Search bar header on job list page
+  - pubspec.yaml: assets/images/ directory included
 - 2026-02-24: Professional UI Modernization (3-tier)
   - Design system: app_colors.dart (gradients, semantic colors), app_spacing.dart (8-point scale), app_text_styles.dart (Noto Sans JP typography hierarchy), app_shadows.dart (5-level elevation)
   - Shared widgets: skeleton_loader.dart (shimmer animation), empty_state.dart (gradient icon + CTA), status_badge.dart (pill badges, 7 Japanese statuses), app_card.dart (modern cards)

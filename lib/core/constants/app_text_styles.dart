@@ -10,17 +10,17 @@ class AppTextStyles {
   // Display
   static TextStyle displayLarge = _base.copyWith(
     fontSize: 40,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w900,
     height: 1.1,
-    letterSpacing: -0.5,
+    letterSpacing: -1.0,
     color: AppColors.textPrimary,
   );
 
   static TextStyle displayMedium = _base.copyWith(
     fontSize: 32,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w800,
     height: 1.15,
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
     color: AppColors.textPrimary,
   );
 
@@ -29,6 +29,7 @@ class AppTextStyles {
     fontSize: 24,
     fontWeight: FontWeight.w700,
     height: 1.25,
+    letterSpacing: -0.3,
     color: AppColors.textPrimary,
   );
 
@@ -36,6 +37,7 @@ class AppTextStyles {
     fontSize: 20,
     fontWeight: FontWeight.w700,
     height: 1.3,
+    letterSpacing: -0.2,
     color: AppColors.textPrimary,
   );
 
@@ -93,16 +95,17 @@ class AppTextStyles {
 
   // Special
   static TextStyle salary = _base.copyWith(
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: FontWeight.w800,
     height: 1.1,
     color: AppColors.salaryHighlight,
   );
 
   static TextStyle salaryLarge = _base.copyWith(
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: FontWeight.w800,
     height: 1.1,
+    letterSpacing: -0.5,
     color: AppColors.salaryHighlight,
   );
 
@@ -142,6 +145,21 @@ class AppTextStyles {
     fontWeight: FontWeight.w700,
     height: 1.3,
     letterSpacing: 0.5,
+    color: AppColors.textSecondary,
+  );
+
+  static TextStyle caption = _base.copyWith(
+    fontSize: 11,
+    fontWeight: FontWeight.w400,
+    height: 1.3,
+    color: AppColors.textHint,
+  );
+
+  static TextStyle overline = _base.copyWith(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    height: 1.2,
+    letterSpacing: 1.0,
     color: AppColors.textSecondary,
   );
 }
