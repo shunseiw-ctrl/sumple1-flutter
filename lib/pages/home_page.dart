@@ -69,7 +69,50 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isAdmin ? 'ALBAWORK（管理者）' : 'ALBAWORK'),
+        titleSpacing: 12,
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/logo.png',
+                height: 32,
+                width: 32,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _isAdmin ? 'ALBAWORKS' : 'ALBAWORKS',
+              style: const TextStyle(
+                fontFamily: 'serif',
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            if (_isAdmin)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.ruriPale,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '管理者',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ruri,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
         actions: [
           if (_index == 0 && _isAdmin)
             IconButton(
