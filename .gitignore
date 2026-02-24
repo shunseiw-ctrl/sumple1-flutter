@@ -52,4 +52,3 @@ functions/node_modules/
 # Dart/Flutter additional
 .flutter-plugins
 .packages
-pubspec.lock
