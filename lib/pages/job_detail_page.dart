@@ -82,7 +82,7 @@ class _DetailScaffold extends StatelessWidget {
     final doc = await FirebaseFirestore.instance.doc('config/admins').get();
     final docData = doc.data() as Map<String, dynamic>?;
 
-    final adminUids = (docData?['uids'] as List?)
+    final adminUids = (docData?['adminUids'] as List?)
             ?.map((e) => e.toString().trim())
             .toList() ??
         [];

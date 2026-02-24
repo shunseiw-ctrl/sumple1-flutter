@@ -56,7 +56,7 @@ class AuthService {
 
       final data = doc.data() as Map<String, dynamic>?;
 
-      final adminUids = (data?['uids'] as List?)
+      final adminUids = (data?['adminUids'] as List?)
               ?.map((e) => e.toString().trim())
               .toList() ??
           [];

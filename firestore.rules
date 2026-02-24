@@ -13,7 +13,7 @@ service cloud.firestore {
       return signedIn()
         && exists(/databases/$(database)/documents/config/admins)
         && (
-          uid() in get(/databases/$(database)/documents/config/admins).data.uids
+          uid() in get(/databases/$(database)/documents/config/admins).data.adminUids
           || request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.emails
         );
     }
