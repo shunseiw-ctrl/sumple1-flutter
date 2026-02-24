@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../core/services/auth_service.dart';
-import '../../core/utils/error_handler.dart';
-import '../../core/utils/logger.dart';
+import 'package:sumple1/core/services/auth_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 /// 未登録ユーザー（ゲスト）用のホーム画面
 class GuestHomePage extends StatefulWidget {

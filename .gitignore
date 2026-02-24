@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Node.js
+node_modules/
+functions/node_modules/
+
+# Dart/Flutter additional
+.flutter-plugins
+.packages
+pubspec.lock
