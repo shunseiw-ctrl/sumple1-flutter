@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'chat_room_page.dart';
 import 'job_detail_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/rating_dialog.dart';
+import 'package:sumple1/core/services/notification_service.dart';
 
 class WorkDetailPage extends StatefulWidget {
   final String applicationId;
@@ -50,6 +52,62 @@ class _WorkDetailPageState extends State<WorkDetailPage>
         return '完了';
       default:
         return key;
+    }
+  }
+
+  Future<bool> _hasRated(String applicationId) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return false;
+    final snap = await FirebaseFirestore.instance
+        .collection('ratings')
+        .where('applicationId', isEqualTo: applicationId)
+        .where('raterUid', isEqualTo: uid)
+        .limit(1)
+        .get();
+    return snap.docs.isNotEmpty;
+  }
+
+  Future<void> _checkIn() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('applications')
+          .doc(widget.applicationId)
+          .update({
+        'checkInAt': FieldValue.serverTimestamp(),
+        'checkInStatus': 'checked_in',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('出勤しました')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('出勤記録に失敗: $e')),
+      );
+    }
+  }
+
+  Future<void> _checkOut() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('applications')
+          .doc(widget.applicationId)
+          .update({
+        'checkOutAt': FieldValue.serverTimestamp(),
+        'checkInStatus': 'checked_out',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('退勤しました')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('退勤記録に失敗: $e')),
+      );
     }
   }
 
@@ -168,6 +226,15 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           ? () async {
                         try {
                           await _updateStatus('in_progress');
+                          final applicantUid = (app['applicantUid'] ?? '').toString();
+                          if (applicantUid.isNotEmpty) {
+                            NotificationService.createNotification(
+                              targetUid: applicantUid,
+                              title: 'ステータス更新',
+                              body: '${title}が「着工中」になりました',
+                              type: 'status_update',
+                            );
+                          }
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('開始しました（着工中）')),
@@ -188,6 +255,15 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           ? () async {
                         try {
                           await _updateStatus('completed');
+                          final applicantUid = (app['applicantUid'] ?? '').toString();
+                          if (applicantUid.isNotEmpty) {
+                            NotificationService.createNotification(
+                              targetUid: applicantUid,
+                              title: 'ステータス更新',
+                              body: '${title}が「施工完了」になりました',
+                              type: 'status_update',
+                            );
+                          }
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('完了しました（施工完了）')),
@@ -202,9 +278,128 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           : null,
                       child: const Text('完了'),
                     ),
+                    const SizedBox(width: 6),
+                    if (status == 'done')
+                      FutureBuilder<bool>(
+                        future: _hasRated(widget.applicationId),
+                        builder: (context, ratingSnap) {
+                          final hasRated = ratingSnap.data == true;
+                          if (hasRated) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.star_rounded, size: 18, color: Colors.amber),
+                                  const SizedBox(width: 4),
+                                  Text('評価済み', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
+                                ],
+                              ),
+                            );
+                          }
+                          return ElevatedButton.icon(
+                            onPressed: () {
+                              RatingDialog.show(
+                                context,
+                                applicationId: widget.applicationId,
+                                jobId: jobId,
+                                jobTitle: title,
+                              );
+                            },
+                            icon: const Icon(Icons.star_rounded, size: 18),
+                            label: const Text('評価する'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+                              foregroundColor: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
+
+              if (status == 'in_progress' || status == 'assigned')
+                Divider(height: 1, color: AppColors.divider),
+              if (status == 'in_progress' || status == 'assigned')
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                  child: Builder(
+                    builder: (context) {
+                      final checkInStatus = (app['checkInStatus'] ?? '').toString();
+                      final isCheckedIn = checkInStatus == 'checked_in';
+                      final isCheckedOut = checkInStatus == 'checked_out';
+
+                      return Row(
+                        children: [
+                          Icon(
+                            isCheckedIn ? Icons.location_on : Icons.location_off_outlined,
+                            color: isCheckedIn ? Colors.green : AppColors.textHint,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isCheckedOut
+                                ? '退勤済み'
+                                : isCheckedIn
+                                    ? '出勤中'
+                                    : '未出勤',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: isCheckedIn ? Colors.green : AppColors.textSecondary,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (!isCheckedIn && !isCheckedOut)
+                            ElevatedButton.icon(
+                              onPressed: () => _checkIn(),
+                              icon: const Icon(Icons.login, size: 18),
+                              label: const Text('出勤'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              ),
+                            ),
+                          if (isCheckedIn && !isCheckedOut)
+                            ElevatedButton.icon(
+                              onPressed: () => _checkOut(),
+                              icon: const Icon(Icons.logout, size: 18),
+                              label: const Text('退勤'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              ),
+                            ),
+                          if (isCheckedOut)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.chipUnselected,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.check_circle, size: 16, color: Colors.green),
+                                  const SizedBox(width: 4),
+                                  Text('完了', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                                ],
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
 
               Expanded(
                 child: TabBarView(

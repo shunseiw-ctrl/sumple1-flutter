@@ -6,7 +6,9 @@ import 'post_page.dart';
 import 'work_detail_page.dart';
 import 'sales_page.dart';
 import 'profile_page.dart';
+import 'notifications_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/services/notification_service.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -66,6 +68,48 @@ class _AdminHomePageState extends State<AdminHomePage> {
             ),
           ],
         ),
+        actions: [
+          StreamBuilder<int>(
+            stream: NotificationService.unreadCountStream(
+              FirebaseAuth.instance.currentUser?.uid ?? '',
+            ),
+            builder: (context, snap) {
+              final count = snap.data ?? 0;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'お知らせ',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                      );
+                    },
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Text(
+                          count > 99 ? '99+' : count.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: IndexedStack(
         index: _currentIndex,

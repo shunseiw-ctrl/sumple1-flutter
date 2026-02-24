@@ -5,6 +5,7 @@ import 'job_detail_page.dart';
 import 'job_edit_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/services/favorites_service.dart';
 
 class JobListPage extends StatefulWidget {
   const JobListPage({super.key});
@@ -19,6 +20,9 @@ class _JobListPageState extends State<JobListPage> {
   String? _selectedMonthKey;
 
   String _sortLabel = '新着順';
+
+  final _favoritesService = FavoritesService();
+  Set<String> _guestFavorites = {};
 
   final List<String> _prefs = const [
     '千葉県',
@@ -144,103 +148,134 @@ class _JobListPageState extends State<JobListPage> {
           const SizedBox(height: 8),
 
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: (() {
-                Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection('jobs');
+            child: StreamBuilder<List<String>>(
+              stream: _favoritesService.favoritesStream(),
+              builder: (context, favSnap) {
+                final firestoreFavs = favSnap.data ?? [];
 
-                if (_selectedPref != 'その他') {
-                  q = q.where('prefecture', isEqualTo: _selectedPref);
-                }
+                return StreamBuilder<QuerySnapshot>(
+                  stream: (() {
+                    Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection('jobs');
 
-                if (_selectedMonthKey != null) {
-                  q = q.where('workMonthKey', isEqualTo: _selectedMonthKey);
-                }
+                    if (_selectedPref != 'その他') {
+                      q = q.where('prefecture', isEqualTo: _selectedPref);
+                    }
 
-                q = q.orderBy('createdAt', descending: true);
+                    if (_selectedMonthKey != null) {
+                      q = q.where('workMonthKey', isEqualTo: _selectedMonthKey);
+                    }
 
-                return q.snapshots();
-              })(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return _CenterMessage(text: 'エラー: ${snapshot.error}');
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const _CenterMessage(text: '案件がありません');
-                }
+                    q = q.orderBy('createdAt', descending: true);
 
-                final rawDocs = snapshot.data!.docs;
+                    return q.snapshots();
+                  })(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return _CenterMessage(text: 'エラー: ${snapshot.error}');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const _CenterMessage(text: '案件がありません');
+                    }
 
-                const excludePrefs = {'千葉県', '東京都', '神奈川県'};
+                    final rawDocs = snapshot.data!.docs;
 
-                final docs = _selectedPref == 'その他'
-                    ? rawDocs.where((d) {
-                  final data = d.data() as Map<String, dynamic>;
-                  final pref = data['prefecture']?.toString();
+                    const excludePrefs = {'千葉県', '東京都', '神奈川県'};
 
-                  if (pref == null || pref.isEmpty || pref == '未設定') return true;
-                  return !excludePrefs.contains(pref);
-                }).toList()
-                    : rawDocs;
+                    final docs = _selectedPref == 'その他'
+                        ? rawDocs.where((d) {
+                      final data = d.data() as Map<String, dynamic>;
+                      final pref = data['prefecture']?.toString();
 
-                return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 20),
-                  itemCount: docs.length,
-                  itemBuilder: (context, index) {
-                    final doc = docs[index];
-                    final data = doc.data() as Map<String, dynamic>;
+                      if (pref == null || pref.isEmpty || pref == '未設定') return true;
+                      return !excludePrefs.contains(pref);
+                    }).toList()
+                        : rawDocs;
 
-                    final title = data['title']?.toString() ?? 'タイトルなし';
-                    final location = data['location']?.toString() ?? '未設定';
-                    final price = data['price']?.toString() ?? '0';
-                    final date = data['date']?.toString() ?? '未設定';
-                    final imageUrl = data['imageUrl']?.toString();
-                    final category = data['category']?.toString();
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 20),
+                      itemCount: docs.length,
+                      itemBuilder: (context, index) {
+                        final doc = docs[index];
+                        final data = doc.data() as Map<String, dynamic>;
 
-                    final ownerId = data['ownerId']?.toString();
-                    final isOwner = currentUser != null &&
-                        ownerId != null &&
-                        ownerId.isNotEmpty &&
-                        ownerId == currentUser.uid;
+                        final title = data['title']?.toString() ?? 'タイトルなし';
+                        final location = data['location']?.toString() ?? '未設定';
+                        final price = data['price']?.toString() ?? '0';
+                        final date = data['date']?.toString() ?? '未設定';
+                        final imageUrl = data['imageUrl']?.toString();
+                        final category = data['category']?.toString();
 
-                    final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
+                        final ownerId = data['ownerId']?.toString();
+                        final isOwner = currentUser != null &&
+                            ownerId != null &&
+                            ownerId.isNotEmpty &&
+                            ownerId == currentUser.uid;
 
-                    final badges = <_BadgeSpec>[];
+                        final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _JobCard(
-                        title: title,
-                        location: location,
-                        dateText: date,
-                        priceText: '¥$price',
-                        imageUrl: imageUrl,
-                        category: category,
-                        badges: badges,
-                        showLegacyWarning: !hasOwnerId,
-                        isOwner: isOwner,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => JobDetailPage(jobId: doc.id, jobData: data),
-                            ),
-                          );
-                        },
-                        onEdit: isOwner
-                            ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => JobEditPage(jobId: doc.id, jobData: data),
-                            ),
-                          );
-                        }
-                            : null,
-                        onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
-                      ),
+                        final badges = <_BadgeSpec>[];
+
+                        final isFav = _favoritesService.isRegistered
+                            ? firestoreFavs.contains(doc.id)
+                            : _guestFavorites.contains(doc.id);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _JobCard(
+                            title: title,
+                            location: location,
+                            dateText: date,
+                            priceText: '¥$price',
+                            imageUrl: imageUrl,
+                            category: category,
+                            badges: badges,
+                            showLegacyWarning: !hasOwnerId,
+                            isOwner: isOwner,
+                            isFavorite: isFav,
+                            onToggleFavorite: () {
+                              if (_favoritesService.isRegistered) {
+                                _favoritesService.toggleFavorite(doc.id);
+                              } else {
+                                setState(() {
+                                  if (_guestFavorites.contains(doc.id)) {
+                                    _guestFavorites.remove(doc.id);
+                                  } else {
+                                    _guestFavorites.add(doc.id);
+                                  }
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('登録するとお気に入りが保存されます'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => JobDetailPage(jobId: doc.id, jobData: data),
+                                ),
+                              );
+                            },
+                            onEdit: isOwner
+                                ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => JobEditPage(jobId: doc.id, jobData: data),
+                                ),
+                              );
+                            }
+                                : null,
+                            onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
+                          ),
+                        );
+                      },
                     );
                   },
                 );
@@ -497,9 +532,11 @@ class _JobCard extends StatelessWidget {
   final bool showLegacyWarning;
 
   final bool isOwner;
+  final bool isFavorite;
   final VoidCallback onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onToggleFavorite;
 
   const _JobCard({
     required this.title,
@@ -511,9 +548,11 @@ class _JobCard extends StatelessWidget {
     required this.badges,
     required this.showLegacyWarning,
     required this.isOwner,
+    this.isFavorite = false,
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
+    this.onToggleFavorite,
   });
 
   IconData _categoryIcon(String? cat) {
@@ -605,10 +644,31 @@ class _JobCard extends StatelessWidget {
                       ),
                     ),
 
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: GestureDetector(
+                        onTap: onToggleFavorite,
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : AppColors.textSecondary,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+
                     if (isOwner)
                       Positioned(
-                        top: 6,
-                        left: 6,
+                        top: 8,
+                        left: 48,
                         child: Material(
                           color: Colors.white.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(20),

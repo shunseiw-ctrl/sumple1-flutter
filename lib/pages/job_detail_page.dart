@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'job_edit_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
+import 'package:sumple1/core/services/favorites_service.dart';
+import 'package:sumple1/core/services/notification_service.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -59,7 +61,7 @@ class JobDetailPage extends StatelessWidget {
   }
 }
 
-class _DetailScaffold extends StatelessWidget {
+class _DetailScaffold extends StatefulWidget {
   final String jobId;
   final Map<String, dynamic> data;
 
@@ -67,6 +69,17 @@ class _DetailScaffold extends StatelessWidget {
     required this.jobId,
     required this.data,
   });
+
+  @override
+  State<_DetailScaffold> createState() => _DetailScaffoldState();
+}
+
+class _DetailScaffoldState extends State<_DetailScaffold> {
+  final _favoritesService = FavoritesService();
+  bool _guestFavorite = false;
+
+  String get jobId => widget.jobId;
+  Map<String, dynamic> get data => widget.data;
 
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
@@ -158,6 +171,16 @@ class _DetailScaffold extends StatelessWidget {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
+    if (jobOwnerId.isNotEmpty) {
+      NotificationService.createNotification(
+        targetUid: jobOwnerId,
+        title: '新しい応募',
+        body: '${resolvedProjectName}に応募がありました',
+        type: 'application',
+        data: {'jobId': jobId},
+      );
+    }
+
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('応募しました')));
   }
@@ -190,6 +213,37 @@ class _DetailScaffold extends StatelessWidget {
           style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
         ),
         actions: [
+          StreamBuilder<List<String>>(
+            stream: _favoritesService.favoritesStream(),
+            builder: (context, favSnap) {
+              final isFav = _favoritesService.isRegistered
+                  ? (favSnap.data ?? []).contains(jobId)
+                  : _guestFavorite;
+
+              return IconButton(
+                tooltip: 'お気に入り',
+                onPressed: () {
+                  if (_favoritesService.isRegistered) {
+                    _favoritesService.toggleFavorite(jobId);
+                  } else {
+                    setState(() {
+                      _guestFavorite = !_guestFavorite;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('登録するとお気に入りが保存されます'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                icon: Icon(
+                  isFav ? Icons.favorite : Icons.favorite_border,
+                  color: isFav ? Colors.red : AppColors.textSecondary,
+                ),
+              );
+            },
+          ),
           FutureBuilder<bool>(
             future: _isAdmin(),
             builder: (context, snap) {

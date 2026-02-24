@@ -9,9 +9,11 @@ import 'profile_page.dart';
 import 'post_page.dart';
 import '../services/push_token_service.dart';
 import '../core/services/auth_service.dart';
+import '../core/services/notification_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'notifications_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -114,6 +116,46 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
+          StreamBuilder<int>(
+            stream: NotificationService.unreadCountStream(
+              FirebaseAuth.instance.currentUser?.uid ?? '',
+            ),
+            builder: (context, snap) {
+              final count = snap.data ?? 0;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'お知らせ',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                      );
+                    },
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Text(
+                          count > 99 ? '99+' : count.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           if (_index == 0 && _isAdmin)
             IconButton(
               icon: const Icon(Icons.add),

@@ -21,6 +21,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
   final _postalCodeCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
 
+  final _introCtrl = TextEditingController();
+  final _experienceYearsCtrl = TextEditingController();
+  List<String> _qualifications = [];
+  final _qualificationInputCtrl = TextEditingController();
+
   String? _gender;
   bool _isLoading = false;
   bool _loadedOnce = false;
@@ -39,6 +44,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
     _birthDateCtrl.dispose();
     _postalCodeCtrl.dispose();
     _addressCtrl.dispose();
+    _introCtrl.dispose();
+    _experienceYearsCtrl.dispose();
+    _qualificationInputCtrl.dispose();
     super.dispose();
   }
 
@@ -70,6 +78,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
         _birthDateCtrl.text = (data['birthDate'] ?? '').toString();
         _postalCodeCtrl.text = (data['postalCode'] ?? '').toString();
         _addressCtrl.text = (data['address'] ?? '').toString();
+
+        _introCtrl.text = (data['introduction'] ?? '').toString();
+        _experienceYearsCtrl.text = (data['experienceYears'] ?? '').toString();
+        final quals = data['qualifications'];
+        if (quals is List) {
+          _qualifications = quals.map((e) => e.toString()).toList();
+        }
 
         final g = data['gender'];
         if (g is String && g.trim().isNotEmpty) {
@@ -155,6 +170,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       'gender': _gender,
       'postalCode': _postalCodeCtrl.text.trim(),
       'address': _addressCtrl.text.trim(),
+      'introduction': _introCtrl.text.trim(),
+      'experienceYears': _experienceYearsCtrl.text.trim(),
+      'qualifications': _qualifications,
       'updatedAt': now,
     };
 
@@ -340,6 +358,95 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 keyboardType: TextInputType.text,
                 maxLines: 2,
+              ),
+
+              const SizedBox(height: 20),
+              const _SectionTitle('経験・スキル'),
+
+              TextFormField(
+                controller: _experienceYearsCtrl,
+                decoration: const InputDecoration(
+                  labelText: '経験年数',
+                  hintText: '例）5年',
+                  suffixText: '年',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+
+              TextFormField(
+                controller: _introCtrl,
+                decoration: const InputDecoration(
+                  labelText: '自己紹介',
+                  hintText: '得意な作業や経験をアピールしましょう',
+                  alignLabelWithHint: true,
+                ),
+                maxLines: 4,
+              ),
+              const SizedBox(height: 16),
+
+              const _SectionTitle('保有資格'),
+
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (int i = 0; i < _qualifications.length; i++)
+                    Chip(
+                      label: Text(_qualifications[i]),
+                      deleteIcon: const Icon(Icons.close, size: 18),
+                      onDeleted: isAnon ? null : () {
+                        setState(() => _qualifications.removeAt(i));
+                      },
+                      backgroundColor: AppColors.ruriPale,
+                      labelStyle: TextStyle(color: AppColors.ruri, fontWeight: FontWeight.w600),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _qualificationInputCtrl,
+                      decoration: InputDecoration(
+                        hintText: '資格名を入力',
+                        isDense: true,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: isAnon ? null : () {
+                      final text = _qualificationInputCtrl.text.trim();
+                      if (text.isEmpty) return;
+                      setState(() {
+                        _qualifications.add(text);
+                        _qualificationInputCtrl.clear();
+                      });
+                    },
+                    icon: Icon(Icons.add_circle, color: AppColors.ruri, size: 32),
+                    tooltip: '資格を追加',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  for (final suggestion in ['足場組立', '玉掛け', 'フォークリフト', '電気工事士', '溶接', '危険物取扱者'])
+                    ActionChip(
+                      label: Text(suggestion, style: const TextStyle(fontSize: 12)),
+                      onPressed: isAnon ? null : () {
+                        if (!_qualifications.contains(suggestion)) {
+                          setState(() => _qualifications.add(suggestion));
+                        }
+                      },
+                    ),
+                ],
               ),
 
               const SizedBox(height: 24),
