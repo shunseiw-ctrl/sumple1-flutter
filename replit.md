@@ -53,6 +53,18 @@ A Flutter-based job matching application for the construction industry (建設�
 - Logging: Debug/info logs suppressed in release builds, error/warning logs retained
 - Firebase API key: Public by design (Firebase Web SDK), should be restricted via Firebase Console (HTTP referrer restrictions)
 
+## Three-Tier User System
+- **Guest (ゲスト)**: Anonymous Firebase auth, can browse jobs but restricted from applying/messages/earnings/work tabs
+  - Guest guard shows styled placeholder with registration CTA button
+  - RegistrationPromptModal offers LINE or email registration
+- **Worker (職人)**: Registered user (email or LINE login), full access to all features
+  - Same 5-tab layout: 検索, はたらく, メッセージ, 売上, マイページ
+  - はたらく tab preserves original worker-focused design
+- **Admin (ALBALIZE管理者)**: Detected via Firestore config/admins, completely separate dashboard
+  - AdminHomePage with 5 tabs: ダッシュボード, 案件管理, 応募者, 売上管理, 設定
+  - Dashboard shows real-time counts (jobs, applications, users)
+  - AuthGate routes: null→GuestHomePage, anonymous→HomePage, admin→AdminHomePage, worker→HomePage
+
 ## Recent Changes
 - 2026-02-24: LINE Login integration
   - server.js: Full Node.js server replacing inline serve.sh, handles LINE OAuth flow + static serving
@@ -80,6 +92,13 @@ A Flutter-based job matching application for the construction industry (建設�
   - Updated ThemeData in main.dart: ruri accent, white/light base
   - Updated all 16 page files to use AppColors instead of hardcoded colors
   - LINE green button preserved, text readability maintained
+- 2026-02-24: Three-tier user system implementation
+  - AuthService: anonymous users now return UserRole.guest (was incorrectly returning UserRole.user)
+  - RegistrationPromptModal: modal dialog guiding guests to LINE or email registration
+  - Guest guards: work_page, messages_page, sales_page show styled placeholders with registration CTA
+  - job_detail_page: apply button shows RegistrationPromptModal for guests instead of SnackBar
+  - AdminHomePage: new admin dashboard with 5 tabs (dashboard/jobs/applicants/earnings/settings)
+  - AuthGate (main.dart): StatefulWidget with role-based routing and caching
 - 2026-02-24: Adapted project for Replit environment
   - Flutter web platform support, Firebase config, API compatibility fixes
 
