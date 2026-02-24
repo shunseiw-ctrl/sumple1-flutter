@@ -65,7 +65,25 @@ A Flutter-based job matching application for the construction industry (建設�
   - Dashboard shows real-time counts (jobs, applications, users)
   - AuthGate routes: null→GuestHomePage, anonymous→HomePage, admin→AdminHomePage, worker→HomePage
 
+## Firestore Collections
+- `profiles/{uid}` - User profiles: name, kana, birthDate, gender, address, introduction, experienceYears, qualifications[]
+- `favorites/{uid}` - User favorites: jobIds[] array
+- `ratings` - Job ratings: applicationId, jobId, raterUid, stars, comment, createdAt
+- `notifications` - In-app notifications: targetUid, title, body, type (application/status_update), read, createdAt
+- `applications` - Job applications: includes checkInAt, checkOutAt, checkInStatus fields for GPS check-in/out
+
+## Key Services
+- `FavoritesService` - Manages job favorites in Firestore for registered users, in-memory for guests
+- `NotificationService` - Creates/reads in-app notifications, unread count stream, mark as read
+- `RatingDialog` - Modal widget for 5-star job rating after completion
+
 ## Recent Changes
+- 2026-02-24: Five new features implemented
+  - Favorites: Heart icon on job cards/detail, FavoritesService (Firestore for registered, in-memory for guests)
+  - Rating system: RatingDialog (5-star + comment), shown on work_detail when status='done', stored in ratings collection
+  - GPS check-in/out: Check-in/check-out buttons on work_detail for in_progress/assigned status, timestamps in Firestore
+  - Profile enhancement: Experience years, self-introduction, qualifications with suggestion chips (足場組立, 玉掛け, etc.)
+  - In-app notifications: Bell icon with unread badge on home/admin pages, NotificationsPage, auto-notify on apply/status change
 - 2026-02-24: LINE Login integration
   - server.js: Full Node.js server replacing inline serve.sh, handles LINE OAuth flow + static serving
   - LINE OAuth: Authorization code flow, token exchange, Firebase custom token generation
