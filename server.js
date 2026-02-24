@@ -7,8 +7,8 @@ const https = require('https');
 const PORT = 5000;
 const ROOT = path.resolve('./build/web');
 
-const LINE_CHANNEL_ID = process.env.LINE_CHANNEL_ID || '';
-const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || '';
+const LINE_CHANNEL_ID = (process.env.LINE_CHANNEL_ID || '').trim();
+const LINE_CHANNEL_SECRET = (process.env.LINE_CHANNEL_SECRET || '').trim();
 
 const REPLIT_DOMAIN = process.env.REPLIT_DEV_DOMAIN || '';
 const BASE_URL = REPLIT_DOMAIN ? `https://${REPLIT_DOMAIN}` : `http://localhost:${PORT}`;
