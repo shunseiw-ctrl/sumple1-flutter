@@ -2,7 +2,18 @@ import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 
 void redirectTo(String url) {
-  web.window.location.href = url;
+  try {
+    final top = web.window.top;
+    if (top != null) {
+      top.location.href = url;
+      return;
+    }
+  } catch (_) {}
+  try {
+    web.window.open(url, '_top');
+  } catch (_) {
+    web.window.location.href = url;
+  }
 }
 
 String getCurrentUrl() {
