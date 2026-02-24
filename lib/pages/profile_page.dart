@@ -14,9 +14,16 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isAnonymous(User? user) => user == null || user.isAnonymous;
 
-  // ✅ ここで保持（disposed raceを根絶）
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
+
+  int _failedAttempts = 0;
+  DateTime? _lockoutUntil;
+  static const int _maxAttempts = 5;
+  static const Duration _lockoutDuration = Duration(minutes: 3);
+
+  bool get _isLockedOut =>
+      _lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!);
 
   @override
   void dispose() {
@@ -30,9 +37,9 @@ class _ProfilePageState extends State<ProfilePage> {
       case 'invalid-email':
         return 'メールアドレスの形式が正しくありません';
       case 'user-not-found':
-        return 'このメールアドレスのユーザーが見つかりません';
       case 'wrong-password':
-        return 'パスワードが違います';
+      case 'invalid-credential':
+        return 'メールアドレスまたはパスワードが正しくありません';
       case 'email-already-in-use':
         return 'そのメールアドレスは既に使われています';
       case 'weak-password':
@@ -64,6 +71,11 @@ class _ProfilePageState extends State<ProfilePage> {
         return StatefulBuilder(
           builder: (dialogContext, setLocalState) {
             Future<void> signIn() async {
+              if (_isLockedOut) {
+                await _showSnack('ログイン試行回数の上限に達しました。しばらくお待ちください');
+                return;
+              }
+
               final email = _emailController.text.trim();
               final pass = _passController.text;
 
@@ -79,15 +91,26 @@ class _ProfilePageState extends State<ProfilePage> {
                   password: pass,
                 );
 
+                _failedAttempts = 0;
+                _lockoutUntil = null;
+
                 if (dialogContext.mounted) {
                   Navigator.pop(dialogContext);
                 }
                 if (mounted) setState(() {});
                 await _showSnack('ログインしました');
               } on FirebaseAuthException catch (e) {
+                _failedAttempts++;
+                if (_failedAttempts >= _maxAttempts) {
+                  _lockoutUntil = DateTime.now().add(_lockoutDuration);
+                }
                 await _showSnack(_authErrorMessageJa(e));
               } catch (e) {
-                await _showSnack('ログインに失敗しました: $e');
+                _failedAttempts++;
+                if (_failedAttempts >= _maxAttempts) {
+                  _lockoutUntil = DateTime.now().add(_lockoutDuration);
+                }
+                await _showSnack('ログインに失敗しました');
               } finally {
                 if (dialogContext.mounted) {
                   setLocalState(() => isLoading = false);
@@ -134,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
               } on FirebaseAuthException catch (e) {
                 await _showSnack(_authErrorMessageJa(e));
               } catch (e) {
-                await _showSnack('登録に失敗しました: $e');
+                await _showSnack('登録に失敗しました');
               } finally {
                 if (dialogContext.mounted) {
                   setLocalState(() => isLoading = false);

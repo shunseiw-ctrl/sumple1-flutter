@@ -19,8 +19,7 @@ class Logger {
     dynamic error,
     StackTrace? stackTrace,
   }) {
-    // リリースビルドではdebugログを出力しない
-    if (!kDebugMode && level == LogLevel.debug) return;
+    if (!kDebugMode && (level == LogLevel.debug || level == LogLevel.info)) return;
 
     final prefix = tag != null ? '[$tag]' : '';
     final dataStr = data != null && data.isNotEmpty ? ' | data: $data' : '';

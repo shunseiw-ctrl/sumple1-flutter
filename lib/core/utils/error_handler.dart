@@ -85,10 +85,10 @@ class ErrorHandler {
       return _getFirebaseAuthErrorMessage(error);
     } else if (error is FirebaseException) {
       return _getFirebaseErrorMessage(error);
-    } else if (error is Exception) {
-      return 'エラーが発生しました: ${error.toString()}';
+    } else if (error is String) {
+      return error;
     } else {
-      return 'エラーが発生しました';
+      return 'エラーが発生しました。しばらく経ってからお試しください';
     }
   }
 
@@ -100,9 +100,9 @@ class ErrorHandler {
       case 'user-disabled':
         return 'このアカウントは無効化されています';
       case 'user-not-found':
-        return 'ユーザーが見つかりません';
       case 'wrong-password':
-        return 'パスワードが間違っています';
+      case 'invalid-credential':
+        return 'メールアドレスまたはパスワードが正しくありません';
       case 'email-already-in-use':
         return 'このメールアドレスは既に使用されています';
       case 'operation-not-allowed':

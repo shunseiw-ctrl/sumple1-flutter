@@ -20,7 +20,29 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
+  int _failedAttempts = 0;
+  DateTime? _lockoutUntil;
+  static const int _maxAttempts = 5;
+  static const Duration _lockoutDuration = Duration(minutes: 3);
+
+  bool get _isLockedOut =>
+      _lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!);
+
+  String get _lockoutMessage {
+    if (_lockoutUntil == null) return '';
+    final remaining = _lockoutUntil!.difference(DateTime.now());
+    final minutes = remaining.inMinutes;
+    final seconds = remaining.inSeconds % 60;
+    return 'ログイン試行回数の上限に達しました。${minutes}分${seconds}秒後にお試しください';
+  }
+
   Future<void> _signIn() async {
+    if (_isLockedOut) {
+      ErrorHandler.showError(context, _lockoutMessage);
+      setState(() {});
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     final email = _emailController.text.trim();
@@ -33,14 +55,25 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         password: password,
       );
 
+      _failedAttempts = 0;
+      _lockoutUntil = null;
       Logger.info('Admin sign in successful', tag: 'AdminLoginPage');
 
       if (!mounted) return;
       ErrorHandler.showSuccess(context, 'ログインしました');
     } catch (e) {
+      _failedAttempts++;
+      if (_failedAttempts >= _maxAttempts) {
+        _lockoutUntil = DateTime.now().add(_lockoutDuration);
+        Logger.warning('Login locked out after $_failedAttempts attempts', tag: 'AdminLoginPage');
+      }
       Logger.error('Admin sign in failed', tag: 'AdminLoginPage', error: e);
       if (!mounted) return;
-      ErrorHandler.showError(context, e);
+      if (_isLockedOut) {
+        ErrorHandler.showError(context, _lockoutMessage);
+      } else {
+        ErrorHandler.showError(context, e);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -69,6 +102,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 autocorrect: false,
+                enableSuggestions: false,
                 decoration: const InputDecoration(
                   labelText: 'メールアドレス',
                   prefixIcon: Icon(Icons.email_outlined),
@@ -88,6 +122,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
+                enableSuggestions: false,
+                autocorrect: false,
                 decoration: InputDecoration(
                   labelText: 'パスワード',
                   prefixIcon: const Icon(Icons.lock_outlined),
@@ -107,11 +143,34 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   return null;
                 },
               ),
+              if (_isLockedOut) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.lock_clock, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _lockoutMessage,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 32),
               SizedBox(
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _signIn,
+                  onPressed: (_isLoading || _isLockedOut) ? null : _signIn,
                   child: _isLoading
                       ? const SizedBox(
                           width: 24,
