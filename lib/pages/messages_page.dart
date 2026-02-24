@@ -8,6 +8,7 @@ import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
@@ -176,9 +177,63 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_myUid.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('ログインしてください')),
+    if (_myUid.isEmpty || FirebaseAuth.instance.currentUser?.isAnonymous == true) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('メッセージ')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.ruriPale,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: const Icon(Icons.chat_bubble_outline, size: 40, color: AppColors.ruri),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'メッセージを見るには\n登録が必要です',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '案件の担当者とチャットで\nやりとりできます',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => RegistrationPromptModal.show(context, featureName: 'メッセージを見る'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.ruri,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 

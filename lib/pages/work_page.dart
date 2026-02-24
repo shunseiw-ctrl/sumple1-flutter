@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'work_detail_page.dart';
 import 'chat_room_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class WorkPage extends StatefulWidget {
   const WorkPage({super.key});
@@ -82,12 +83,60 @@ class _WorkPageState extends State<WorkPage>
     final user = FirebaseAuth.instance.currentUser;
 
     if (!_notAnonymous(user)) {
-      return const Scaffold(
+      return Scaffold(
+        backgroundColor: AppColors.background,
         body: SafeArea(
           child: Center(
-            child: Text(
-              '「はたらく」を使うにはログインが必要です\n（応募・受託した案件を表示します）',
-              textAlign: TextAlign.center,
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.ruriPale,
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: const Icon(Icons.work_outline, size: 40, color: AppColors.ruri),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    '「はたらく」を使うには\n登録が必要です',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '応募・受託した案件の進捗を\nこのページで管理できます',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => RegistrationPromptModal.show(context, featureName: 'はたらく機能を使う'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.ruri,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'job_edit_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -123,9 +124,7 @@ class _DetailScaffold extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (!_notAnonymous(user)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('応募するにはログインが必要です')),
-      );
+      RegistrationPromptModal.show(context, featureName: '案件に応募する');
       return;
     }
 

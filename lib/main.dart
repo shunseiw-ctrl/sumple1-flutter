@@ -4,8 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_options.dart';
 import 'pages/home_page.dart';
+import 'pages/admin_home_page.dart';
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
+import 'core/services/auth_service.dart';
+import 'core/enums/user_role.dart';
 import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -86,8 +89,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  final _authService = AuthService();
+  UserRole? _cachedRole;
+  String? _lastUid;
+
+  Future<UserRole> _resolveRole(User user) async {
+    if (_lastUid == user.uid && _cachedRole != null) {
+      return _cachedRole!;
+    }
+    final role = await _authService.getCurrentUserRole();
+    _lastUid = user.uid;
+    _cachedRole = role;
+    return role;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,16 +151,41 @@ class AuthGate extends StatelessWidget {
         final user = snapshot.data;
 
         if (user == null) {
+          _cachedRole = null;
+          _lastUid = null;
           Logger.info('User not authenticated, showing guest page', tag: 'AuthGate');
           return const GuestHomePage();
         }
 
-        Logger.info(
-          'User authenticated, showing home page',
-          tag: 'AuthGate',
-          data: {'uid': user.uid.substring(0, 8)},
+        if (user.isAnonymous) {
+          Logger.info('Guest user, showing home page', tag: 'AuthGate');
+          return const HomePage();
+        }
+
+        return FutureBuilder<UserRole>(
+          future: _resolveRole(user),
+          builder: (context, roleSnap) {
+            if (roleSnap.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(color: AppColors.ruri),
+                ),
+              );
+            }
+
+            final role = roleSnap.data ?? UserRole.user;
+
+            if (role.isAdmin) {
+              Logger.info('Admin user, showing admin dashboard', tag: 'AuthGate',
+                data: {'uid': user.uid.substring(0, 8)});
+              return const AdminHomePage();
+            }
+
+            Logger.info('Worker user, showing home page', tag: 'AuthGate',
+              data: {'uid': user.uid.substring(0, 8)});
+            return const HomePage();
+          },
         );
-        return const HomePage();
       },
     );
   }

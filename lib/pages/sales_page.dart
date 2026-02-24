@@ -6,6 +6,7 @@ import 'earnings_create_page.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -67,8 +68,65 @@ class _SalesPageState extends State<SalesPage> {
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (uid.isEmpty) {
-      return const Scaffold(body: Center(child: Text('ログインしてください')));
+    final isAnonymous = FirebaseAuth.instance.currentUser?.isAnonymous ?? true;
+    if (uid.isEmpty || isAnonymous) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('売上'), centerTitle: true),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.ruriPale,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: const Icon(Icons.payments_outlined, size: 40, color: AppColors.ruri),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  '売上を確認するには\n登録が必要です',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'お仕事の報酬や支払い履歴を\nこのページで確認できます',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => RegistrationPromptModal.show(context, featureName: '売上を確認する'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.ruri,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('登録して始める', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     }
 
     final isAdmin = _isAdmin;
