@@ -84,6 +84,18 @@ A Flutter-based job matching application for the construction industry (建設�
 - `ChatService` - Chat room initialization, message sending with retry, unread count management
 
 ## Recent Changes
+- 2026-02-24: Professional UI Modernization (3-tier)
+  - Design system: app_colors.dart (gradients, semantic colors), app_spacing.dart (8-point scale), app_text_styles.dart (Noto Sans JP typography hierarchy), app_shadows.dart (5-level elevation)
+  - Shared widgets: skeleton_loader.dart (shimmer animation), empty_state.dart (gradient icon + CTA), status_badge.dart (pill badges, 7 Japanese statuses), app_card.dart (modern cards)
+  - Theme: Material 3, Google Fonts Noto Sans JP, 52px buttons, custom InputDecoration, SnackBar, TabBar, Card, Chip, Divider themes
+  - Page transitions: CupertinoPageTransitionsBuilder for all platforms
+  - Job list: Hero image cards with gradient overlay, category tags, skeleton loading, EmptyState
+  - Job detail: 200px hero image, modern info cards with shadows, gradient apply button, AnimatedSwitcher favorite
+  - Guest home: Full-screen gradient hero, frosted glass feature cards, gradient CTA buttons, animated fade-in
+  - Home: Custom _ModernBottomNav with animated indicator line, Poppins title, dot notification badge
+  - Profile: Gradient avatar ring, menu groups with colored icons, section accent bars, modern dialogs
+  - Work/Messages/Notifications/Sales: EmptyState widgets, StatusBadge.fromStatus(), AppShadows throughout
+  - Dependencies added: google_fonts ^6.2.1, shared_preferences ^2.3.4
 - 2026-02-24: 11 quality/UX improvement features
   - Search filters: Bottom sheet with area, salary range slider, qualification chips, date range pickers
   - Favorites page: TabBar in sales tab (売上/お気に入り), favorited jobs with thumbnails and instant removal
