@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../core/services/auth_service.dart';
+import '../core/enums/user_role.dart';
+
 class EarningsCreatePage extends StatefulWidget {
   const EarningsCreatePage({super.key});
 
@@ -11,12 +14,23 @@ class EarningsCreatePage extends StatefulWidget {
 
 class _EarningsCreatePageState extends State<EarningsCreatePage> {
   final _db = FirebaseFirestore.instance;
-
-  // 固定ADMIN UID（MVP）
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  final _authService = AuthService();
 
   String get _myUid => FirebaseAuth.instance.currentUser?.uid ?? '';
-  bool get _isAdmin => _myUid.isNotEmpty && _myUid == _adminUid;
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAdminRole();
+  }
+
+  Future<void> _checkAdminRole() async {
+    final role = await _authService.getCurrentUserRole();
+    if (mounted) {
+      setState(() => _isAdmin = role.isAdmin);
+    }
+  }
 
   String _query = '';
 

@@ -1,19 +1,18 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 import '../utils/logger.dart';
 
-/// 画像アップロード機能を管理
 class ImageUploadService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
 
-  /// ギャラリーから画像を選択してアップロード
   Future<ImageUploadResult> pickAndUploadImage({
     required String userId,
-    required String folder, // 'jobs' or 'messages'
+    required String folder,
     required String documentId,
     int maxWidth = 1920,
     int maxHeight = 1080,
@@ -21,7 +20,6 @@ class ImageUploadService {
     bool compress = true,
   }) async {
     try {
-      // 画像を選択
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: maxWidth.toDouble(),
@@ -37,15 +35,12 @@ class ImageUploadService {
       Logger.info(
         'Image selected',
         tag: 'ImageUploadService',
-        data: {
-          'path': pickedFile.path,
-          'name': pickedFile.name,
-        },
+        data: {'name': pickedFile.name},
       );
 
-      // アップロード
-      return await uploadImageFile(
-        file: File(pickedFile.path),
+      final bytes = await pickedFile.readAsBytes();
+      return await uploadImageBytes(
+        bytes: bytes,
         userId: userId,
         folder: folder,
         documentId: documentId,
@@ -62,7 +57,6 @@ class ImageUploadService {
     }
   }
 
-  /// カメラで撮影してアップロード
   Future<ImageUploadResult> captureAndUploadImage({
     required String userId,
     required String folder,
@@ -73,7 +67,10 @@ class ImageUploadService {
     bool compress = true,
   }) async {
     try {
-      // カメラで撮影
+      if (kIsWeb) {
+        return ImageUploadResult.error('Web版ではカメラ撮影は利用できません。ギャラリーから選択してください');
+      }
+
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.camera,
         maxWidth: maxWidth.toDouble(),
@@ -89,15 +86,12 @@ class ImageUploadService {
       Logger.info(
         'Image captured',
         tag: 'ImageUploadService',
-        data: {
-          'path': pickedFile.path,
-          'name': pickedFile.name,
-        },
+        data: {'name': pickedFile.name},
       );
 
-      // アップロード
-      return await uploadImageFile(
-        file: File(pickedFile.path),
+      final bytes = await pickedFile.readAsBytes();
+      return await uploadImageBytes(
+        bytes: bytes,
         userId: userId,
         folder: folder,
         documentId: documentId,
@@ -114,7 +108,6 @@ class ImageUploadService {
     }
   }
 
-  /// 複数の画像を選択してアップロード
   Future<List<ImageUploadResult>> pickAndUploadMultipleImages({
     required String userId,
     required String folder,
@@ -126,7 +119,6 @@ class ImageUploadService {
     bool compress = true,
   }) async {
     try {
-      // 複数画像を選択
       final List<XFile> pickedFiles = await _picker.pickMultiImage(
         maxWidth: maxWidth.toDouble(),
         maxHeight: maxHeight.toDouble(),
@@ -138,7 +130,6 @@ class ImageUploadService {
         return [];
       }
 
-      // 最大数を超える場合は制限
       final filesToUpload = pickedFiles.take(maxImages).toList();
 
       Logger.info(
@@ -147,14 +138,14 @@ class ImageUploadService {
         data: {'count': filesToUpload.length},
       );
 
-      // 並列でアップロード
       final results = <ImageUploadResult>[];
       for (int i = 0; i < filesToUpload.length; i++) {
-        final result = await uploadImageFile(
-          file: File(filesToUpload[i].path),
+        final bytes = await filesToUpload[i].readAsBytes();
+        final result = await uploadImageBytes(
+          bytes: bytes,
           userId: userId,
           folder: folder,
-          documentId: '$documentId\_$i',
+          documentId: '${documentId}_$i',
           compress: compress,
         );
         results.add(result);
@@ -172,58 +163,51 @@ class ImageUploadService {
     }
   }
 
-  /// 画像ファイルをアップロード
-  Future<ImageUploadResult> uploadImageFile({
-    required File file,
+  Future<ImageUploadResult> uploadImageBytes({
+    required Uint8List bytes,
     required String userId,
     required String folder,
     required String documentId,
     bool compress = true,
   }) async {
     try {
-      // 圧縮
-      File fileToUpload = file;
+      Uint8List dataToUpload = bytes;
       if (compress) {
-        fileToUpload = await _compressImage(file);
+        dataToUpload = _compressImageBytes(bytes);
       }
 
-      // ファイル名を生成
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final fileName = '$documentId\_$timestamp.jpg';
-
-      // Storage パスを生成
+      final fileName = '${documentId}_$timestamp.jpg';
       final path = '$folder/$userId/$fileName';
 
       Logger.info(
         'Uploading image',
         tag: 'ImageUploadService',
-        data: {'path': path},
+        data: {'path': path, 'size': '${(dataToUpload.length / 1024).toStringAsFixed(1)} KB'},
       );
 
-      // アップロード
       final ref = _storage.ref().child(path);
-      final uploadTask = ref.putFile(fileToUpload);
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+      final uploadTask = ref.putData(dataToUpload, metadata);
 
-      // 進捗監視
       uploadTask.snapshotEvents.listen((snapshot) {
-        final progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
-        Logger.debug(
-          'Upload progress',
-          tag: 'ImageUploadService',
-          data: {'progress': progress.toStringAsFixed(2)},
-        );
+        if (snapshot.totalBytes > 0) {
+          final progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+          Logger.debug(
+            'Upload progress',
+            tag: 'ImageUploadService',
+            data: {'progress': progress.toStringAsFixed(1)},
+          );
+        }
       });
 
-      // 完了を待つ
       await uploadTask;
 
-      // URLを取得
       final downloadUrl = await ref.getDownloadURL();
 
       Logger.info(
         'Image uploaded successfully',
         tag: 'ImageUploadService',
-        data: {'url': downloadUrl},
       );
 
       return ImageUploadResult.success(downloadUrl);
@@ -246,61 +230,50 @@ class ImageUploadService {
     }
   }
 
-  /// 画像を圧縮
-  Future<File> _compressImage(File file) async {
+  Uint8List _compressImageBytes(Uint8List bytes) {
     try {
       Logger.debug('Compressing image', tag: 'ImageUploadService');
 
-      // 画像を読み込み
-      final bytes = await file.readAsBytes();
       final image = img.decodeImage(bytes);
 
       if (image == null) {
-        Logger.warning('Failed to decode image', tag: 'ImageUploadService');
-        return file;
+        Logger.warning('Failed to decode image, using original', tag: 'ImageUploadService');
+        return bytes;
       }
 
-      // リサイズ（長辺を1920pxに）
       img.Image resized;
-      if (image.width > image.height) {
-        resized = img.copyResize(image, width: 1920);
+      if (image.width > 1920 || image.height > 1920) {
+        if (image.width > image.height) {
+          resized = img.copyResize(image, width: 1920);
+        } else {
+          resized = img.copyResize(image, height: 1920);
+        }
       } else {
-        resized = img.copyResize(image, height: 1920);
+        resized = image;
       }
 
-      // JPEG形式で圧縮
-      final compressed = img.encodeJpg(resized, quality: 85);
-
-      // 一時ファイルに保存
-      final tempPath = '${file.path}_compressed.jpg';
-      final compressedFile = File(tempPath);
-      await compressedFile.writeAsBytes(compressed);
-
-      final originalSize = await file.length();
-      final compressedSize = await compressedFile.length();
+      final compressed = Uint8List.fromList(img.encodeJpg(resized, quality: 85));
 
       Logger.info(
         'Image compressed',
         tag: 'ImageUploadService',
         data: {
-          'original': '${(originalSize / 1024 / 1024).toStringAsFixed(2)} MB',
-          'compressed': '${(compressedSize / 1024 / 1024).toStringAsFixed(2)} MB',
-          'ratio': '${((1 - compressedSize / originalSize) * 100).toStringAsFixed(1)}% reduction',
+          'original': '${(bytes.length / 1024).toStringAsFixed(1)} KB',
+          'compressed': '${(compressed.length / 1024).toStringAsFixed(1)} KB',
         },
       );
 
-      return compressedFile;
+      return compressed;
     } catch (e) {
       Logger.warning(
         'Image compression failed, using original',
         tag: 'ImageUploadService',
         data: {'error': e.toString()},
       );
-      return file;
+      return bytes;
     }
   }
 
-  /// 画像を削除
   Future<bool> deleteImage(String downloadUrl) async {
     try {
       final ref = _storage.refFromURL(downloadUrl);
@@ -309,7 +282,6 @@ class ImageUploadService {
       Logger.info(
         'Image deleted',
         tag: 'ImageUploadService',
-        data: {'url': downloadUrl},
       );
 
       return true;
@@ -319,13 +291,11 @@ class ImageUploadService {
         tag: 'ImageUploadService',
         error: e,
         stackTrace: stackTrace,
-        data: {'url': downloadUrl},
       );
       return false;
     }
   }
 
-  /// Firebaseエラーメッセージを取得
   String _getFirebaseErrorMessage(FirebaseException e) {
     switch (e.code) {
       case 'unauthorized':
@@ -340,37 +310,38 @@ class ImageUploadService {
   }
 }
 
-/// 画像アップロード結果
 class ImageUploadResult {
-  final bool success;
+  final bool isSuccess;
   final String? downloadUrl;
   final String? errorMessage;
   final bool cancelled;
 
   ImageUploadResult._({
-    required this.success,
+    required this.isSuccess,
     this.downloadUrl,
     this.errorMessage,
     this.cancelled = false,
   });
 
+  bool get success => isSuccess;
+
   factory ImageUploadResult.success(String downloadUrl) {
     return ImageUploadResult._(
-      success: true,
+      isSuccess: true,
       downloadUrl: downloadUrl,
     );
   }
 
   factory ImageUploadResult.error(String message) {
     return ImageUploadResult._(
-      success: false,
+      isSuccess: false,
       errorMessage: message,
     );
   }
 
   factory ImageUploadResult.cancelled() {
     return ImageUploadResult._(
-      success: false,
+      isSuccess: false,
       cancelled: true,
     );
   }

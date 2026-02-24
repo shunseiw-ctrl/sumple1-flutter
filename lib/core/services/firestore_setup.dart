@@ -1,22 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../utils/logger.dart';
 
-/// Firestore の初期設定
 class FirestoreSetup {
   static Future<void> initialize() async {
     try {
-      // オフライン永続化を有効化
-      final settings = const Settings(
+      final settings = Settings(
         persistenceEnabled: true,
-        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+        cacheSizeBytes: kIsWeb ? 40 * 1024 * 1024 : Settings.CACHE_SIZE_UNLIMITED,
       );
 
       FirebaseFirestore.instance.settings = settings;
 
       Logger.info(
-        'Firestore initialized with offline persistence',
+        'Firestore initialized',
         tag: 'FirestoreSetup',
+        data: {
+          'persistence': true,
+          'cacheSize': kIsWeb ? '40MB' : 'unlimited',
+          'platform': kIsWeb ? 'web' : 'native',
+        },
       );
     } catch (e, stackTrace) {
       Logger.error(
@@ -28,7 +32,6 @@ class FirestoreSetup {
     }
   }
 
-  /// ネットワーク接続を有効化
   static Future<void> enableNetwork() async {
     try {
       await FirebaseFirestore.instance.enableNetwork();
@@ -42,7 +45,6 @@ class FirestoreSetup {
     }
   }
 
-  /// ネットワーク接続を無効化（テスト用）
   static Future<void> disableNetwork() async {
     try {
       await FirebaseFirestore.instance.disableNetwork();
@@ -56,7 +58,6 @@ class FirestoreSetup {
     }
   }
 
-  /// キャッシュをクリア（開発用）
   static Future<void> clearPersistence() async {
     try {
       await FirebaseFirestore.instance.clearPersistence();

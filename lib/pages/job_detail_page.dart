@@ -72,9 +72,6 @@ class _DetailScaffold extends StatelessWidget {
     required this.data,
   });
 
-  // 固定ADMIN UID（MVP）
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
-
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
   Future<bool> _isAdmin() async {
@@ -83,9 +80,19 @@ class _DetailScaffold extends StatelessWidget {
     if (email == null || email.trim().isEmpty) return false;
 
     final doc = await FirebaseFirestore.instance.doc('config/admins').get();
-    final map = doc.data() as Map<String, dynamic>?;
-    final emails = (map?['emails'] as List?)?.map((e) => e.toString()).toList() ?? const [];
-    return emails.contains(email);
+    final docData = doc.data() as Map<String, dynamic>?;
+
+    final adminUids = (docData?['uids'] as List?)
+            ?.map((e) => e.toString().trim())
+            .toList() ??
+        [];
+    if (adminUids.contains(user?.uid)) return true;
+
+    final adminEmails = (docData?['emails'] as List?)
+            ?.map((e) => e.toString().toLowerCase().trim())
+            .toList() ??
+        [];
+    return adminEmails.contains(email.toLowerCase().trim());
   }
 
   Future<void> _deleteJob(BuildContext context) async {
@@ -140,9 +147,10 @@ class _DetailScaffold extends StatelessWidget {
         ? projectNameSnapshot
         : (data['title'] ?? title ?? '案件').toString();
 
+    final jobOwnerId = (data['ownerId'] ?? data['adminUid'] ?? data['createdBy'] ?? '').toString();
     await FirebaseFirestore.instance.collection('applications').add({
       'applicantUid': uid,
-      'adminUid': _adminUid, // ✅ B方式：案件ごとに管理者UIDを保持
+      'adminUid': jobOwnerId,
       'jobId': jobId,
 
       // ✅ KANNA風一覧/チャット表示の主キー

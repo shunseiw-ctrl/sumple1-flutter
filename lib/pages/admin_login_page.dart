@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-import 'home_page.dart'; // ★ HomePageのパスが違う場合は合わせてください
+import '../core/services/auth_service.dart';
+import '../core/utils/error_handler.dart';
+import '../core/utils/logger.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -11,95 +12,35 @@ class AdminLoginPage extends StatefulWidget {
 }
 
 class _AdminLoginPageState extends State<AdminLoginPage> {
+  final _authService = AuthService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   bool _isLoading = false;
-
-  Future<void> _createAdmin() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('メールとパスワードを入力してください')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    try {
-      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      if (!mounted) return;
-      final u = cred.user;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('作成OK: email=${u?.email}, isAnon=${u?.isAnonymous}')),
-      );
-
-      // 作成できたら管理画面へ
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('作成に失敗しました: ${e.code}')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('作成に失敗しました: $e')),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  bool _obscurePassword = true;
 
   Future<void> _signIn() async {
+    if (!_formKey.currentState!.validate()) return;
+
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('メールとパスワードを入力してください')),
-      );
-      return;
-    }
-
     setState(() => _isLoading = true);
     try {
-      final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await _authService.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      if (!mounted) return;
-      final u = cred.user;
+      Logger.info('Admin sign in successful', tag: 'AdminLoginPage');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ログインOK: email=${u?.email}, isAnon=${u?.isAnonymous}')),
-      );
-
-      // ログインできたら管理画面へ
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ログインに失敗しました: ${e.code}')),
-      );
+      ErrorHandler.showSuccess(context, 'ログインしました');
     } catch (e) {
+      Logger.error('Admin sign in failed', tag: 'AdminLoginPage', error: e);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ログインに失敗しました: $e')),
-      );
+      ErrorHandler.showError(context, e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -117,40 +58,77 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('管理者ログイン')),
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: 'メール'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'パスワード'),
-            ),
-            const SizedBox(height: 24),
-            if (_isLoading) const CircularProgressIndicator(),
-            if (!_isLoading) ...[
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _createAdmin,
-                  child: const Text('管理者を作成（初回だけ）'),
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 32),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  labelText: 'メールアドレス',
+                  prefixIcon: Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'メールアドレスを入力してください';
+                  }
+                  if (!value.contains('@') || !value.contains('.')) {
+                    return '有効なメールアドレスを入力してください';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  labelText: 'パスワード',
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'パスワードを入力してください';
+                  }
+                  if (value.length < 6) {
+                    return 'パスワードは6文字以上で入力してください';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 32),
               SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _signIn,
-                  child: const Text('ログイン'),
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _signIn,
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'ログイン',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                        ),
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'earnings_create_page.dart';
+import '../core/services/auth_service.dart';
+import '../core/enums/user_role.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -12,7 +14,21 @@ class SalesPage extends StatefulWidget {
 }
 
 class _SalesPageState extends State<SalesPage> {
-  static const String _adminUid = '5AeMBYb9PifYVUWMf4lSdCjuM1s1';
+  final _authService = AuthService();
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAdminRole();
+  }
+
+  Future<void> _checkAdminRole() async {
+    final role = await _authService.getCurrentUserRole();
+    if (mounted) {
+      setState(() => _isAdmin = role.isAdmin);
+    }
+  }
 
   DateTime? _selectedMonth; // DateTime(year, month, 1)
 
@@ -55,7 +71,7 @@ class _SalesPageState extends State<SalesPage> {
       return const Scaffold(body: Center(child: Text('ログインしてください')));
     }
 
-    final isAdmin = uid == _adminUid;
+    final isAdmin = _isAdmin;
 
     final db = FirebaseFirestore.instance;
     final q = db.collection('earnings').where('uid', isEqualTo: uid);

@@ -1,77 +1,70 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 
 import '../enums/user_role.dart';
 import '../constants/app_constants.dart';
+import '../utils/logger.dart';
 
-/// 認証とユーザーロール管理を行うサービス
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// 現在のユーザー
   User? get currentUser => _auth.currentUser;
 
-  /// 現在のユーザーUID
   String get currentUserId => currentUser?.uid ?? '';
 
-  /// 現在のユーザーメールアドレス
   String? get currentUserEmail => currentUser?.email;
 
-  /// 認証状態の変更を監視
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  /// 現在のユーザーロールを取得
   Future<UserRole> getCurrentUserRole() async {
     final user = currentUser;
 
-    // 未認証ユーザー
     if (user == null) {
-      _log('User is not authenticated -> guest');
+      Logger.info('User is not authenticated -> guest', tag: 'AuthService');
       return UserRole.guest;
     }
 
-    // 匿名ユーザー
     if (user.isAnonymous) {
-      _log('User is anonymous -> user', userId: user.uid);
+      Logger.info('User is anonymous -> user', tag: 'AuthService', data: {'uid': _shortUid(user.uid)});
       return UserRole.user;
     }
 
-    // メールアドレスがない場合
     final email = user.email;
     if (email == null || email.trim().isEmpty) {
-      _log('User has no email -> user', userId: user.uid);
+      Logger.info('User has no email -> user', tag: 'AuthService', data: {'uid': _shortUid(user.uid)});
       return UserRole.user;
     }
 
-    // 管理者かどうかをチェック
     final isAdmin = await _checkIsAdmin(email);
-    _log('User role determined', userId: user.uid, extra: {
-      'email': email,
+    Logger.info('User role determined', tag: 'AuthService', data: {
+      'uid': _shortUid(user.uid),
       'isAdmin': isAdmin,
     });
 
     return isAdmin ? UserRole.admin : UserRole.user;
   }
 
-  /// 管理者かどうかをチェック
   Future<bool> _checkIsAdmin(String email) async {
     try {
-      // 固定UIDチェック（MVP用）
-      if (currentUserId == AppConstants.adminUid) {
-        return true;
-      }
-
-      // Firestoreの管理者リストをチェック
       final doc = await _firestore.doc(AppConstants.adminConfigPath).get();
 
       if (!doc.exists) {
-        _log('Admin config document not found');
+        Logger.warning('Admin config document not found', tag: 'AuthService');
         return false;
       }
 
       final data = doc.data() as Map<String, dynamic>?;
+
+      final adminUids = (data?['uids'] as List?)
+              ?.map((e) => e.toString().trim())
+              .toList() ??
+          [];
+
+      if (adminUids.contains(currentUserId)) {
+        return true;
+      }
+
       final adminEmails = (data?['emails'] as List?)
               ?.map((e) => e.toString().toLowerCase().trim())
               .toList() ??
@@ -79,24 +72,22 @@ class AuthService {
 
       return adminEmails.contains(email.toLowerCase().trim());
     } catch (e) {
-      _log('Error checking admin status', error: e);
+      Logger.error('Error checking admin status', tag: 'AuthService', error: e);
       return false;
     }
   }
 
-  /// 匿名ログイン
   Future<User?> signInAnonymously() async {
     try {
       final credential = await _auth.signInAnonymously();
-      _log('Anonymous sign in successful', userId: credential.user?.uid);
+      Logger.info('Anonymous sign in successful', tag: 'AuthService', data: {'uid': _shortUid(credential.user?.uid)});
       return credential.user;
     } catch (e) {
-      _log('Anonymous sign in failed', error: e);
+      Logger.error('Anonymous sign in failed', tag: 'AuthService', error: e);
       rethrow;
     }
   }
 
-  /// メールアドレスでログイン
   Future<User?> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -106,15 +97,14 @@ class AuthService {
         email: email.trim(),
         password: password,
       );
-      _log('Email sign in successful', userId: credential.user?.uid);
+      Logger.info('Email sign in successful', tag: 'AuthService', data: {'uid': _shortUid(credential.user?.uid)});
       return credential.user;
     } catch (e) {
-      _log('Email sign in failed', error: e);
+      Logger.error('Email sign in failed', tag: 'AuthService', error: e);
       rethrow;
     }
   }
 
-  /// メールアドレスで新規登録
   Future<User?> createUserWithEmailAndPassword({
     required String email,
     required String password,
@@ -124,55 +114,36 @@ class AuthService {
         email: email.trim(),
         password: password,
       );
-      _log('User creation successful', userId: credential.user?.uid);
+      Logger.info('User creation successful', tag: 'AuthService', data: {'uid': _shortUid(credential.user?.uid)});
       return credential.user;
     } catch (e) {
-      _log('User creation failed', error: e);
+      Logger.error('User creation failed', tag: 'AuthService', error: e);
       rethrow;
     }
   }
 
-  /// ログアウト
   Future<void> signOut() async {
     try {
       await _auth.signOut();
-      _log('Sign out successful');
+      Logger.info('Sign out successful', tag: 'AuthService');
     } catch (e) {
-      _log('Sign out failed', error: e);
+      Logger.error('Sign out failed', tag: 'AuthService', error: e);
       rethrow;
     }
   }
 
-  /// パスワードリセットメールを送信
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
-      _log('Password reset email sent', extra: {'email': email});
+      Logger.info('Password reset email sent', tag: 'AuthService');
     } catch (e) {
-      _log('Password reset email failed', error: e);
+      Logger.error('Password reset email failed', tag: 'AuthService', error: e);
       rethrow;
     }
   }
 
-  /// デバッグログ出力
-  void _log(String message, {String? userId, dynamic error, Map<String, dynamic>? extra}) {
-    if (!kDebugMode) return;
-
-    final buffer = StringBuffer('[AuthService] $message');
-
-    if (userId != null) {
-      final shortId = userId.length > 8 ? userId.substring(0, 8) : userId;
-      buffer.write(' | uid=$shortId...');
-    }
-
-    if (extra != null && extra.isNotEmpty) {
-      buffer.write(' | $extra');
-    }
-
-    if (error != null) {
-      buffer.write(' | error=$error');
-    }
-
-    debugPrint(buffer.toString());
+  String _shortUid(String? uid) {
+    if (uid == null) return 'null';
+    return uid.length > 8 ? uid.substring(0, 8) : uid;
   }
 }

@@ -27,7 +27,22 @@ A Flutter-based job matching application for the construction industry (建設�
 - Firebase is used for authentication, data storage, and cloud functions
 - The app starts with a guest login page (anonymous auth)
 
+## Admin Management
+- Admin status is determined by Firestore document `config/admins`
+- The document contains `uids[]` and `emails[]` arrays
+- AuthService.getCurrentUserRole() checks both arrays to determine admin role
+- No hardcoded admin UIDs in the codebase (removed for security)
+
 ## Recent Changes
+- 2026-02-24: Code quality and security improvements
+  - Removed all hardcoded admin UIDs from codebase (messages_page, sales_page, earnings_create_page, job_detail_page, app_constants)
+  - Admin detection now uses Firestore `config/admins` document (uids[] and emails[] arrays)
+  - Cross-platform image upload: replaced dart:io File with Uint8List (image_upload_service.dart)
+  - Web platform guards: kIsWeb checks for push notifications (push_token_service.dart)
+  - Firestore cache size: 40MB limit for Web, unlimited for native (firestore_setup.dart)
+  - Admin login page: removed "create admin" button (security), added form validation and password toggle
+  - Unified error handling with Logger and ErrorHandler classes
+  - job_detail_page: adminUid fallback chain (ownerId -> adminUid -> createdBy) for legacy data compatibility
 - 2026-02-24: Adapted project for Replit environment
   - Added Flutter web platform support
   - Added web Firebase configuration in `firebase_options.dart`

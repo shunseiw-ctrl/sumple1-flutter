@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import 'chat_room_page.dart';
-import '../core/constants/app_constants.dart';
+import '../core/services/auth_service.dart';
+import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -17,15 +18,26 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   final _auth = FirebaseAuth.instance;
   final _db = FirebaseFirestore.instance;
+  final _authService = AuthService();
 
   String _query = '';
-
-  // 固定ADMIN UID（MVP）
-  static const String _adminUid = AppConstants.adminUid;
+  bool _isAdmin = false;
 
   String get _myUid => _auth.currentUser?.uid ?? '';
   String get _myEmail => _auth.currentUser?.email ?? '';
-  bool get _isAdmin => _myUid.isNotEmpty && _myUid == _adminUid;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAdminRole();
+  }
+
+  Future<void> _checkAdminRole() async {
+    final role = await _authService.getCurrentUserRole();
+    if (mounted) {
+      setState(() => _isAdmin = role.isAdmin);
+    }
+  }
 
   // chats/{appId} の lastMessageAt をキャッシュ（並び替え用）
   final Map<String, DateTime> _lastAtCache = {};
