@@ -196,6 +196,8 @@ class _JobListPageState extends State<JobListPage> {
                     final location = data['location']?.toString() ?? '未設定';
                     final price = data['price']?.toString() ?? '0';
                     final date = data['date']?.toString() ?? '未設定';
+                    final imageUrl = data['imageUrl']?.toString();
+                    final category = data['category']?.toString();
 
                     final ownerId = data['ownerId']?.toString();
                     final isOwner = currentUser != null &&
@@ -208,12 +210,14 @@ class _JobListPageState extends State<JobListPage> {
                     final badges = <_BadgeSpec>[];
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: _JobCard(
                         title: title,
                         location: location,
                         dateText: date,
                         priceText: '¥$price',
+                        imageUrl: imageUrl,
+                        category: category,
                         badges: badges,
                         showLegacyWarning: !hasOwnerId,
                         isOwner: isOwner,
@@ -487,6 +491,8 @@ class _JobCard extends StatelessWidget {
   final String location;
   final String dateText;
   final String priceText;
+  final String? imageUrl;
+  final String? category;
   final List<_BadgeSpec> badges;
   final bool showLegacyWarning;
 
@@ -500,6 +506,8 @@ class _JobCard extends StatelessWidget {
     required this.location,
     required this.dateText,
     required this.priceText,
+    this.imageUrl,
+    this.category,
     required this.badges,
     required this.showLegacyWarning,
     required this.isOwner,
@@ -508,135 +516,249 @@ class _JobCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  IconData _categoryIcon(String? cat) {
+    switch (cat) {
+      case '解体':
+        return Icons.handyman;
+      case '内装':
+        return Icons.format_paint;
+      case '外壁':
+        return Icons.home_work;
+      case '電気':
+        return Icons.electrical_services;
+      case '配管':
+        return Icons.plumbing;
+      case '土木':
+        return Icons.landscape;
+      case '塗装':
+        return Icons.brush;
+      default:
+        return Icons.construction;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
+
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE6E8EB)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x12000000),
+                blurRadius: 12,
+                offset: Offset(0, 3),
+              ),
+              BoxShadow(
+                color: Color(0x08000000),
+                blurRadius: 4,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
-          child: Row(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF1F4),
-                  borderRadius: BorderRadius.circular(12),
+              SizedBox(
+                height: 140,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (hasImage)
+                      Image.network(
+                        imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholderImage(),
+                      )
+                    else
+                      _placeholderImage(),
+
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.ruri,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          priceText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    if (isOwner)
+                      Positioned(
+                        top: 6,
+                        left: 6,
+                        child: Material(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(20),
+                          child: PopupMenuButton<String>(
+                            tooltip: '操作',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            iconSize: 20,
+                            onSelected: (v) {
+                              if (v == 'edit') onEdit?.call();
+                              if (v == 'delete') onDelete?.call();
+                            },
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(value: 'edit', child: Text('編集')),
+                              PopupMenuItem(value: 'delete', child: Text('削除')),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                child: Icon(Icons.photo, color: AppColors.textHint),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final b in badges)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: b.bg,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Text(
-                              b.label,
-                              style: TextStyle(
-                                color: b.fg,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
+                    if (badges.isNotEmpty || showLegacyWarning) ...[
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          for (final b in badges)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: b.bg,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                b.label,
+                                style: TextStyle(
+                                  color: b.fg,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                        if (showLegacyWarning)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF3E0),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: const Text(
-                              'ownerIdなし',
-                              style: TextStyle(
-                                color: Color(0xFFE65100),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
+                          if (showLegacyWarning)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF3E0),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                'ownerIdなし',
+                                style: TextStyle(
+                                  color: Color(0xFFE65100),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+
                     Text(
                       title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
+                        height: 1.3,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      location,
-                      style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
+
                     Row(
                       children: [
-                        Icon(Icons.event, size: 16, color: AppColors.textHint),
-                        const SizedBox(width: 6),
+                        Icon(Icons.place_outlined, size: 15, color: AppColors.ruri),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            dateText,
-                            style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                            location,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      priceText,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            dateText,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Column(
-                children: [
-                  if (isOwner)
-                    PopupMenuButton<String>(
-                      tooltip: '操作',
-                      onSelected: (v) {
-                        if (v == 'edit') onEdit?.call();
-                        if (v == 'delete') onDelete?.call();
-                      },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'edit', child: Text('編集')),
-                        PopupMenuItem(value: 'delete', child: Text('削除')),
-                      ],
-                    ),
-                ],
-              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholderImage() {
+    return Container(
+      color: AppColors.ruriPale,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _categoryIcon(category),
+              size: 40,
+              color: AppColors.ruri.withValues(alpha: 0.35),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              category ?? '建設',
+              style: TextStyle(
+                color: AppColors.ruri.withValues(alpha: 0.45),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
