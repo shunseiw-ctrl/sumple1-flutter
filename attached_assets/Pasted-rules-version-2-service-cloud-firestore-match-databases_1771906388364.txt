@@ -1,0 +1,164 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+
+    function isString(v) { return v is string; }
+    function isTimestamp(v) { return v is timestamp; }
+    function isInt(v) { return v is int; }
+
+    // 固定Admin UID（MVP）
+    function isAdminUid() {
+      return signedIn() && uid() == "5AeMBYb9PifYVUWMf4lSdCjuM1s1";
+    }
+
+    match /config/{docId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /jobs/{jobId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && (isAdminUid() || (request.resource.data.ownerId == uid()))
+        && isString(request.resource.data.title)
+        && isString(request.resource.data.location)
+        && isString(request.resource.data.price)
+        && isString(request.resource.data.date);
+
+      allow update: if signedIn()
+        && (isAdminUid() || (resource.data.ownerId == uid()))
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "title","location","price","date",
+          "description","notes",
+          "prefecture",
+          "workDateKey","workMonthKey",
+          "updatedAt",
+          "projectName"
+        ]);
+
+      allow delete: if signedIn()
+        && (isAdminUid() || (resource.data.ownerId == uid()));
+    }
+
+    function isAppPartyData(appData) {
+      return signedIn()
+        && (appData.applicantUid == uid() || appData.adminUid == uid());
+    }
+
+    match /applications/{appId} {
+      allow read: if isAppPartyData(resource.data);
+
+      allow create: if signedIn()
+        && request.resource.data.applicantUid == uid()
+        && isString(request.resource.data.adminUid)
+        && isString(request.resource.data.jobId)
+        && isString(request.resource.data.status)
+        && request.resource.data.status == "applied"
+        && isString(request.resource.data.projectNameSnapshot);
+
+      allow update: if isAppPartyData(resource.data)
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "status","updatedAt",
+          "projectNameSnapshot",
+          "jobTitleSnapshot","jobLocationSnapshot","jobPriceSnapshot","jobDateSnapshot"
+        ]);
+
+      allow delete: if false;
+    }
+
+    // ✅ profiles: 自分のprofileのみ read/write
+    match /profiles/{profileUid} {
+      allow read: if signedIn() && uid() == profileUid;
+      allow create: if signedIn() && uid() == profileUid;
+
+      allow update: if signedIn()
+        && uid() == profileUid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "displayName","name","email","photoUrl","phone",
+          "fcmToken","updatedAt"
+        ]);
+
+      allow delete: if false;
+    }
+
+    function appDoc(appId) {
+      return get(/databases/$(database)/documents/applications/$(appId)).data;
+    }
+
+    function chatPartyByApp(chatId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/applications/$(chatId))
+        && (appDoc(chatId).applicantUid == uid() || appDoc(chatId).adminUid == uid());
+    }
+
+    match /chats/{chatId} {
+      allow read: if chatPartyByApp(chatId);
+
+      // ✅ create: ChatRoomPage が実際に set(merge:true) で書く keys に合わせる
+      allow create: if chatPartyByApp(chatId)
+        && request.resource.data.keys().hasOnly([
+          "applicationId",
+          "applicantUid",
+          "adminUid",
+          "jobId",
+          "titleSnapshot",
+          "createdAt",
+          "updatedAt"
+        ])
+        && isString(request.resource.data.applicationId)
+        && request.resource.data.applicationId == chatId
+        && isString(request.resource.data.applicantUid)
+        && isString(request.resource.data.adminUid)
+        && isString(request.resource.data.jobId)
+        && isString(request.resource.data.titleSnapshot)
+        && request.resource.data.applicantUid == appDoc(chatId).applicantUid
+        && request.resource.data.adminUid == appDoc(chatId).adminUid
+        && request.resource.data.jobId == appDoc(chatId).jobId;
+
+      allow update: if chatPartyByApp(chatId)
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "lastMessageText","lastMessageAt","lastMessageSenderUid",
+          "unreadCountApplicant","unreadCountAdmin",
+          "updatedAt","titleSnapshot"
+        ]);
+
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if chatPartyByApp(chatId);
+
+        allow create: if chatPartyByApp(chatId)
+          && request.resource.data.senderUid == uid()
+          && request.resource.data.keys().hasOnly(["senderUid","text","createdAt"])
+          && isString(request.resource.data.text);
+
+        allow update, delete: if false;
+      }
+    }
+
+    match /earnings/{earningId} {
+      allow read: if signedIn() && (
+        isAdminUid() || (resource.data.uid == uid())
+      );
+
+      allow create: if isAdminUid()
+        && isString(request.resource.data.uid)
+        && isString(request.resource.data.applicationId)
+        && isString(request.resource.data.projectNameSnapshot)
+        && isInt(request.resource.data.amount)
+        && isTimestamp(request.resource.data.payoutConfirmedAt);
+
+      allow update: if isAdminUid()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "uid","applicationId","projectNameSnapshot",
+          "amount","payoutConfirmedAt","jobId","updatedAt"
+        ]);
+
+      allow delete: if isAdminUid();
+    }
+  }
+}
