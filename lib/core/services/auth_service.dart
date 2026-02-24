@@ -15,6 +15,11 @@ class AuthService {
 
   String? get currentUserEmail => currentUser?.email;
 
+  bool get isGuest {
+    final user = currentUser;
+    return user == null || user.isAnonymous;
+  }
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   Future<UserRole> getCurrentUserRole() async {
@@ -26,8 +31,8 @@ class AuthService {
     }
 
     if (user.isAnonymous) {
-      Logger.info('User is anonymous -> user', tag: 'AuthService', data: {'uid': _shortUid(user.uid)});
-      return UserRole.user;
+      Logger.info('User is anonymous -> guest', tag: 'AuthService', data: {'uid': _shortUid(user.uid)});
+      return UserRole.guest;
     }
 
     final email = user.email;
