@@ -36,6 +36,6 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["bash", "-c", "cd /home/runner/workspace && flutter pub get && flutter build web --release"]
+build = ["bash", "-c", "cd /home/runner/workspace && npm install --production"]
 publicDir = "build/web"
 run = ["node", "server.js"]
