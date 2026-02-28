@@ -61,6 +61,58 @@ const securityHeaders = {
 const stateStore = new Map();
 const tokenStore = new Map();
 
+// --- Rate limiting ---
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
+
+function isRateLimited(req) {
+  const ip = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  const entry = rateLimitMap.get(ip);
+  if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    entry.count = 1;
+    entry.windowStart = now;
+    return false;
+  }
+
+  entry.count++;
+  return entry.count > RATE_LIMIT_MAX_REQUESTS;
+}
+
+// Periodic cleanup every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap.entries()) {
+    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS * 2) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// --- CORS ---
+function getAllowedOrigin() {
+  if (REPLIT_DOMAIN) return `https://${REPLIT_DOMAIN}`;
+  return `http://localhost:${PORT}`;
+}
+
+function applyCors(req, res) {
+  const origin = req.headers.origin;
+  const allowed = getAllowedOrigin();
+  if (origin === allowed) {
+    res.setHeader('Access-Control-Allow-Origin', allowed);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
+}
+
 function cleanupExpired(store, maxAgeMs) {
   const now = Date.now();
   for (const [key, entry] of store.entries()) {
@@ -232,10 +284,27 @@ async function handleAuthLineCallback(req, res) {
   }
 }
 
+const MAX_BODY_SIZE = 1024;
+
 function handleTokenExchange(req, res) {
   let body = '';
-  req.on('data', (chunk) => { body += chunk; });
+  let bodySize = 0;
+  let aborted = false;
+
+  req.on('data', (chunk) => {
+    if (aborted) return;
+    bodySize += chunk.length;
+    if (bodySize > MAX_BODY_SIZE) {
+      aborted = true;
+      res.writeHead(413, { 'Content-Type': 'application/json', ...securityHeaders });
+      res.end(JSON.stringify({ error: 'payload_too_large' }));
+      req.destroy();
+      return;
+    }
+    body += chunk;
+  });
   req.on('end', () => {
+    if (aborted) return;
     try {
       const { code } = JSON.parse(body);
 
@@ -306,7 +375,25 @@ function serveStaticFile(req, res) {
 }
 
 const server = http.createServer(async (req, res) => {
+  applyCors(req, res);
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, securityHeaders);
+    res.end();
+    return;
+  }
+
   const urlPath = req.url.split('?')[0].split('#')[0];
+
+  // Rate limit auth endpoints
+  if (urlPath.startsWith('/auth/')) {
+    if (isRateLimited(req)) {
+      res.writeHead(429, { 'Content-Type': 'application/json', ...securityHeaders });
+      res.end(JSON.stringify({ error: 'too_many_requests' }));
+      return;
+    }
+  }
 
   if (urlPath === '/auth/line' && req.method === 'GET') {
     handleAuthLineStart(req, res);
