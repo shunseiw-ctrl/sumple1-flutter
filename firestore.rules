@@ -69,7 +69,8 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
           "status","updatedAt",
           "projectNameSnapshot",
-          "jobTitleSnapshot","jobLocationSnapshot","jobPriceSnapshot","jobDateSnapshot"
+          "jobTitleSnapshot","jobLocationSnapshot","jobPriceSnapshot","jobDateSnapshot",
+          "checkInStatus","checkInAt","checkOutAt"
         ]);
 
       allow delete: if false;
@@ -80,10 +81,14 @@ service cloud.firestore {
       allow create: if signedIn() && uid() == profileUid;
 
       allow update: if signedIn()
-        && uid() == profileUid
+        && (uid() == profileUid || isAdminUid())
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
           "displayName","name","email","photoUrl","phone",
-          "fcmToken","updatedAt"
+          "fcmToken","updatedAt",
+          "familyName","givenName","familyNameKana","givenNameKana",
+          "birthDate","gender","postalCode","address",
+          "introduction","experienceYears","qualifications",
+          "profilePhotoUrl","profilePhotoLocked"
         ]);
 
       allow delete: if false;
@@ -159,11 +164,82 @@ service cloud.firestore {
 
       allow update: if isAdminUid()
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
-          "uid","applicationId","projectNameSnapshot",
+          "applicationId","projectNameSnapshot",
           "amount","payoutConfirmedAt","jobId","updatedAt"
         ]);
 
       allow delete: if isAdminUid();
+    }
+
+    match /notifications/{notifId} {
+      allow read: if signedIn()
+        && (resource.data.targetUid == uid() || isAdminUid());
+
+      allow create: if signedIn()
+        && isString(request.resource.data.targetUid)
+        && isString(request.resource.data.title)
+        && isString(request.resource.data.body)
+        && request.resource.data.read == false;
+
+      allow update: if signedIn()
+        && resource.data.targetUid == uid()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["read"]);
+
+      allow delete: if false;
+    }
+
+    match /favorites/{favUid} {
+      allow read: if signedIn() && uid() == favUid;
+      allow create: if signedIn() && uid() == favUid;
+
+      allow update: if signedIn()
+        && uid() == favUid
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "jobIds","updatedAt"
+        ]);
+
+      allow delete: if false;
+    }
+
+    match /ratings/{ratingId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && request.resource.data.raterUid == uid()
+        && isString(request.resource.data.applicationId)
+        && isString(request.resource.data.jobId)
+        && isInt(request.resource.data.stars)
+        && request.resource.data.stars >= 1
+        && request.resource.data.stars <= 5;
+
+      allow update, delete: if false;
+    }
+
+    match /identity_verification/{ivUid} {
+      allow read: if signedIn()
+        && (uid() == ivUid || isAdminUid());
+
+      allow create: if signedIn()
+        && uid() == ivUid
+        && request.resource.data.uid == uid()
+        && request.resource.data.status == 'pending';
+
+      allow update: if signedIn()
+        && (
+          (uid() == ivUid
+            && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+              "idPhotoUrl","selfieUrl","status","submittedAt"
+            ])
+            && request.resource.data.status == 'pending'
+          )
+          || (isAdminUid()
+            && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+              "status","reviewedAt","reviewedBy"
+            ])
+          )
+        );
+
+      allow delete: if false;
     }
 
     match /{document=**} {

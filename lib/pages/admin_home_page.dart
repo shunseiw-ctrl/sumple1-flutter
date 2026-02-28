@@ -225,7 +225,7 @@ class _DashboardTab extends StatelessWidget {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('users').snapshots(),
+                stream: FirebaseFirestore.instance.collection('profiles').snapshots(),
                 builder: (context, snap) {
                   final count = snap.data?.docs.length ?? 0;
                   return _SummaryCard(
