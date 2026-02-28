@@ -1,4 +1,5 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
 const https = require("https");
@@ -8,8 +9,8 @@ const logger = require("firebase-functions/logger");
 const stateStore = new Map();
 const tokenStore = new Map();
 
-const LINE_CHANNEL_ID = process.env.LINE_CHANNEL_ID || "";
-const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET || "";
+const lineChannelId = defineSecret("LINE_CHANNEL_ID");
+const lineChannelSecret = defineSecret("LINE_CHANNEL_SECRET");
 
 function httpsRequest(url, options, postData) {
   return new Promise((resolve, reject) => {
@@ -54,14 +55,17 @@ const securityHeaders = {
  * LINE認証リダイレクト
  */
 exports.lineRedirect = onRequest(
-  { region: "asia-northeast1", maxInstances: 10 },
+  { region: "asia-northeast1", maxInstances: 10, secrets: [lineChannelId, lineChannelSecret] },
   (req, res) => {
     if (req.method !== "GET") {
       res.status(405).set(securityHeaders).send("Method Not Allowed");
       return;
     }
 
-    if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
+    const channelId = lineChannelId.value();
+    const channelSecret = lineChannelSecret.value();
+
+    if (!channelId || !channelSecret) {
       res.status(503).set(securityHeaders).json({ error: "line_not_configured" });
       return;
     }
@@ -75,7 +79,7 @@ exports.lineRedirect = onRequest(
 
     const params = new URLSearchParams({
       response_type: "code",
-      client_id: LINE_CHANNEL_ID,
+      client_id: channelId,
       redirect_uri: callbackUrl,
       state,
       scope: "profile openid",
@@ -91,7 +95,7 @@ exports.lineRedirect = onRequest(
  * LINEコールバック処理
  */
 exports.lineCallback = onRequest(
-  { region: "asia-northeast1", maxInstances: 10 },
+  { region: "asia-northeast1", maxInstances: 10, secrets: [lineChannelId, lineChannelSecret] },
   async (req, res) => {
     try {
       const code = req.query.code;
@@ -122,8 +126,8 @@ exports.lineCallback = onRequest(
         grant_type: "authorization_code",
         code,
         redirect_uri: callbackUrl,
-        client_id: LINE_CHANNEL_ID,
-        client_secret: LINE_CHANNEL_SECRET,
+        client_id: lineChannelId.value(),
+        client_secret: lineChannelSecret.value(),
       });
 
       const tokenRes = await httpsRequest(
@@ -204,7 +208,7 @@ exports.lineCallback = onRequest(
  * トークン交換
  */
 exports.lineTokenExchange = onRequest(
-  { region: "asia-northeast1", maxInstances: 10 },
+  { region: "asia-northeast1", maxInstances: 10, secrets: [lineChannelId, lineChannelSecret] },
   (req, res) => {
     res.set(securityHeaders);
 

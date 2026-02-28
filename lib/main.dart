@@ -46,11 +46,22 @@ Future<void> main() async {
   }
 
   // --- App Check ---
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaEnterpriseProvider('placeholder-site-key'),
-    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
-  );
+  if (kDebugMode) {
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+    );
+  } else {
+    const recaptchaKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');
+    if (recaptchaKey.isNotEmpty) {
+      await FirebaseAppCheck.instance.activate(
+        webProvider: ReCaptchaEnterpriseProvider(recaptchaKey),
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      );
+    }
+  }
 
   await FirestoreSetup.initialize();
 
