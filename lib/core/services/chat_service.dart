@@ -195,14 +195,22 @@ class ChatService {
     }
   }
 
+  /// メッセージの最大文字数
+  static const int maxMessageLength = 5000;
+
   /// メッセージを送信（リトライ機能付き）
   Future<SendMessageResult> sendMessage({
     required String applicationId,
     required String text,
     int maxRetries = 3,
   }) async {
-    if (text.trim().isEmpty) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) {
       return SendMessageResult.error('メッセージが空です');
+    }
+
+    if (trimmed.length > maxMessageLength) {
+      return SendMessageResult.error('メッセージは${maxMessageLength}文字以内で入力してください');
     }
 
     if (currentUserId.isEmpty) {

@@ -12,6 +12,10 @@ dependencies:
     sdk: flutter
 
   firebase_messaging: ^15.0.0
+  firebase_crashlytics: ^4.3.0
+  firebase_analytics: ^11.4.0
+  firebase_performance: ^0.10.0
+  firebase_app_check: ^0.3.2
 
   cupertino_icons: ^1.0.8
 
@@ -22,7 +26,7 @@ dependencies:
   url_launcher: ^6.2.6
   web: ^1.1.0
   http: ^1.2.0
-  
+
   # 画像関連
   image_picker: ^1.0.7
   image: ^4.1.7
@@ -36,6 +40,8 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
+  fake_cloud_firestore: ^3.1.0
 
 
 flutter:

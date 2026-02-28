@@ -1,31 +1,74 @@
 const admin = require("firebase-admin");
 
-// v2 (firebase-functions v5+) の書き方
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const logger = require("firebase-functions/logger");
 
 admin.initializeApp();
 
-// コスト制御（任意）
+// コスト制御
 setGlobalOptions({ maxInstances: 10 });
 
-/**
- * earnings/{earningId} 作成時に、profiles/{uid}.fcmToken に通知を送る
- *
- * 前提（Flutter側で実装）:
- * - profiles/{uid}.fcmToken を端末起動/ログイン後に保存していること
- *
- * earnings ドキュメントの想定フィールド:
- * - uid: string (支払対象ユーザーUID)
- * - amount: int
- * - payoutConfirmedAt: Timestamp
- * - projectNameSnapshot: string
- */
+// --- LINE認証 Cloud Functions ---
+const lineAuth = require("./src/lineAuth");
+exports.lineRedirect = lineAuth.lineRedirect;
+exports.lineCallback = lineAuth.lineCallback;
+exports.lineTokenExchange = lineAuth.lineTokenExchange;
+
+// --- KPI集計バッチ（日次: 毎日 0:00 JST = 15:00 UTC）---
+exports.dailyStatsAggregation = onSchedule(
+  {
+    schedule: "0 15 * * *",
+    region: "asia-northeast1",
+    timeZone: "Asia/Tokyo",
+  },
+  async (event) => {
+    try {
+      const now = new Date();
+      const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const dateKey = jst.toISOString().split("T")[0];
+
+      const db = admin.firestore();
+
+      const [jobsSnap, appsSnap, profilesSnap] = await Promise.all([
+        db.collection("jobs").count().get(),
+        db.collection("applications").count().get(),
+        db.collection("profiles").count().get(),
+      ]);
+
+      await db.doc("stats/daily").collection("entries").doc(dateKey).set(
+        {
+          totalJobs: jobsSnap.data().count,
+          totalApplications: appsSnap.data().count,
+          totalUsers: profilesSnap.data().count,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      await db.doc("stats/realtime").set(
+        {
+          totalJobs: jobsSnap.data().count,
+          totalApplications: appsSnap.data().count,
+          totalUsers: profilesSnap.data().count,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      logger.info("Daily stats aggregated", { dateKey });
+    } catch (e) {
+      logger.error("Daily stats aggregation failed", e);
+    }
+  }
+);
+
+// --- earnings/{earningId} 作成時にFCM通知 ---
 exports.onEarningCreated = onDocumentCreated(
   {
     document: "earnings/{earningId}",
-    region: "asia-northeast1", // Firestoreのリージョンに合わせる（よく使う）
+    region: "asia-northeast1",
   },
   async (event) => {
     try {
@@ -48,7 +91,6 @@ exports.onEarningCreated = onDocumentCreated(
         return;
       }
 
-      // profiles/{uid} から FCM token を取得（単一端末MVP）
       const profileRef = admin.firestore().collection("profiles").doc(targetUid);
       const profileSnap = await profileRef.get();
       if (!profileSnap.exists) {
@@ -64,7 +106,6 @@ exports.onEarningCreated = onDocumentCreated(
         return;
       }
 
-      // 日付文字列（yyyy/MM/dd）
       let ymd = "";
       try {
         if (payoutConfirmedAt && payoutConfirmedAt.toDate) {
@@ -93,14 +134,10 @@ exports.onEarningCreated = onDocumentCreated(
         },
         android: {
           priority: "high",
-          notification: {
-            channelId: "default",
-          },
+          notification: { channelId: "default" },
         },
         apns: {
-          headers: {
-            "apns-priority": "10",
-          },
+          headers: { "apns-priority": "10" },
         },
       };
 

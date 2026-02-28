@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "alba-work"
+    "default": "alba-work",
+    "staging": "alba-work-staging",
+    "production": "alba-work"
   }
 }

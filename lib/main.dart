@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,12 +16,13 @@ import 'pages/onboarding_page.dart';
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
 import 'core/services/auth_service.dart';
+import 'core/services/analytics_service.dart';
 import 'core/enums/user_role.dart';
 import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'core/services/splash_remover.dart';
 import 'presentation/widgets/error_retry_widget.dart';
 
@@ -25,6 +31,25 @@ Future<void> main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // --- Crashlytics ---
+  if (!kIsWeb) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+    if (kDebugMode) {
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+    }
+  }
+
+  // --- App Check ---
+  await FirebaseAppCheck.instance.activate(
+    webProvider: ReCaptchaEnterpriseProvider('placeholder-site-key'),
+    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
   );
 
   await FirestoreSetup.initialize();
@@ -378,6 +403,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
+      navigatorObservers: [AnalyticsService.observer],
       home: const AuthGate(),
     );
   }

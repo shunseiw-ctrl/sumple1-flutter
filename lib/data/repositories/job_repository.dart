@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/job_model.dart';
+import '../models/paginated_result.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
 
@@ -196,6 +197,69 @@ class JobRepository {
         error: e,
         stackTrace: stackTrace,
         data: {'jobId': jobId},
+      );
+      rethrow;
+    }
+  }
+
+  /// カーソルベースページネーションで案件一覧を取得
+  Future<PaginatedResult<JobModel>> getJobsPaginated({
+    String? prefecture,
+    String? workMonthKey,
+    int limit = 20,
+    DocumentSnapshot? startAfter,
+  }) async {
+    try {
+      Query<Map<String, dynamic>> query = _collection;
+
+      if (prefecture != null && prefecture != 'その他') {
+        query = query.where('prefecture', isEqualTo: prefecture);
+      }
+
+      if (workMonthKey != null) {
+        query = query.where('workMonthKey', isEqualTo: workMonthKey);
+      }
+
+      query = query.orderBy('createdAt', descending: true);
+
+      if (startAfter != null) {
+        query = query.startAfterDocument(startAfter);
+      }
+
+      query = query.limit(limit);
+
+      final snapshot = await query.get();
+
+      var jobs = snapshot.docs.map((doc) => JobModel.fromFirestore(doc)).toList();
+
+      if (prefecture == 'その他') {
+        jobs = jobs.where((job) {
+          if (job.prefecture.isEmpty || job.prefecture == '未設定') return true;
+          return !AppConstants.excludedPrefectures.contains(job.prefecture);
+        }).toList();
+      }
+
+      Logger.debug(
+        'Fetched jobs (paginated)',
+        tag: 'JobRepository',
+        data: {
+          'count': jobs.length,
+          'hasMore': snapshot.docs.length == limit,
+          'prefecture': prefecture,
+        },
+      );
+
+      return PaginatedResult<JobModel>(
+        items: jobs,
+        lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
+        hasMore: snapshot.docs.length == limit,
+      );
+    } catch (e, stackTrace) {
+      Logger.error(
+        'Failed to get jobs (paginated)',
+        tag: 'JobRepository',
+        error: e,
+        stackTrace: stackTrace,
       );
       rethrow;
     }

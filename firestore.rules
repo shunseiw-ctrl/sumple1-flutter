@@ -2,6 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── ヘルパー関数 ──
+
     function signedIn() { return request.auth != null; }
     function uid() { return request.auth.uid; }
 
@@ -9,6 +11,12 @@ service cloud.firestore {
     function isTimestamp(v) { return v is timestamp; }
     function isInt(v) { return v is int; }
 
+    /// 文字列の長さを検証（最大値）
+    function isStringMaxLen(v, maxLen) {
+      return v is string && v.size() <= maxLen;
+    }
+
+    /// 管理者かどうかを判定
     function isAdminUid() {
       return signedIn()
         && exists(/databases/$(database)/documents/config/admins)
@@ -18,18 +26,35 @@ service cloud.firestore {
         );
     }
 
+    // ── config ──
+
     match /config/{docId} {
       allow read: if signedIn();
       allow write: if isAdminUid();
     }
+
+    // ── stats（KPI集計ドキュメント）──
+
+    match /stats/{docId} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false; // Cloud Functions のみ書き込み可
+    }
+
+    match /stats/{docId}/{subCol}/{subDocId} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false;
+    }
+
+    // ── jobs（求人） ──
+    // B案: SEO優先で公開維持。App Check で正規アプリのみアクセス可にする。
 
     match /jobs/{jobId} {
       allow read: if true;
 
       allow create: if signedIn()
         && (isAdminUid() || (request.resource.data.ownerId == uid()))
-        && isString(request.resource.data.title)
-        && isString(request.resource.data.location)
+        && isStringMaxLen(request.resource.data.title, 200)
+        && isStringMaxLen(request.resource.data.location, 500)
         && isString(request.resource.data.price)
         && isString(request.resource.data.date);
 
@@ -42,11 +67,21 @@ service cloud.firestore {
           "workDateKey","workMonthKey",
           "updatedAt",
           "projectName"
-        ]);
+        ])
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["title"])
+            || isStringMaxLen(request.resource.data.title, 200))
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["location"])
+            || isStringMaxLen(request.resource.data.location, 500))
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["description"])
+            || isStringMaxLen(request.resource.data.description, 5000))
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["notes"])
+            || isStringMaxLen(request.resource.data.notes, 2000));
 
       allow delete: if signedIn()
         && (isAdminUid() || (resource.data.ownerId == uid()));
     }
+
+    // ── applications（応募） ──
 
     function isAppPartyData(appData) {
       return signedIn()
@@ -59,11 +94,11 @@ service cloud.firestore {
 
       allow create: if signedIn()
         && request.resource.data.applicantUid == uid()
-        && isString(request.resource.data.adminUid)
-        && isString(request.resource.data.jobId)
+        && isStringMaxLen(request.resource.data.adminUid, 128)
+        && isStringMaxLen(request.resource.data.jobId, 128)
         && isString(request.resource.data.status)
         && request.resource.data.status == "applied"
-        && isString(request.resource.data.projectNameSnapshot);
+        && isStringMaxLen(request.resource.data.projectNameSnapshot, 200);
 
       allow update: if isAppPartyData(resource.data)
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
@@ -75,6 +110,8 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+
+    // ── profiles（プロフィール） ──
 
     match /profiles/{profileUid} {
       allow read: if signedIn() && (uid() == profileUid || isAdminUid());
@@ -89,10 +126,16 @@ service cloud.firestore {
           "birthDate","gender","postalCode","address",
           "introduction","experienceYears","qualifications",
           "profilePhotoUrl","profilePhotoLocked"
-        ]);
+        ])
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["displayName"])
+            || isStringMaxLen(request.resource.data.displayName, 100))
+        && (!request.resource.data.diff(resource.data).changedKeys().hasAny(["introduction"])
+            || isStringMaxLen(request.resource.data.introduction, 2000));
 
       allow delete: if false;
     }
+
+    // ── chats（チャット） ──
 
     function appDoc(appId) {
       return get(/databases/$(database)/documents/applications/$(appId)).data;
@@ -122,7 +165,7 @@ service cloud.firestore {
         && isString(request.resource.data.applicantUid)
         && isString(request.resource.data.adminUid)
         && isString(request.resource.data.jobId)
-        && isString(request.resource.data.titleSnapshot)
+        && isStringMaxLen(request.resource.data.titleSnapshot, 200)
         && request.resource.data.applicantUid == appDoc(chatId).applicantUid
         && request.resource.data.adminUid == appDoc(chatId).adminUid
         && request.resource.data.jobId == appDoc(chatId).jobId;
@@ -150,16 +193,20 @@ service cloud.firestore {
       }
     }
 
+    // ── earnings（収益） ──
+
     match /earnings/{earningId} {
       allow read: if signedIn() && (
         isAdminUid() || (resource.data.uid == uid())
       );
 
       allow create: if isAdminUid()
-        && isString(request.resource.data.uid)
-        && isString(request.resource.data.applicationId)
-        && isString(request.resource.data.projectNameSnapshot)
+        && isStringMaxLen(request.resource.data.uid, 128)
+        && isStringMaxLen(request.resource.data.applicationId, 128)
+        && isStringMaxLen(request.resource.data.projectNameSnapshot, 200)
         && isInt(request.resource.data.amount)
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 100000000
         && isTimestamp(request.resource.data.payoutConfirmedAt);
 
       allow update: if isAdminUid()
@@ -171,14 +218,18 @@ service cloud.firestore {
       allow delete: if isAdminUid();
     }
 
+    // ── notifications（通知） ──
+    // 修正: 管理者のみ通知を作成可能（スパム防止）
+
     match /notifications/{notifId} {
       allow read: if signedIn()
         && (resource.data.targetUid == uid() || isAdminUid());
 
       allow create: if signedIn()
-        && isString(request.resource.data.targetUid)
-        && isString(request.resource.data.title)
-        && isString(request.resource.data.body)
+        && isAdminUid()
+        && isStringMaxLen(request.resource.data.targetUid, 128)
+        && isStringMaxLen(request.resource.data.title, 200)
+        && isStringMaxLen(request.resource.data.body, 1000)
         && request.resource.data.read == false;
 
       allow update: if signedIn()
@@ -187,6 +238,8 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+
+    // ── favorites（お気に入り） ──
 
     match /favorites/{favUid} {
       allow read: if signedIn() && uid() == favUid;
@@ -201,19 +254,23 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── ratings（評価） ──
+
     match /ratings/{ratingId} {
       allow read: if signedIn();
 
       allow create: if signedIn()
         && request.resource.data.raterUid == uid()
-        && isString(request.resource.data.applicationId)
-        && isString(request.resource.data.jobId)
+        && isStringMaxLen(request.resource.data.applicationId, 128)
+        && isStringMaxLen(request.resource.data.jobId, 128)
         && isInt(request.resource.data.stars)
         && request.resource.data.stars >= 1
         && request.resource.data.stars <= 5;
 
       allow update, delete: if false;
     }
+
+    // ── identity_verification（本人確認） ──
 
     match /identity_verification/{ivUid} {
       allow read: if signedIn()
@@ -241,6 +298,8 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+
+    // ── デフォルト: 全て拒否 ──
 
     match /{document=**} {
       allow read, write: if false;

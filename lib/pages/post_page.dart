@@ -162,6 +162,20 @@ class _PostPageState extends State<PostPage> {
       return;
     }
 
+    if (title.length > 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('タイトルは200文字以内で入力してください')),
+      );
+      return;
+    }
+
+    if (location.length > 500) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('場所は500文字以内で入力してください')),
+      );
+      return;
+    }
+
     final iso = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!iso.hasMatch(dateKey)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -171,9 +185,16 @@ class _PostPageState extends State<PostPage> {
     }
 
     final price = int.tryParse(priceText);
-    if (price == null) {
+    if (price == null || price <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額は数字で入力してください')),
+        const SnackBar(content: Text('金額は正の数字で入力してください')),
+      );
+      return;
+    }
+
+    if (price > 100000000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('金額が上限を超えています')),
       );
       return;
     }

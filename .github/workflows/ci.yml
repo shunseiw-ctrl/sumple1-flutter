@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Check coverage report
+        if: always()
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            echo "Coverage report generated"
+            LINES_FOUND=$(grep -c "^DA:" coverage/lcov.info || echo "0")
+            LINES_HIT=$(grep "^DA:" coverage/lcov.info | grep -v ",0$" | wc -l || echo "0")
+            if [ "$LINES_FOUND" -gt 0 ]; then
+              COVERAGE=$((LINES_HIT * 100 / LINES_FOUND))
+              echo "Approximate coverage: ${COVERAGE}%"
+            fi
+          fi
+
+  firestore-rules-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Firestore rules syntax
+        run: |
+          if grep -q "rules_version" firestore.rules; then
+            echo "Firestore rules file is valid"
+          else
+            echo "ERROR: Invalid firestore.rules"
+            exit 1
+          fi
+
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check for outdated dependencies
+        run: flutter pub outdated

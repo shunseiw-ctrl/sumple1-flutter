@@ -185,79 +185,77 @@ class _DashboardTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('jobs').snapshots(),
-                builder: (context, snap) {
-                  final count = snap.data?.docs.length ?? 0;
-                  return _SummaryCard(
-                    icon: Icons.work,
-                    iconColor: AppColors.ruri,
-                    iconBgColor: AppColors.ruriPale,
-                    label: '掲載中の案件',
+        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance.doc('stats/realtime').snapshots(),
+          builder: (context, statsSnap) {
+            final stats = statsSnap.data?.data() ?? {};
+            final jobCount = (stats['totalJobs'] ?? 0) as int;
+            final appCount = (stats['totalApplications'] ?? 0) as int;
+            final userCount = (stats['totalUsers'] ?? 0) as int;
+
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _SummaryCard(
+                        icon: Icons.work,
+                        iconColor: AppColors.ruri,
+                        iconBgColor: AppColors.ruriPale,
+                        label: '掲載中の案件',
+                        count: jobCount,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _SummaryCard(
+                        icon: Icons.people,
+                        iconColor: AppColors.success,
+                        iconBgColor: const Color(0xFFD1FAE5),
+                        label: '応募数',
+                        count: appCount,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _SummaryCard(
+                        icon: Icons.person,
+                        iconColor: AppColors.warning,
+                        iconBgColor: const Color(0xFFFEF3C7),
+                        label: '登録ユーザー',
+                        count: userCount,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('applications')
+                            .where('status', isEqualTo: 'applied')
+                            .limit(100)
+                            .snapshots(),
+                        builder: (context, snap) {
+                          final count = snap.data?.docs.length ?? 0;
+                          return _SummaryCard(
+                            icon: Icons.pending_actions,
+                            iconColor: AppColors.error,
+                            iconBgColor: const Color(0xFFFEE2E2),
+                            label: '未対応の応募',
                     count: count,
                   );
                 },
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('applications').snapshots(),
-                builder: (context, snap) {
-                  final count = snap.data?.docs.length ?? 0;
-                  return _SummaryCard(
-                    icon: Icons.people,
-                    iconColor: AppColors.success,
-                    iconBgColor: const Color(0xFFD1FAE5),
-                    label: '応募数',
-                    count: count,
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('profiles').snapshots(),
-                builder: (context, snap) {
-                  final count = snap.data?.docs.length ?? 0;
-                  return _SummaryCard(
-                    icon: Icons.person,
-                    iconColor: AppColors.warning,
-                    iconBgColor: const Color(0xFFFEF3C7),
-                    label: '登録ユーザー',
-                    count: count,
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('applications')
-                    .where('status', isEqualTo: 'applied')
-                    .snapshots(),
-                builder: (context, snap) {
-                  final count = snap.data?.docs.length ?? 0;
-                  return _SummaryCard(
-                    icon: Icons.pending_actions,
-                    iconColor: AppColors.error,
-                    iconBgColor: const Color(0xFFFEE2E2),
-                    label: '未対応の応募',
-                    count: count,
-                  );
-                },
-              ),
-            ),
-          ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 20),
         const Text(
