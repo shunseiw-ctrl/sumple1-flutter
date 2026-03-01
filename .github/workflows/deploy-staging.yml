@@ -1,0 +1,39 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install Functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Run Functions tests
+        working-directory: functions
+        run: npm test
+
+      - name: Deploy Functions to staging
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions,firestore:rules --project staging
+        env:
+          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+
+      - name: Deploy Firestore indexes to staging
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only firestore:indexes --project staging
+        env:
+          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}

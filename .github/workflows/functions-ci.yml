@@ -5,10 +5,12 @@ on:
     branches: [main, develop]
     paths:
       - 'functions/**'
+      - 'firestore.rules'
   pull_request:
     branches: [main, develop]
     paths:
       - 'functions/**'
+      - 'firestore.rules'
 
 jobs:
   test:
@@ -31,5 +33,27 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
+
+  rules-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Run Firestore rules tests
+        working-directory: functions
+        run: firebase emulators:exec --only firestore 'npx jest tests/rules/ --forceExit'

@@ -4,6 +4,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/main.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -15,6 +16,12 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('onboarding');
+  }
 
   static const List<_OnboardingData> _pages = [
     _OnboardingData(

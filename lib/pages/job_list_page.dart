@@ -14,6 +14,7 @@ import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/presentation/widgets/scale_tap.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class JobListPage extends StatefulWidget {
   const JobListPage({super.key});
@@ -47,6 +48,12 @@ class _JobListPageState extends State<JobListPage> {
   ];
 
   late final List<_MonthChip> _monthChips = _buildMonthChips();
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('job_list');
+  }
 
   List<_MonthChip> _buildMonthChips() {
     final now = DateTime.now();

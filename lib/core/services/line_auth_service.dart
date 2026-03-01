@@ -14,6 +14,13 @@ class LineAuthService {
   final _auth = FirebaseAuth.instance;
   final _db = FirebaseFirestore.instance;
 
+  /// Cloud Functions LINE Auth エンドポイントのベース URL
+  /// 本番環境では Firebase Hosting の rewrite で CF にプロキシされるため、
+  /// 相対パスのままで動作する。将来的に直接 CF URL を指定する場合はここを変更。
+  static String _getLineAuthBaseUrl() {
+    return '';  // 空文字 = 相対パス（Firebase Hosting rewrite 経由）
+  }
+
   Future<bool> handleLineCallbackIfNeeded() async {
     if (!kIsWeb) return false;
 
@@ -48,7 +55,9 @@ class LineAuthService {
 
   Future<bool> _exchangeCodeAndSignIn(String code) async {
     try {
-      final baseUrl = Uri.base.origin;
+      final baseUrl = _getLineAuthBaseUrl().isNotEmpty
+          ? _getLineAuthBaseUrl()
+          : Uri.base.origin;
       final response = await http.post(
         Uri.parse('$baseUrl/auth/line/exchange'),
         headers: {'Content-Type': 'application/json'},
@@ -95,6 +104,11 @@ class LineAuthService {
 
   void startLineLogin() {
     if (!kIsWeb) return;
-    web_redirect.redirectTo('/auth/line');
+    final base = _getLineAuthBaseUrl();
+    if (base.isNotEmpty) {
+      web_redirect.redirectTo('$base/auth/line');
+    } else {
+      web_redirect.redirectTo('/auth/line');
+    }
   }
 }

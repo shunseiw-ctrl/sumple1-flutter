@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class FaqPage extends StatelessWidget {
   const FaqPage({super.key});
@@ -41,6 +42,7 @@ class FaqPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsService.logScreenView('faq');
     return Scaffold(
       appBar: AppBar(
         title: const Text('よくある質問', style: TextStyle(fontWeight: FontWeight.w800)),

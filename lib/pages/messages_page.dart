@@ -8,6 +8,7 @@ import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import '../core/services/analytics_service.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
@@ -36,6 +37,7 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('messages');
     _checkAdminRole();
   }
 

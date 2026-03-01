@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -19,6 +20,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('account_settings');
     final user = FirebaseAuth.instance.currentUser;
     _nameController.text = user?.displayName ?? '';
   }

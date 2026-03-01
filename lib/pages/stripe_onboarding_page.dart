@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/payment_service.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class StripeOnboardingPage extends StatefulWidget {
   final String? email;
@@ -20,6 +21,7 @@ class _StripeOnboardingPageState extends State<StripeOnboardingPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('stripe_onboarding');
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -39,6 +40,7 @@ class _PostPageState extends State<PostPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('post');
     _guardAdmin();
   }
 

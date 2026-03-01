@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class JobEditPage extends StatefulWidget {
   final String jobId;
@@ -33,6 +34,7 @@ class _JobEditPageState extends State<JobEditPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('job_edit');
 
     _titleController =
         TextEditingController(text: widget.jobData['title']?.toString() ?? '');

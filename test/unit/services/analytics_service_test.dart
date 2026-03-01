@@ -8,10 +8,10 @@ import 'package:sumple1/core/services/analytics_service.dart';
 void main() {
   group('AnalyticsService', () {
     test('can be imported', () {
-      // AnalyticsService がインポートできること自体を確認
-      // (Firebase未初期化でもインポートは成功する)
       expect(true, isTrue);
     });
+
+    // --- 既存メソッド ---
 
     test('logJobView method exists', () {
       expect(AnalyticsService.logJobView, isA<Function>());
@@ -47,6 +47,56 @@ void main() {
 
     test('setUserRole method exists', () {
       expect(AnalyticsService.setUserRole, isA<Function>());
+    });
+
+    // --- Phase 8A-2 新規メソッド ---
+
+    test('logScreenView method exists', () {
+      expect(AnalyticsService.logScreenView, isA<Function>());
+    });
+
+    test('logChatMessage method exists', () {
+      expect(AnalyticsService.logChatMessage, isA<Function>());
+    });
+
+    test('logFavoriteRemove method exists', () {
+      expect(AnalyticsService.logFavoriteRemove, isA<Function>());
+    });
+
+    test('logContactSubmit method exists', () {
+      expect(AnalyticsService.logContactSubmit, isA<Function>());
+    });
+
+    test('logEarningCreate method exists', () {
+      expect(AnalyticsService.logEarningCreate, isA<Function>());
+    });
+
+    test('logProfileEdit method exists', () {
+      expect(AnalyticsService.logProfileEdit, isA<Function>());
+    });
+
+    test('logCheckIn method exists', () {
+      expect(AnalyticsService.logCheckIn, isA<Function>());
+    });
+
+    test('logCheckOut method exists', () {
+      expect(AnalyticsService.logCheckOut, isA<Function>());
+    });
+
+    test('logStripeOnboarding method exists', () {
+      expect(AnalyticsService.logStripeOnboarding, isA<Function>());
+    });
+
+    test('logNotificationOpen method exists', () {
+      expect(AnalyticsService.logNotificationOpen, isA<Function>());
+    });
+
+    test('setUserId method exists', () {
+      expect(AnalyticsService.setUserId, isA<Function>());
+    });
+
+    test('setUserPrefecture method exists', () {
+      expect(AnalyticsService.setUserPrefecture, isA<Function>());
     });
   });
 }

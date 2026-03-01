@@ -10,6 +10,7 @@ import 'notifications_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -20,6 +21,12 @@ class AdminHomePage extends StatefulWidget {
 
 class _AdminHomePageState extends State<AdminHomePage> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('admin_home');
+  }
 
   @override
   Widget build(BuildContext context) {

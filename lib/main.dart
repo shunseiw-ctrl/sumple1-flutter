@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
+import 'core/config/app_environment.dart';
 import 'pages/home_page.dart';
 import 'pages/admin_home_page.dart';
 import 'pages/onboarding_page.dart';
@@ -51,8 +52,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    options: AppConfig.firebaseOptions,
   );
+
+  Logger.info('Environment: ${AppConfig.environmentName}', tag: 'main');
 
   // --- App Check ---
   if (kDebugMode) {

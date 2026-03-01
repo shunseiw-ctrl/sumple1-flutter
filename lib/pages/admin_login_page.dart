@@ -4,6 +4,7 @@ import '../core/services/auth_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import '../core/services/analytics_service.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
@@ -28,6 +29,12 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   bool get _isLockedOut =>
       _lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!);
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('admin_login');
+  }
 
   String get _lockoutMessage {
     if (_lockoutUntil == null) return '';

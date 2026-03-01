@@ -11,6 +11,7 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/pages/email_auth_page.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class GuestHomePage extends StatefulWidget {
   const GuestHomePage({super.key});
@@ -27,6 +28,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('guest_home');
     Logger.info('GuestHomePage initialized', tag: 'GuestHomePage');
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {

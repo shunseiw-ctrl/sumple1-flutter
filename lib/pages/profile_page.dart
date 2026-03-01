@@ -17,6 +17,7 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -38,6 +39,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool get _isLockedOut =>
       _lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!);
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('profile');
+  }
 
   @override
   void dispose() {

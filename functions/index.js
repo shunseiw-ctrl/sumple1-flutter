@@ -29,6 +29,22 @@ exports.onProfileCreated = counters.onProfileCreated;
 const { initializeCounters } = require("./src/initCounters");
 exports.initializeCounters = initializeCounters;
 
+// --- 分散カウンタ同期 ---
+const { syncDistributedCounters } = require("./src/distributedCounter");
+exports.syncDistributedCounters = syncDistributedCounters;
+
+// --- LINE認証 (Cloud Functions) ---
+const lineAuth = require("./src/lineAuth");
+exports.lineAuthStart = lineAuth.lineAuthStart;
+exports.lineAuthCallback = lineAuth.lineAuthCallback;
+exports.lineAuthExchange = lineAuth.lineAuthExchange;
+exports.cleanupExpiredLineAuthDocs = lineAuth.cleanupExpiredLineAuthDocs;
+
+// --- KPIバッチ (Cloud Scheduler) ---
+const kpiBatch = require("./src/kpiBatch");
+exports.dailyKpiAggregation = kpiBatch.dailyKpiAggregation;
+exports.monthlyKpiAggregation = kpiBatch.monthlyKpiAggregation;
+
 // --- Stripe決済 ---
 const stripe = require("./src/stripe");
 exports.createConnectAccount = stripe.createConnectAccount;

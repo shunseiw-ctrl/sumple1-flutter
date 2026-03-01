@@ -5,6 +5,7 @@ const {
   onDocumentWritten,
 } = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
+const { incrementDistributed } = require("./distributedCounter");
 
 const REGION = "asia-northeast1";
 const STATS_DOC = "stats/realtime";
@@ -12,8 +13,19 @@ const STATS_DOC = "stats/realtime";
 /**
  * stats/realtime ドキュメントの指定フィールドを increment する
  * ドキュメントが存在しない場合は初期化して作成
+ *
+ * ※ 互換性のため残す。分散カウンタへも同時に書き込む。
  */
 async function incrementStat(fields) {
+  // 分散カウンタに書き込み（10万人規模対応）
+  const distributedPromises = Object.entries(fields).map(
+    ([key, value]) => incrementDistributed("stats", key, value).catch((e) => {
+      logger.warn("distributedCounter write failed (fallback to direct)", { key, error: e.message });
+    }),
+  );
+  await Promise.all(distributedPromises);
+
+  // 直接書き込み（互換性: syncDistributedCounters が動くまでの即時反映）
   const ref = admin.firestore().doc(STATS_DOC);
   const update = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
   for (const [key, value] of Object.entries(fields)) {
@@ -23,7 +35,6 @@ async function incrementStat(fields) {
     await ref.update(update);
   } catch (e) {
     if (e.code === 5 || e.code === "not-found") {
-      // ドキュメント未存在 → 初期値で作成
       const initial = {
         totalJobs: 0,
         totalApplications: 0,
@@ -95,7 +106,6 @@ exports.onApplicationUpdated = onDocumentWritten(
       const before = event.data?.before?.data();
       const after = event.data?.after?.data();
 
-      // 作成・削除はそれぞれ専用トリガーで処理
       if (!before || !after) return;
 
       const oldStatus = before.status;

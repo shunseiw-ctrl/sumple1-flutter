@@ -17,6 +17,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'notifications_page.dart';
+import '../core/services/analytics_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('home');
     _initializeUserRole();
     Future.microtask(() => PushTokenService.syncFcmToken());
   }

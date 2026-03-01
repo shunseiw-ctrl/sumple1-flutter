@@ -6,11 +6,42 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
-import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
-class NotificationsPage extends StatelessWidget {
+class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
+
+  @override
+  State<NotificationsPage> createState() => _NotificationsPageState();
+}
+
+class _NotificationsPageState extends State<NotificationsPage> {
+  static const _pageSize = 20;
+  int _currentLimit = _pageSize;
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('notifications');
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      setState(() {
+        _currentLimit += _pageSize;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +79,7 @@ class NotificationsPage extends StatelessWidget {
             .collection('notifications')
             .where('targetUid', isEqualTo: uid)
             .orderBy('createdAt', descending: true)
-            .limit(50)
+            .limit(_currentLimit)
             .snapshots(),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
@@ -66,6 +97,7 @@ class NotificationsPage extends StatelessWidget {
             );
           }
           return ListView.separated(
+            controller: _scrollController,
             padding: EdgeInsets.all(AppSpacing.pagePadding),
             itemCount: docs.length,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
@@ -113,6 +145,7 @@ class NotificationsPage extends StatelessWidget {
                     onTap: () {
                       if (!isRead) {
                         NotificationService().markAsRead(doc.id);
+                        AnalyticsService.logNotificationOpen(type);
                       }
                     },
                     child: Padding(

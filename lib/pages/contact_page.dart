@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
@@ -25,6 +26,12 @@ class _ContactPageState extends State<ContactPage> {
     '不具合の報告',
     'その他',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('contact');
+  }
 
   @override
   void dispose() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/checkin_service.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class QrCheckinPage extends StatefulWidget {
   final String applicationId;
@@ -21,6 +22,12 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
   final MobileScannerController _scannerController = MobileScannerController();
   bool _processing = false;
   bool _scanned = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('qr_checkin');
+  }
 
   @override
   void dispose() {

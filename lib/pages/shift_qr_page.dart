@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class ShiftQrPage extends StatefulWidget {
   final String jobId;
@@ -21,6 +22,12 @@ class ShiftQrPage extends StatefulWidget {
 
 class _ShiftQrPageState extends State<ShiftQrPage> {
   bool _generating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('shift_qr');
+  }
 
   String _generateCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

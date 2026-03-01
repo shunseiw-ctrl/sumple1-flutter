@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -35,6 +36,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
   bool get _isAnonymous {
     final u = FirebaseAuth.instance.currentUser;
     return u == null || u.isAnonymous;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('my_profile');
   }
 
   @override

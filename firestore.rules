@@ -142,6 +142,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // --- KPI (Cloud Functions のみ書き込み、admin のみ読み取り) ---
+    match /kpi_daily/{dateKey} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false;
+    }
+    match /kpi_monthly/{monthKey} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false;
+    }
+
     // --- favorites (お気に入り) ---
     match /favorites/{favUid} {
       allow read, write: if signedIn() && favUid == uid();
@@ -260,6 +270,25 @@ service cloud.firestore {
         ]);
 
       allow delete: if isAdminUid();
+    }
+
+    // --- 分散カウンタ (Cloud Functions のみ書き込み) ---
+    match /counters/{counterId} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false;
+
+      match /shards/{shardId} {
+        allow read: if signedIn() && isAdminUid();
+        allow write: if false;
+      }
+    }
+
+    // --- LINE認証 (Cloud Functions のみ管理 — クライアント禁止) ---
+    match /line_auth_states/{stateId} {
+      allow read, write: if false;
+    }
+    match /line_auth_tokens/{tokenId} {
+      allow read, write: if false;
     }
 
     match /{document=**} {

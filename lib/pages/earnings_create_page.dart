@@ -6,6 +6,7 @@ import '../core/services/auth_service.dart';
 import '../core/services/payment_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import '../core/services/analytics_service.dart';
 
 class EarningsCreatePage extends StatefulWidget {
   const EarningsCreatePage({super.key});
@@ -24,6 +25,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('earnings_create');
     _checkAdminRole();
   }
 

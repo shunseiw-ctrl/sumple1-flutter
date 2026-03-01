@@ -1,0 +1,64 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    setup_ci if ENV["CI"]
+
+    # Match for signing (requires match repo setup)
+    match(
+      type: "appstore",
+      app_identifier: "com.albawork.app",
+      readonly: ENV["CI"] == "true",
+    )
+
+    # Clean build
+    sh("cd ../.. && flutter clean && flutter pub get")
+    sh("cd ../.. && flutter build ios --release --no-codesign --dart-define=ENV=production")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios/ipa",
+    )
+
+    upload_to_testflight(
+      apple_id: ENV["APPLE_APP_ID"],
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Submit to App Store for review"
+  lane :release do
+    deliver(
+      app_identifier: "com.albawork.app",
+      submit_for_review: true,
+      automatic_release: false,
+      skip_metadata: false,
+      skip_screenshots: true,
+      force: true,
+    )
+  end
+
+  desc "Build IPA without uploading (for CI validation)"
+  lane :build_only do
+    setup_ci if ENV["CI"]
+
+    match(
+      type: "appstore",
+      app_identifier: "com.albawork.app",
+      readonly: true,
+    )
+
+    sh("cd ../.. && flutter clean && flutter pub get")
+    sh("cd ../.. && flutter build ios --release --no-codesign --dart-define=ENV=production")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios/ipa",
+    )
+  end
+end

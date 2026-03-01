@@ -1,0 +1,43 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build and upload to Google Play internal track"
+  lane :internal do
+    # Clean build
+    sh("cd ../.. && flutter clean && flutter pub get")
+
+    # Build AAB
+    sh("cd ../.. && flutter build appbundle --release --dart-define=ENV=production")
+
+    upload_to_play_store(
+      track: "internal",
+      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY"] || "google-play-key.json",
+      package_name: "com.albawork.app",
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Promote internal to production"
+  lane :promote_to_production do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production",
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY"] || "google-play-key.json",
+      package_name: "com.albawork.app",
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Build APK for ad-hoc testing"
+  lane :build_apk do
+    sh("cd ../.. && flutter clean && flutter pub get")
+    sh("cd ../.. && flutter build apk --release --dart-define=ENV=production")
+  end
+end

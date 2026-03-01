@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/data/models/payment_model.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class PaymentDetailPage extends StatelessWidget {
   final String paymentId;
@@ -32,6 +33,7 @@ class PaymentDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsService.logScreenView('payment_detail');
     return Scaffold(
       appBar: AppBar(
         title: const Text(

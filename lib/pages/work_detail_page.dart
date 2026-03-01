@@ -11,6 +11,7 @@ import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/presentation/widgets/rating_dialog.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class WorkDetailPage extends StatefulWidget {
   final String applicationId;
@@ -56,6 +57,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('work_detail');
     _tabController = TabController(length: 3, vsync: this);
     _checkAdmin();
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class LegalPage extends StatefulWidget {
   final String title;
@@ -155,6 +156,7 @@ class _LegalPageState extends State<LegalPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('legal');
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadHtmlString(widget.htmlContent);

@@ -5,6 +5,7 @@ import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/utils/logger.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class EmailAuthPage extends StatefulWidget {
   const EmailAuthPage({super.key});
@@ -37,6 +38,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('email_auth');
     _tabController = TabController(length: 2, vsync: this);
   }
 

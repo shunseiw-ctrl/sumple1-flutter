@@ -7,6 +7,7 @@ import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import '../core/services/analytics_service.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String applicationId;
@@ -39,6 +40,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('chat_room');
     _initializeChatRoom();
   }
 

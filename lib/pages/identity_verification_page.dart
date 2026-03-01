@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
   const IdentityVerificationPage({super.key});
@@ -24,6 +25,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('identity_verification');
     _loadStatus();
   }
 

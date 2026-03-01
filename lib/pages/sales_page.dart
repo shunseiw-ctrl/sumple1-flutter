@@ -13,6 +13,7 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
+import '../core/services/analytics_service.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -30,6 +31,7 @@ class _SalesPageState extends State<SalesPage>
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('sales');
     _checkAdminRole();
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -155,7 +157,10 @@ class _SalesContentState extends State<_SalesContent> {
   @override
   Widget build(BuildContext context) {
     final db = FirebaseFirestore.instance;
-    final q = db.collection('earnings').where('uid', isEqualTo: widget.uid);
+    final q = db.collection('earnings')
+        .where('uid', isEqualTo: widget.uid)
+        .orderBy('payoutConfirmedAt', descending: true)
+        .limit(200);
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: q.snapshots(),
@@ -710,6 +715,7 @@ class _PaymentSummarySection extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('earnings')
           .orderBy('createdAt', descending: true)
+          .limit(200)
           .snapshots(),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {

@@ -11,6 +11,7 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 
 class WorkPage extends StatefulWidget {
   const WorkPage({super.key});
@@ -38,6 +39,7 @@ class _WorkPageState extends State<WorkPage>
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('work');
     _statusTabController = TabController(length: _statusTabs.length, vsync: this);
     _statusTabController.addListener(() {
       if (mounted) setState(() {});
@@ -143,6 +145,8 @@ class _WorkPageState extends State<WorkPage>
                 stream: FirebaseFirestore.instance
                     .collection('applications')
                     .where('applicantUid', isEqualTo: uid)
+                    .orderBy('createdAt', descending: true)
+                    .limit(100)
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasError) {
