@@ -54,7 +54,7 @@ class _StripeOnboardingPageState extends State<StripeOnboardingPage> {
         _error = null;
       });
 
-      final result = await PaymentService.createConnectAccount(
+      final result = await PaymentService().createConnectAccount(
         email: widget.email,
       );
 

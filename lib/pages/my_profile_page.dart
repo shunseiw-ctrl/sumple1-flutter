@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 
 class MyProfilePage extends StatefulWidget {
@@ -417,12 +418,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 left: TextFormField(
                   controller: _familyNameCtrl,
                   decoration: const InputDecoration(labelText: '姓（必須）'),
+                  maxLength: AppConstants.maxDisplayNameLength,
                   validator: (v) => _requiredValidator(v, '姓'),
                   textInputAction: TextInputAction.next,
                 ),
                 right: TextFormField(
                   controller: _givenNameCtrl,
                   decoration: const InputDecoration(labelText: '名（必須）'),
+                  maxLength: AppConstants.maxDisplayNameLength,
                   validator: (v) => _requiredValidator(v, '名'),
                   textInputAction: TextInputAction.next,
                 ),
@@ -433,12 +436,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 left: TextFormField(
                   controller: _familyNameKanaCtrl,
                   decoration: const InputDecoration(labelText: 'セイ（必須）'),
+                  maxLength: AppConstants.maxDisplayNameLength,
                   validator: (v) => _requiredValidator(v, 'セイ'),
                   textInputAction: TextInputAction.next,
                 ),
                 right: TextFormField(
                   controller: _givenNameKanaCtrl,
                   decoration: const InputDecoration(labelText: 'メイ（必須）'),
+                  maxLength: AppConstants.maxDisplayNameLength,
                   validator: (v) => _requiredValidator(v, 'メイ'),
                   textInputAction: TextInputAction.next,
                 ),
@@ -489,6 +494,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return null;
+                  final regex = RegExp(AppConstants.postalCodePattern);
+                  if (!regex.hasMatch(v.trim())) return '正しい郵便番号を入力してください（例: 123-4567）';
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
 
@@ -500,6 +511,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 keyboardType: TextInputType.text,
                 maxLines: 2,
+                maxLength: AppConstants.maxAddressLength,
               ),
 
               const SizedBox(height: 20),
@@ -513,6 +525,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   suffixText: '年',
                 ),
                 keyboardType: TextInputType.number,
+                maxLength: AppConstants.maxExperienceYearsLength,
               ),
               const SizedBox(height: 12),
 
@@ -524,6 +537,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   alignLabelWithHint: true,
                 ),
                 maxLines: 4,
+                maxLength: AppConstants.maxIntroductionLength,
               ),
               const SizedBox(height: 16),
 
@@ -552,9 +566,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   Expanded(
                     child: TextField(
                       controller: _qualificationInputCtrl,
+                      maxLength: AppConstants.maxQualificationLength,
                       decoration: InputDecoration(
                         hintText: '資格名を入力',
                         isDense: true,
+                        counterText: '',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),

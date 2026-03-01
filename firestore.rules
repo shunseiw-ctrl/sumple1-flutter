@@ -29,9 +29,13 @@ service cloud.firestore {
       allow create: if signedIn()
         && (isAdminUid() || (request.resource.data.ownerId == uid()))
         && isString(request.resource.data.title)
+        && request.resource.data.title.size() <= 100
         && isString(request.resource.data.location)
+        && request.resource.data.location.size() <= 200
         && isString(request.resource.data.price)
-        && isString(request.resource.data.date);
+        && isString(request.resource.data.date)
+        && (!("description" in request.resource.data.keys()) || request.resource.data.description.size() <= 5000)
+        && (!("notes" in request.resource.data.keys()) || request.resource.data.notes.size() <= 2000);
 
       allow update: if signedIn()
         && (isAdminUid() || (resource.data.ownerId == uid()))
@@ -43,7 +47,11 @@ service cloud.firestore {
           "updatedAt",
           "projectName",
           "latitude","longitude"
-        ]);
+        ])
+        && (!("title" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.title.size() <= 100)
+        && (!("location" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.location.size() <= 200)
+        && (!("description" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.description.size() <= 5000)
+        && (!("notes" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.notes.size() <= 2000);
 
       allow delete: if signedIn()
         && (isAdminUid() || (resource.data.ownerId == uid()));
@@ -64,7 +72,8 @@ service cloud.firestore {
         && isString(request.resource.data.jobId)
         && isString(request.resource.data.status)
         && request.resource.data.status == "applied"
-        && isString(request.resource.data.projectNameSnapshot);
+        && isString(request.resource.data.projectNameSnapshot)
+        && request.resource.data.projectNameSnapshot.size() <= 200;
 
       allow update: if isAppPartyData(resource.data)
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
@@ -106,7 +115,9 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.uid == uid()
         && isString(request.resource.data.subject)
+        && request.resource.data.subject.size() <= 200
         && isString(request.resource.data.body)
+        && request.resource.data.body.size() <= 5000
         && isString(request.resource.data.category);
       allow update, delete: if false;
     }
@@ -115,7 +126,11 @@ service cloud.firestore {
     match /notifications/{notifId} {
       allow read: if signedIn() && resource.data.targetUid == uid();
       allow create: if signedIn()
-        && (request.resource.data.targetUid == uid() || isAdminUid());
+        && (request.resource.data.targetUid == uid() || isAdminUid())
+        && isString(request.resource.data.title)
+        && request.resource.data.title.size() <= 200
+        && isString(request.resource.data.body)
+        && request.resource.data.body.size() <= 5000;
       allow update: if signedIn() && resource.data.targetUid == uid()
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(["read"]);
       allow delete: if false;
@@ -234,6 +249,7 @@ service cloud.firestore {
         && isString(request.resource.data.uid)
         && isString(request.resource.data.applicationId)
         && isString(request.resource.data.projectNameSnapshot)
+        && request.resource.data.projectNameSnapshot.size() <= 200
         && isInt(request.resource.data.amount)
         && isTimestamp(request.resource.data.payoutConfirmedAt);
 

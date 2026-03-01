@@ -32,4 +32,19 @@ class AppConstants {
 
   static const String appName = 'ALBAWORK';
   static const String appVersion = '1.0.0';
+
+  // === Input Validation Limits (Firestore rules と一致) ===
+  static const int maxMessageLength = 5000;
+  static const int maxJobTitleLength = 100;
+  static const int maxJobLocationLength = 200;
+  static const int maxJobDescriptionLength = 5000;
+  static const int maxJobNotesLength = 2000;
+  static const int maxDisplayNameLength = 50;
+  static const int maxIntroductionLength = 2000;
+  static const int maxExperienceYearsLength = 3;
+  static const int maxAddressLength = 200;
+  static const int maxQualificationLength = 50;
+  static const int maxContactSubjectLength = 200;
+  static const int maxContactBodyLength = 5000;
+  static const String postalCodePattern = r'^\d{3}-?\d{4}$';
 }

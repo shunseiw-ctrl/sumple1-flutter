@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/logger.dart';
 
 class NotificationService {
-  static final _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
 
-  static Future<void> createNotification({
+  NotificationService({FirebaseFirestore? firestore})
+      : _db = firestore ?? FirebaseFirestore.instance;
+
+  Future<void> createNotification({
     required String targetUid,
     required String title,
     required String body,
@@ -21,13 +24,13 @@ class NotificationService {
         'read': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      Logger.info('Notification created', tag: 'NotificationService', data: {'targetUid': targetUid.substring(0, 8)});
+      Logger.info('Notification created', tag: 'NotificationService', data: {'targetUid': targetUid.substring(0, targetUid.length.clamp(0, 8))});
     } catch (e) {
       Logger.error('Failed to create notification', tag: 'NotificationService', error: e);
     }
   }
 
-  static Stream<int> unreadCountStream(String uid) {
+  Stream<int> unreadCountStream(String uid) {
     return _db
         .collection('notifications')
         .where('targetUid', isEqualTo: uid)
@@ -36,11 +39,11 @@ class NotificationService {
         .map((snap) => snap.docs.length);
   }
 
-  static Future<void> markAsRead(String notificationId) async {
+  Future<void> markAsRead(String notificationId) async {
     await _db.collection('notifications').doc(notificationId).update({'read': true});
   }
 
-  static Future<void> markAllAsRead(String uid) async {
+  Future<void> markAllAsRead(String uid) async {
     final snap = await _db
         .collection('notifications')
         .where('targetUid', isEqualTo: uid)

@@ -276,7 +276,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           await _updateStatus('in_progress');
                           final applicantUid = (app['applicantUid'] ?? '').toString();
                           if (applicantUid.isNotEmpty) {
-                            NotificationService.createNotification(
+                            NotificationService().createNotification(
                               targetUid: applicantUid,
                               title: 'ステータス更新',
                               body: '${title}が「着工中」になりました',
@@ -305,7 +305,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           await _updateStatus('completed');
                           final applicantUid = (app['applicantUid'] ?? '').toString();
                           if (applicantUid.isNotEmpty) {
-                            NotificationService.createNotification(
+                            NotificationService().createNotification(
                               targetUid: applicantUid,
                               title: 'ステータス更新',
                               body: '${title}が「施工完了」になりました',

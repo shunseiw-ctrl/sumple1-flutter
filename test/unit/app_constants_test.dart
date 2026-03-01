@@ -63,6 +63,64 @@ void main() {
     });
   });
 
+  group('AppConstants validation limits', () {
+    test('maxMessageLength is 5000', () {
+      expect(AppConstants.maxMessageLength, 5000);
+    });
+
+    test('maxJobTitleLength is 100', () {
+      expect(AppConstants.maxJobTitleLength, 100);
+    });
+
+    test('maxJobLocationLength is 200', () {
+      expect(AppConstants.maxJobLocationLength, 200);
+    });
+
+    test('maxJobDescriptionLength is 5000', () {
+      expect(AppConstants.maxJobDescriptionLength, 5000);
+    });
+
+    test('maxJobNotesLength is 2000', () {
+      expect(AppConstants.maxJobNotesLength, 2000);
+    });
+
+    test('maxDisplayNameLength is 50', () {
+      expect(AppConstants.maxDisplayNameLength, 50);
+    });
+
+    test('maxIntroductionLength is 2000', () {
+      expect(AppConstants.maxIntroductionLength, 2000);
+    });
+
+    test('maxExperienceYearsLength is 3', () {
+      expect(AppConstants.maxExperienceYearsLength, 3);
+    });
+
+    test('maxAddressLength is 200', () {
+      expect(AppConstants.maxAddressLength, 200);
+    });
+
+    test('maxQualificationLength is 50', () {
+      expect(AppConstants.maxQualificationLength, 50);
+    });
+
+    test('maxContactSubjectLength is 200', () {
+      expect(AppConstants.maxContactSubjectLength, 200);
+    });
+
+    test('maxContactBodyLength is 5000', () {
+      expect(AppConstants.maxContactBodyLength, 5000);
+    });
+
+    test('postalCodePattern matches valid postal codes', () {
+      final regex = RegExp(AppConstants.postalCodePattern);
+      expect(regex.hasMatch('123-4567'), isTrue);
+      expect(regex.hasMatch('1234567'), isTrue);
+      expect(regex.hasMatch('12-4567'), isFalse);
+      expect(regex.hasMatch('abc-defg'), isFalse);
+    });
+  });
+
   group('AppConstants other values', () {
     test('adminConfigPath is config/admins', () {
       expect(AppConstants.adminConfigPath, 'config/admins');

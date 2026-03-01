@@ -33,7 +33,7 @@ class NotificationsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              await NotificationService.markAllAsRead(uid);
+              await NotificationService().markAllAsRead(uid);
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('すべて既読にしました')),
@@ -112,7 +112,7 @@ class NotificationsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                     onTap: () {
                       if (!isRead) {
-                        NotificationService.markAsRead(doc.id);
+                        NotificationService().markAsRead(doc.id);
                       }
                     },
                     child: Padding(

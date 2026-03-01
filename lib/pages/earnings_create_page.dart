@@ -89,7 +89,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
 
     setState(() => _saving = true);
     try {
-      final result = await PaymentService.createPaymentIntent(
+      final result = await PaymentService().createPaymentIntent(
         applicationId: _selectedApp!.id,
         amount: amount,
       );

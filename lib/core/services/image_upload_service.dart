@@ -7,8 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import '../utils/logger.dart';
 
 class ImageUploadService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final ImagePicker _picker = ImagePicker();
+  final FirebaseStorage _storage;
+  final ImagePicker _picker;
+
+  ImageUploadService({FirebaseStorage? storage, ImagePicker? picker})
+      : _storage = storage ?? FirebaseStorage.instance,
+        _picker = picker ?? ImagePicker();
 
   Future<ImageUploadResult> pickAndUploadImage({
     required String userId,

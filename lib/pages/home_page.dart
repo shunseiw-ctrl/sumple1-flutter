@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           StreamBuilder<int>(
-            stream: NotificationService.unreadCountStream(
+            stream: NotificationService().unreadCountStream(
               FirebaseAuth.instance.currentUser?.uid ?? '',
             ),
             builder: (context, snap) {

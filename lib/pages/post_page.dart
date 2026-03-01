@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -301,6 +302,7 @@ class _PostPageState extends State<PostPage> {
                     hint: '例）クロス張替え（1LDK）',
                     controller: _titleController,
                     textInputAction: TextInputAction.next,
+                    maxLength: AppConstants.maxJobTitleLength,
                   ),
                   const _Divider(),
                   _LabeledField(
@@ -308,6 +310,7 @@ class _PostPageState extends State<PostPage> {
                     hint: '例）千葉県千葉市花見川区',
                     controller: _locationController,
                     textInputAction: TextInputAction.next,
+                    maxLength: AppConstants.maxJobLocationLength,
                   ),
                 ],
               ),
@@ -434,6 +437,7 @@ class _LabeledField extends StatelessWidget {
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
   final ValueChanged<String>? onSubmitted;
+  final int? maxLength;
 
   final bool readOnly;
   final VoidCallback? onTap;
@@ -446,6 +450,7 @@ class _LabeledField extends StatelessWidget {
     this.keyboardType,
     this.prefixIcon,
     this.onSubmitted,
+    this.maxLength,
     this.readOnly = false,
     this.onTap,
   });
@@ -462,6 +467,7 @@ class _LabeledField extends StatelessWidget {
           textInputAction: textInputAction,
           keyboardType: keyboardType,
           onSubmitted: onSubmitted,
+          maxLength: maxLength,
           readOnly: readOnly,
           onTap: onTap,
           decoration: InputDecoration(
@@ -469,6 +475,7 @@ class _LabeledField extends StatelessWidget {
             prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
             filled: true,
             fillColor: AppColors.chipUnselected,
+            counterText: '',
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

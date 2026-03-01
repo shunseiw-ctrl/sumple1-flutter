@@ -181,7 +181,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     });
 
     if (jobOwnerId.isNotEmpty) {
-      NotificationService.createNotification(
+      NotificationService().createNotification(
         targetUid: jobOwnerId,
         title: '新しい応募',
         body: '${resolvedProjectName}に応募がありました',

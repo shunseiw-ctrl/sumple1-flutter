@@ -45,8 +45,9 @@ jobs:
             if [ "$TOTAL_LINES" -gt 0 ]; then
               COVERAGE=$((HIT_LINES * 100 / TOTAL_LINES))
               echo "Coverage: ${COVERAGE}%"
-              if [ "$COVERAGE" -lt 30 ]; then
-                echo "::warning::Coverage ${COVERAGE}% is below threshold of 30%"
+              if [ "$COVERAGE" -lt 50 ]; then
+                echo "::error::Coverage ${COVERAGE}% is below threshold of 50%"
+                exit 1
               fi
             fi
           fi

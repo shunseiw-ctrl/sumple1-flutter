@@ -56,10 +56,36 @@ const securityHeaders = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Cache-Control': 'no-cache, no-store, must-revalidate',
+  'X-Frame-Options': 'DENY',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net; frame-src 'self' https://accounts.google.com https://access.line.me",
 };
 
 const stateStore = new Map();
 const tokenStore = new Map();
+const rateLimitStore = new Map();
+
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = rateLimitStore.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitStore.set(ip, { windowStart: now, count: 1 });
+    return true;
+  }
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX_REQUESTS) return false;
+  return true;
+}
+
+function cleanupRateLimit() {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitStore.entries()) {
+    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS) rateLimitStore.delete(ip);
+  }
+}
 
 function cleanupExpired(store, maxAgeMs) {
   const now = Date.now();
@@ -88,6 +114,7 @@ function httpsRequest(url, options, postData) {
   });
 }
 
+// TODO Phase 8: CSRF state を Firestore に永続化して複数インスタンス対応
 function handleAuthLineStart(req, res) {
   const state = crypto.randomBytes(32).toString('hex');
   stateStore.set(state, Date.now());
@@ -233,6 +260,14 @@ async function handleAuthLineCallback(req, res) {
 }
 
 function handleTokenExchange(req, res) {
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  cleanupRateLimit();
+  if (!checkRateLimit(clientIp)) {
+    res.writeHead(429, { 'Content-Type': 'application/json', ...securityHeaders });
+    res.end(JSON.stringify({ error: 'too_many_requests' }));
+    return;
+  }
+
   let body = '';
   req.on('data', (chunk) => { body += chunk; });
   req.on('end', () => {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../core/constants/app_constants.dart';
 import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
@@ -303,12 +304,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 focusNode: _focusNode,
                                 minLines: 1,
                                 maxLines: 4,
+                                maxLength: AppConstants.maxMessageLength,
                                 textInputAction: TextInputAction.send,
                                 onSubmitted: (_) => _send(),
                                 decoration: InputDecoration(
                                   hintText: 'メッセージを入力',
                                   hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
                                   border: InputBorder.none,
+                                  counterText: '',
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                                 ),
                               ),

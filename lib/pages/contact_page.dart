@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
@@ -105,7 +106,11 @@ class _ContactPageState extends State<ContactPage> {
           const SizedBox(height: 8),
           TextField(
             controller: _subjectController,
-            decoration: const InputDecoration(hintText: '件名を入力'),
+            maxLength: AppConstants.maxContactSubjectLength,
+            decoration: const InputDecoration(
+              hintText: '件名を入力',
+              counterText: '',
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -114,7 +119,11 @@ class _ContactPageState extends State<ContactPage> {
           TextField(
             controller: _bodyController,
             maxLines: 6,
-            decoration: const InputDecoration(hintText: 'お問い合わせ内容を入力してください'),
+            maxLength: AppConstants.maxContactBodyLength,
+            decoration: const InputDecoration(
+              hintText: 'お問い合わせ内容を入力してください',
+              counterText: '',
+            ),
           ),
 
           const SizedBox(height: 24),

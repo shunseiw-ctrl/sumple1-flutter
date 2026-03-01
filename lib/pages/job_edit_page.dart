@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 
 class JobEditPage extends StatefulWidget {
   final String jobId;
@@ -263,6 +264,7 @@ class _JobEditPageState extends State<JobEditPage> {
                     hint: '例）クロス張替え（1LDK）',
                     controller: _titleController,
                     textInputAction: TextInputAction.next,
+                    maxLength: AppConstants.maxJobTitleLength,
                   ),
                   const _Divider(),
                   _LabeledField(
@@ -270,6 +272,7 @@ class _JobEditPageState extends State<JobEditPage> {
                     hint: '例）千葉県千葉市花見川区',
                     controller: _locationController,
                     textInputAction: TextInputAction.next,
+                    maxLength: AppConstants.maxJobLocationLength,
                   ),
                 ],
               ),
@@ -309,6 +312,7 @@ class _JobEditPageState extends State<JobEditPage> {
                     controller: _descriptionController,
                     textInputAction: TextInputAction.next,
                     maxLines: 6,
+                    maxLength: AppConstants.maxJobDescriptionLength,
                   ),
                   const _Divider(),
                   _LabeledField(
@@ -317,6 +321,7 @@ class _JobEditPageState extends State<JobEditPage> {
                     controller: _notesController,
                     textInputAction: TextInputAction.done,
                     maxLines: 6,
+                    maxLength: AppConstants.maxJobNotesLength,
                     onSubmitted: (_) => _update(),
                   ),
                 ],
@@ -420,6 +425,7 @@ class _LabeledField extends StatelessWidget {
   final IconData? prefixIcon;
   final ValueChanged<String>? onSubmitted;
   final int maxLines;
+  final int? maxLength;
 
   final bool readOnly;
   final VoidCallback? onTap;
@@ -433,6 +439,7 @@ class _LabeledField extends StatelessWidget {
     this.prefixIcon,
     this.onSubmitted,
     this.maxLines = 1,
+    this.maxLength,
     this.readOnly = false,
     this.onTap,
   });
@@ -450,6 +457,7 @@ class _LabeledField extends StatelessWidget {
           keyboardType: keyboardType,
           onSubmitted: onSubmitted,
           maxLines: maxLines,
+          maxLength: maxLength,
           readOnly: readOnly,
           onTap: onTap,
           decoration: InputDecoration(
@@ -457,6 +465,7 @@ class _LabeledField extends StatelessWidget {
             prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
             filled: true,
             fillColor: AppColors.chipUnselected,
+            counterText: '',
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
