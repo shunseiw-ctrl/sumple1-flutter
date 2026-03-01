@@ -15,7 +15,6 @@ import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
-import 'package:sumple1/core/constants/app_spacing.dart';
 import 'notifications_page.dart';
 import '../core/services/analytics_service.dart';
 
@@ -79,13 +78,16 @@ class _HomePageState extends State<HomePage> {
         titleSpacing: 12,
         title: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/logo.png',
-                height: 36,
-                width: 36,
-                fit: BoxFit.contain,
+            Semantics(
+              excludeSemantics: true,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/logo.png',
+                  height: 36,
+                  width: 36,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -102,18 +104,21 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             if (_isAdmin)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.ruriPale,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '管理者',
-                    style: AppTextStyles.badgeText.copyWith(
-                      color: AppColors.ruri,
+              Semantics(
+                label: 'ステータス: 管理者',
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.ruriPale,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '管理者',
+                      style: AppTextStyles.badgeText.copyWith(
+                        color: AppColors.ruri,
+                      ),
                     ),
                   ),
                 ),
@@ -127,41 +132,49 @@ class _HomePageState extends State<HomePage> {
             ),
             builder: (context, snap) {
               final count = snap.data ?? 0;
-              return IconButton(
-                icon: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(Icons.notifications_outlined, size: 26),
-                    if (count > 0)
-                      Positioned(
-                        right: -2,
-                        top: -2,
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            color: AppColors.error,
-                            shape: BoxShape.circle,
+              return Semantics(
+                button: true,
+                label: count > 0 ? 'お知らせ、未読${count}件' : 'お知らせ',
+                child: IconButton(
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.notifications_outlined, size: 26),
+                      if (count > 0)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              color: AppColors.error,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
+                  tooltip: 'お知らせ',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                    );
+                  },
                 ),
-                tooltip: 'お知らせ',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const NotificationsPage()),
-                  );
-                },
               );
             },
           ),
           if (_index == 0 && _isAdmin)
-            IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: '案件を投稿',
-              onPressed: _goToPost,
+            Semantics(
+              button: true,
+              label: '案件を投稿',
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                tooltip: '案件を投稿',
+                onPressed: _goToPost,
+              ),
             ),
         ],
       ),
@@ -215,7 +228,7 @@ class _ModernBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -230,38 +243,43 @@ class _ModernBottomNav extends StatelessWidget {
               final item = _items[index];
               final isSelected = index == currentIndex;
               return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onTap(index),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeInOut,
-                        width: isSelected ? 20 : 0,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.ruri : Colors.transparent,
-                          borderRadius: BorderRadius.circular(2),
+                child: Semantics(
+                  button: true,
+                  label: '${item.label}タブ${isSelected ? "、選択中" : ""}',
+                  selected: isSelected,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => onTap(index),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          width: isSelected ? 20 : 0,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.ruri : Colors.transparent,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Icon(
-                        isSelected ? item.selectedIcon : item.unselectedIcon,
-                        size: 26,
-                        color: isSelected ? AppColors.ruri : AppColors.textHint,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.label,
-                        style: GoogleFonts.notoSansJp(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        const SizedBox(height: 4),
+                        Icon(
+                          isSelected ? item.selectedIcon : item.unselectedIcon,
+                          size: 26,
                           color: isSelected ? AppColors.ruri : AppColors.textHint,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          item.label,
+                          style: GoogleFonts.notoSansJp(
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                            color: isSelected ? AppColors.ruri : AppColors.textHint,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

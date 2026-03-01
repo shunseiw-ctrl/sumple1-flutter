@@ -167,6 +167,41 @@ class ChatModel {
   }
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChatModel &&
+          other.id == id &&
+          other.applicationId == applicationId &&
+          other.applicantUid == applicantUid &&
+          other.adminUid == adminUid &&
+          other.jobId == jobId &&
+          other.titleSnapshot == titleSnapshot &&
+          other.lastMessageText == lastMessageText &&
+          other.lastMessageSenderUid == lastMessageSenderUid &&
+          other.lastMessageAt == lastMessageAt &&
+          other.unreadCountApplicant == unreadCountApplicant &&
+          other.unreadCountAdmin == unreadCountAdmin &&
+          other.createdAt == createdAt &&
+          other.updatedAt == updatedAt);
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        applicationId,
+        applicantUid,
+        adminUid,
+        jobId,
+        titleSnapshot,
+        lastMessageText,
+        lastMessageSenderUid,
+        lastMessageAt,
+        unreadCountApplicant,
+        unreadCountAdmin,
+        createdAt,
+        updatedAt,
+      );
+
+  @override
   String toString() {
     return 'ChatModel(id: $id, title: $titleSnapshot, lastMessage: $lastMessageText)';
   }

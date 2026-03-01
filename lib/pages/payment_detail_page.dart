@@ -63,9 +63,9 @@ class PaymentDetailPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: _statusColor(payment.status).withOpacity(0.1),
+                  color: _statusColor(payment.status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _statusColor(payment.status).withOpacity(0.3)),
+                  border: Border.all(color: _statusColor(payment.status).withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   children: [

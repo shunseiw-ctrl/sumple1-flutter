@@ -1,13 +1,25 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class AnalyticsService {
-  static final _analytics = FirebaseAnalytics.instance;
-  static final observer = FirebaseAnalyticsObserver(analytics: _analytics);
+  static FirebaseAnalytics? _analyticsInstance;
+  static FirebaseAnalytics get _analytics {
+    _analyticsInstance ??= FirebaseAnalytics.instance;
+    return _analyticsInstance!;
+  }
+  static FirebaseAnalyticsObserver? _observerInstance;
+  static FirebaseAnalyticsObserver get observer {
+    _observerInstance ??= FirebaseAnalyticsObserver(analytics: _analytics);
+    return _observerInstance!;
+  }
 
   // --- 画面表示 ---
 
   static Future<void> logScreenView(String screenName) async {
-    await _analytics.logScreenView(screenName: screenName);
+    try {
+      await _analytics.logScreenView(screenName: screenName);
+    } catch (_) {
+      // Firebase 未初期化の場合は無視（テスト環境等）
+    }
   }
 
   // --- 案件関連 ---

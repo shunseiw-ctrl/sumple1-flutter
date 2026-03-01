@@ -258,9 +258,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

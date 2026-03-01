@@ -35,6 +35,39 @@ void main() {
       });
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final now = DateTime(2025, 3, 15);
+        final model1 = ShiftModel(
+          id: 'shift-001',
+          date: '2025-04-01',
+          qrCode: 'shift-abc123',
+          createdBy: 'admin-001',
+          createdAt: now,
+        );
+        final model2 = ShiftModel(
+          id: 'shift-001',
+          date: '2025-04-01',
+          qrCode: 'shift-abc123',
+          createdBy: 'admin-001',
+          createdAt: now,
+        );
+
+        expect(model1, equals(model2));
+        expect(model1.hashCode, equals(model2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final model1 = ShiftModel.fromMap('shift-001', TestFixtures.shiftData());
+        final model2 = ShiftModel.fromMap('shift-002', TestFixtures.shiftData(
+          date: '2025-05-01',
+          qrCode: 'shift-xyz789',
+        ));
+
+        expect(model1, isNot(equals(model2)));
+      });
+    });
+
     group('toCreateMap', () {
       test('必要なフィールドが含まれる', () {
         final model = ShiftModel(

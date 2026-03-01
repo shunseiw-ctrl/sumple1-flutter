@@ -28,13 +28,11 @@ class _WorkDetailPageState extends State<WorkDetailPage>
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
   bool _isAdminUser = false;
-  bool _checkedAdmin = false;
 
   Future<void> _checkAdmin() async {
     final user = FirebaseAuth.instance.currentUser;
     final email = user?.email;
     if (email == null || email.trim().isEmpty) {
-      if (mounted) setState(() => _checkedAdmin = true);
       return;
     }
     try {
@@ -45,12 +43,10 @@ class _WorkDetailPageState extends State<WorkDetailPage>
       if (mounted) {
         setState(() {
           _isAdminUser = emails.contains(email) || adminUids.contains(user?.uid);
-          _checkedAdmin = true;
         });
       }
     } catch (e) {
       Logger.warning('管理者チェックに失敗', tag: 'WorkDetail', data: {'error': '$e'});
-      if (mounted) setState(() => _checkedAdmin = true);
     }
   }
 
@@ -99,50 +95,6 @@ class _WorkDetailPageState extends State<WorkDetailPage>
         .limit(1)
         .get();
     return snap.docs.isNotEmpty;
-  }
-
-  Future<void> _checkIn() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('applications')
-          .doc(widget.applicationId)
-          .update({
-        'checkInAt': FieldValue.serverTimestamp(),
-        'checkInStatus': 'checked_in',
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('出勤しました')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('出勤記録に失敗: $e')),
-      );
-    }
-  }
-
-  Future<void> _checkOut() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('applications')
-          .doc(widget.applicationId)
-          .update({
-        'checkOutAt': FieldValue.serverTimestamp(),
-        'checkInStatus': 'checked_out',
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('退勤しました')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('退勤記録に失敗: $e')),
-      );
-    }
   }
 
   Future<void> _updateStatus(String newStatus) async {
@@ -563,7 +515,6 @@ class _PhotosTab extends StatefulWidget {
 class _PhotosTabState extends State<_PhotosTab> {
   final _imageService = ImageUploadService();
   bool _uploading = false;
-  static const int _pageSize = 20;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 

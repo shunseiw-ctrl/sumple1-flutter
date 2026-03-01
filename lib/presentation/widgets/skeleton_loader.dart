@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 
 class SkeletonLoader extends StatefulWidget {
@@ -78,7 +77,7 @@ class SkeletonJobCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

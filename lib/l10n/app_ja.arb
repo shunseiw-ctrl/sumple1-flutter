@@ -1,0 +1,129 @@
+{
+  "@@locale": "ja",
+
+  "appName": "ALBAWORK",
+  "@appName": { "description": "アプリ名" },
+
+  "navHome": "ホーム",
+  "@navHome": { "description": "BottomNavigation: ホーム" },
+
+  "navWork": "仕事",
+  "@navWork": { "description": "BottomNavigation: 仕事" },
+
+  "navMessages": "メッセージ",
+  "@navMessages": { "description": "BottomNavigation: メッセージ" },
+
+  "navSales": "売上",
+  "@navSales": { "description": "BottomNavigation: 売上" },
+
+  "navProfile": "プロフィール",
+  "@navProfile": { "description": "BottomNavigation: プロフィール" },
+
+  "cancel": "キャンセル",
+  "@cancel": { "description": "汎用キャンセルボタン" },
+
+  "save": "保存",
+  "@save": { "description": "汎用保存ボタン" },
+
+  "delete": "削除",
+  "@delete": { "description": "汎用削除ボタン" },
+
+  "confirm": "確認",
+  "@confirm": { "description": "汎用確認ボタン" },
+
+  "close": "閉じる",
+  "@close": { "description": "汎用閉じるボタン" },
+
+  "skip": "スキップ",
+  "@skip": { "description": "オンボーディング: スキップ" },
+
+  "next": "次へ",
+  "@next": { "description": "オンボーディング: 次へ" },
+
+  "getStarted": "始める",
+  "@getStarted": { "description": "オンボーディング: 始める" },
+
+  "retry": "再試行",
+  "@retry": { "description": "エラー時のリトライボタン" },
+
+  "loading": "読み込み中...",
+  "@loading": { "description": "ローディング表示" },
+
+  "errorGeneric": "エラーが発生しました",
+  "@errorGeneric": { "description": "汎用エラーメッセージ" },
+
+  "errorNetwork": "ネットワークエラーが発生しました",
+  "@errorNetwork": { "description": "ネットワークエラーメッセージ" },
+
+  "noData": "データがありません",
+  "@noData": { "description": "データなし表示" },
+
+  "statusApplied": "応募中",
+  "@statusApplied": { "description": "ステータス: 応募済み" },
+
+  "statusAssigned": "確定",
+  "@statusAssigned": { "description": "ステータス: 確定" },
+
+  "statusCompleted": "完了",
+  "@statusCompleted": { "description": "ステータス: 完了" },
+
+  "statusCancelled": "キャンセル",
+  "@statusCancelled": { "description": "ステータス: キャンセル" },
+
+  "accountSettings": "アカウント設定",
+  "@accountSettings": { "description": "アカウント設定ページタイトル" },
+
+  "deleteAccount": "アカウントを削除",
+  "@deleteAccount": { "description": "アカウント削除ボタン" },
+
+  "downloadData": "データをダウンロード",
+  "@downloadData": { "description": "データダウンロードボタン" },
+
+  "agreeToTerms": "利用規約に同意する",
+  "@agreeToTerms": { "description": "利用規約同意チェック" },
+
+  "agreeToPrivacy": "プライバシーポリシーに同意する",
+  "@agreeToPrivacy": { "description": "プライバシーポリシー同意チェック" },
+
+  "login": "ログイン",
+  "@login": { "description": "ログインボタン" },
+
+  "logout": "ログアウト",
+  "@logout": { "description": "ログアウトボタン" },
+
+  "email": "メールアドレス",
+  "@email": { "description": "メールアドレスラベル" },
+
+  "password": "パスワード",
+  "@password": { "description": "パスワードラベル" },
+
+  "errorNetworkTitle": "ネットワークエラー",
+  "@errorNetworkTitle": { "description": "ネットワークエラータイトル" },
+
+  "errorNetworkMessage": "インターネット接続を確認して\nもう一度お試しください",
+  "@errorNetworkMessage": { "description": "ネットワークエラー詳細メッセージ" },
+
+  "errorTimeout": "タイムアウト",
+  "@errorTimeout": { "description": "タイムアウトエラータイトル" },
+
+  "errorTimeoutMessage": "サーバーへの接続に時間がかかっています\nもう一度お試しください",
+  "@errorTimeoutMessage": { "description": "タイムアウトエラー詳細メッセージ" },
+
+  "errorDefaultMessage": "しばらく経ってからもう一度お試しください",
+  "@errorDefaultMessage": { "description": "汎用エラー詳細メッセージ" },
+
+  "errorDataNotFound": "データが見つかりません",
+  "@errorDataNotFound": { "description": "データ未検出タイトル" },
+
+  "errorSearchRetry": "条件を変更して再検索してください",
+  "@errorSearchRetry": { "description": "検索リトライメッセージ" },
+
+  "errorLabel": "エラー",
+  "@errorLabel": { "description": "コンパクトエラーラベル" },
+
+  "displayName": "表示名",
+  "@displayName": { "description": "表示名ラベル" },
+
+  "changePassword": "パスワードを変更",
+  "@changePassword": { "description": "パスワード変更ボタン" }
+}

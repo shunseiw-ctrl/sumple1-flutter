@@ -74,6 +74,18 @@ class MessageModel {
   }
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MessageModel &&
+          other.id == id &&
+          other.senderUid == senderUid &&
+          other.text == text &&
+          other.createdAt == createdAt);
+
+  @override
+  int get hashCode => Object.hash(id, senderUid, text, createdAt);
+
+  @override
   String toString() {
     return 'MessageModel(id: $id, sender: $senderUid, text: $text)';
   }

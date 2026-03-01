@@ -138,6 +138,35 @@ class ApplicationModel {
   }
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ApplicationModel &&
+          other.id == id &&
+          other.applicantUid == applicantUid &&
+          other.adminUid == adminUid &&
+          other.jobId == jobId &&
+          other.status == status &&
+          other.projectNameSnapshot == projectNameSnapshot &&
+          other.jobTitleSnapshot == jobTitleSnapshot &&
+          other.titleSnapshot == titleSnapshot &&
+          other.createdAt == createdAt &&
+          other.updatedAt == updatedAt);
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        applicantUid,
+        adminUid,
+        jobId,
+        status,
+        projectNameSnapshot,
+        jobTitleSnapshot,
+        titleSnapshot,
+        createdAt,
+        updatedAt,
+      );
+
+  @override
   String toString() {
     return 'ApplicationModel(id: $id, title: $displayTitle, status: $status)';
   }

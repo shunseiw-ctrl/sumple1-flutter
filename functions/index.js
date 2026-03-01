@@ -54,6 +54,21 @@ exports.createPaymentIntent = stripe.createPaymentIntent;
 exports.handleStripeWebhook = stripe.handleStripeWebhook;
 exports.getExpressDashboardLink = stripe.getExpressDashboardLink;
 
+// --- アカウント削除 (Phase 9) ---
+const { deleteUserData } = require("./src/accountDeletion");
+exports.deleteUserData = deleteUserData;
+
+// --- データエクスポート (Phase 9) ---
+const { exportUserData } = require("./src/dataExport");
+exports.exportUserData = exportUserData;
+
+// --- 監査ログ (Phase 9) ---
+const auditLog = require("./src/auditLog");
+exports.onAuditJobWrite = auditLog.onAuditJobWrite;
+exports.onAuditApplicationWrite = auditLog.onAuditApplicationWrite;
+exports.onAuditPaymentCreated = auditLog.onAuditPaymentCreated;
+exports.onAuditRatingCreated = auditLog.onAuditRatingCreated;
+
 /**
  * earnings/{earningId} 作成時に、profiles/{uid}.fcmToken に通知を送る
  *

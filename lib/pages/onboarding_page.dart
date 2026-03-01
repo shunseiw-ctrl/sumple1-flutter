@@ -5,6 +5,7 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/main.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -16,6 +17,8 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _termsAccepted = false;
+  bool _privacyAccepted = false;
 
   @override
   void initState() {
@@ -41,9 +44,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ),
   ];
 
+  bool get _canComplete => _termsAccepted && _privacyAccepted;
+
   Future<void> _completeOnboarding() async {
+    // 最終ページの場合、同意チェックが必要
+    if (_currentPage == _pages.length - 1 && !_canComplete) return;
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+
+    // 同意日時を保存
+    final now = DateTime.now().toIso8601String();
+    await prefs.setString('terms_accepted_at', now);
+    await prefs.setString('privacy_accepted_at', now);
+
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
@@ -60,6 +74,39 @@ class _OnboardingPageState extends State<OnboardingPage> {
     } else {
       _completeOnboarding();
     }
+  }
+
+  Widget _buildConsentCheckbox({
+    required bool value,
+    required String label,
+    required ValueChanged<bool?> onChanged,
+    required VoidCallback onTap,
+  }) {
+    return Semantics(
+      toggled: value,
+      label: '$label${value ? "、同意済み" : ""}',
+      child: Row(
+        children: [
+          Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.ruri,
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: onTap,
+              child: Text(
+                label,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.ruri,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -79,12 +126,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.base, top: AppSpacing.sm),
-                child: TextButton(
-                  onPressed: _completeOnboarding,
-                  child: Text(
-                    'スキップ',
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                child: Semantics(
+                  button: true,
+                  label: 'オンボーディングをスキップ',
+                  enabled: !(_currentPage == _pages.length - 1 && !_canComplete),
+                  child: TextButton(
+                    onPressed: (_currentPage == _pages.length - 1 && !_canComplete)
+                        ? null
+                        : _completeOnboarding,
+                    child: Text(
+                      AppLocalizations.of(context)!.skip,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: (_currentPage == _pages.length - 1 && !_canComplete)
+                            ? AppColors.divider
+                            : AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ),
@@ -113,52 +169,79 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      _pages.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _currentPage == index
-                              ? AppColors.ruri
-                              : AppColors.divider,
+                  Semantics(
+                    label: 'ページ${_currentPage + 1} / ${_pages.length}',
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        _pages.length,
+                        (index) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentPage == index
+                                ? AppColors.ruri
+                                : AppColors.divider,
+                          ),
                         ),
                       ),
                     ),
                   ),
+                  if (_currentPage == _pages.length - 1) ...[
+                    const SizedBox(height: AppSpacing.base),
+                    _buildConsentCheckbox(
+                      value: _termsAccepted,
+                      label: AppLocalizations.of(context)!.agreeToTerms,
+                      onChanged: (v) => setState(() => _termsAccepted = v ?? false),
+                      onTap: () => Navigator.pushNamed(context, '/legal', arguments: 'terms'),
+                    ),
+                    _buildConsentCheckbox(
+                      value: _privacyAccepted,
+                      label: AppLocalizations.of(context)!.agreeToPrivacy,
+                      onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
+                      onTap: () => Navigator.pushNamed(context, '/legal', arguments: 'privacy'),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.xl),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.ruri.withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _nextPage,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                          ),
+                  Semantics(
+                    button: true,
+                    label: _currentPage == _pages.length - 1 ? 'アプリを始める' : '次のページへ進む',
+                    enabled: !(_currentPage == _pages.length - 1 && !_canComplete),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: (_currentPage == _pages.length - 1 && !_canComplete)
+                              ? const LinearGradient(colors: [Colors.grey, Colors.grey])
+                              : AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.ruri.withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          _currentPage == _pages.length - 1 ? '始める' : '次へ',
-                          style: AppTextStyles.button.copyWith(color: Colors.white),
+                        child: ElevatedButton(
+                          onPressed: (_currentPage == _pages.length - 1 && !_canComplete)
+                              ? null
+                              : _nextPage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                            ),
+                          ),
+                          child: Text(
+                            _currentPage == _pages.length - 1 ? AppLocalizations.of(context)!.getStarted : AppLocalizations.of(context)!.next,
+                            style: AppTextStyles.button.copyWith(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
@@ -186,18 +269,21 @@ class _OnboardingPageContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
       child: Column(
         children: [
-          SizedBox(
-            height: screenHeight * 0.45,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.ruriSurface,
-                borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
-              ),
-              child: Center(
-                child: Image.asset(
-                  data.image,
-                  fit: BoxFit.contain,
-                  height: screenHeight * 0.35,
+          Semantics(
+            excludeSemantics: true,
+            child: SizedBox(
+              height: screenHeight * 0.45,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.ruriSurface,
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    data.image,
+                    fit: BoxFit.contain,
+                    height: screenHeight * 0.35,
+                  ),
                 ),
               ),
             ),

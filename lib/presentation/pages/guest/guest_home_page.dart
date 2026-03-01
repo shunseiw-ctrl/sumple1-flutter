@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/services/line_auth_service.dart';
@@ -102,7 +101,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             borderRadius: BorderRadius.circular(22),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withOpacity(0.15),
+                                color: Colors.white.withValues(alpha: 0.15),
                                 blurRadius: 32,
                                 spreadRadius: 8,
                               ),
@@ -112,10 +111,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
+                              color: Colors.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.25),
+                                color: Colors.white.withValues(alpha: 0.25),
                                 width: 1.5,
                               ),
                             ),
@@ -140,7 +139,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         Text(
                           '建設業界の仕事マッチングアプリ',
                           style: AppTextStyles.bodyLarge.copyWith(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 15,
                           ),
                           textAlign: TextAlign.center,
@@ -150,7 +149,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                           width: 40,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -187,7 +186,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, -4),
                       ),
@@ -253,7 +252,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.lineGreen.withOpacity(0.3),
+                                    color: AppColors.lineGreen.withValues(alpha: 0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -402,10 +401,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           border: Border.all(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -415,7 +414,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -428,7 +427,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
             Text(
               label,
               style: AppTextStyles.labelMedium.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 12,
               ),
               textAlign: TextAlign.center,

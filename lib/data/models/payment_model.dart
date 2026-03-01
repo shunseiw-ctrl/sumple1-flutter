@@ -80,6 +80,45 @@ class PaymentModel {
     }
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PaymentModel &&
+          other.id == id &&
+          other.applicationId == applicationId &&
+          other.jobId == jobId &&
+          other.earningId == earningId &&
+          other.workerUid == workerUid &&
+          other.adminUid == adminUid &&
+          other.amount == amount &&
+          other.platformFee == platformFee &&
+          other.netAmount == netAmount &&
+          other.stripePaymentIntentId == stripePaymentIntentId &&
+          other.status == status &&
+          other.payoutStatus == payoutStatus &&
+          other.projectNameSnapshot == projectNameSnapshot &&
+          other.createdAt == createdAt &&
+          other.updatedAt == updatedAt);
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        applicationId,
+        jobId,
+        earningId,
+        workerUid,
+        adminUid,
+        amount,
+        platformFee,
+        netAmount,
+        stripePaymentIntentId,
+        status,
+        payoutStatus,
+        projectNameSnapshot,
+        createdAt,
+        updatedAt,
+      );
+
   static int? _parseInt(dynamic value) {
     if (value == null) return null;
     if (value is int) return value;

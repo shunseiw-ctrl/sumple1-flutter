@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/services/account_service.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -120,6 +124,127 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     }
   }
 
+  Future<void> _exportData() async {
+    setState(() => _saving = true);
+    try {
+      final accountService = AccountService();
+      final data = await accountService.exportUserData();
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
+
+      await Clipboard.setData(ClipboardData(text: jsonStr));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('データをクリップボードにコピーしました')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('データエクスポートに失敗しました: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _showDeleteConfirmation() async {
+    // Step 1: 警告ダイアログ
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteAccount),
+        content: const Text(
+          'アカウントを削除すると、全てのデータが完全に失われます。\n\n'
+          '・プロフィール情報\n'
+          '・応募履歴\n'
+          '・チャット履歴\n'
+          '・お気に入り\n'
+          '・通知\n\n'
+          'この操作は取り消せません。本当に削除しますか？',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(AppLocalizations.of(context)!.delete, style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Step 2: 再認証
+    final password = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.confirm),
+          content: TextField(
+            controller: controller,
+            obscureText: true,
+            decoration: const InputDecoration(hintText: '現在のパスワード'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, controller.text),
+              child: Text(AppLocalizations.of(context)!.confirm, style: TextStyle(color: AppColors.error)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (password == null || password.isEmpty || !mounted) return;
+
+    setState(() => _saving = true);
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final email = user?.email;
+      if (user == null || email == null) throw Exception('ログインが必要です');
+
+      // 再認証
+      final cred = EmailAuthProvider.credential(email: email, password: password);
+      await user.reauthenticateWithCredential(cred);
+
+      // Step 3: アカウント削除 CF 呼び出し
+      final accountService = AccountService();
+      await accountService.deleteAccount();
+
+      // Step 4: サインアウト → ゲストホーム画面へ遷移
+      await FirebaseAuth.instance.signOut();
+
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        final msg = e.code == 'wrong-password'
+            ? 'パスワードが正しくありません'
+            : 'アカウント削除に失敗しました: ${e.code}';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('アカウント削除に失敗しました: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -127,7 +252,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('アカウント設定', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(AppLocalizations.of(context)!.accountSettings, style: const TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -148,7 +273,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('メールアドレス', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      Text(AppLocalizations.of(context)!.email, style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
                       Text(email, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     ],
@@ -161,7 +286,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 20),
 
           // 表示名変更
-          Text('表示名', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(AppLocalizations.of(context)!.displayName, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
@@ -177,7 +302,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 28),
 
           // パスワード変更
-          Text('パスワード変更', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(AppLocalizations.of(context)!.changePassword, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _currentPassController,
@@ -197,28 +322,28 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               onPressed: _saving ? null : _changePassword,
               child: _saving
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('パスワードを変更'),
+                  : Text(AppLocalizations.of(context)!.changePassword),
             ),
           ),
 
           const SizedBox(height: 32),
 
+          // データダウンロード
+          Center(
+            child: TextButton.icon(
+              onPressed: _saving ? null : _exportData,
+              icon: Icon(Icons.download, color: AppColors.ruri, size: 18),
+              label: Text(AppLocalizations.of(context)!.downloadData, style: TextStyle(color: AppColors.ruri, fontSize: 13)),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
           // アカウント削除
           Center(
             child: TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('アカウント削除'),
-                    content: const Text('アカウントを削除すると、全てのデータが失われます。この操作は取り消せません。\n\n削除を希望される場合は、お問い合わせよりご連絡ください。'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('閉じる')),
-                    ],
-                  ),
-                );
-              },
-              child: Text('アカウントを削除', style: TextStyle(color: AppColors.error, fontSize: 13)),
+              onPressed: _saving ? null : _showDeleteConfirmation,
+              child: Text(AppLocalizations.of(context)!.deleteAccount, style: TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ),
         ],

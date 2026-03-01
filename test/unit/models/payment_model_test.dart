@@ -90,6 +90,56 @@ void main() {
       });
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final now = DateTime(2025, 3, 15);
+        final model1 = PaymentModel(
+          id: 'pay-001',
+          applicationId: 'app-001',
+          jobId: 'job-001',
+          earningId: 'earn-001',
+          workerUid: 'worker-001',
+          adminUid: 'admin-001',
+          amount: 15000,
+          platformFee: 1500,
+          netAmount: 13500,
+          stripePaymentIntentId: 'pi_test_123',
+          status: 'pending',
+          payoutStatus: 'pending',
+          projectNameSnapshot: '内装工事案件',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final model2 = PaymentModel(
+          id: 'pay-001',
+          applicationId: 'app-001',
+          jobId: 'job-001',
+          earningId: 'earn-001',
+          workerUid: 'worker-001',
+          adminUid: 'admin-001',
+          amount: 15000,
+          platformFee: 1500,
+          netAmount: 13500,
+          stripePaymentIntentId: 'pi_test_123',
+          status: 'pending',
+          payoutStatus: 'pending',
+          projectNameSnapshot: '内装工事案件',
+          createdAt: now,
+          updatedAt: now,
+        );
+
+        expect(model1, equals(model2));
+        expect(model1.hashCode, equals(model2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final model1 = _createPayment(status: 'pending');
+        final model2 = _createPayment(status: 'succeeded', amount: 20000);
+
+        expect(model1, isNot(equals(model2)));
+      });
+    });
+
     test('optionalフィールドのnullハンドリング', () {
       final model = PaymentModel(
         id: 'pay-001',

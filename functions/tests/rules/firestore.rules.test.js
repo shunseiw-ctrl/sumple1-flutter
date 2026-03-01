@@ -568,6 +568,84 @@ describe("line_auth_tokens", () => {
 });
 
 // ============================
+// audit_logs コレクション
+// ============================
+describe("audit_logs", () => {
+  test("admin can read audit_logs", async () => {
+    await setupAdmin("admin1");
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().doc("audit_logs/log1").set({
+        action: "account_deleted",
+        actorUid: "user1",
+        timestamp: new Date(),
+      });
+    });
+
+    const ctx = getAuthContext("admin1");
+    await assertSucceeds(ctx.firestore().doc("audit_logs/log1").get());
+  });
+
+  test("non-admin cannot read audit_logs", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().doc("audit_logs/log1").set({
+        action: "account_deleted",
+        actorUid: "user1",
+        timestamp: new Date(),
+      });
+    });
+
+    const ctx = getAuthContext("user1");
+    await assertFails(ctx.firestore().doc("audit_logs/log1").get());
+  });
+
+  test("nobody can write audit_logs", async () => {
+    await setupAdmin("admin1");
+    const ctx = getAuthContext("admin1");
+    await assertFails(
+      ctx.firestore().doc("audit_logs/log1").set({
+        action: "test",
+        actorUid: "admin1",
+      }),
+    );
+  });
+});
+
+// ============================
+// profiles — 同意フィールド
+// ============================
+describe("profiles consent fields", () => {
+  test("user can update termsAcceptedAt", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().doc("profiles/user1").set({
+        displayName: "Test User",
+      });
+    });
+
+    const ctx = getAuthContext("user1");
+    await assertSucceeds(
+      ctx.firestore().doc("profiles/user1").update({
+        termsAcceptedAt: new Date(),
+      }),
+    );
+  });
+
+  test("user can update privacyAcceptedAt", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().doc("profiles/user1").set({
+        displayName: "Test User",
+      });
+    });
+
+    const ctx = getAuthContext("user1");
+    await assertSucceeds(
+      ctx.firestore().doc("profiles/user1").update({
+        privacyAcceptedAt: new Date(),
+      }),
+    );
+  });
+});
+
+// ============================
 // catch-all ルール
 // ============================
 describe("catch-all rule", () => {

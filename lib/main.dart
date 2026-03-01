@@ -28,6 +28,8 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'core/services/splash_remover.dart';
 import 'presentation/widgets/error_retry_widget.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
 /// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
 @pragma('vm:entry-point')
@@ -476,6 +478,14 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('ja'),
       home: const AuthGate(),
     );
   }

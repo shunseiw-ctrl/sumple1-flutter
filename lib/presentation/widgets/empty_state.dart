@@ -38,7 +38,7 @@ class EmptyState extends StatelessWidget {
                 width: 160,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.05),
+                  color: color.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: ClipRRect(
@@ -59,8 +59,8 @@ class EmptyState extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      color.withOpacity(0.08),
-                      color.withOpacity(0.15),
+                      color.withValues(alpha: 0.08),
+                      color.withValues(alpha: 0.15),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -93,7 +93,7 @@ class EmptyState extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.ruri.withOpacity(0.25),
+                        color: AppColors.ruri.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

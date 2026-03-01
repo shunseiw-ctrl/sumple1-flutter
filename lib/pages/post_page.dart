@@ -31,7 +31,7 @@ class _PostPageState extends State<PostPage> {
     if (email == null || email.trim().isEmpty) return false;
 
     final doc = await FirebaseFirestore.instance.doc('config/admins').get();
-    final data = doc.data() as Map<String, dynamic>?;
+    final data = doc.data();
     final emails =
         (data?['emails'] as List?)?.map((e) => e.toString()).toList() ?? const [];
     return emails.contains(email);
@@ -264,7 +264,7 @@ class _PostPageState extends State<PostPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.ruri,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.ruri.withOpacity(0.4),
+                disabledBackgroundColor: AppColors.ruri.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -438,7 +438,6 @@ class _LabeledField extends StatelessWidget {
   final TextInputAction textInputAction;
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
-  final ValueChanged<String>? onSubmitted;
   final int? maxLength;
 
   final bool readOnly;
@@ -451,7 +450,6 @@ class _LabeledField extends StatelessWidget {
     required this.textInputAction,
     this.keyboardType,
     this.prefixIcon,
-    this.onSubmitted,
     this.maxLength,
     this.readOnly = false,
     this.onTap,
@@ -468,7 +466,6 @@ class _LabeledField extends StatelessWidget {
           controller: controller,
           textInputAction: textInputAction,
           keyboardType: keyboardType,
-          onSubmitted: onSubmitted,
           maxLength: maxLength,
           readOnly: readOnly,
           onTap: onTap,

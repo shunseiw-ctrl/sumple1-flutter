@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 
 class ErrorRetryWidget extends StatelessWidget {
   final String? title;
@@ -74,13 +75,14 @@ class ErrorRetryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (isCompact) {
-      return _buildCompact();
+      return _buildCompact(l10n);
     }
-    return _buildFull();
+    return _buildFull(l10n);
   }
 
-  Widget _buildCompact() {
+  Widget _buildCompact(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -90,20 +92,20 @@ class ErrorRetryWidget extends StatelessWidget {
             Icon(icon, size: 32, color: AppColors.textHint),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              title ?? 'エラー',
+              title ?? l10n.errorLabel,
               style: AppTextStyles.labelLarge.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.base),
-            _buildRetryButton(compact: true),
+            _buildRetryButton(compact: true, l10n: l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFull() {
+  Widget _buildFull(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -116,8 +118,8 @@ class ErrorRetryWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.red.withOpacity(0.06),
-                    Colors.red.withOpacity(0.12),
+                    Colors.red.withValues(alpha: 0.06),
+                    Colors.red.withValues(alpha: 0.12),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -128,7 +130,7 @@ class ErrorRetryWidget extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              title ?? 'エラーが発生しました',
+              title ?? l10n.errorGeneric,
               textAlign: TextAlign.center,
               style: AppTextStyles.headingSmall,
             ),
@@ -144,14 +146,14 @@ class ErrorRetryWidget extends StatelessWidget {
               ),
             ],
             const SizedBox(height: AppSpacing.xl),
-            _buildRetryButton(compact: false),
+            _buildRetryButton(compact: false, l10n: l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRetryButton({required bool compact}) {
+  Widget _buildRetryButton({required bool compact, required AppLocalizations l10n}) {
     return SizedBox(
       width: compact ? null : double.infinity,
       height: compact ? 36 : 48,
@@ -159,7 +161,7 @@ class ErrorRetryWidget extends StatelessWidget {
         onPressed: onRetry,
         icon: const Icon(Icons.refresh_rounded, size: 18),
         label: Text(
-          '再試行',
+          l10n.retry,
           style: AppTextStyles.labelMedium.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w700,

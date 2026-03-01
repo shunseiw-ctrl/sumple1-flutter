@@ -158,6 +158,48 @@ void main() {
       });
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final now = DateTime(2025, 3, 15);
+        final model1 = ApplicationModel(
+          id: 'app-001',
+          applicantUid: 'worker-001',
+          adminUid: 'admin-001',
+          jobId: 'job-001',
+          status: 'applied',
+          projectNameSnapshot: '新宿内装工事',
+          jobTitleSnapshot: '内装案件',
+          titleSnapshot: 'タイトル',
+          createdAt: now,
+          updatedAt: now,
+        );
+        final model2 = ApplicationModel(
+          id: 'app-001',
+          applicantUid: 'worker-001',
+          adminUid: 'admin-001',
+          jobId: 'job-001',
+          status: 'applied',
+          projectNameSnapshot: '新宿内装工事',
+          jobTitleSnapshot: '内装案件',
+          titleSnapshot: 'タイトル',
+          createdAt: now,
+          updatedAt: now,
+        );
+
+        expect(model1, equals(model2));
+        expect(model1.hashCode, equals(model2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final model1 = ApplicationModel.fromMap('app-001', TestFixtures.applicationData());
+        final model2 = ApplicationModel.fromMap('app-002', TestFixtures.applicationData(
+          status: 'approved',
+        ));
+
+        expect(model1, isNot(equals(model2)));
+      });
+    });
+
     test('toStringに主要情報が含まれる', () {
       final model = ApplicationModel.fromMap(
         'app-001',

@@ -150,7 +150,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
                     '管理者のQRコードをスキャンしてください',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
@@ -160,7 +160,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
                   'GPS検証: 現場から100m以内で$actionできます',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),

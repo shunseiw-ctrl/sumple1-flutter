@@ -371,22 +371,26 @@ class _JobListPageState extends State<JobListPage> {
           Container(
             padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
             color: Colors.white,
-            child: GestureDetector(
-              onTap: _showFilterSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.search, color: AppColors.textHint, size: 20),
-                    const SizedBox(width: 12),
-                    Text('エリア・条件で検索', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
-                    const Spacer(),
-                    const Icon(Icons.tune_rounded, color: AppColors.textSecondary, size: 20),
-                  ],
+            child: Semantics(
+              button: true,
+              label: '検索フィルターを開く',
+              child: GestureDetector(
+                onTap: _showFilterSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: AppColors.textHint, size: 20),
+                      const SizedBox(width: 12),
+                      Text('エリア・条件で検索', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
+                      const Spacer(),
+                      const Icon(Icons.tune_rounded, color: AppColors.textSecondary, size: 20),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -421,37 +425,41 @@ class _JobListPageState extends State<JobListPage> {
                       onSelected: (value) => setState(() => _sortLabel = value),
                     ),
                     const Spacer(),
-                    GestureDetector(
-                      onTap: _showFilterSheet,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.sm + 2),
-                        decoration: BoxDecoration(
-                          color: _hasActiveFilters ? AppColors.ruriPale : AppColors.chipUnselected,
-                          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                          border: _hasActiveFilters ? Border.all(color: AppColors.ruri.withOpacity(0.3), width: 1) : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.tune_rounded, size: 18, color: _hasActiveFilters ? AppColors.ruri : AppColors.textSecondary),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              '絞り込み',
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: _hasActiveFilters ? AppColors.ruri : AppColors.textPrimary,
-                              ),
-                            ),
-                            if (_hasActiveFilters) ...[
-                              const SizedBox(width: AppSpacing.xs),
-                              Container(
-                                width: 8, height: 8,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.ruri,
-                                  shape: BoxShape.circle,
+                    Semantics(
+                      button: true,
+                      label: _hasActiveFilters ? '絞り込み、フィルター適用中' : '絞り込み',
+                      child: GestureDetector(
+                        onTap: _showFilterSheet,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.sm + 2),
+                          decoration: BoxDecoration(
+                            color: _hasActiveFilters ? AppColors.ruriPale : AppColors.chipUnselected,
+                            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                            border: _hasActiveFilters ? Border.all(color: AppColors.ruri.withValues(alpha: 0.3), width: 1) : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.tune_rounded, size: 18, color: _hasActiveFilters ? AppColors.ruri : AppColors.textSecondary),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                '絞り込み',
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  color: _hasActiveFilters ? AppColors.ruri : AppColors.textPrimary,
                                 ),
                               ),
+                              if (_hasActiveFilters) ...[
+                                const SizedBox(width: AppSpacing.xs),
+                                Container(
+                                  width: 8, height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.ruri,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -660,25 +668,29 @@ class _JobListPageState extends State<JobListPage> {
         ],
       ),
 
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-          boxShadow: AppShadows.button,
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            final pref = _selectedPref == 'その他' ? '日本' : _selectedPref;
+      floatingActionButton: Semantics(
+        button: true,
+        label: '地図で現場を確認する',
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            boxShadow: AppShadows.button,
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              final pref = _selectedPref == 'その他' ? '日本' : _selectedPref;
 
-            final month = _selectedMonthKey;
-            final query = (month == null) ? pref : '$pref $month';
+              final month = _selectedMonthKey;
+              final query = (month == null) ? pref : '$pref $month';
 
-            _openMapByQuery(query);
-          },
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          icon: const Icon(Icons.map_outlined, color: Colors.white),
-          label: Text('地図で見る', style: AppTextStyles.buttonSmall.copyWith(color: Colors.white)),
+              _openMapByQuery(query);
+            },
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            icon: const Icon(Icons.map_outlined, color: Colors.white),
+            label: Text('地図で見る', style: AppTextStyles.buttonSmall.copyWith(color: Colors.white)),
+          ),
         ),
       ),
     );
@@ -745,20 +757,25 @@ class _PrefChips extends StatelessWidget {
         itemBuilder: (_, i) {
           final p = prefs[i];
           final isSelected = p == selected;
-          return GestureDetector(
-            onTap: () => onSelected(p),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.ruri : AppColors.chipUnselected,
-                borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-              ),
-              child: Center(
-                child: Text(
-                  p,
-                  style: AppTextStyles.chipText.copyWith(
-                    color: isSelected ? Colors.white : AppColors.chipTextUnselected,
+          return Semantics(
+            button: true,
+            label: '$p${isSelected ? "、選択中" : ""}',
+            selected: isSelected,
+            child: GestureDetector(
+              onTap: () => onSelected(p),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.ruri : AppColors.chipUnselected,
+                  borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                ),
+                child: Center(
+                  child: Text(
+                    p,
+                    style: AppTextStyles.chipText.copyWith(
+                      color: isSelected ? Colors.white : AppColors.chipTextUnselected,
+                    ),
                   ),
                 ),
               ),
@@ -960,7 +977,9 @@ class _JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
-    return ScaleTap(
+    return Semantics(
+      label: '$title、場所: $location、日程: $dateText、報酬: $priceText',
+      child: ScaleTap(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
@@ -999,7 +1018,7 @@ class _JobCard extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.4),
+                            Colors.black.withValues(alpha: 0.4),
                           ],
                         ),
                       ),
@@ -1013,7 +1032,7 @@ class _JobCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.92),
+                          color: Colors.white.withValues(alpha: 0.92),
                           borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                         ),
                         child: Row(
@@ -1033,20 +1052,24 @@ class _JobCard extends StatelessWidget {
                   Positioned(
                     top: AppSpacing.md,
                     right: AppSpacing.md,
-                    child: GestureDetector(
-                      onTap: onToggleFavorite,
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.92),
-                          shape: BoxShape.circle,
-                          boxShadow: AppShadows.subtle,
-                        ),
-                        child: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: isFavorite ? AppColors.error : AppColors.textHint,
-                          size: 20,
+                    child: Semantics(
+                      button: true,
+                      label: isFavorite ? 'お気に入りから削除' : 'お気に入りに追加',
+                      child: GestureDetector(
+                        onTap: onToggleFavorite,
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.92),
+                            shape: BoxShape.circle,
+                            boxShadow: AppShadows.subtle,
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            color: isFavorite ? AppColors.error : AppColors.textHint,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
@@ -1060,7 +1083,7 @@ class _JobCard extends StatelessWidget {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.92),
+                          color: Colors.white.withValues(alpha: 0.92),
                           shape: BoxShape.circle,
                           boxShadow: AppShadows.subtle,
                         ),
@@ -1226,23 +1249,27 @@ class _JobCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
   Widget _placeholderImage() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.ruriPale, Color(0xFFE0E7F2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Semantics(
+      excludeSemantics: true,
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.ruriPale, Color(0xFFE0E7F2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-      ),
-      child: Center(
-        child: Icon(
-          _categoryIcon(category),
-          size: 48,
-          color: AppColors.ruri.withOpacity(0.3),
+        child: Center(
+          child: Icon(
+            _categoryIcon(category),
+            size: 48,
+            color: AppColors.ruri.withValues(alpha: 0.3),
+          ),
         ),
       ),
     );

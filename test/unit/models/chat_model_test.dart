@@ -147,6 +147,54 @@ void main() {
       });
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final now = DateTime(2025, 3, 15);
+        final model1 = ChatModel(
+          id: 'chat-001',
+          applicationId: 'app-001',
+          applicantUid: 'worker-001',
+          adminUid: 'admin-001',
+          jobId: 'job-001',
+          titleSnapshot: '内装工事案件',
+          lastMessageText: 'こんにちは',
+          lastMessageSenderUid: 'worker-001',
+          lastMessageAt: now,
+          unreadCountApplicant: 3,
+          unreadCountAdmin: 1,
+          createdAt: now,
+          updatedAt: now,
+        );
+        final model2 = ChatModel(
+          id: 'chat-001',
+          applicationId: 'app-001',
+          applicantUid: 'worker-001',
+          adminUid: 'admin-001',
+          jobId: 'job-001',
+          titleSnapshot: '内装工事案件',
+          lastMessageText: 'こんにちは',
+          lastMessageSenderUid: 'worker-001',
+          lastMessageAt: now,
+          unreadCountApplicant: 3,
+          unreadCountAdmin: 1,
+          createdAt: now,
+          updatedAt: now,
+        );
+
+        expect(model1, equals(model2));
+        expect(model1.hashCode, equals(model2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final model1 = ChatModel.fromMap('chat-001', TestFixtures.chatData());
+        final model2 = ChatModel.fromMap('chat-002', TestFixtures.chatData(
+          titleSnapshot: '別の案件',
+        ));
+
+        expect(model1, isNot(equals(model2)));
+      });
+    });
+
     test('toStringに主要情報が含まれる', () {
       final model = ChatModel.fromMap('chat-001', TestFixtures.chatData(
         lastMessageText: 'テスト',

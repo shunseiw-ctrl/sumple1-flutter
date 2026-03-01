@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 
 class OfflineBanner extends StatelessWidget {
@@ -35,7 +34,7 @@ class OfflineBanner extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

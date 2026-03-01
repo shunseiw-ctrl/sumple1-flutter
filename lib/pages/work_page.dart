@@ -7,7 +7,6 @@ import 'chat_room_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
-import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
@@ -316,7 +315,7 @@ class _WhiteCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF000000).withOpacity(0.04),
+            color: const Color(0xFF000000).withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -354,7 +353,7 @@ class _StatusGroup extends StatelessWidget {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, size: 18, color: color),
@@ -366,7 +365,7 @@ class _StatusGroup extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
               ),
               child: Text('$count', style: AppTextStyles.badgeText.copyWith(color: color)),

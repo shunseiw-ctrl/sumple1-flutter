@@ -10,12 +10,10 @@ import 'faq_page.dart';
 import 'contact_page.dart';
 import 'legal_page.dart';
 import '../core/services/line_auth_service.dart';
-import '../core/services/payment_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -207,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         borderSide: BorderSide(color: AppColors.ruri, width: 2),
                       ),
                       filled: true,
-                      fillColor: AppColors.ruriSurface.withOpacity(0.3),
+                      fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
@@ -218,9 +216,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: InputDecoration(
                       labelText: 'パスワード',
                       prefixIcon: const Icon(Icons.lock_outline, size: 20),
-                      suffixIcon: IconButton(
-                        onPressed: () => setLocalState(() => obscure = !obscure),
-                        icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
+                      suffixIcon: Semantics(
+                        button: true,
+                        label: obscure ? 'パスワードを表示' : 'パスワードを隠す',
+                        child: IconButton(
+                          onPressed: () => setLocalState(() => obscure = !obscure),
+                          icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
+                        ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -234,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         borderSide: BorderSide(color: AppColors.ruri, width: 2),
                       ),
                       filled: true,
-                      fillColor: AppColors.ruriSurface.withOpacity(0.3),
+                      fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
@@ -312,31 +314,35 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.lineGreen.withOpacity(0.3),
+                    color: AppColors.lineGreen.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    LineAuthService().startLineLogin();
-                  },
-                  icon: const Icon(Icons.chat_bubble, size: 20),
-                  label: Text(
-                    'LINEでログイン',
-                    style: AppTextStyles.button.copyWith(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.lineGreen,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+              child: Semantics(
+                button: true,
+                label: 'LINEアカウントでログインする',
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      LineAuthService().startLineLogin();
+                    },
+                    icon: const Icon(Icons.chat_bubble, size: 20),
+                    label: Text(
+                      'LINEでログイン',
+                      style: AppTextStyles.button.copyWith(color: Colors.white),
                     ),
-                    elevation: 0,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.lineGreen,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                      ),
+                      elevation: 0,
+                    ),
                   ),
                 ),
               ),
@@ -592,19 +598,22 @@ class _ProfileHeaderCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: AppColors.primaryGradient,
-            ),
-            child: CircleAvatar(
-              radius: 32,
-              backgroundColor: Colors.white,
+          Semantics(
+            excludeSemantics: true,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppColors.primaryGradient,
+              ),
               child: CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.ruriPale,
-                child: Icon(Icons.person, color: AppColors.ruri, size: 30),
+                radius: 32,
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppColors.ruriPale,
+                  child: Icon(Icons.person, color: AppColors.ruri, size: 30),
+                ),
               ),
             ),
           ),
@@ -625,41 +634,44 @@ class _ProfileHeaderCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: isLoggedIn ? AppColors.successLight : Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isLoggedIn) ...[
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: AppColors.success,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.success.withOpacity(0.4),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        ),
-                      ],
+          Semantics(
+            label: 'ステータス: ${isLoggedIn ? "ログイン済み" : "ゲスト"}',
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: isLoggedIn ? AppColors.successLight : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isLoggedIn) ...[
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: AppColors.success,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.success.withValues(alpha: 0.4),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    isLoggedIn ? 'ログイン済み' : 'ゲスト',
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: isLoggedIn ? AppColors.success : AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 6),
                 ],
-                Text(
-                  isLoggedIn ? 'ログイン済み' : 'ゲスト',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: isLoggedIn ? AppColors.success : AppColors.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -795,23 +807,27 @@ class _MenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          leading: Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+        Semantics(
+          button: true,
+          label: subtitle != null ? '$title、$subtitle' : title,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            leading: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
             ),
-            child: Icon(icon, color: iconColor, size: 20),
+            title: Text(title, style: AppTextStyles.bodyMedium),
+            subtitle: subtitle == null
+                ? null
+                : Text(subtitle!, style: AppTextStyles.labelSmall),
+            trailing: Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+            onTap: onTap,
           ),
-          title: Text(title, style: AppTextStyles.bodyMedium),
-          subtitle: subtitle == null
-              ? null
-              : Text(subtitle!, style: AppTextStyles.labelSmall),
-          trailing: Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
-          onTap: onTap,
         ),
         if (!isLast)
           Padding(

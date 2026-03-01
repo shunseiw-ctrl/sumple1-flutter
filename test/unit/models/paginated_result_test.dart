@@ -25,6 +25,35 @@ void main() {
       expect(result.hasMore, isFalse);
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final result1 = PaginatedResult<String>(
+          items: ['a', 'b', 'c'],
+          hasMore: true,
+        );
+        final result2 = PaginatedResult<String>(
+          items: ['a', 'b', 'c'],
+          hasMore: true,
+        );
+
+        expect(result1, equals(result2));
+        expect(result1.hashCode, equals(result2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final result1 = PaginatedResult<String>(
+          items: ['a', 'b'],
+          hasMore: true,
+        );
+        final result2 = PaginatedResult<String>(
+          items: ['c', 'd'],
+          hasMore: false,
+        );
+
+        expect(result1, isNot(equals(result2)));
+      });
+    });
+
     test('preserves generic type', () {
       final result = PaginatedResult<Map<String, dynamic>>(
         items: [

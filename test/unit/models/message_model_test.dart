@@ -65,6 +65,36 @@ void main() {
       });
     });
 
+    group('equality', () {
+      test('同一フィールドのオブジェクトは等しい', () {
+        final now = DateTime(2025, 3, 15);
+        final model1 = MessageModel(
+          id: 'msg-001',
+          senderUid: 'worker-001',
+          text: 'テストメッセージ',
+          createdAt: now,
+        );
+        final model2 = MessageModel(
+          id: 'msg-001',
+          senderUid: 'worker-001',
+          text: 'テストメッセージ',
+          createdAt: now,
+        );
+
+        expect(model1, equals(model2));
+        expect(model1.hashCode, equals(model2.hashCode));
+      });
+
+      test('異なるフィールドのオブジェクトは等しくない', () {
+        final model1 = MessageModel.fromMap('msg-001', TestFixtures.messageData());
+        final model2 = MessageModel.fromMap('msg-002', TestFixtures.messageData(
+          text: '別のメッセージ',
+        ));
+
+        expect(model1, isNot(equals(model2)));
+      });
+    });
+
     test('copyWithで指定フィールドのみ変更される', () {
       final original = MessageModel.fromMap('msg-001', TestFixtures.messageData());
       final copied = original.copyWith(text: '新しいテキスト');

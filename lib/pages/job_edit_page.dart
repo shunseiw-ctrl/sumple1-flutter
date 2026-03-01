@@ -226,7 +226,7 @@ class _JobEditPageState extends State<JobEditPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.ruri,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.ruri.withOpacity(0.4),
+                disabledBackgroundColor: AppColors.ruri.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),

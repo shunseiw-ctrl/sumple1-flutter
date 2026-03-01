@@ -142,6 +142,41 @@ class JobModel {
   }
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JobModel &&
+          other.id == id &&
+          other.title == title &&
+          other.location == location &&
+          other.prefecture == prefecture &&
+          other.price == price &&
+          other.date == date &&
+          other.workMonthKey == workMonthKey &&
+          other.ownerId == ownerId &&
+          other.description == description &&
+          other.latitude == latitude &&
+          other.longitude == longitude &&
+          other.createdAt == createdAt &&
+          other.updatedAt == updatedAt);
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        title,
+        location,
+        prefecture,
+        price,
+        date,
+        workMonthKey,
+        ownerId,
+        description,
+        latitude,
+        longitude,
+        createdAt,
+        updatedAt,
+      );
+
+  @override
   String toString() {
     return 'JobModel(id: $id, title: $title, location: $location, price: $price)';
   }

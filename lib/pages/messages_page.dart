@@ -13,7 +13,6 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
-import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 
 class MessagesPage extends StatefulWidget {

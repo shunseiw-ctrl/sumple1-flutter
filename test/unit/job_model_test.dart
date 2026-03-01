@@ -304,6 +304,66 @@ void main() {
     });
   });
 
+  group('equality', () {
+    test('同一フィールドのオブジェクトは等しい', () {
+      final now = DateTime(2025, 1, 15);
+      final job1 = JobModel(
+        id: 'job1',
+        title: '足場工事',
+        location: '東京都渋谷区',
+        prefecture: '東京都',
+        price: 15000,
+        date: '2025-01-20',
+        workMonthKey: '2025-01',
+        ownerId: 'owner123',
+        description: '3階建て住宅の足場組立',
+        latitude: 35.6895,
+        longitude: 139.6917,
+        createdAt: now,
+        updatedAt: now,
+      );
+      final job2 = JobModel(
+        id: 'job1',
+        title: '足場工事',
+        location: '東京都渋谷区',
+        prefecture: '東京都',
+        price: 15000,
+        date: '2025-01-20',
+        workMonthKey: '2025-01',
+        ownerId: 'owner123',
+        description: '3階建て住宅の足場組立',
+        latitude: 35.6895,
+        longitude: 139.6917,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      expect(job1, equals(job2));
+      expect(job1.hashCode, equals(job2.hashCode));
+    });
+
+    test('異なるフィールドのオブジェクトは等しくない', () {
+      final job1 = JobModel(
+        id: 'job1',
+        title: '足場工事',
+        location: '東京都渋谷区',
+        prefecture: '東京都',
+        price: 15000,
+        date: '2025-01-20',
+      );
+      final job2 = JobModel(
+        id: 'job2',
+        title: '塗装工事',
+        location: '千葉県船橋市',
+        prefecture: '千葉県',
+        price: 20000,
+        date: '2025-02-01',
+      );
+
+      expect(job1, isNot(equals(job2)));
+    });
+  });
+
   group('toString', () {
     test('returns correct format', () {
       final job = JobModel(

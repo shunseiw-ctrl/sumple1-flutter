@@ -36,6 +36,19 @@ class ShiftModel {
     );
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShiftModel &&
+          other.id == id &&
+          other.date == date &&
+          other.qrCode == qrCode &&
+          other.createdBy == createdBy &&
+          other.createdAt == createdAt);
+
+  @override
+  int get hashCode => Object.hash(id, date, qrCode, createdBy, createdAt);
+
   Map<String, dynamic> toCreateMap() {
     return {
       'date': date,

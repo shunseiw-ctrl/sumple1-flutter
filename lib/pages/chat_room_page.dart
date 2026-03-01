@@ -27,8 +27,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool _ready = false;
   String? _readyError;
 
-  ChatRoomInitResult? _initResult;
-
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
   DocumentReference<Map<String, dynamic>> get _chatRef =>
@@ -60,7 +58,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (!mounted) return;
 
     if (result.success) {
-      setState(() { _initResult = result; _ready = true; _readyError = null; });
+      setState(() { _ready = true; _readyError = null; });
     } else {
       setState(() { _ready = false; _readyError = result.errorMessage; });
     }
@@ -253,7 +251,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.06),
+                                              color: Colors.black.withValues(alpha: 0.06),
                                               blurRadius: 4,
                                               offset: const Offset(0, 2),
                                             ),

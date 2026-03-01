@@ -100,7 +100,8 @@ service cloud.firestore {
           "fcmToken","updatedAt",
           "familyName","givenName","familyNameKana","givenNameKana",
           "birthDate","gender","postalCode","address",
-          "introduction","experienceYears","qualifications"
+          "introduction","experienceYears","qualifications",
+          "termsAcceptedAt","privacyAcceptedAt"
         ])
         && request.resource.data.displayName.size() <= 50
         && (!("introduction" in request.resource.data.diff(resource.data).changedKeys())
@@ -281,6 +282,12 @@ service cloud.firestore {
         allow read: if signedIn() && isAdminUid();
         allow write: if false;
       }
+    }
+
+    // --- 監査ログ (Cloud Functions のみ書き込み、admin のみ読み取り) ---
+    match /audit_logs/{logId} {
+      allow read: if signedIn() && isAdminUid();
+      allow write: if false;
     }
 
     // --- LINE認証 (Cloud Functions のみ管理 — クライアント禁止) ---
