@@ -1,4 +1,5 @@
 import 'dart:js_interop';
+import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
 void redirectTo(String url) {
@@ -8,10 +9,13 @@ void redirectTo(String url) {
       top.location.href = url;
       return;
     }
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[WebRedirect] window.top アクセスに失敗: $e');
+  }
   try {
     web.window.open(url, '_top');
-  } catch (_) {
+  } catch (e) {
+    debugPrint('[WebRedirect] window.open に失敗、location.href にフォールバック: $e');
     web.window.location.href = url;
   }
 }

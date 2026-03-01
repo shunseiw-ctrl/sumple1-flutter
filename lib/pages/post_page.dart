@@ -15,6 +15,8 @@ class _PostPageState extends State<PostPage> {
   final _locationController = TextEditingController();
   final _priceController = TextEditingController();
   final _dateController = TextEditingController();
+  final _latitudeController = TextEditingController();
+  final _longitudeController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -130,6 +132,8 @@ class _PostPageState extends State<PostPage> {
     _locationController.dispose();
     _priceController.dispose();
     _dateController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
     super.dispose();
   }
 
@@ -162,20 +166,6 @@ class _PostPageState extends State<PostPage> {
       return;
     }
 
-    if (title.length > 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('タイトルは200文字以内で入力してください')),
-      );
-      return;
-    }
-
-    if (location.length > 500) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('場所は500文字以内で入力してください')),
-      );
-      return;
-    }
-
     final iso = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!iso.hasMatch(dateKey)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,16 +175,9 @@ class _PostPageState extends State<PostPage> {
     }
 
     final price = int.tryParse(priceText);
-    if (price == null || price <= 0) {
+    if (price == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額は正の数字で入力してください')),
-      );
-      return;
-    }
-
-    if (price > 100000000) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額が上限を超えています')),
+        const SnackBar(content: Text('金額は数字で入力してください')),
       );
       return;
     }
@@ -211,6 +194,9 @@ class _PostPageState extends State<PostPage> {
 
     setState(() => _isLoading = true);
 
+    final lat = double.tryParse(_latitudeController.text.trim());
+    final lng = double.tryParse(_longitudeController.text.trim());
+
     try {
       await FirebaseFirestore.instance.collection('jobs').add({
         'title': title,
@@ -223,6 +209,9 @@ class _PostPageState extends State<PostPage> {
         'workMonthKey': monthKey,
 
         'ownerId': user.uid,
+
+        if (lat != null) 'latitude': lat,
+        if (lng != null) 'longitude': lng,
 
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
@@ -349,9 +338,33 @@ class _PostPageState extends State<PostPage> {
               ),
             ),
             const SizedBox(height: 10),
+            _WhiteCard(
+              child: Column(
+                children: [
+                  _LabeledField(
+                    label: '緯度（任意）',
+                    hint: '例）35.6812',
+                    controller: _latitudeController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.next,
+                    prefixIcon: Icons.my_location,
+                  ),
+                  const _Divider(),
+                  _LabeledField(
+                    label: '経度（任意）',
+                    hint: '例）139.7671',
+                    controller: _longitudeController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.done,
+                    prefixIcon: Icons.my_location,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             const _HintCard(
               title: 'ヒント',
-              body: '日程はカレンダーから選択できます。',
+              body: '日程はカレンダーから選択できます。緯度・経度を入力するとQR出退勤時にGPS検証が有効になります。',
             ),
           ],
         ),

@@ -25,8 +25,8 @@ try {
     });
     console.log('Firebase Admin SDK initialized with service account');
   } else {
-    console.error('FIREBASE_SERVICE_ACCOUNT is not set. Custom token creation will not work.');
     admin.initializeApp({ projectId: 'alba-work' });
+    console.log('Firebase Admin SDK initialized without service account (custom tokens will not work until FIREBASE_SERVICE_ACCOUNT is set)');
   }
 } catch (e) {
   console.error('Firebase Admin SDK initialization failed:', e.message);
@@ -50,130 +50,16 @@ const mimeTypes = {
   '.wasm': 'application/wasm',
 };
 
-// --- セキュリティヘッダー ---
-function getSecurityHeaders() {
-  const headers = {
-    'X-Content-Type-Options': 'nosniff',
-    'X-XSS-Protection': '0',
-    'X-Frame-Options': 'DENY',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Content-Security-Policy': [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://api.line.me https://firestore.googleapis.com",
-      "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
-    ].join('; '),
-  };
-
-  // 本番環境のみ HSTS を設定
-  if (REPLIT_DOMAIN) {
-    headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains';
-  }
-
-  return headers;
-}
-
-const securityHeaders = getSecurityHeaders();
+const securityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+};
 
 const stateStore = new Map();
 const tokenStore = new Map();
-
-// --- IP取得（プロキシ対応）---
-function getClientIp(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (forwarded) {
-    // X-Forwarded-For の最初のIPを取得（クライアントIP）
-    return forwarded.split(',')[0].trim();
-  }
-  return req.socket.remoteAddress || 'unknown';
-}
-
-// --- レートリミット（IP単位）---
-const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 10;
-
-function isRateLimited(req) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-
-  if (!rateLimitMap.has(ip)) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-
-  const entry = rateLimitMap.get(ip);
-  if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    entry.count = 1;
-    entry.windowStart = now;
-    return false;
-  }
-
-  entry.count++;
-  return entry.count > RATE_LIMIT_MAX_REQUESTS;
-}
-
-// --- カスタムトークン生成のレートリミット（UID単位, 5回/10分）---
-const tokenRateLimitMap = new Map();
-const TOKEN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const TOKEN_RATE_LIMIT_MAX = 5;
-
-function isTokenRateLimited(uid) {
-  const now = Date.now();
-
-  if (!tokenRateLimitMap.has(uid)) {
-    tokenRateLimitMap.set(uid, { count: 1, windowStart: now });
-    return false;
-  }
-
-  const entry = tokenRateLimitMap.get(uid);
-  if (now - entry.windowStart > TOKEN_RATE_LIMIT_WINDOW_MS) {
-    entry.count = 1;
-    entry.windowStart = now;
-    return false;
-  }
-
-  entry.count++;
-  return entry.count > TOKEN_RATE_LIMIT_MAX;
-}
-
-// 定期クリーンアップ（5分ごと）
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap.entries()) {
-    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS * 2) {
-      rateLimitMap.delete(ip);
-    }
-  }
-  for (const [uid, entry] of tokenRateLimitMap.entries()) {
-    if (now - entry.windowStart > TOKEN_RATE_LIMIT_WINDOW_MS * 2) {
-      tokenRateLimitMap.delete(uid);
-    }
-  }
-}, 5 * 60 * 1000);
-
-// --- CORS ---
-function getAllowedOrigin() {
-  if (REPLIT_DOMAIN) return `https://${REPLIT_DOMAIN}`;
-  return `http://localhost:${PORT}`;
-}
-
-function applyCors(req, res) {
-  const origin = req.headers.origin;
-  const allowed = getAllowedOrigin();
-  if (origin === allowed) {
-    res.setHeader('Access-Control-Allow-Origin', allowed);
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Max-Age', '86400');
-}
 
 function cleanupExpired(store, maxAgeMs) {
   const now = Date.now();
@@ -197,28 +83,12 @@ function httpsRequest(url, options, postData) {
       });
     });
     req.on('error', reject);
-    req.setTimeout(10000, () => {
-      req.destroy(new Error('Request timeout'));
-    });
     if (postData) req.write(postData);
     req.end();
   });
 }
 
-// --- exchangeCode のフォーマット検証 ---
-function isValidExchangeCode(code) {
-  if (typeof code !== 'string') return false;
-  // 64文字の16進数文字列（crypto.randomBytes(32).toString('hex')）
-  return /^[a-f0-9]{64}$/.test(code);
-}
-
 function handleAuthLineStart(req, res) {
-  if (!LINE_CHANNEL_ID || !LINE_CHANNEL_SECRET) {
-    res.writeHead(503, { 'Content-Type': 'application/json', ...securityHeaders });
-    res.end(JSON.stringify({ error: 'line_not_configured' }));
-    return;
-  }
-
   const state = crypto.randomBytes(32).toString('hex');
   stateStore.set(state, Date.now());
   cleanupExpired(stateStore, 10 * 60 * 1000);
@@ -279,7 +149,7 @@ async function handleAuthLineCallback(req, res) {
     }, tokenParams.toString());
 
     if (tokenRes.status !== 200 || !tokenRes.data.access_token) {
-      console.error('LINE token exchange failed:', tokenRes.status);
+      console.error('LINE token exchange failed:', tokenRes.data);
       res.writeHead(302, { Location: '/#line_error=token_failed', ...securityHeaders });
       res.end();
       return;
@@ -295,33 +165,16 @@ async function handleAuthLineCallback(req, res) {
     });
 
     if (profileRes.status !== 200 || !profileRes.data.userId) {
-      console.error('LINE profile fetch failed:', profileRes.status);
+      console.error('LINE profile fetch failed:', profileRes.data);
       res.writeHead(302, { Location: '/#line_error=profile_failed', ...securityHeaders });
       res.end();
       return;
     }
 
     const lineUser = profileRes.data;
-
-    // userId のフォーマット検証（LINEのuserIdは英数字）
-    if (typeof lineUser.userId !== 'string' || !/^U[a-f0-9]{32}$/.test(lineUser.userId)) {
-      console.error('Invalid LINE userId format');
-      res.writeHead(302, { Location: '/#line_error=invalid_profile', ...securityHeaders });
-      res.end();
-      return;
-    }
-
     const firebaseUid = `line:${lineUser.userId}`;
 
-    // UID単位のレートリミット
-    if (isTokenRateLimited(firebaseUid)) {
-      console.warn('Token rate limited:', firebaseUid.substring(0, 12));
-      res.writeHead(302, { Location: '/#line_error=rate_limited', ...securityHeaders });
-      res.end();
-      return;
-    }
-
-    console.log('LINE login successful:', { uid: firebaseUid.substring(0, 12) });
+    console.log('LINE login successful:', { displayName: lineUser.displayName, uid: firebaseUid });
 
     if (!admin) {
       res.writeHead(302, { Location: '/#line_error=server_config', ...securityHeaders });
@@ -335,17 +188,17 @@ async function handleAuthLineCallback(req, res) {
       if (e.code === 'auth/user-not-found') {
         await admin.auth().createUser({
           uid: firebaseUid,
-          displayName: (lineUser.displayName || 'LINEユーザー').substring(0, 100),
+          displayName: lineUser.displayName || 'LINEユーザー',
           photoURL: lineUser.pictureUrl || null,
         });
-        console.log('Created new Firebase user for LINE:', firebaseUid.substring(0, 12));
+        console.log('Created new Firebase user for LINE:', firebaseUid);
       } else {
         throw e;
       }
     }
 
     await admin.auth().updateUser(firebaseUid, {
-      displayName: (lineUser.displayName || 'LINEユーザー').substring(0, 100),
+      displayName: lineUser.displayName || 'LINEユーザー',
       photoURL: lineUser.pictureUrl || null,
     });
 
@@ -358,7 +211,7 @@ async function handleAuthLineCallback(req, res) {
     tokenStore.set(exchangeCode, {
       customToken,
       profile: {
-        displayName: (lineUser.displayName || '').substring(0, 100),
+        displayName: lineUser.displayName || '',
         photoUrl: lineUser.pictureUrl || '',
         provider: 'line',
       },
@@ -373,52 +226,20 @@ async function handleAuthLineCallback(req, res) {
     res.end();
 
   } catch (e) {
-    console.error('LINE callback error:', e.message);
+    console.error('LINE callback error:', e);
     res.writeHead(302, { Location: '/#line_error=server_error', ...securityHeaders });
     res.end();
   }
 }
 
-const MAX_BODY_SIZE = 1024;
-
 function handleTokenExchange(req, res) {
-  // Content-Type 検証
-  const contentType = (req.headers['content-type'] || '').toLowerCase();
-  if (!contentType.includes('application/json')) {
-    res.writeHead(400, { 'Content-Type': 'application/json', ...securityHeaders });
-    res.end(JSON.stringify({ error: 'invalid_content_type' }));
-    return;
-  }
-
   let body = '';
-  let bodySize = 0;
-  let aborted = false;
-
-  req.on('data', (chunk) => {
-    if (aborted) return;
-    bodySize += chunk.length;
-    if (bodySize > MAX_BODY_SIZE) {
-      aborted = true;
-      res.writeHead(413, { 'Content-Type': 'application/json', ...securityHeaders });
-      res.end(JSON.stringify({ error: 'payload_too_large' }));
-      req.destroy();
-      return;
-    }
-    body += chunk;
-  });
+  req.on('data', (chunk) => { body += chunk; });
   req.on('end', () => {
-    if (aborted) return;
     try {
       const { code } = JSON.parse(body);
 
-      // exchangeCode のフォーマット検証
-      if (!isValidExchangeCode(code)) {
-        res.writeHead(400, { 'Content-Type': 'application/json', ...securityHeaders });
-        res.end(JSON.stringify({ error: 'invalid_code_format' }));
-        return;
-      }
-
-      if (!tokenStore.has(code)) {
+      if (!code || !tokenStore.has(code)) {
         res.writeHead(400, { 'Content-Type': 'application/json', ...securityHeaders });
         res.end(JSON.stringify({ error: 'invalid_code' }));
         return;
@@ -478,37 +299,14 @@ function serveStaticFile(req, res) {
         res.end(fallback);
       });
     } else {
-      // 静的アセットにはキャッシュヘッダーを設定
-      const responseHeaders = { 'Content-Type': contentType, ...securityHeaders };
-      if (ext !== '.html') {
-        responseHeaders['Cache-Control'] = 'public, max-age=31536000, immutable';
-      }
-      res.writeHead(200, responseHeaders);
+      res.writeHead(200, { 'Content-Type': contentType, ...securityHeaders });
       res.end(content);
     }
   });
 }
 
 const server = http.createServer(async (req, res) => {
-  applyCors(req, res);
-
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, securityHeaders);
-    res.end();
-    return;
-  }
-
   const urlPath = req.url.split('?')[0].split('#')[0];
-
-  // Rate limit auth endpoints
-  if (urlPath.startsWith('/auth/')) {
-    if (isRateLimited(req)) {
-      res.writeHead(429, { 'Content-Type': 'application/json', ...securityHeaders });
-      res.end(JSON.stringify({ error: 'too_many_requests' }));
-      return;
-    }
-  }
 
   if (urlPath === '/auth/line' && req.method === 'GET') {
     handleAuthLineStart(req, res);

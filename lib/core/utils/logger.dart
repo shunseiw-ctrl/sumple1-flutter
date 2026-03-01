@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 
 /// ログレベル
 enum LogLevel {
@@ -30,49 +30,31 @@ class Logger {
 
     switch (level) {
       case LogLevel.error:
-        debugPrint('ERROR $logMessage');
+        debugPrint('❌ $logMessage');
         if (stackTrace != null) {
           debugPrint('StackTrace: $stackTrace');
         }
-        // Crashlytics に送信（Web以外）
         if (!kIsWeb) {
-          _sendToCrashlytics(message, error, stackTrace, tag);
+          try {
+            FirebaseCrashlytics.instance.recordError(
+              error ?? logMessage,
+              stackTrace,
+              reason: logMessage,
+            );
+          } catch (_) {
+            // Crashlytics not initialized (e.g., in tests)
+          }
         }
         break;
       case LogLevel.warning:
-        debugPrint('WARN  $logMessage');
+        debugPrint('⚠️  $logMessage');
         break;
       case LogLevel.info:
-        debugPrint('INFO  $logMessage');
+        debugPrint('ℹ️  $logMessage');
         break;
       case LogLevel.debug:
-        debugPrint('DEBUG $logMessage');
+        debugPrint('🐛 $logMessage');
         break;
-    }
-  }
-
-  /// Crashlytics にエラーを送信
-  static void _sendToCrashlytics(
-    String message,
-    dynamic error,
-    StackTrace? stackTrace,
-    String? tag,
-  ) {
-    try {
-      if (tag != null) {
-        FirebaseCrashlytics.instance.setCustomKey('tag', tag);
-      }
-      FirebaseCrashlytics.instance.log(message);
-      if (error != null) {
-        FirebaseCrashlytics.instance.recordError(
-          error,
-          stackTrace,
-          reason: message,
-          fatal: false,
-        );
-      }
-    } catch (_) {
-      // Crashlytics が初期化されていない場合は無視
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../core/services/auth_service.dart';
+import '../core/services/payment_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 
@@ -68,6 +69,48 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   int _parseAmountYen(String s) {
     final cleaned = s.replaceAll(',', '').replaceAll('¥', '').trim();
     return int.tryParse(cleaned) ?? 0;
+  }
+
+  Future<void> _createStripePayment() async {
+    if (!_isAdmin || _selectedApp == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('案件を選択してください')),
+      );
+      return;
+    }
+
+    final amount = _parseAmountYen(_amountCtrl.text);
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('金額を入力してください')),
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+    try {
+      final result = await PaymentService.createPaymentIntent(
+        applicationId: _selectedApp!.id,
+        amount: amount,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Stripe決済を作成しました (ID: ${result['paymentId']})')),
+      );
+
+      setState(() {
+        _amountCtrl.clear();
+        _selectedApp = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Stripe決済に失敗: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Future<void> _createEarning() async {
@@ -312,6 +355,23 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                     child: Text(
                       _saving ? '登録中...' : '支払い確定を登録（earnings作成）',
                       style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _saving ? null : () => _createStripePayment(),
+                    icon: const Icon(Icons.credit_card, size: 18),
+                    label: const Text(
+                      'Stripe決済で支払い',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF635BFF),
+                      side: const BorderSide(color: Color(0xFF635BFF)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                 ),

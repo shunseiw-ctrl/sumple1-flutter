@@ -7,18 +7,21 @@ class RatingDialog extends StatefulWidget {
   final String applicationId;
   final String jobId;
   final String jobTitle;
+  final String targetUid;
 
   const RatingDialog({
     super.key,
     required this.applicationId,
     required this.jobId,
     required this.jobTitle,
+    required this.targetUid,
   });
 
   static Future<void> show(BuildContext context, {
     required String applicationId,
     required String jobId,
     required String jobTitle,
+    required String targetUid,
   }) {
     return showDialog(
       context: context,
@@ -26,6 +29,7 @@ class RatingDialog extends StatefulWidget {
         applicationId: applicationId,
         jobId: jobId,
         jobTitle: jobTitle,
+        targetUid: targetUid,
       ),
     );
   }
@@ -59,6 +63,7 @@ class _RatingDialogState extends State<RatingDialog> {
         'applicationId': widget.applicationId,
         'jobId': widget.jobId,
         'raterUid': uid,
+        'targetUid': widget.targetUid,
         'stars': _stars,
         'comment': _commentController.text.trim(),
         'createdAt': FieldValue.serverTimestamp(),

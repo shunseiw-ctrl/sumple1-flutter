@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,9 +25,27 @@ import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'core/services/splash_remover.dart';
 import 'presentation/widgets/error_retry_widget.dart';
+
+/// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  Logger.info('Background message received', tag: 'FCM', data: {'id': message.messageId});
+}
+
+/// フォアグラウンド通知用のローカル通知プラグイン
+final FlutterLocalNotificationsPlugin _localNotifications =
+    FlutterLocalNotificationsPlugin();
+
+/// Android通知チャンネル
+const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
+  'default',
+  'デフォルト通知',
+  description: 'ALBAWORKからの通知',
+  importance: Importance.high,
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +54,19 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // --- App Check ---
+  if (kDebugMode) {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+    );
+  } else {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.deviceCheck,
+    );
+  }
+
   // --- Crashlytics ---
   if (!kIsWeb) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -40,32 +74,58 @@ Future<void> main() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    if (kDebugMode) {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    }
-  }
-
-  // --- App Check ---
-  if (kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
-      webProvider: ReCaptchaV3Provider('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'),
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-    );
-  } else {
-    const recaptchaKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');
-    if (recaptchaKey.isNotEmpty) {
-      await FirebaseAppCheck.instance.activate(
-        webProvider: ReCaptchaEnterpriseProvider(recaptchaKey),
-        androidProvider: AndroidProvider.playIntegrity,
-        appleProvider: AppleProvider.deviceCheck,
-      );
-    }
   }
 
   await FirestoreSetup.initialize();
 
   Logger.info('Firebase initialized', tag: 'main');
+
+  // --- FCM ---
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    await FirebaseMessaging.instance.requestPermission();
+
+    // Android通知チャンネル作成
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_androidChannel);
+
+    // ローカル通知初期化
+    await _localNotifications.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(),
+      ),
+    );
+
+    // フォアグラウンド通知処理
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final notification = message.notification;
+      if (notification == null) return;
+
+      _localNotifications.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _androidChannel.id,
+            _androidChannel.name,
+            channelDescription: _androidChannel.description,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: const DarwinNotificationDetails(),
+        ),
+      );
+    });
+
+    // 通知タップ時の処理
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      Logger.info('Notification tapped', tag: 'FCM', data: message.data);
+    });
+  }
 
   await LineAuthService().handleLineCallbackIfNeeded();
 
@@ -90,9 +150,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ALBAWORK',
+      navigatorObservers: [AnalyticsService.observer],
       theme: ThemeData(
         useMaterial3: true,
-        primaryColor: AppColors.ruri,
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppColors.background,
         textTheme: baseTextTheme,
@@ -254,7 +314,6 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        primaryColor: AppColors.ruri,
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppDarkColors.background,
         textTheme: baseTextTheme,
@@ -414,7 +473,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
-      navigatorObservers: [AnalyticsService.observer],
       home: const AuthGate(),
     );
   }

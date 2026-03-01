@@ -472,7 +472,7 @@ class _JobListPageState extends State<JobListPage> {
                       q = q.where('workMonthKey', isEqualTo: _selectedMonthKey);
                     }
 
-                    q = q.orderBy('createdAt', descending: true);
+                    q = q.orderBy('createdAt', descending: true).limit(100);
 
                     return q.snapshots();
                   })(),

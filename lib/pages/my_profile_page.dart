@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -307,6 +308,108 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 },
               ),
               const SizedBox(height: 16),
+
+              const _SectionTitle('あなたの評価'),
+              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('profiles')
+                    .doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+                    .snapshots(),
+                builder: (context, snap) {
+                  final data = snap.data?.data();
+                  final avg = (data?['ratingAverage'] ?? 0).toDouble();
+                  final count = (data?['ratingCount'] ?? 0) as int;
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.amber.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        RatingStarsDisplay(
+                          average: avg,
+                          count: count,
+                          starSize: 28,
+                          fontSize: 16,
+                        ),
+                        if (count > 0) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            '管理者からの評価',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              const _SectionTitle('Stripe連携'),
+              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('profiles')
+                    .doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+                    .snapshots(),
+                builder: (context, snap) {
+                  final data = snap.data?.data();
+                  final stripeStatus = (data?['stripeAccountStatus'] ?? '').toString();
+                  final hasAccount = (data?['stripeAccountId'] ?? '').toString().isNotEmpty;
+
+                  IconData icon;
+                  Color color;
+                  String label;
+
+                  if (!hasAccount) {
+                    icon = Icons.account_balance_outlined;
+                    color = AppColors.textHint;
+                    label = '未設定 — 設定ページからStripe口座を登録してください';
+                  } else if (stripeStatus == 'active') {
+                    icon = Icons.check_circle;
+                    color = AppColors.success;
+                    label = '連携済み — 報酬を受け取れます';
+                  } else {
+                    icon = Icons.pending;
+                    color = AppColors.warning;
+                    label = '設定中 — Stripeでの確認をお待ちください';
+                  }
+
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: color.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icon, color: color, size: 24),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
 
               const _SectionTitle('基本情報'),
 

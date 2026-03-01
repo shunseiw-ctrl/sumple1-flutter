@@ -35,7 +35,8 @@ class ConnectivityService {
       if (wasOnline != _isOnline) {
         _controller.add(_isOnline);
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[Connectivity] 接続チェックに失敗: $e');
       if (_isOnline) {
         _isOnline = false;
         _controller.add(false);
@@ -46,7 +47,8 @@ class ConnectivityService {
   Future<bool> _checkWebConnectivity() async {
     try {
       return _checkNavigatorOnline();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[Connectivity] Web接続チェックに失敗: $e');
       return false;
     }
   }
@@ -67,7 +69,8 @@ class ConnectivityService {
 bool _webNavigatorOnline() {
   try {
     return true;
-  } catch (_) {
+  } catch (e) {
+    debugPrint('[Connectivity] navigator.onLine チェックに失敗: $e');
     return true;
   }
 }

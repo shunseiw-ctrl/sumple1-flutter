@@ -13,10 +13,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -50,9 +47,18 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAmLkg-2SEUk_LrDMnViKNH0Rm7CTNd3CA',
-    appId: '1:319960355608:android:acddd0bec19a47f48c846d',
+    appId: '1:319960355608:android:b56daa0f665626fe8c846d',
     messagingSenderId: '319960355608',
     projectId: 'alba-work',
     storageBucket: 'alba-work.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAlYIb6c4fJpbXcOHZYzbpaKF-B8pBqz1A',
+    appId: '1:319960355608:ios:2711963242d7cf778c846d',
+    messagingSenderId: '319960355608',
+    projectId: 'alba-work',
+    storageBucket: 'alba-work.firebasestorage.app',
+    iosBundleId: 'com.albawork.app',
   );
 }

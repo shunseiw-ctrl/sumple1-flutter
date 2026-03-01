@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.sumple1</string>
+	<string>com.albawork.app</string>
 	<key>PROJECT_ID</key>
 	<string>alba-work</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:319960355608:ios:d46ff7da2607d1968c846d</string>
+	<string>1:319960355608:ios:2711963242d7cf778c846d</string>
 </dict>
 </plist>

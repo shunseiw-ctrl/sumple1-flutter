@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
   const IdentityVerificationPage({super.key});
@@ -43,7 +44,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           if (_selfieUrl!.isEmpty) _selfieUrl = null;
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('本人確認ステータスの読み込みに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
+    }
   }
 
   Future<void> _pickIdPhoto() async {

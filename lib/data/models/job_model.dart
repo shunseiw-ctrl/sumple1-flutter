@@ -11,6 +11,8 @@ class JobModel {
   final String? workMonthKey; // YYYY-MM形式
   final String? ownerId;
   final String? description;
+  final double? latitude;
+  final double? longitude;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -24,6 +26,8 @@ class JobModel {
     this.workMonthKey,
     this.ownerId,
     this.description,
+    this.latitude,
+    this.longitude,
     this.createdAt,
     this.updatedAt,
   });
@@ -45,6 +49,8 @@ class JobModel {
       workMonthKey: data['workMonthKey']?.toString(),
       ownerId: data['ownerId']?.toString(),
       description: data['description']?.toString(),
+      latitude: _parseDouble(data['latitude']),
+      longitude: _parseDouble(data['longitude']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -62,6 +68,8 @@ class JobModel {
       workMonthKey: data['workMonthKey']?.toString(),
       ownerId: data['ownerId']?.toString(),
       description: data['description']?.toString(),
+      latitude: _parseDouble(data['latitude']),
+      longitude: _parseDouble(data['longitude']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -78,6 +86,8 @@ class JobModel {
       if (workMonthKey != null) 'workMonthKey': workMonthKey,
       if (ownerId != null) 'ownerId': ownerId,
       if (description != null) 'description': description,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -109,6 +119,8 @@ class JobModel {
     String? workMonthKey,
     String? ownerId,
     String? description,
+    double? latitude,
+    double? longitude,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -122,6 +134,8 @@ class JobModel {
       workMonthKey: workMonthKey ?? this.workMonthKey,
       ownerId: ownerId ?? this.ownerId,
       description: description ?? this.description,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -133,6 +147,14 @@ class JobModel {
   }
 
   // ヘルパーメソッド
+
+  static double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
 
   static int? _parseInt(dynamic value) {
     if (value == null) return null;

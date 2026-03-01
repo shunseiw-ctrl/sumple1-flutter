@@ -9,6 +9,7 @@ import 'profile_page.dart';
 import 'notifications_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -187,12 +188,12 @@ class _DashboardTab extends StatelessWidget {
         const SizedBox(height: 16),
         StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance.doc('stats/realtime').snapshots(),
-          builder: (context, statsSnap) {
-            final stats = statsSnap.data?.data() ?? {};
-            final jobCount = (stats['totalJobs'] ?? 0) as int;
-            final appCount = (stats['totalApplications'] ?? 0) as int;
-            final userCount = (stats['totalUsers'] ?? 0) as int;
-
+          builder: (context, snap) {
+            final data = snap.data?.data() ?? {};
+            final totalJobs = (data['totalJobs'] ?? 0) as int;
+            final totalApplications = (data['totalApplications'] ?? 0) as int;
+            final totalUsers = (data['totalUsers'] ?? 0) as int;
+            final pendingApplications = (data['pendingApplications'] ?? 0) as int;
             return Column(
               children: [
                 Row(
@@ -203,7 +204,7 @@ class _DashboardTab extends StatelessWidget {
                         iconColor: AppColors.ruri,
                         iconBgColor: AppColors.ruriPale,
                         label: '掲載中の案件',
-                        count: jobCount,
+                        count: totalJobs,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -213,7 +214,7 @@ class _DashboardTab extends StatelessWidget {
                         iconColor: AppColors.success,
                         iconBgColor: const Color(0xFFD1FAE5),
                         label: '応募数',
-                        count: appCount,
+                        count: totalApplications,
                       ),
                     ),
                   ],
@@ -227,29 +228,18 @@ class _DashboardTab extends StatelessWidget {
                         iconColor: AppColors.warning,
                         iconBgColor: const Color(0xFFFEF3C7),
                         label: '登録ユーザー',
-                        count: userCount,
+                        count: totalUsers,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('applications')
-                            .where('status', isEqualTo: 'applied')
-                            .limit(100)
-                            .snapshots(),
-                        builder: (context, snap) {
-                          final count = snap.data?.docs.length ?? 0;
-                          return _SummaryCard(
-                            icon: Icons.pending_actions,
-                            iconColor: AppColors.error,
-                            iconBgColor: const Color(0xFFFEE2E2),
-                            label: '未対応の応募',
-                    count: count,
-                  );
-                },
-              ),
-            ),
+                      child: _SummaryCard(
+                        icon: Icons.pending_actions,
+                        iconColor: AppColors.error,
+                        iconBgColor: const Color(0xFFFEE2E2),
+                        label: '未対応の応募',
+                        count: pendingApplications,
+                      ),
                     ),
                   ],
                 ),
@@ -621,6 +611,7 @@ class _JobManagementTab extends StatelessWidget {
         stream: FirebaseFirestore.instance
             .collection('jobs')
             .orderBy('createdAt', descending: true)
+            .limit(20)
             .snapshots(),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
@@ -934,6 +925,7 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
             stream: FirebaseFirestore.instance
                 .collection('applications')
                 .orderBy('createdAt', descending: true)
+                .limit(20)
                 .snapshots(),
             builder: (context, snap) {
               if (snap.connectionState == ConnectionState.waiting) {
@@ -1029,6 +1021,25 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                                           ],
                                         ],
                                       ),
+                                      if (applicantUid.isNotEmpty)
+                                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                                          stream: FirebaseFirestore.instance.collection('profiles').doc(applicantUid).snapshots(),
+                                          builder: (context, profileSnap) {
+                                            final profileData = profileSnap.data?.data();
+                                            final avg = (profileData?['ratingAverage'] ?? 0).toDouble();
+                                            final rCount = (profileData?['ratingCount'] ?? 0) as int;
+                                            if (rCount == 0) return const SizedBox.shrink();
+                                            return Padding(
+                                              padding: const EdgeInsets.only(top: 4),
+                                              child: RatingStarsDisplay(
+                                                average: avg,
+                                                count: rCount,
+                                                starSize: 14,
+                                                fontSize: 11,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                     ],
                                   ),
                                 ),

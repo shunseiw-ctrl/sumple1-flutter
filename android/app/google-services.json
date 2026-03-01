@@ -7,6 +7,44 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:319960355608:android:b56daa0f665626fe8c846d",
+        "android_client_info": {
+          "package_name": "com.albawork.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmLkg-2SEUk_LrDMnViKNH0Rm7CTNd3CA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319960355608:android:75d7539ac3c058988c846d",
+        "android_client_info": {
+          "package_name": "com.craftconnect.jobs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmLkg-2SEUk_LrDMnViKNH0Rm7CTNd3CA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:319960355608:android:acddd0bec19a47f48c846d",
         "android_client_info": {
           "package_name": "com.example.sumple1"

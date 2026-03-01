@@ -1,5 +1,6 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'package:flutter/foundation.dart';
 
 void removeSplashScreenImpl() {
   try {
@@ -9,8 +10,12 @@ void removeSplashScreenImpl() {
       Future.delayed(const Duration(milliseconds: 500), () {
         try {
           splash.remove();
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('[SplashRemover] スプラッシュ要素の削除に失敗: $e');
+        }
       });
     }
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[SplashRemover] スプラッシュスクリーンの処理に失敗: $e');
+  }
 }

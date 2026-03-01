@@ -4,15 +4,13 @@ analyzer:
   errors:
     missing_return: error
     dead_code: warning
-    unused_import: warning
   exclude:
     - "**/*.g.dart"
-    - "build/**"
 
 linter:
   rules:
     - always_declare_return_types
     - avoid_print
-    - prefer_const_declarations
-    - unnecessary_this
-    - use_key_in_widget_constructors
+    - prefer_const_constructors
+    - require_trailing_commas
+    - unnecessary_string_escapes

@@ -2,11 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FavoritesService {
-  final _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
+  final FirebaseAuth _authInstance;
 
-  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+  FavoritesService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+      : _db = firestore ?? FirebaseFirestore.instance,
+        _authInstance = auth ?? FirebaseAuth.instance;
+
+  String? get _uid => _authInstance.currentUser?.uid;
   bool get isRegistered {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authInstance.currentUser;
     return user != null && !user.isAnonymous;
   }
 

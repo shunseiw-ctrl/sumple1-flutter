@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/services/line_auth_service.dart';
 import '../../core/utils/logger.dart';
+import '../../pages/email_auth_page.dart';
 
 /// 登録を促すモーダルダイアログウィジェット
 class RegistrationPromptModal {
@@ -175,13 +176,9 @@ class RegistrationPromptModal {
   /// メール登録を処理
   static void _handleEmailLogin(BuildContext context) {
     Logger.info('Email registration started from registration prompt', tag: 'RegistrationPromptModal');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('メール登録ページへ移動します'),
-        duration: Duration(seconds: 2),
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EmailAuthPage()),
     );
-    // TODO: Navigate to admin_login_page for email registration
-    // Navigator.pushNamed(context, '/admin_login');
   }
 }

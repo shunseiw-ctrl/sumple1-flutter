@@ -11,6 +11,7 @@ import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 
 class JobDetailPage extends StatelessWidget {
@@ -25,6 +26,7 @@ class JobDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    try { AnalyticsService.logJobView(jobId); } catch (_) {}
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: FirebaseFirestore.instance.collection('jobs').doc(jobId).snapshots(),
       builder: (context, snapshot) {

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 
 import '../models/job_model.dart';
 import '../models/paginated_result.dart';
@@ -7,7 +8,10 @@ import '../../core/utils/logger.dart';
 
 /// 案件（Job）のデータアクセスを管理
 class JobRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  JobRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> get _collection =>
       _firestore.collection(AppConstants.collectionJobs);
@@ -202,13 +206,20 @@ class JobRepository {
     }
   }
 
-  /// カーソルベースページネーションで案件一覧を取得
+  /// 案件一覧をページネーション付きで取得
   Future<PaginatedResult<JobModel>> getJobsPaginated({
     String? prefecture,
     String? workMonthKey,
     int limit = 20,
     DocumentSnapshot? startAfter,
   }) async {
+    Trace? trace;
+    try {
+      trace = FirebasePerformance.instance.newTrace('job_list_load');
+      await trace.start();
+    } catch (_) {
+      // Performance not available (e.g., in tests)
+    }
     try {
       Query<Map<String, dynamic>> query = _collection;
 
@@ -226,11 +237,14 @@ class JobRepository {
         query = query.startAfterDocument(startAfter);
       }
 
-      query = query.limit(limit);
+      query = query.limit(limit + 1);
 
       final snapshot = await query.get();
+      final docs = snapshot.docs;
+      final hasMore = docs.length > limit;
+      final resultDocs = hasMore ? docs.sublist(0, limit) : docs;
 
-      var jobs = snapshot.docs.map((doc) => JobModel.fromFirestore(doc)).toList();
+      var jobs = resultDocs.map((doc) => JobModel.fromFirestore(doc)).toList();
 
       if (prefecture == 'その他') {
         jobs = jobs.where((job) {
@@ -240,23 +254,26 @@ class JobRepository {
       }
 
       Logger.debug(
-        'Fetched jobs (paginated)',
+        'Fetched paginated jobs',
         tag: 'JobRepository',
         data: {
           'count': jobs.length,
-          'hasMore': snapshot.docs.length == limit,
+          'hasMore': hasMore,
           'prefecture': prefecture,
+          'workMonthKey': workMonthKey,
         },
       );
 
-      return PaginatedResult<JobModel>(
+      try { await trace?.stop(); } catch (_) {}
+      return PaginatedResult(
         items: jobs,
-        lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
-        hasMore: snapshot.docs.length == limit,
+        lastDocument: resultDocs.isNotEmpty ? resultDocs.last : null,
+        hasMore: hasMore,
       );
     } catch (e, stackTrace) {
+      try { await trace?.stop(); } catch (_) {}
       Logger.error(
-        'Failed to get jobs (paginated)',
+        'Failed to get paginated jobs',
         tag: 'JobRepository',
         error: e,
         stackTrace: stackTrace,

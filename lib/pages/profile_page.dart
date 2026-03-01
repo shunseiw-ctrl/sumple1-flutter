@@ -4,7 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'admin_login_page.dart';
 import 'identity_verification_page.dart';
 import 'my_profile_page.dart';
+import 'stripe_onboarding_page.dart';
+import 'account_settings_page.dart';
+import 'faq_page.dart';
+import 'contact_page.dart';
+import 'legal_page.dart';
 import '../core/services/line_auth_service.dart';
+import '../core/services/payment_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -344,8 +350,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: AppColors.ruri,
                       title: 'アカウント設定',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('アカウント設定（準備中）')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AccountSettingsPage()),
                         );
                       },
                     ),
@@ -365,11 +372,25 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: AppColors.success,
                       title: '本人確認',
                       subtitle: '身分証明書と顔写真を提出',
-                      isLast: true,
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const IdentityVerificationPage()),
+                        );
+                      },
+                    ),
+                    _MenuTile(
+                      icon: Icons.account_balance_outlined,
+                      iconColor: const Color(0xFF635BFF),
+                      title: 'Stripe口座設定',
+                      subtitle: '報酬の受取口座を設定',
+                      isLast: true,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => StripeOnboardingPage(
+                            email: user?.email,
+                          )),
                         );
                       },
                     ),
@@ -393,8 +414,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: AppColors.warning,
                       title: 'よくある質問',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('よくある質問（準備中）')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const FaqPage()),
                         );
                       },
                     ),
@@ -404,8 +426,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: 'お問い合わせ',
                       isLast: true,
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('お問い合わせ（準備中）')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ContactPage()),
                         );
                       },
                     ),
@@ -430,8 +453,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: 'ダークモード',
                       subtitle: 'システム設定に従う',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('ダークモードはシステム設定に従います')),
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('ダークモード'),
+                            content: const Text(
+                              'ダークモードはお使いの端末のシステム設定に連動しています。\n\n'
+                              'iOS: 設定 → 画面表示と明るさ\n'
+                              'Android: 設定 → ディスプレイ → ダークテーマ',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -440,8 +477,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: AppColors.textSecondary,
                       title: 'プライバシーポリシー',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('プライバシーポリシー（準備中）')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LegalPage(
+                              title: 'プライバシーポリシー',
+                              htmlContent: LegalPage.privacyPolicyHtml,
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -451,8 +494,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: '利用規約',
                       isLast: true,
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('利用規約（準備中）')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LegalPage(
+                              title: '利用規約',
+                              htmlContent: LegalPage.termsHtml,
+                            ),
+                          ),
                         );
                       },
                     ),

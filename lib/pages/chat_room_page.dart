@@ -24,7 +24,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool _sending = false;
   bool _ready = false;
   String? _readyError;
-  int _charCount = 0;
 
   ChatRoomInitResult? _initResult;
 
@@ -39,12 +38,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() {
-      final count = _controller.text.length;
-      if (count != _charCount) {
-        setState(() => _charCount = count);
-      }
-    });
     _initializeChatRoom();
   }
 
@@ -310,7 +303,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 focusNode: _focusNode,
                                 minLines: 1,
                                 maxLines: 4,
-                                maxLength: ChatService.maxMessageLength,
                                 textInputAction: TextInputAction.send,
                                 onSubmitted: (_) => _send(),
                                 decoration: InputDecoration(
@@ -318,15 +310,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                                  counterText: _charCount > ChatService.maxMessageLength * 0.8
-                                      ? '$_charCount / ${ChatService.maxMessageLength}'
-                                      : '',
-                                  counterStyle: TextStyle(
-                                    fontSize: 11,
-                                    color: _charCount > ChatService.maxMessageLength
-                                        ? Colors.red
-                                        : AppColors.textHint,
-                                  ),
                                 ),
                               ),
                             ),

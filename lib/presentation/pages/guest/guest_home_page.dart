@@ -9,6 +9,8 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/pages/legal_page.dart';
+import 'package:sumple1/pages/email_auth_page.dart';
 
 class GuestHomePage extends StatefulWidget {
   const GuestHomePage({super.key});
@@ -55,7 +57,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
   void _goToEmailLogin() {
     Logger.info('Navigate to email login', tag: 'GuestHomePage');
-    ErrorHandler.showInfo(context, 'メールログイン画面は準備中です');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EmailAuthPage()),
+    );
   }
 
   @override
@@ -312,7 +317,15 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  ErrorHandler.showInfo(context, '利用規約は準備中です');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LegalPage(
+                                        title: '利用規約',
+                                        htmlContent: LegalPage.termsHtml,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -340,7 +353,15 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  ErrorHandler.showInfo(context, 'プライバシーポリシーは準備中です');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LegalPage(
+                                        title: 'プライバシーポリシー',
+                                        htmlContent: LegalPage.privacyPolicyHtml,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

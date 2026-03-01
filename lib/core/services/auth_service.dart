@@ -4,10 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../enums/user_role.dart';
 import '../constants/app_constants.dart';
 import '../utils/logger.dart';
+import 'analytics_service.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+
+  AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
+      : _auth = auth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance;
 
   User? get currentUser => _auth.currentUser;
 
@@ -47,6 +52,7 @@ class AuthService {
       'isAdmin': isAdmin,
     });
 
+    try { await AnalyticsService.setUserRole(isAdmin ? 'admin' : 'user'); } catch (_) {}
     return isAdmin ? UserRole.admin : UserRole.user;
   }
 
@@ -103,6 +109,7 @@ class AuthService {
         password: password,
       );
       Logger.info('Email sign in successful', tag: 'AuthService', data: {'uid': _shortUid(credential.user?.uid)});
+      try { AnalyticsService.logLogin('email'); } catch (_) {}
       return credential.user;
     } catch (e) {
       Logger.error('Email sign in failed', tag: 'AuthService', error: e);
@@ -120,6 +127,7 @@ class AuthService {
         password: password,
       );
       Logger.info('User creation successful', tag: 'AuthService', data: {'uid': _shortUid(credential.user?.uid)});
+      try { AnalyticsService.logSignUp('email'); } catch (_) {}
       return credential.user;
     } catch (e) {
       Logger.error('User creation failed', tag: 'AuthService', error: e);

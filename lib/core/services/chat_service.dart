@@ -1,19 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 
 import '../constants/app_constants.dart';
 import '../utils/logger.dart';
 
 /// チャット機能のビジネスロジックを管理
 class ChatService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
+
+  ChatService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
 
   /// 現在のユーザーUID
   String get currentUserId => _auth.currentUser?.uid ?? '';
 
   /// チャットルームの初期化情報
   Future<ChatRoomInitResult> initializeChatRoom(String applicationId) async {
+    Trace? trace;
+    try {
+      trace = FirebasePerformance.instance.newTrace('chat_init');
+      await trace.start();
+    } catch (_) {
+      // Performance not available (e.g., in tests)
+    }
     try {
       if (currentUserId.isEmpty) {
         return ChatRoomInitResult.error('ログインしてください');
@@ -76,6 +88,7 @@ class ChatService {
         },
       );
 
+      try { await trace?.stop(); } catch (_) {}
       return ChatRoomInitResult.success(
         applicantUid: applicantUid,
         adminUid: adminUid,
@@ -85,6 +98,7 @@ class ChatService {
         isAdmin: amAdmin,
       );
     } on FirebaseException catch (e) {
+      try { await trace?.stop(); } catch (_) {}
       Logger.error(
         'Firebase error during chat initialization',
         tag: 'ChatService',
@@ -93,6 +107,7 @@ class ChatService {
       );
       return ChatRoomInitResult.error(_getFirebaseErrorMessage(e));
     } catch (e, stackTrace) {
+      try { await trace?.stop(); } catch (_) {}
       Logger.error(
         'Unexpected error during chat initialization',
         tag: 'ChatService',
@@ -195,22 +210,14 @@ class ChatService {
     }
   }
 
-  /// メッセージの最大文字数
-  static const int maxMessageLength = 5000;
-
   /// メッセージを送信（リトライ機能付き）
   Future<SendMessageResult> sendMessage({
     required String applicationId,
     required String text,
     int maxRetries = 3,
   }) async {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) {
+    if (text.trim().isEmpty) {
       return SendMessageResult.error('メッセージが空です');
-    }
-
-    if (trimmed.length > maxMessageLength) {
-      return SendMessageResult.error('メッセージは${maxMessageLength}文字以内で入力してください');
     }
 
     if (currentUserId.isEmpty) {

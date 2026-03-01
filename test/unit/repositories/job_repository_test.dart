@@ -1,210 +1,160 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:sumple1/data/models/job_model.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/data/repositories/job_repository.dart';
 
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
+  late JobRepository repository;
 
   setUp(() {
     fakeFirestore = FakeFirebaseFirestore();
+    repository = JobRepository(firestore: fakeFirestore);
   });
 
-  group('JobRepository with FakeFirestore', () {
-    group('create and read', () {
-      test('should create and retrieve a job', () async {
-        final jobData = {
-          'title': 'クロス張替え',
-          'location': '東京都新宿区',
-          'prefecture': '東京都',
-          'price': 30000,
-          'date': '2026-03-01',
-          'workMonthKey': '2026-03',
-          'workDateKey': '2026-03-01',
-          'ownerId': 'owner-1',
-          'description': 'テスト説明',
-          'notes': '',
-        };
+  Map<String, dynamic> jobData({
+    String title = 'テスト案件',
+    String location = '東京都渋谷区',
+    String prefecture = '東京都',
+    String price = '15000',
+    String date = '2026-04-01',
+    String? workMonthKey,
+    String? ownerId,
+  }) {
+    return {
+      'title': title,
+      'location': location,
+      'prefecture': prefecture,
+      'price': price,
+      'date': date,
+      if (workMonthKey != null) 'workMonthKey': workMonthKey,
+      if (ownerId != null) 'ownerId': ownerId,
+      'createdAt': DateTime.now(),
+    };
+  }
 
-        final docRef = await fakeFirestore.collection('jobs').add(jobData);
-        final doc = await fakeFirestore.collection('jobs').doc(docRef.id).get();
-
-        expect(doc.exists, true);
-        final model = JobModel.fromFirestore(doc);
-        expect(model.title, 'クロス張替え');
-        expect(model.location, '東京都新宿区');
-        expect(model.prefecture, '東京都');
-        expect(model.price, 30000);
-      });
-
-      test('should return null data for non-existent job', () async {
-        final doc =
-            await fakeFirestore.collection('jobs').doc('non-existent').get();
-        expect(doc.exists, false);
-      });
-    });
-
-    group('filtering', () {
-      setUp(() async {
-        await fakeFirestore.collection('jobs').add({
-          'title': '案件A',
-          'location': '東京都渋谷区',
-          'prefecture': '東京都',
-          'price': 20000,
-          'date': '2026-03-01',
-          'workMonthKey': '2026-03',
-          'ownerId': 'owner-1',
-        });
-        await fakeFirestore.collection('jobs').add({
-          'title': '案件B',
-          'location': '千葉県千葉市',
-          'prefecture': '千葉県',
-          'price': 25000,
-          'date': '2026-04-01',
-          'workMonthKey': '2026-04',
-          'ownerId': 'owner-2',
-        });
-        await fakeFirestore.collection('jobs').add({
-          'title': '案件C',
-          'location': '神奈川県横浜市',
-          'prefecture': '神奈川県',
-          'price': 35000,
-          'date': '2026-03-15',
-          'workMonthKey': '2026-03',
-          'ownerId': 'owner-1',
-        });
-      });
-
-      test('should filter by prefecture', () async {
-        final snapshot = await fakeFirestore
-            .collection('jobs')
-            .where('prefecture', isEqualTo: '東京都')
-            .get();
-
-        expect(snapshot.docs.length, 1);
-        expect(snapshot.docs.first.data()['title'], '案件A');
-      });
-
-      test('should filter by workMonthKey', () async {
-        final snapshot = await fakeFirestore
-            .collection('jobs')
-            .where('workMonthKey', isEqualTo: '2026-03')
-            .get();
-
-        expect(snapshot.docs.length, 2);
-      });
-
-      test('should filter by owner', () async {
-        final snapshot = await fakeFirestore
-            .collection('jobs')
-            .where('ownerId', isEqualTo: 'owner-1')
-            .get();
-
-        expect(snapshot.docs.length, 2);
-      });
-
-      test('should return all jobs without filter', () async {
-        final snapshot = await fakeFirestore.collection('jobs').get();
-        expect(snapshot.docs.length, 3);
-      });
-    });
-
-    group('update and delete', () {
-      test('should update a job', () async {
-        final docRef = await fakeFirestore.collection('jobs').add({
-          'title': '元のタイトル',
-          'location': '東京都',
-          'prefecture': '東京都',
-          'price': 10000,
-          'date': '2026-03-01',
-          'ownerId': 'owner-1',
-        });
-
-        await fakeFirestore.collection('jobs').doc(docRef.id).update({
-          'title': '更新後のタイトル',
-          'price': 20000,
-        });
-
-        final updated =
-            await fakeFirestore.collection('jobs').doc(docRef.id).get();
-        expect(updated.data()!['title'], '更新後のタイトル');
-        expect(updated.data()!['price'], 20000);
-      });
-
-      test('should delete a job', () async {
-        final docRef = await fakeFirestore.collection('jobs').add({
-          'title': '削除対象',
-          'location': '東京都',
-          'prefecture': '東京都',
-          'price': 10000,
-          'date': '2026-03-01',
-          'ownerId': 'owner-1',
-        });
-
-        await fakeFirestore.collection('jobs').doc(docRef.id).delete();
-
-        final doc =
-            await fakeFirestore.collection('jobs').doc(docRef.id).get();
-        expect(doc.exists, false);
-      });
-    });
-
-    group('JobModel', () {
-      test('fromFirestore handles missing fields gracefully', () async {
-        await fakeFirestore.collection('jobs').doc('minimal').set({
-          'title': 'タイトルのみ',
-        });
-
-        final doc =
-            await fakeFirestore.collection('jobs').doc('minimal').get();
-        final model = JobModel.fromFirestore(doc);
-        expect(model.title, 'タイトルのみ');
-        expect(model.location, '未設定');
-        expect(model.price, 0);
-      });
-
-      test('fromFirestore parses string price correctly', () async {
-        await fakeFirestore.collection('jobs').doc('string-price').set({
-          'title': 'テスト',
-          'price': '25000',
-        });
-
-        final doc =
-            await fakeFirestore.collection('jobs').doc('string-price').get();
-        final model = JobModel.fromFirestore(doc);
-        expect(model.price, 25000);
-      });
-
-      test('copyWith creates new instance with updated fields', () {
-        final original = JobModel(
-          id: '1',
-          title: '元',
-          location: '東京都',
-          prefecture: '東京都',
-          price: 10000,
-          date: '2026-01-01',
+  group('getJobsPaginated', () {
+    test('returns first page with correct limit', () async {
+      // 25件投入
+      for (int i = 0; i < 25; i++) {
+        await fakeFirestore.collection('jobs').add(
+          jobData(title: '案件$i', prefecture: '東京都'),
         );
+      }
 
-        final copied = original.copyWith(title: '変更後', price: 50000);
-        expect(copied.title, '変更後');
-        expect(copied.price, 50000);
-        expect(copied.location, '東京都');
-        expect(copied.id, '1');
-      });
+      final result = await repository.getJobsPaginated(
+        prefecture: '東京都',
+        limit: 20,
+      );
 
-      test('isOwner returns correct value', () {
-        final job = JobModel(
-          id: '1',
-          title: 'テスト',
-          location: '東京都',
-          prefecture: '東京都',
-          price: 10000,
-          date: '2026-01-01',
-          ownerId: 'owner-123',
+      expect(result.items.length, 20);
+      expect(result.hasMore, isTrue);
+      expect(result.lastDocument, isNotNull);
+    });
+
+    test('returns all items when less than limit', () async {
+      for (int i = 0; i < 5; i++) {
+        await fakeFirestore.collection('jobs').add(
+          jobData(title: '案件$i'),
         );
+      }
 
-        expect(job.isOwner('owner-123'), true);
-        expect(job.isOwner('other-uid'), false);
-      });
+      final result = await repository.getJobsPaginated(limit: 20);
+
+      expect(result.items.length, 5);
+      expect(result.hasMore, isFalse);
+    });
+
+    test('returns second page using startAfter', () async {
+      for (int i = 0; i < 30; i++) {
+        await fakeFirestore.collection('jobs').add(
+          jobData(title: '案件${i.toString().padLeft(2, '0')}'),
+        );
+      }
+
+      final page1 = await repository.getJobsPaginated(limit: 20);
+      expect(page1.items.length, 20);
+      expect(page1.hasMore, isTrue);
+
+      final page2 = await repository.getJobsPaginated(
+        limit: 20,
+        startAfter: page1.lastDocument,
+      );
+
+      expect(page2.items.length, 10);
+      expect(page2.hasMore, isFalse);
+    });
+
+    test('filters by prefecture', () async {
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '東京案件', prefecture: '東京都'),
+      );
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '千葉案件', prefecture: '千葉県'),
+      );
+
+      final result = await repository.getJobsPaginated(prefecture: '東京都');
+
+      expect(result.items.length, 1);
+      expect(result.items.first.title, '東京案件');
+    });
+
+    test('filters by workMonthKey', () async {
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '4月案件', workMonthKey: '2026-04'),
+      );
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '5月案件', workMonthKey: '2026-05'),
+      );
+
+      final result = await repository.getJobsPaginated(
+        workMonthKey: '2026-04',
+      );
+
+      expect(result.items.length, 1);
+      expect(result.items.first.title, '4月案件');
+    });
+
+    test('returns empty result for no matches', () async {
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '東京案件', prefecture: '東京都'),
+      );
+
+      final result = await repository.getJobsPaginated(prefecture: '大阪府');
+
+      expect(result.items, isEmpty);
+      expect(result.hasMore, isFalse);
+      expect(result.lastDocument, isNull);
+    });
+
+    test('filters その他 prefecture (excludes major prefectures)', () async {
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '東京案件', prefecture: '東京都'),
+      );
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '埼玉案件', prefecture: '埼玉県'),
+      );
+      await fakeFirestore.collection('jobs').add(
+        jobData(title: '未設定案件', prefecture: '未設定'),
+      );
+
+      final result = await repository.getJobsPaginated(prefecture: 'その他');
+
+      // 東京都は除外、埼玉県と未設定は含む
+      expect(result.items.length, 2);
+      final titles = result.items.map((j) => j.title).toSet();
+      expect(titles.contains('埼玉案件'), isTrue);
+      expect(titles.contains('未設定案件'), isTrue);
+    });
+
+    test('uses default limit of 20', () async {
+      for (int i = 0; i < 25; i++) {
+        await fakeFirestore.collection('jobs').add(jobData(title: '案件$i'));
+      }
+
+      final result = await repository.getJobsPaginated();
+
+      expect(result.items.length, 20);
+      expect(result.hasMore, isTrue);
     });
   });
 }

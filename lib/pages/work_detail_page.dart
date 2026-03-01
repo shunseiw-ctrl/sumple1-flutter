@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 
 import 'chat_room_page.dart';
 import 'job_detail_page.dart';
+import 'qr_checkin_page.dart';
+import 'shift_qr_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/presentation/widgets/rating_dialog.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 class WorkDetailPage extends StatefulWidget {
   final String applicationId;
@@ -23,10 +26,38 @@ class _WorkDetailPageState extends State<WorkDetailPage>
 
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
+  bool _isAdminUser = false;
+  bool _checkedAdmin = false;
+
+  Future<void> _checkAdmin() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final email = user?.email;
+    if (email == null || email.trim().isEmpty) {
+      if (mounted) setState(() => _checkedAdmin = true);
+      return;
+    }
+    try {
+      final doc = await FirebaseFirestore.instance.doc('config/admins').get();
+      final data = doc.data();
+      final emails = (data?['emails'] as List?)?.map((e) => e.toString()).toList() ?? [];
+      final adminUids = (data?['adminUids'] as List?)?.map((e) => e.toString()).toList() ?? [];
+      if (mounted) {
+        setState(() {
+          _isAdminUser = emails.contains(email) || adminUids.contains(user?.uid);
+          _checkedAdmin = true;
+        });
+      }
+    } catch (e) {
+      Logger.warning('管理者チェックに失敗', tag: 'WorkDetail', data: {'error': '$e'});
+      if (mounted) setState(() => _checkedAdmin = true);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _checkAdmin();
   }
 
   @override
@@ -158,7 +189,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
         final app = doc.data() ?? <String, dynamic>{};
 
         final applicantUid = (app['applicantUid'] ?? '').toString();
-        if (applicantUid.isNotEmpty && applicantUid != uid) {
+        if (applicantUid.isNotEmpty && applicantUid != uid && !_isAdminUser) {
           return const Scaffold(body: Center(child: Text('権限がありません')));
         }
 
@@ -178,6 +209,22 @@ class _WorkDetailPageState extends State<WorkDetailPage>
               style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
             ),
             actions: [
+              if (_isAdminUser && jobId.isNotEmpty)
+                IconButton(
+                  tooltip: 'QR出退勤管理',
+                  icon: const Icon(Icons.qr_code),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ShiftQrPage(
+                          jobId: jobId,
+                          jobTitle: title,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               IconButton(
                 tooltip: 'チャット',
                 icon: const Icon(Icons.chat_bubble_outline),
@@ -280,7 +327,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                       child: const Text('完了'),
                     ),
                     const SizedBox(width: 6),
-                    if (status == 'done')
+                    if (status == 'done' && _isAdminUser)
                       FutureBuilder<bool>(
                         future: _hasRated(widget.applicationId),
                         builder: (context, ratingSnap) {
@@ -309,6 +356,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                                 applicationId: widget.applicationId,
                                 jobId: jobId,
                                 jobTitle: title,
+                                targetUid: applicantUid,
                               );
                             },
                             icon: const Icon(Icons.star_rounded, size: 18),
@@ -358,9 +406,19 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                           const Spacer(),
                           if (!isCheckedIn && !isCheckedOut)
                             ElevatedButton.icon(
-                              onPressed: () => _checkIn(),
-                              icon: const Icon(Icons.login, size: 18),
-                              label: const Text('出勤'),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => QrCheckinPage(
+                                      applicationId: widget.applicationId,
+                                      isCheckOut: false,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.qr_code_scanner, size: 18),
+                              label: const Text('QR出勤'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                                 foregroundColor: Colors.white,
@@ -370,9 +428,19 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                             ),
                           if (isCheckedIn && !isCheckedOut)
                             ElevatedButton.icon(
-                              onPressed: () => _checkOut(),
-                              icon: const Icon(Icons.logout, size: 18),
-                              label: const Text('退勤'),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => QrCheckinPage(
+                                      applicationId: widget.applicationId,
+                                      isCheckOut: true,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.qr_code_scanner, size: 18),
+                              label: const Text('QR退勤'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 foregroundColor: Colors.white,
@@ -567,7 +635,9 @@ class _PhotosTabState extends State<_PhotosTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('写真を削除しました')));
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('写真の削除に失敗', tag: 'WorkDetail', data: {'docId': docId, 'error': '$e'});
+    }
   }
 
   @override
@@ -878,7 +948,9 @@ class _DocsTabState extends State<_DocsTab> {
                             try {
                               await _docsRef.doc(docs[i].id).delete();
                               await _imageService.deleteImage(url);
-                            } catch (_) {}
+                            } catch (e) {
+                              Logger.warning('資料の削除に失敗', tag: 'WorkDetail', data: {'error': '$e'});
+                            }
                           },
                         ),
                       ],

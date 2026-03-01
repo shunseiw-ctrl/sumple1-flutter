@@ -24,6 +24,8 @@ class _JobEditPageState extends State<JobEditPage> {
 
   late final TextEditingController _descriptionController;
   late final TextEditingController _notesController;
+  late final TextEditingController _latitudeController;
+  late final TextEditingController _longitudeController;
 
   bool _isLoading = false;
 
@@ -44,6 +46,10 @@ class _JobEditPageState extends State<JobEditPage> {
         TextEditingController(text: widget.jobData['description']?.toString() ?? '');
     _notesController =
         TextEditingController(text: widget.jobData['notes']?.toString() ?? '');
+    _latitudeController =
+        TextEditingController(text: widget.jobData['latitude']?.toString() ?? '');
+    _longitudeController =
+        TextEditingController(text: widget.jobData['longitude']?.toString() ?? '');
   }
 
   @override
@@ -54,6 +60,8 @@ class _JobEditPageState extends State<JobEditPage> {
     _dateController.dispose();
     _descriptionController.dispose();
     _notesController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
     super.dispose();
   }
 
@@ -154,10 +162,13 @@ class _JobEditPageState extends State<JobEditPage> {
     final prefecture = _guessPrefecture(location);
     final monthKey = _monthKeyFromDateKey(dateKey);
 
+    final lat = double.tryParse(_latitudeController.text.trim());
+    final lng = double.tryParse(_longitudeController.text.trim());
+
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseFirestore.instance.collection('jobs').doc(widget.jobId).update({
+      final updateData = <String, dynamic>{
         'title': title,
         'location': location,
         'prefecture': prefecture,
@@ -171,7 +182,11 @@ class _JobEditPageState extends State<JobEditPage> {
         'notes': notes,
 
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      };
+      if (lat != null) updateData['latitude'] = lat;
+      if (lng != null) updateData['longitude'] = lng;
+
+      await FirebaseFirestore.instance.collection('jobs').doc(widget.jobId).update(updateData);
 
       if (!mounted) return;
       Navigator.pop(context);
@@ -308,9 +323,33 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
+            _WhiteCard(
+              child: Column(
+                children: [
+                  _LabeledField(
+                    label: '緯度（任意）',
+                    hint: '例）35.6812',
+                    controller: _latitudeController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.next,
+                    prefixIcon: Icons.my_location,
+                  ),
+                  const _Divider(),
+                  _LabeledField(
+                    label: '経度（任意）',
+                    hint: '例）139.7671',
+                    controller: _longitudeController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.done,
+                    prefixIcon: Icons.my_location,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             const _HintCard(
               title: 'ヒント',
-              body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。',
+              body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。緯度・経度を設定するとQR出退勤時のGPS検証が有効になります。',
             ),
           ],
         ),
