@@ -31,6 +31,12 @@ import '../../pages/contact_page.dart';
 import '../../pages/faq_page.dart';
 import '../../pages/legal_page.dart';
 import '../../pages/map_search_page.dart';
+import '../../pages/work_detail/work_report_create_page.dart';
+import '../../pages/work_detail/inspection_page.dart';
+import '../../pages/work_detail/timeline_tab.dart';
+import '../../pages/qualifications_page.dart';
+import '../../pages/qualification_add_page.dart';
+import '../../pages/statement_detail_page.dart';
 
 /// GoRouter インスタンスプロバイダー
 final routerProvider = Provider<GoRouter>((ref) {
@@ -221,6 +227,76 @@ final routerProvider = Provider<GoRouter>((ref) {
           return slideUpTransition(
             key: state.pageKey,
             child: PaymentDetailPage(paymentId: paymentId),
+          );
+        },
+      ),
+
+      // --- 日報・検査・タイムライン ---
+      GoRoute(
+        path: RoutePaths.workReportCreate,
+        pageBuilder: (context, state) {
+          final applicationId = state.pathParameters['applicationId'] ?? '';
+          return slideUpTransition(
+            key: state.pageKey,
+            child: WorkReportCreatePage(applicationId: applicationId),
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.workInspection,
+        pageBuilder: (context, state) {
+          final applicationId = state.pathParameters['applicationId'] ?? '';
+          return slideUpTransition(
+            key: state.pageKey,
+            child: InspectionPage(applicationId: applicationId),
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.workTimeline,
+        pageBuilder: (context, state) {
+          final applicationId = state.pathParameters['applicationId'] ?? '';
+          return slideUpTransition(
+            key: state.pageKey,
+            child: Scaffold(
+              appBar: AppBar(title: const Text('工程タイムライン')),
+              body: TimelineTab(applicationId: applicationId),
+            ),
+          );
+        },
+      ),
+
+      // --- 資格 ---
+      GoRoute(
+        path: RoutePaths.qualifications,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const QualificationsPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.qualificationAdd,
+        pageBuilder: (context, state) => slideUpTransition(
+          key: state.pageKey,
+          child: const QualificationAddPage(),
+        ),
+      ),
+
+      // --- 明細 ---
+      GoRoute(
+        path: RoutePaths.statements,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const Scaffold(body: Center(child: Text('明細一覧'))),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.statementDetail,
+        pageBuilder: (context, state) {
+          final statementId = state.pathParameters['statementId'] ?? '';
+          return slideUpTransition(
+            key: state.pageKey,
+            child: StatementDetailPage(statementId: statementId),
           );
         },
       ),

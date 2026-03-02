@@ -13,6 +13,7 @@ class JobModel {
   final String? description;
   final double? latitude;
   final double? longitude;
+  final List<String>? requiredQualifications;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -28,6 +29,7 @@ class JobModel {
     this.description,
     this.latitude,
     this.longitude,
+    this.requiredQualifications,
     this.createdAt,
     this.updatedAt,
   });
@@ -51,6 +53,7 @@ class JobModel {
       description: data['description']?.toString(),
       latitude: _parseDouble(data['latitude']),
       longitude: _parseDouble(data['longitude']),
+      requiredQualifications: _parseStringList(data['requiredQualifications']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -70,6 +73,7 @@ class JobModel {
       description: data['description']?.toString(),
       latitude: _parseDouble(data['latitude']),
       longitude: _parseDouble(data['longitude']),
+      requiredQualifications: _parseStringList(data['requiredQualifications']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -88,6 +92,8 @@ class JobModel {
       if (description != null) 'description': description,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (requiredQualifications != null)
+        'requiredQualifications': requiredQualifications,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -121,6 +127,7 @@ class JobModel {
     String? description,
     double? latitude,
     double? longitude,
+    List<String>? requiredQualifications,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -136,6 +143,8 @@ class JobModel {
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      requiredQualifications:
+          requiredQualifications ?? this.requiredQualifications,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -175,6 +184,12 @@ class JobModel {
         createdAt,
         updatedAt,
       );
+
+  static List<String>? _parseStringList(dynamic value) {
+    if (value == null) return null;
+    if (value is List) return value.map((e) => e.toString()).toList();
+    return null;
+  }
 
   @override
   String toString() {

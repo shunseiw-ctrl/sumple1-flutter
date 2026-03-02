@@ -17,8 +17,10 @@ import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'job_detail_page.dart' show JobDetailBody;
 import 'work_detail/photos_tab.dart';
 import 'work_detail/docs_tab.dart';
+import 'work_detail/work_reports_tab.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
+import 'package:sumple1/core/services/work_report_service.dart';
 
 class WorkDetailPage extends ConsumerStatefulWidget {
   final String applicationId;
@@ -61,7 +63,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('work_detail');
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _checkAdmin();
   }
 
@@ -149,6 +151,13 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
               style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
             ),
             actions: [
+              IconButton(
+                tooltip: 'タイムライン',
+                icon: const Icon(Icons.timeline),
+                onPressed: () {
+                  context.push(RoutePaths.workTimelinePath(widget.applicationId));
+                },
+              ),
               if (_isAdminUser && jobId.isNotEmpty)
                 IconButton(
                   tooltip: 'QR出退勤管理',
@@ -174,6 +183,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
               indicatorColor: AppColors.ruri,
               tabs: const [
                 Tab(text: '概要'),
+                Tab(text: '日報'),
                 Tab(text: '写真'),
                 Tab(text: '資料'),
               ],
@@ -233,6 +243,16 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                       onPressed: canComplete
                           ? () async {
                         try {
+                          // 完了ゲート: 日報1件以上
+                          final reportCount = await WorkReportService()
+                              .getReportCount(widget.applicationId);
+                          if (reportCount == 0) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('日報を1件以上提出してください')),
+                            );
+                            return;
+                          }
                           await _updateStatus('completed');
                           final applicantUid = (app['applicantUid'] ?? '').toString();
                           if (applicantUid.isNotEmpty) {
@@ -257,6 +277,22 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           : null,
                       child: const Text('完了'),
                     ),
+                    // 管理者: 検収ボタン
+                    if (_isAdminUser && (status == 'completed' || status == 'fixing'))
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            context.push(RoutePaths.workInspectionPath(widget.applicationId));
+                          },
+                          icon: const Icon(Icons.checklist, size: 18),
+                          label: Text(status == 'fixing' ? '再検収' : '検収開始'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
                     const SizedBox(width: 6),
                     if (status == 'done' && _isAdminUser)
                       FutureBuilder<bool>(
@@ -394,6 +430,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                   controller: _tabController,
                   children: [
                     _OverviewTab(app: app, jobId: jobId),
+                    WorkReportsTab(applicationId: widget.applicationId),
                     WorkPhotosTab(applicationId: widget.applicationId, jobId: jobId),
                     WorkDocsTab(applicationId: widget.applicationId),
                   ],

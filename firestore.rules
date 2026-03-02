@@ -46,7 +46,8 @@ service cloud.firestore {
           "workDateKey","workMonthKey",
           "updatedAt",
           "projectName",
-          "latitude","longitude"
+          "latitude","longitude",
+          "requiredQualifications"
         ])
         && (!("title" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.title.size() <= 100)
         && (!("location" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.location.size() <= 200)
@@ -87,6 +88,38 @@ service cloud.firestore {
         ]);
 
       allow delete: if false;
+
+      // --- 日報 (work_reports) ---
+      match /work_reports/{reportId} {
+        allow read: if signedIn()
+          && (isAdminUid() || isAppPartyData(get(/databases/$(database)/documents/applications/$(appId)).data));
+        allow create: if signedIn()
+          && get(/databases/$(database)/documents/applications/$(appId)).data.applicantUid == uid()
+          && isString(request.resource.data.workContent)
+          && request.resource.data.workContent.size() <= 2000;
+        allow update, delete: if false;
+      }
+
+      // --- 活動ログ (activity_logs) ---
+      match /activity_logs/{logId} {
+        allow read: if signedIn()
+          && (isAdminUid() || isAppPartyData(get(/databases/$(database)/documents/applications/$(appId)).data));
+        allow create: if signedIn()
+          && isAppPartyData(get(/databases/$(database)/documents/applications/$(appId)).data)
+          && isString(request.resource.data.eventType)
+          && isString(request.resource.data.description)
+          && request.resource.data.description.size() <= 500;
+        allow update, delete: if false;
+      }
+
+      // --- 検査 (inspections) ---
+      match /inspections/{inspectionId} {
+        allow read: if signedIn()
+          && (isAdminUid() || isAppPartyData(get(/databases/$(database)/documents/applications/$(appId)).data));
+        allow create: if isAdminUid()
+          && isString(request.resource.data.result);
+        allow update, delete: if false;
+      }
     }
 
     match /profiles/{profileUid} {
@@ -108,6 +141,20 @@ service cloud.firestore {
             || request.resource.data.introduction.size() <= 2000);
 
       allow delete: if false;
+
+      // --- 資格 v2 (qualifications_v2) ---
+      match /qualifications_v2/{qualId} {
+        allow read: if signedIn() && (uid() == profileUid || isAdminUid());
+        allow create: if signedIn() && uid() == profileUid
+          && isString(request.resource.data.name)
+          && request.resource.data.name.size() <= 100
+          && isString(request.resource.data.category);
+        allow update: if isAdminUid()
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            "verificationStatus", "reviewedBy", "rejectionReason", "updatedAt"
+          ]);
+        allow delete: if false;
+      }
     }
 
     // --- contacts (お問い合わせ) ---
@@ -281,6 +328,39 @@ service cloud.firestore {
         ]);
 
       allow delete: if isAdminUid();
+    }
+
+    // --- 月次支払明細 ---
+    match /monthly_statements/{statementId} {
+      allow read: if signedIn() && (
+        isAdminUid() || resource.data.workerUid == uid()
+      );
+      allow create: if isAdminUid();
+      allow update: if signedIn() && (
+        isAdminUid()
+        || (resource.data.workerUid == uid()
+            && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+              "earlyPaymentRequested", "updatedAt"
+            ]))
+      );
+      allow delete: if false;
+    }
+
+    // --- 即金申請 ---
+    match /early_payment_requests/{requestId} {
+      allow read: if signedIn() && (
+        isAdminUid() || resource.data.workerUid == uid()
+      );
+      allow create: if signedIn()
+        && request.resource.data.workerUid == uid()
+        && isInt(request.resource.data.requestedAmount)
+        && isInt(request.resource.data.earlyPaymentFee)
+        && isInt(request.resource.data.payoutAmount);
+      allow update: if isAdminUid()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "status", "reviewedBy", "rejectionReason", "updatedAt"
+        ]);
+      allow delete: if false;
     }
 
     // --- 分散カウンタ (Cloud Functions のみ書き込み) ---

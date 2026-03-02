@@ -34,7 +34,7 @@ class _SalesPageState extends State<SalesPage>
     super.initState();
     AnalyticsService.logScreenView('sales');
     _checkAdminRole();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -95,6 +95,7 @@ class _SalesPageState extends State<SalesPage>
           tabs: const [
             Tab(text: '売上'),
             Tab(icon: Icon(Icons.favorite, size: 18), text: 'お気に入り'),
+            Tab(text: '明細'),
           ],
         ),
       ),
@@ -103,6 +104,7 @@ class _SalesPageState extends State<SalesPage>
         children: [
           _SalesContent(uid: uid, isAdmin: isAdmin),
           const _FavoritesContent(),
+          _StatementsContent(uid: uid),
         ],
       ),
     );
@@ -913,5 +915,89 @@ class _MiniStat extends StatelessWidget {
         Text(value, style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w800, color: color)),
       ],
     );
+  }
+}
+
+class _StatementsContent extends StatelessWidget {
+  final String uid;
+  const _StatementsContent({required this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('monthly_statements')
+          .where('workerUid', isEqualTo: uid)
+          .orderBy('month', descending: true)
+          .snapshots(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const SkeletonList();
+        }
+        final docs = snap.data?.docs ?? [];
+        if (docs.isEmpty) {
+          return const EmptyState(
+            icon: Icons.receipt_long_outlined,
+            title: '月次明細はまだありません',
+            description: '完了した案件があると\n自動的に明細が作成されます',
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(AppSpacing.pagePadding),
+          itemCount: docs.length,
+          itemBuilder: (context, i) {
+            final data = docs[i].data();
+            final month = (data['month'] ?? '').toString();
+            final total = int.tryParse((data['totalAmount'] ?? '0').toString()) ?? 0;
+            final status = (data['status'] ?? 'draft').toString();
+            final statusLabel = switch (status) {
+              'draft' => '集計中',
+              'confirmed' => '確定済み',
+              'paid' => '支払済み',
+              _ => status,
+            };
+            final statusColor = switch (status) {
+              'paid' => AppColors.success,
+              'confirmed' => AppColors.ruri,
+              _ => AppColors.textSecondary,
+            };
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: ListTile(
+                leading: const Icon(Icons.receipt_long, color: AppColors.ruri),
+                title: Text('$month月 明細',
+                    style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700)),
+                subtitle: Text('合計: ¥${_formatAmount(total)}'),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(statusLabel,
+                      style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 12)),
+                ),
+                onTap: () {
+                  context.push(RoutePaths.statementDetailPath(docs[i].id));
+                },
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _formatAmount(int value) {
+    final s = value.toString();
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      final idxFromEnd = s.length - i;
+      buf.write(s[i]);
+      if (idxFromEnd > 1 && idxFromEnd % 3 == 1) buf.write(',');
+    }
+    return buf.toString();
   }
 }

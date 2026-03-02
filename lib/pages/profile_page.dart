@@ -153,6 +153,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     ProfileMenuTile(
+                      icon: Icons.workspace_premium,
+                      iconColor: Colors.teal,
+                      title: '資格管理',
+                      subtitle: '保有資格の登録・確認',
+                      onTap: () {
+                        context.push(RoutePaths.qualifications);
+                      },
+                    ),
+                    ProfileMenuTile(
                       icon: Icons.account_balance_outlined,
                       iconColor: const Color(0xFF635BFF),
                       title: 'Stripe口座設定',

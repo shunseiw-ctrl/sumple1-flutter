@@ -48,6 +48,19 @@ class RoutePaths {
   // --- マップ ---
   static const String mapSearch = '/map-search';
 
+  // --- 日報・検査・タイムライン ---
+  static const String workReportCreate = '/work/:applicationId/report/new';
+  static const String workInspection = '/work/:applicationId/inspection';
+  static const String workTimeline = '/work/:applicationId/timeline';
+
+  // --- 資格 ---
+  static const String qualifications = '/qualifications';
+  static const String qualificationAdd = '/qualifications/new';
+
+  // --- 明細 ---
+  static const String statements = '/statements';
+  static const String statementDetail = '/statements/:statementId';
+
   // --- 管理者 ---
   static const String adminHome = '/admin';
 
@@ -59,4 +72,8 @@ class RoutePaths {
   static String qrCheckinPath(String applicationId) => '/work/$applicationId/qr-checkin';
   static String shiftQrPath(String jobId) => '/work/$jobId/shift-qr';
   static String paymentDetailPath(String paymentId) => '/payments/$paymentId';
+  static String workReportCreatePath(String applicationId) => '/work/$applicationId/report/new';
+  static String workInspectionPath(String applicationId) => '/work/$applicationId/inspection';
+  static String workTimelinePath(String applicationId) => '/work/$applicationId/timeline';
+  static String statementDetailPath(String statementId) => '/statements/$statementId';
 }

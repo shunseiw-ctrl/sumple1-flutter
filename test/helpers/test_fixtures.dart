@@ -149,6 +149,171 @@ class TestFixtures {
     };
   }
 
+  /// 日報テストデータ
+  static Map<String, dynamic> workReportData({
+    String? applicationId,
+    String? workerUid,
+    String? reportDate,
+    String? workContent,
+    double? hoursWorked,
+    List<String>? photoUrls,
+    String? notes,
+  }) {
+    return {
+      'applicationId': applicationId ?? 'app-001',
+      'workerUid': workerUid ?? 'worker-001',
+      'reportDate': reportDate ?? '2025-04-01',
+      'workContent': workContent ?? '内装工事の作業を行いました',
+      'hoursWorked': hoursWorked ?? 8.0,
+      'photoUrls': photoUrls ?? [],
+      if (notes != null) 'notes': notes,
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 活動ログテストデータ
+  static Map<String, dynamic> activityLogData({
+    String? applicationId,
+    String? actorUid,
+    String? actorRole,
+    String? eventType,
+    String? description,
+    Map<String, dynamic>? metadata,
+  }) {
+    return {
+      'applicationId': applicationId ?? 'app-001',
+      'actorUid': actorUid ?? 'worker-001',
+      'actorRole': actorRole ?? 'worker',
+      'eventType': eventType ?? 'status_change',
+      'description': description ?? 'ステータスが変更されました',
+      if (metadata != null) 'metadata': metadata,
+      'createdAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 検査テストデータ
+  static Map<String, dynamic> inspectionData({
+    String? applicationId,
+    String? inspectorUid,
+    String? result,
+    List<Map<String, dynamic>>? items,
+    String? overallComment,
+  }) {
+    return {
+      'applicationId': applicationId ?? 'app-001',
+      'inspectorUid': inspectorUid ?? 'admin-001',
+      'result': result ?? 'passed',
+      'items': items ??
+          [
+            {'label': '仕上がり品質', 'result': 'pass'},
+            {'label': '清掃状況', 'result': 'pass'},
+          ],
+      'photoUrls': <String>[],
+      if (overallComment != null) 'overallComment': overallComment,
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 検査チェック項目テストデータ
+  static Map<String, dynamic> inspectionCheckItemData({
+    String? label,
+    String? result,
+    String? comment,
+  }) {
+    return {
+      'label': label ?? '仕上がり品質',
+      'result': result ?? 'pass',
+      if (comment != null) 'comment': comment,
+    };
+  }
+
+  /// 資格テストデータ
+  static Map<String, dynamic> qualificationData({
+    String? uid,
+    String? name,
+    String? category,
+    String? certPhotoUrl,
+    String? expiryDate,
+    String? verificationStatus,
+    String? reviewedBy,
+    String? rejectionReason,
+  }) {
+    return {
+      'uid': uid ?? 'worker-001',
+      'name': name ?? '内装仕上げ施工技能士',
+      'category': category ?? 'interior',
+      if (certPhotoUrl != null) 'certPhotoUrl': certPhotoUrl,
+      if (expiryDate != null) 'expiryDate': expiryDate,
+      'verificationStatus': verificationStatus ?? 'pending',
+      if (reviewedBy != null) 'reviewedBy': reviewedBy,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 月次明細テストデータ
+  static Map<String, dynamic> monthlyStatementData({
+    String? workerUid,
+    String? month,
+    List<Map<String, dynamic>>? items,
+    int? totalAmount,
+    int? netAmount,
+    String? status,
+    String? paymentDate,
+    bool? earlyPaymentRequested,
+  }) {
+    return {
+      'workerUid': workerUid ?? 'worker-001',
+      'month': month ?? '2025-04',
+      'items': items ??
+          [
+            {
+              'applicationId': 'app-001',
+              'jobTitle': '内装工事',
+              'completedDate': '2025-04-15',
+              'amount': 150000,
+            },
+          ],
+      'totalAmount': totalAmount ?? 150000,
+      'netAmount': netAmount ?? 150000,
+      'status': status ?? 'draft',
+      if (paymentDate != null) 'paymentDate': paymentDate,
+      'earlyPaymentRequested': earlyPaymentRequested ?? false,
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 即金申請テストデータ
+  static Map<String, dynamic> earlyPaymentRequestData({
+    String? workerUid,
+    String? statementId,
+    String? month,
+    int? requestedAmount,
+    int? earlyPaymentFee,
+    int? payoutAmount,
+    String? status,
+    String? reviewedBy,
+    String? rejectionReason,
+  }) {
+    return {
+      'workerUid': workerUid ?? 'worker-001',
+      'statementId': statementId ?? 'stmt-001',
+      'month': month ?? '2025-04',
+      'requestedAmount': requestedAmount ?? 150000,
+      'earlyPaymentFee': earlyPaymentFee ?? 15000,
+      'payoutAmount': payoutAmount ?? 135000,
+      'status': status ?? 'requested',
+      if (reviewedBy != null) 'reviewedBy': reviewedBy,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
   /// QRコード文字列生成
   static String validQrData({
     String jobId = 'job-001',

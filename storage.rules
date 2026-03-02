@@ -58,6 +58,13 @@ service firebase.storage {
       allow write: if isAuthenticated() && isUnder50MB();
     }
 
+    // === 資格証明書写真 ===
+    // パス: qualification_photos/{userId}/...
+    match /qualification_photos/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isImageType() && isUnder10MB();
+    }
+
     // === 身分証明書 ===
     // パス: identity_documents/{userId}/...
     match /identity_documents/{userId}/{allPaths=**} {

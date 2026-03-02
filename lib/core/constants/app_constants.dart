@@ -48,6 +48,30 @@ class AppConstants {
   static const int maxContactBodyLength = 5000;
   static const String postalCodePattern = r'^\d{3}-?\d{4}$';
 
+  // === Work Report Limits ===
+  static const int maxWorkReportContentLength = 2000;
+  static const int maxWorkReportNotesLength = 1000;
+  static const int maxWorkReportPhotos = 10;
+
+  // === Inspection Limits ===
+  static const int maxInspectionCommentLength = 500;
+  static const int maxInspectionOverallCommentLength = 2000;
+
+  // === Qualification ===
+  static const int maxQualificationNameLength = 100;
+
+  static const Map<String, String> qualificationCategories = {
+    'scaffolding': '足場の組立て作業主任者',
+    'interior': '内装仕上げ施工技能士',
+    'construction_management': '建築施工管理技士',
+    'electrical': '電気工事士',
+    'plumbing': '配管技能士',
+    'safety': '安全衛生責任者',
+    'crane': '玉掛け技能講習',
+    'welding': '溶接技能者',
+    'other': 'その他',
+  };
+
   // === Performance ===
   static const double listCacheExtent = 500.0;
   static const int firestoreCacheSizeBytes = 100 * 1024 * 1024; // 100MB

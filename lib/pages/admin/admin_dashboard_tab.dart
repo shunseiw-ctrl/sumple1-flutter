@@ -141,6 +141,35 @@ class AdminDashboardTab extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 16),
+        // 即金申請待ちカウント
+        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection('early_payment_requests')
+              .where('status', isEqualTo: 'requested')
+              .snapshots(),
+          builder: (context, reqSnap) {
+            final count = reqSnap.data?.docs.length ?? 0;
+            if (count == 0) return const SizedBox.shrink();
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.flash_on, color: Colors.orange),
+                  const SizedBox(width: 8),
+                  Text('即金申請 $count件 承認待ち',
+                      style: const TextStyle(
+                          color: Colors.orange, fontWeight: FontWeight.w700)),
+                ],
+              ),
+            );
+          },
+        ),
         const SizedBox(height: 20),
         const Text(
           '最近の応募',
