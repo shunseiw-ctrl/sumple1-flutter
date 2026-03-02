@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'job_detail_page.dart';
-import 'job_edit_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
@@ -13,10 +13,10 @@ import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
-import 'package:sumple1/presentation/widgets/scale_tap.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/presentation/widgets/job_card.dart';
+import 'package:sumple1/pages/job_filter_sheet.dart';
 
 class JobListPage extends ConsumerStatefulWidget {
   const JobListPage({super.key});
@@ -35,12 +35,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
   final _favoritesService = FavoritesService();
   final Set<String> _guestFavorites = {};
 
-  RangeValues _priceRange = const RangeValues(0, 100000);
-  String _areaFilter = '';
-  Set<String> _qualFilter = {};
-  String? _dateFromFilter;
-  String? _dateToFilter;
-  bool _hasActiveFilters = false;
+  JobFilterState _filterState = const JobFilterState();
 
   final List<String> _prefs = const [
     '千葉県',
@@ -109,257 +104,16 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     }
   }
 
-  void _showFilterSheet() {
-    var tempPrice = _priceRange;
-    var tempArea = _areaFilter;
-    var tempQuals = Set<String>.from(_qualFilter);
-    var tempDateFrom = _dateFromFilter;
-    var tempDateTo = _dateToFilter;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setLocal) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadiusLg)),
-              ),
-              child: DraggableScrollableSheet(
-                initialChildSize: 0.75,
-                minChildSize: 0.5,
-                maxChildSize: 0.9,
-                expand: false,
-                builder: (ctx, scrollController) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.pagePadding),
-                    child: ListView(
-                      controller: scrollController,
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 40, height: 4,
-                            decoration: BoxDecoration(
-                              color: AppColors.border,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.base),
-                        Row(
-                          children: [
-                            Text('絞り込み', style: AppTextStyles.headingMedium),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {
-                                setLocal(() {
-                                  tempPrice = const RangeValues(0, 100000);
-                                  tempArea = '';
-                                  tempQuals = {};
-                                  tempDateFrom = null;
-                                  tempDateTo = null;
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.ruri,
-                              ),
-                              child: Text('リセット', style: AppTextStyles.labelMedium.copyWith(color: AppColors.ruri)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        Text('エリア（市区町村）', style: AppTextStyles.labelLarge),
-                        const SizedBox(height: AppSpacing.sm),
-                        TextField(
-                          controller: TextEditingController(text: tempArea),
-                          decoration: InputDecoration(
-                            hintText: '例）渋谷区、横浜市',
-                            hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
-                            prefixIcon: const Icon(Icons.location_on_outlined, size: 20, color: AppColors.ruri),
-                            isDense: true,
-                            filled: true,
-                            fillColor: AppColors.background,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                              borderSide: const BorderSide(color: AppColors.ruri, width: 1.5),
-                            ),
-                          ),
-                          onChanged: (v) => tempArea = v.trim(),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        Text('金額範囲: ¥${tempPrice.start.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')} ~ ¥${tempPrice.end.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')}${tempPrice.end >= 100000 ? '+' : ''}',
-                          style: AppTextStyles.labelLarge),
-                        RangeSlider(
-                          values: tempPrice,
-                          min: 0,
-                          max: 100000,
-                          divisions: 20,
-                          activeColor: AppColors.ruri,
-                          inactiveColor: AppColors.ruriPale,
-                          labels: RangeLabels(
-                            '¥${tempPrice.start.toInt()}',
-                            tempPrice.end >= 100000 ? '¥100,000+' : '¥${tempPrice.end.toInt()}',
-                          ),
-                          onChanged: (v) => setLocal(() => tempPrice = v),
-                        ),
-                        const SizedBox(height: AppSpacing.base),
-
-                        Text('必要資格', style: AppTextStyles.labelLarge),
-                        const SizedBox(height: AppSpacing.sm),
-                        Wrap(
-                          spacing: AppSpacing.sm, runSpacing: AppSpacing.sm,
-                          children: ['足場組立', '玉掛け', 'フォークリフト', '電気工事士', '溶接', '危険物取扱者', '土木施工管理', '建築施工管理'].map((q) {
-                            final selected = tempQuals.contains(q);
-                            return FilterChip(
-                              label: Text(q),
-                              selected: selected,
-                              onSelected: (v) {
-                                setLocal(() {
-                                  if (v) { tempQuals.add(q); } else { tempQuals.remove(q); }
-                                });
-                              },
-                              selectedColor: AppColors.ruriPale,
-                              checkmarkColor: AppColors.ruri,
-                              backgroundColor: AppColors.background,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                                side: BorderSide(
-                                  color: selected ? AppColors.ruri : Colors.transparent,
-                                  width: 1,
-                                ),
-                              ),
-                              labelStyle: AppTextStyles.chipText.copyWith(
-                                color: selected ? AppColors.ruri : AppColors.textPrimary,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        Text('日付範囲', style: AppTextStyles.labelLarge),
-                        const SizedBox(height: AppSpacing.sm),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final picked = await showDatePicker(
-                                    context: ctx,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime.now().subtract(const Duration(days: 30)),
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                                  );
-                                  if (picked != null) {
-                                    setLocal(() => tempDateFrom = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}');
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.background,
-                                    borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Text(tempDateFrom ?? '開始日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateFrom != null ? AppColors.textPrimary : AppColors.textHint)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                              child: Text('〜', style: AppTextStyles.bodyMedium),
-                            ),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final picked = await showDatePicker(
-                                    context: ctx,
-                                    initialDate: DateTime.now().add(const Duration(days: 30)),
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                                  );
-                                  if (picked != null) {
-                                    setLocal(() => tempDateTo = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}');
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.background,
-                                    borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Text(tempDateTo ?? '終了日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateTo != null ? AppColors.textPrimary : AppColors.textHint)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xxl),
-
-                        Container(
-                          width: double.infinity,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            gradient: AppColors.primaryGradient,
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                            boxShadow: AppShadows.button,
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _priceRange = tempPrice;
-                                _areaFilter = tempArea;
-                                _qualFilter = tempQuals;
-                                _dateFromFilter = tempDateFrom;
-                                _dateToFilter = tempDateTo;
-                                _hasActiveFilters = tempArea.isNotEmpty || tempQuals.isNotEmpty || tempDateFrom != null || tempDateTo != null || tempPrice.start > 0 || tempPrice.end < 100000;
-                              });
-                              Navigator.pop(ctx);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.buttonRadius)),
-                            ),
-                            child: Text('この条件で検索', style: AppTextStyles.button.copyWith(color: Colors.white)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-        );
-      },
+  Future<void> _showFilterSheet() async {
+    final result = await showJobFilterSheet(
+      context,
+      current: _filterState,
     );
+    if (result != null) {
+      setState(() {
+        _filterState = result;
+      });
+    }
   }
 
   @override
@@ -429,28 +183,28 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                     const Spacer(),
                     Semantics(
                       button: true,
-                      label: _hasActiveFilters ? '絞り込み、フィルター適用中' : '絞り込み',
+                      label: _filterState.hasActiveFilters ? '絞り込み、フィルター適用中' : '絞り込み',
                       child: GestureDetector(
                         onTap: _showFilterSheet,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.sm + 2),
                           decoration: BoxDecoration(
-                            color: _hasActiveFilters ? AppColors.ruriPale : AppColors.chipUnselected,
+                            color: _filterState.hasActiveFilters ? AppColors.ruriPale : AppColors.chipUnselected,
                             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                            border: _hasActiveFilters ? Border.all(color: AppColors.ruri.withValues(alpha: 0.3), width: 1) : null,
+                            border: _filterState.hasActiveFilters ? Border.all(color: AppColors.ruri.withValues(alpha: 0.3), width: 1) : null,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.tune_rounded, size: 18, color: _hasActiveFilters ? AppColors.ruri : AppColors.textSecondary),
+                              Icon(Icons.tune_rounded, size: 18, color: _filterState.hasActiveFilters ? AppColors.ruri : AppColors.textSecondary),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
                                 '絞り込み',
                                 style: AppTextStyles.labelMedium.copyWith(
-                                  color: _hasActiveFilters ? AppColors.ruri : AppColors.textPrimary,
+                                  color: _filterState.hasActiveFilters ? AppColors.ruri : AppColors.textPrimary,
                                 ),
                               ),
-                              if (_hasActiveFilters) ...[
+                              if (_filterState.hasActiveFilters) ...[
                                 const SizedBox(width: AppSpacing.xs),
                                 Container(
                                   width: 8, height: 8,
@@ -535,22 +289,22 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                     final filteredDocs = docs.where((d) {
                       final data = d.data() as Map<String, dynamic>;
 
-                      if (_areaFilter.isNotEmpty) {
+                      if (_filterState.areaFilter.isNotEmpty) {
                         final location = (data['location'] ?? '').toString().toLowerCase();
-                        if (!location.contains(_areaFilter.toLowerCase())) return false;
+                        if (!location.contains(_filterState.areaFilter.toLowerCase())) return false;
                       }
 
-                      if (_priceRange.start > 0 || _priceRange.end < 100000) {
+                      if (_filterState.priceRange.start > 0 || _filterState.priceRange.end < 100000) {
                         final price = int.tryParse(data['price']?.toString() ?? '0') ?? 0;
-                        if (price < _priceRange.start) return false;
-                        if (_priceRange.end < 100000 && price > _priceRange.end) return false;
+                        if (price < _filterState.priceRange.start) return false;
+                        if (_filterState.priceRange.end < 100000 && price > _filterState.priceRange.end) return false;
                       }
 
-                      if (_dateFromFilter != null || _dateToFilter != null) {
+                      if (_filterState.dateFromFilter != null || _filterState.dateToFilter != null) {
                         final dateStr = (data['date'] ?? '').toString();
                         if (dateStr.isNotEmpty) {
-                          if (_dateFromFilter != null && dateStr.compareTo(_dateFromFilter!) < 0) return false;
-                          if (_dateToFilter != null && dateStr.compareTo(_dateToFilter!) > 0) return false;
+                          if (_filterState.dateFromFilter != null && dateStr.compareTo(_filterState.dateFromFilter!) < 0) return false;
+                          if (_filterState.dateToFilter != null && dateStr.compareTo(_filterState.dateToFilter!) > 0) return false;
                         }
                       }
 
@@ -597,7 +351,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
                         final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
 
-                        final badges = <_BadgeSpec>[];
+                        final badges = <BadgeSpec>[];
 
                         final isFav = _favoritesService.isRegistered
                             ? firestoreFavs.contains(doc.id)
@@ -607,7 +361,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                           index: index,
                           child: Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.base),
-                          child: _JobCard(
+                          child: JobCard(
                             title: title,
                             location: location,
                             dateText: date,
@@ -639,21 +393,11 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                               }
                             },
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => JobDetailPage(jobId: doc.id, jobData: data),
-                                ),
-                              );
+                              context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
                             },
                             onEdit: isOwner
                                 ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => JobEditPage(jobId: doc.id, jobData: data),
-                                ),
-                              );
+                              context.push(RoutePaths.jobEditPath(doc.id), extra: data);
                             }
                                 : null,
                             onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
@@ -905,373 +649,6 @@ class _SortDropDown extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             const Icon(Icons.arrow_drop_down_rounded, size: 20, color: AppColors.textSecondary),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BadgeSpec {
-  final String label;
-  final Color bg;
-  final Color fg;
-  const _BadgeSpec({required this.label, required this.bg, required this.fg});
-}
-
-class _JobCard extends StatelessWidget {
-  final String title;
-  final String location;
-  final String dateText;
-  final String priceText;
-  final String? imageUrl;
-  final String? category;
-  final List<_BadgeSpec> badges;
-  final bool showLegacyWarning;
-  final Map<String, dynamic> data;
-
-  final bool isOwner;
-  final bool isFavorite;
-  final VoidCallback onTap;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final VoidCallback? onToggleFavorite;
-
-  const _JobCard({
-    required this.title,
-    required this.location,
-    required this.dateText,
-    required this.priceText,
-    this.imageUrl,
-    this.category,
-    required this.badges,
-    required this.showLegacyWarning,
-    required this.data,
-    required this.isOwner,
-    this.isFavorite = false,
-    required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
-    this.onToggleFavorite,
-  });
-
-  IconData _categoryIcon(String? cat) {
-    switch (cat) {
-      case '解体':
-        return Icons.handyman;
-      case '内装':
-        return Icons.format_paint;
-      case '外壁':
-        return Icons.home_work;
-      case '電気':
-        return Icons.electrical_services;
-      case '配管':
-        return Icons.plumbing;
-      case '土木':
-        return Icons.landscape;
-      case '塗装':
-        return Icons.brush;
-      default:
-        return Icons.construction;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
-
-    return Semantics(
-      label: '$title、場所: $location、日程: $dateText、報酬: $priceText',
-      child: ScaleTap(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          boxShadow: AppShadows.card,
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 180,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (hasImage)
-                    AppCachedImage(
-                      imageUrl: imageUrl!,
-                      fit: BoxFit.cover,
-                      errorWidget: _placeholderImage(),
-                    )
-                  else
-                    _placeholderImage(),
-
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 80,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.4),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  if (category != null && category!.isNotEmpty)
-                    Positioned(
-                      top: AppSpacing.md,
-                      left: AppSpacing.md,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(_categoryIcon(category), size: 14, color: AppColors.ruri),
-                            const SizedBox(width: AppSpacing.xs),
-                            Text(
-                              category!,
-                              style: AppTextStyles.badgeText.copyWith(color: AppColors.ruri),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  Positioned(
-                    top: AppSpacing.md,
-                    right: AppSpacing.md,
-                    child: Semantics(
-                      button: true,
-                      label: isFavorite ? 'お気に入りから削除' : 'お気に入りに追加',
-                      child: GestureDetector(
-                        onTap: onToggleFavorite,
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            shape: BoxShape.circle,
-                            boxShadow: AppShadows.subtle,
-                          ),
-                          child: Icon(
-                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                            color: isFavorite ? AppColors.error : AppColors.textHint,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  if (isOwner)
-                    Positioned(
-                      top: AppSpacing.md,
-                      right: AppSpacing.md + 44,
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          shape: BoxShape.circle,
-                          boxShadow: AppShadows.subtle,
-                        ),
-                        child: PopupMenuButton<String>(
-                          tooltip: '操作',
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-                          iconSize: 20,
-                          icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary, size: 20),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
-                          onSelected: (v) {
-                            if (v == 'edit') onEdit?.call();
-                            if (v == 'delete') onDelete?.call();
-                          },
-                          itemBuilder: (_) => [
-                            PopupMenuItem(value: 'edit', child: Text('編集', style: AppTextStyles.bodyMedium)),
-                            PopupMenuItem(value: 'delete', child: Text('削除', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error))),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.cardPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (badges.isNotEmpty || showLegacyWarning) ...[
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final b in badges)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: b.bg,
-                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                            ),
-                            child: Text(
-                              b.label,
-                              style: AppTextStyles.badgeText.copyWith(color: b.fg),
-                            ),
-                          ),
-                        if (showLegacyWarning)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: AppColors.warningLight,
-                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                            ),
-                            child: Text(
-                              'ownerIdなし',
-                              style: AppTextStyles.badgeText.copyWith(color: const Color(0xFFE65100)),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.headingSmall,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  Builder(
-                    builder: (context) {
-                      final totalSlots = int.tryParse((data['slots'] ?? '5').toString()) ?? 5;
-                      final applicantCount = int.tryParse((data['applicantCount'] ?? '0').toString()) ?? 0;
-                      final remaining = (totalSlots - applicantCount).clamp(1, totalSlots);
-                      final isUrgent = remaining <= 2;
-                      final dateDiff = DateTime.tryParse(data['date'] ?? '')?.difference(DateTime.now()).inDays ?? 999;
-                      final showQuickStart = (data['quickStart'] ?? false) == true || dateDiff.abs() <= 3;
-
-                      return Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isUrgent ? AppColors.errorLight : AppColors.warningLight,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isUrgent ? Icons.local_fire_department : Icons.people_outline,
-                                  size: 12,
-                                  color: isUrgent ? AppColors.error : AppColors.warning,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '残り$remaining枠',
-                                  style: AppTextStyles.badgeText.copyWith(
-                                    color: isUrgent ? AppColors.error : AppColors.warning,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (showQuickStart)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.successLight,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '即日勤務OK',
-                                style: AppTextStyles.badgeText.copyWith(color: AppColors.success),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        priceText,
-                        style: AppTextStyles.salary,
-                      ),
-                      Text(' /日', style: AppTextStyles.bodySmall),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  Row(
-                    children: [
-                      const Icon(Icons.place_outlined, size: 16, color: AppColors.ruri),
-                      const SizedBox(width: AppSpacing.xs),
-                      Expanded(
-                        child: Text(
-                          location,
-                          style: AppTextStyles.bodySmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        dateText,
-                        style: AppTextStyles.bodySmall,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-    );
-  }
-
-  Widget _placeholderImage() {
-    return Semantics(
-      excludeSemantics: true,
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.ruriPale, Color(0xFFE0E7F2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            _categoryIcon(category),
-            size: 48,
-            color: AppColors.ruri.withValues(alpha: 0.3),
-          ),
         ),
       ),
     );
