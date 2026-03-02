@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
-import 'legal_page.dart';
 import '../core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
@@ -59,10 +58,19 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           StaggeredFadeSlide(
             index: 0,
-            child: ProfileHeaderCard(
-              displayName: displayName,
-              subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
-              isLoggedIn: !isAnon,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.heroGradient,
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: ProfileHeaderCard(
+                  displayName: displayName,
+                  subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
+                  isLoggedIn: !isAnon,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -173,6 +181,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     ProfileMenuTile(
+                      icon: Icons.card_giftcard_outlined,
+                      iconColor: AppColors.warning,
+                      title: '友達を招待',
+                      subtitle: '紹介コードで友達を招待',
+                      onTap: () {
+                        context.push(RoutePaths.referral);
+                      },
+                    ),
+                    ProfileMenuTile(
                       icon: Icons.favorite_outlined,
                       iconColor: Colors.red,
                       title: 'お気に入り案件',
@@ -255,26 +272,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     ProfileMenuTile(
-                      icon: Icons.privacy_tip_outlined,
+                      icon: Icons.gavel_outlined,
                       iconColor: AppColors.textSecondary,
-                      title: 'プライバシーポリシー',
-                      onTap: () {
-                        context.push(RoutePaths.legal, extra: {
-                          'title': 'プライバシーポリシー',
-                          'htmlContent': LegalPage.privacyPolicyHtml,
-                        });
-                      },
-                    ),
-                    ProfileMenuTile(
-                      icon: Icons.description_outlined,
-                      iconColor: AppColors.textSecondary,
-                      title: '利用規約',
+                      title: '法的情報',
+                      subtitle: 'プライバシーポリシー・利用規約・法令情報',
                       isLast: true,
                       onTap: () {
-                        context.push(RoutePaths.legal, extra: {
-                          'title': '利用規約',
-                          'htmlContent': LegalPage.termsHtml,
-                        });
+                        context.push(RoutePaths.legalIndex);
                       },
                     ),
                   ],

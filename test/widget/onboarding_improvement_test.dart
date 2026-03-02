@@ -39,8 +39,8 @@ void main() {
       // Image.assetが失敗するとerrorBuilderによりIconが表示される
       // テスト環境ではアセットの扱いが異なるため、ページ自体が正しく表示されることを確認
       expect(find.text('仕事を見つけよう'), findsOneWidget);
-      // SizedBox with image container exists
-      expect(find.byType(Image), findsOneWidget);
+      // SizedBox with image container exists (logo + onboarding image)
+      expect(find.byType(Image), findsAtLeast(1));
     });
 
     testWidgets('l10nテキストが表示される', (tester) async {

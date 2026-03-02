@@ -31,6 +31,16 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+  static const LinearGradient warmGradient = LinearGradient(
+    colors: [Color(0xFFFF6B35), Color(0xFFFF8E53)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  static const LinearGradient subtleGradient = LinearGradient(
+    colors: [Color(0xFFF8FAFF), Color(0xFFEEF2FF)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 
   // Neutral / Background
   static const Color background = Color(0xFFF5F6F8);

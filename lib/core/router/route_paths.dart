@@ -51,6 +51,9 @@ class RoutePaths {
   // --- お気に入り ---
   static const String favorites = '/favorites';
 
+  // --- 紹介 ---
+  static const String referral = '/referral';
+
   // --- 電話認証 ---
   static const String phoneAuth = '/phone-auth';
 
@@ -66,6 +69,9 @@ class RoutePaths {
   // --- 明細 ---
   static const String statements = '/statements';
   static const String statementDetail = '/statements/:statementId';
+
+  // --- 法的情報 ---
+  static const String legalIndex = '/legal-index';
 
   // --- 管理者 ---
   static const String adminHome = '/admin';

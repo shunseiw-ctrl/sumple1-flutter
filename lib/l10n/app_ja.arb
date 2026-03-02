@@ -708,5 +708,44 @@
   "@applicationDate": { "description": "応募日ラベル" },
 
   "guestModeWarning": "ゲストモードでは一部機能が制限されます",
-  "@guestModeWarning": { "description": "ゲストモード警告" }
+  "@guestModeWarning": { "description": "ゲストモード警告" },
+
+  "legalIndex": "法的情報",
+  "@legalIndex": { "description": "法的情報ページタイトル" },
+
+  "laborInsurance": "労災保険について",
+  "@laborInsurance": { "description": "労災保険ページタイトル" },
+
+  "dispatchLaw": "労働者派遣法について",
+  "@dispatchLaw": { "description": "派遣法ページタイトル" },
+
+  "employmentSecurityLaw": "職業安定法について",
+  "@employmentSecurityLaw": { "description": "職業安定法ページタイトル" },
+
+  "legalDocuments": "法的ドキュメント",
+  "@legalDocuments": { "description": "法的ドキュメントセクション" },
+
+  "legalCompliance": "法令遵守",
+  "@legalCompliance": { "description": "法令遵守セクション" },
+
+  "legalInfo": "法的情報",
+  "@legalInfo": { "description": "法的情報メニュー項目" },
+
+  "legalInfoSubtitle": "プライバシーポリシー・利用規約・法令情報",
+  "@legalInfoSubtitle": { "description": "法的情報サブタイトル" },
+
+  "inviteFriends": "友達を招待",
+  "@inviteFriends": { "description": "友達招待メニュー" },
+
+  "inviteFriendsSubtitle": "紹介コードで友達を招待",
+  "@inviteFriendsSubtitle": { "description": "友達招待サブタイトル" },
+
+  "shareJob": "案件をシェア",
+  "@shareJob": { "description": "案件シェアボタン" },
+
+  "notificationSettings": "通知設定",
+  "@notificationSettings": { "description": "通知設定セクション" },
+
+  "receiveNotifications": "お知らせ通知を受け取る",
+  "@receiveNotifications": { "description": "通知設定トグル" }
 }

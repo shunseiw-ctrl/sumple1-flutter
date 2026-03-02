@@ -1,4 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AnalyticsService {
   static FirebaseAnalytics? _analyticsInstance;
@@ -163,5 +165,52 @@ class AnalyticsService {
 
   static Future<void> setUserPrefecture(String prefecture) async {
     await _analytics.setUserProperty(name: 'user_prefecture', value: prefecture);
+  }
+
+  // --- 紹介コード ---
+
+  static Future<void> logReferralCreate() async {
+    try {
+      await _analytics.logEvent(name: 'referral_create');
+    } catch (_) {}
+  }
+
+  static Future<void> logReferralApply(String code) async {
+    try {
+      await _analytics.logEvent(
+        name: 'referral_apply',
+        parameters: {'code': code},
+      );
+    } catch (_) {}
+  }
+
+  // --- シェア ---
+
+  static Future<void> logShareJob(String jobId) async {
+    try {
+      await _analytics.logEvent(
+        name: 'share_job',
+        parameters: {'job_id': jobId},
+      );
+    } catch (_) {}
+  }
+
+  static Future<void> logShareReferral() async {
+    try {
+      await _analytics.logEvent(name: 'share_referral');
+    } catch (_) {}
+  }
+
+  // --- lastActive ---
+
+  static Future<void> logLastActive() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.isAnonymous) return;
+      await FirebaseFirestore.instance
+          .collection('profiles')
+          .doc(user.uid)
+          .set({'lastActiveAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    } catch (_) {}
   }
 }

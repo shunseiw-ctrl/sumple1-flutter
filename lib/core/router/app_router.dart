@@ -30,6 +30,7 @@ import '../../pages/notifications_page.dart';
 import '../../pages/contact_page.dart';
 import '../../pages/faq_page.dart';
 import '../../pages/legal_page.dart';
+import '../../pages/legal_index_page.dart';
 import '../../pages/map_search_page.dart';
 import '../../pages/work_detail/work_report_create_page.dart';
 import '../../pages/work_detail/inspection_page.dart';
@@ -41,6 +42,7 @@ import '../../pages/favorites_page.dart';
 import '../../pages/phone_auth_page.dart';
 import '../../pages/admin/admin_qualifications_page.dart';
 import '../../pages/admin/admin_early_payments_page.dart';
+import '../../pages/referral_page.dart';
 
 /// GoRouter インスタンスプロバイダー
 final routerProvider = Provider<GoRouter>((ref) {
@@ -328,6 +330,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
+      // --- 紹介 ---
+      GoRoute(
+        path: RoutePaths.referral,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const ReferralPage(),
+        ),
+      ),
+
       // --- 電話認証 ---
       GoRoute(
         path: RoutePaths.phoneAuth,
@@ -363,6 +374,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => fadeThroughTransition(
           key: state.pageKey,
           child: const FaqPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.legalIndex,
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const LegalIndexPage(),
         ),
       ),
       GoRoute(

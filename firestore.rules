@@ -394,6 +394,29 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // --- 紹介コード ---
+    match /referral_codes/{uid} {
+      allow read: if signedIn();
+      allow create: if signedIn() && uid == uid()
+        && isString(request.resource.data.code)
+        && request.resource.data.code.size() == 6;
+      allow update, delete: if false;
+    }
+
+    // --- 紹介 ---
+    match /referrals/{referralId} {
+      allow read: if signedIn() && (
+        resource.data.referrerUid == uid() || resource.data.refereeUid == uid()
+      );
+      allow create: if signedIn()
+        && request.resource.data.refereeUid == uid()
+        && isString(request.resource.data.code)
+        && request.resource.data.code.size() == 6
+        && isString(request.resource.data.referrerUid)
+        && request.resource.data.referrerUid != uid();
+      allow update, delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

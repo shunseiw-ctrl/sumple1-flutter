@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.albawork.app",
+        "paths": [
+          "/jobs/*",
+          "/referral/*",
+          "/legal/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.albawork.app"
+    ]
+  }
+}

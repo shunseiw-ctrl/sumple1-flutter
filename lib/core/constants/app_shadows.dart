@@ -52,4 +52,17 @@ class AppShadows {
       offset: const Offset(0, 4),
     ),
   ];
+
+  static final List<BoxShadow> cardHover = [
+    BoxShadow(
+      color: const Color(0xFF000000).withValues(alpha: 0.1),
+      blurRadius: 20,
+      offset: const Offset(0, 6),
+    ),
+    BoxShadow(
+      color: const Color(0xFF000000).withValues(alpha: 0.04),
+      blurRadius: 6,
+      offset: const Offset(0, 3),
+    ),
+  ];
 }

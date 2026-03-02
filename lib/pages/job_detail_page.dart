@@ -16,6 +16,7 @@ import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/services/in_app_review_service.dart';
+import 'package:sumple1/core/services/share_service.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -219,6 +220,17 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
       appBar: AppBar(
         title: Text('案件詳細', style: AppTextStyles.appBarTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'シェア',
+            onPressed: () {
+              final title = data['title']?.toString() ?? '';
+              final price = data['price']?.toString() ?? '';
+              final location = data['location']?.toString() ?? '';
+              ShareService.shareJob(jobId, title, price, location);
+              AnalyticsService.logShareJob(jobId);
+            },
+          ),
           StreamBuilder<List<String>>(
             stream: _favoritesService.favoritesStream(),
             builder: (context, favSnap) {

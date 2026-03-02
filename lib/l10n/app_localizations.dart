@@ -1491,6 +1491,84 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ゲストモードでは一部機能が制限されます'**
   String get guestModeWarning;
+
+  /// 法的情報ページタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'法的情報'**
+  String get legalIndex;
+
+  /// 労災保険ページタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'労災保険について'**
+  String get laborInsurance;
+
+  /// 派遣法ページタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'労働者派遣法について'**
+  String get dispatchLaw;
+
+  /// 職業安定法ページタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'職業安定法について'**
+  String get employmentSecurityLaw;
+
+  /// 法的ドキュメントセクション
+  ///
+  /// In ja, this message translates to:
+  /// **'法的ドキュメント'**
+  String get legalDocuments;
+
+  /// 法令遵守セクション
+  ///
+  /// In ja, this message translates to:
+  /// **'法令遵守'**
+  String get legalCompliance;
+
+  /// 法的情報メニュー項目
+  ///
+  /// In ja, this message translates to:
+  /// **'法的情報'**
+  String get legalInfo;
+
+  /// 法的情報サブタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシー・利用規約・法令情報'**
+  String get legalInfoSubtitle;
+
+  /// 友達招待メニュー
+  ///
+  /// In ja, this message translates to:
+  /// **'友達を招待'**
+  String get inviteFriends;
+
+  /// 友達招待サブタイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'紹介コードで友達を招待'**
+  String get inviteFriendsSubtitle;
+
+  /// 案件シェアボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'案件をシェア'**
+  String get shareJob;
+
+  /// 通知設定セクション
+  ///
+  /// In ja, this message translates to:
+  /// **'通知設定'**
+  String get notificationSettings;
+
+  /// 通知設定トグル
+  ///
+  /// In ja, this message translates to:
+  /// **'お知らせ通知を受け取る'**
+  String get receiveNotifications;
 }
 
 class _AppLocalizationsDelegate

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
@@ -258,11 +259,23 @@ class JobCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (badges.isNotEmpty || showLegacyWarning) ...[
+                  if (badges.isNotEmpty || showLegacyWarning || _isNewJob()) ...[
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
                       children: [
+                        if (_isNewJob())
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                            ),
+                            child: Text(
+                              'NEW',
+                              style: AppTextStyles.badgeText.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                            ),
+                          ),
                         for (final b in badges)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
@@ -303,16 +316,25 @@ class JobCard extends StatelessWidget {
                   _buildMetricsRow(JobCardMetrics.fromData(data)),
                   const SizedBox(height: AppSpacing.md),
 
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        priceText,
-                        style: AppTextStyles.salary,
-                      ),
-                      Text(' /日', style: AppTextStyles.bodySmall),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF8F0),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFFFE0B2), width: 0.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          priceText,
+                          style: AppTextStyles.salary,
+                        ),
+                        Text(' /日', style: AppTextStyles.bodySmall),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.md),
 
@@ -361,6 +383,19 @@ class JobCard extends StatelessWidget {
       ),
     ),
     );
+  }
+
+  bool _isNewJob() {
+    final createdAt = data['createdAt'];
+    if (createdAt == null) return false;
+    DateTime? created;
+    if (createdAt is Timestamp) {
+      created = createdAt.toDate();
+    } else if (createdAt is DateTime) {
+      created = createdAt;
+    }
+    if (created == null) return false;
+    return DateTime.now().difference(created).inHours < 24;
   }
 
   Widget _buildMetricsRow(JobCardMetrics metrics) {

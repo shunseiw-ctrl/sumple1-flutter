@@ -71,6 +71,9 @@ dependencies:
   # Google Maps (Phase 15)
   google_maps_flutter: ^2.9.0
 
+  # 紹介コード (Phase 19)
+  share_plus: ^10.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -75,6 +75,14 @@ exports.dailyFirestoreBackup = dailyFirestoreBackup;
 const { cleanupRateLimits } = require("./src/rateLimiter");
 exports.cleanupRateLimits = cleanupRateLimits;
 
+// --- 紹介コード (Phase 19) ---
+const referrals = require("./src/referrals");
+exports.onReferralApplied = referrals.onReferralApplied;
+
+// --- リエンゲージメント通知 (Phase 19) ---
+const reengagement = require("./src/reengagement");
+exports.sendReengagementNotifications = reengagement.sendReengagementNotifications;
+
 // --- 監査ログ (Phase 9) ---
 const auditLog = require("./src/auditLog");
 exports.onAuditJobWrite = auditLog.onAuditJobWrite;

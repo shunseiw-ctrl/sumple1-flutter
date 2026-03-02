@@ -22,6 +22,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final _currentPassController = TextEditingController();
   final _newPassController = TextEditingController();
   bool _saving = false;
+  bool _reengagementEnabled = true;
 
   @override
   void initState() {
@@ -29,6 +30,33 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     AnalyticsService.logScreenView('account_settings');
     final user = FirebaseAuth.instance.currentUser;
     _nameController.text = user?.displayName ?? '';
+    _loadNotificationPrefs();
+  }
+
+  Future<void> _loadNotificationPrefs() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      final doc = await FirebaseFirestore.instance.collection('profiles').doc(user.uid).get();
+      final data = doc.data() ?? {};
+      final prefs = data['notificationPreferences'] as Map<String, dynamic>? ?? {};
+      if (mounted) {
+        setState(() {
+          _reengagementEnabled = prefs['reengagement'] != false;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _toggleReengagement(bool value) async {
+    setState(() => _reengagementEnabled = value);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('profiles').doc(user.uid).set({
+        'notificationPreferences': {'reengagement': value},
+      }, SetOptions(merge: true));
+    } catch (_) {}
   }
 
   @override
@@ -325,6 +353,32 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               child: _saving
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : Text(AppLocalizations.of(context)!.changePassword),
+            ),
+          ),
+
+          const SizedBox(height: 28),
+          const Text('通知設定', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE6E8EB)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.notifications_outlined, color: AppColors.textSecondary, size: 20),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text('お知らせ通知を受け取る', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                ),
+                Switch(
+                  value: _reengagementEnabled,
+                  onChanged: _toggleReengagement,
+                  activeTrackColor: AppColors.ruri,
+                ),
+              ],
             ),
           ),
 

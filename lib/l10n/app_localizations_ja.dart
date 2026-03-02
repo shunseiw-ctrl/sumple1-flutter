@@ -710,4 +710,43 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get guestModeWarning => 'ゲストモードでは一部機能が制限されます';
+
+  @override
+  String get legalIndex => '法的情報';
+
+  @override
+  String get laborInsurance => '労災保険について';
+
+  @override
+  String get dispatchLaw => '労働者派遣法について';
+
+  @override
+  String get employmentSecurityLaw => '職業安定法について';
+
+  @override
+  String get legalDocuments => '法的ドキュメント';
+
+  @override
+  String get legalCompliance => '法令遵守';
+
+  @override
+  String get legalInfo => '法的情報';
+
+  @override
+  String get legalInfoSubtitle => 'プライバシーポリシー・利用規約・法令情報';
+
+  @override
+  String get inviteFriends => '友達を招待';
+
+  @override
+  String get inviteFriendsSubtitle => '紹介コードで友達を招待';
+
+  @override
+  String get shareJob => '案件をシェア';
+
+  @override
+  String get notificationSettings => '通知設定';
+
+  @override
+  String get receiveNotifications => 'お知らせ通知を受け取る';
 }

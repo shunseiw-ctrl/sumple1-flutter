@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +10,7 @@ import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
+import 'package:sumple1/presentation/widgets/animated_page_indicator.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -153,6 +156,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ),
               ),
             ),
+            if (_currentPage == 0)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: Center(
+                  child: Image.asset(
+                    'assets/logo.png',
+                    height: 40,
+                    errorBuilder: (_, __, ___) => Text(
+                      'ALBAWORK',
+                      style: AppTextStyles.headingLarge.copyWith(color: AppColors.ruri),
+                    ),
+                  ),
+                ),
+              ),
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
@@ -185,44 +202,48 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 children: [
                   Semantics(
                     label: 'ページ${_currentPage + 1} / ${pages.length}',
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        pages.length,
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentPage == index
-                                ? AppColors.ruri
-                                : AppColors.divider,
-                          ),
-                        ),
-                      ),
+                    child: AnimatedPageIndicator(
+                      pageCount: pages.length,
+                      currentPage: _currentPage,
                     ),
                   ),
                   if (_currentPage == pages.length - 1) ...[
                     const SizedBox(height: AppSpacing.base),
-                    _buildConsentCheckbox(
-                      value: _termsAccepted,
-                      label: l10n.agreeToTerms,
-                      onChanged: (v) => setState(() => _termsAccepted = v ?? false),
-                      onTap: () => context.push(RoutePaths.legal, extra: {
-                        'title': '利用規約',
-                        'htmlContent': LegalPage.termsHtml,
-                      }),
-                    ),
-                    _buildConsentCheckbox(
-                      value: _privacyAccepted,
-                      label: l10n.agreeToPrivacy,
-                      onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
-                      onTap: () => context.push(RoutePaths.legal, extra: {
-                        'title': 'プライバシーポリシー',
-                        'htmlContent': LegalPage.privacyPolicyHtml,
-                      }),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                          ),
+                          child: Column(
+                            children: [
+                              _buildConsentCheckbox(
+                                value: _termsAccepted,
+                                label: l10n.agreeToTerms,
+                                onChanged: (v) => setState(() => _termsAccepted = v ?? false),
+                                onTap: () => context.push(RoutePaths.legal, extra: {
+                                  'title': '利用規約',
+                                  'htmlContent': LegalPage.termsHtml,
+                                }),
+                              ),
+                              _buildConsentCheckbox(
+                                value: _privacyAccepted,
+                                label: l10n.agreeToPrivacy,
+                                onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
+                                onTap: () => context.push(RoutePaths.legal, extra: {
+                                  'title': 'プライバシーポリシー',
+                                  'htmlContent': LegalPage.privacyPolicyHtml,
+                                }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                   const SizedBox(height: AppSpacing.xl),
@@ -295,7 +316,7 @@ class _OnboardingPageContent extends StatelessWidget {
               height: screenHeight * 0.45,
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.ruriSurface,
+                  gradient: AppColors.heroGradient,
                   borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
                 ),
                 child: Center(
@@ -306,7 +327,7 @@ class _OnboardingPageContent extends StatelessWidget {
                     errorBuilder: (_, __, ___) => Icon(
                       data.fallbackIcon,
                       size: 80,
-                      color: AppColors.ruri,
+                      color: Colors.white,
                     ),
                   ),
                 ),

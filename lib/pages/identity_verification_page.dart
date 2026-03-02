@@ -5,10 +5,13 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/services/ekyc_service.dart';
+import 'package:sumple1/core/services/ekyc_manual_service.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
-  const IdentityVerificationPage({super.key});
+  final EkycService? ekycService;
+  const IdentityVerificationPage({super.key, this.ekycService});
 
   @override
   State<IdentityVerificationPage> createState() => _IdentityVerificationPageState();
@@ -16,6 +19,8 @@ class IdentityVerificationPage extends StatefulWidget {
 
 class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   final _imageService = ImageUploadService();
+  // ignore: unused_field
+  late final EkycService _ekycService;
   String? _idPhotoUrl;
   String? _selfieUrl;
   bool _uploading = false;
@@ -26,6 +31,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   @override
   void initState() {
     super.initState();
+    _ekycService = widget.ekycService ?? ManualEkycService();
     AnalyticsService.logScreenView('identity_verification');
     _loadStatus();
   }
@@ -147,6 +153,39 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
+  }
+
+  Widget _buildStep(int number, String label, bool completed) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: completed ? AppColors.success : AppColors.divider,
+            ),
+            child: Center(
+              child: completed
+                  ? const Icon(Icons.check, color: Colors.white, size: 18)
+                  : Text('$number', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepConnector(bool completed) {
+    return Expanded(
+      child: Container(
+        height: 2,
+        color: completed ? AppColors.success : AppColors.divider,
+      ),
+    );
   }
 
   Widget _buildPhotoUploadCard({
@@ -281,6 +320,19 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
+          // Step indicator
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child: Row(
+              children: [
+                _buildStep(1, '身分証アップロード', _idPhotoUrl != null),
+                _buildStepConnector(_idPhotoUrl != null),
+                _buildStep(2, '自撮り', _selfieUrl != null),
+                _buildStepConnector(_selfieUrl != null),
+                _buildStep(3, '送信', _verificationStatus == 'pending' || _verificationStatus == 'approved'),
+              ],
+            ),
+          ),
           _buildStatusBanner(),
           Container(
             padding: const EdgeInsets.all(14),
@@ -301,7 +353,30 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+          // eKYC banner
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.infoLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.verified_user, color: AppColors.info, size: 22),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'eKYC（電子本人確認）対応予定 — より迅速な本人確認が可能になります',
+                    style: TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
           _buildPhotoUploadCard(
             title: '身分証明書',
             subtitle: '運転免許証・マイナンバーカード・パスポート等',

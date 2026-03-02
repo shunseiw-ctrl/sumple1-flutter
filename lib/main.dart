@@ -36,6 +36,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 import 'core/services/force_update_service.dart';
 import 'presentation/widgets/force_update_dialog.dart';
+import 'core/services/analytics_service.dart';
 
 /// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
 @pragma('vm:entry-point')
@@ -187,6 +188,13 @@ class _MyAppState extends ConsumerState<MyApp> {
   void initState() {
     super.initState();
     _deepLinkService.initialize(navigatorKey);
+    AppLifecycleListener(onStateChange: _onAppLifecycleChange);
+  }
+
+  void _onAppLifecycleChange(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      AnalyticsService.logLastActive();
+    }
   }
 
   @override

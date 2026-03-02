@@ -46,6 +46,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'おはようございます';
+    if (hour < 18) return 'こんにちは';
+    return 'こんばんは';
+  }
+
   late final List<Widget> _pages = const [
     JobListPage(),
     WorkPage(),
@@ -65,6 +72,17 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 12,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.white, Color(0xFFF5F8FF)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Semantics(
@@ -80,38 +98,54 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             ),
             const SizedBox(width: 10),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Text(
-                'ALBAWORK',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                  color: AppColors.textPrimary,
-                ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          'ALBAWORK',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.5,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      if (_isAdmin)
+                        Semantics(
+                          label: 'ステータス: 管理者',
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.ruriPale,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '管理者',
+                                style: AppTextStyles.badgeText.copyWith(
+                                  color: AppColors.ruri,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  Text(
+                    _greeting,
+                    style: AppTextStyles.bodySmall.copyWith(fontSize: 12),
+                  ),
+                ],
               ),
             ),
-            if (_isAdmin)
-              Semantics(
-                label: 'ステータス: 管理者',
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.ruriPale,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      '管理者',
-                      style: AppTextStyles.badgeText.copyWith(
-                        color: AppColors.ruri,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
           ],
         ),
         actions: [
