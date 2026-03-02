@@ -347,6 +347,35 @@ class _GuestHomePageState extends State<GuestHomePage> {
                           SizedBox(
                             width: double.infinity,
                             height: 54,
+                            child: ElevatedButton.icon(
+                              onPressed: _isLoading
+                                  ? null
+                                  : () {
+                                      context.push(RoutePaths.phoneAuth);
+                                    },
+                              icon: const Icon(Icons.phone, size: 22),
+                              label: Text(
+                                '電話番号でログイン',
+                                style: AppTextStyles.button.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.ruri,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      AppSpacing.buttonRadius),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
                             child: OutlinedButton.icon(
                               onPressed: _isLoading ? null : _goToEmailLogin,
                               icon: const Icon(

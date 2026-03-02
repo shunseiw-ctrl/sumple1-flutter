@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sumple1/core/services/chat_service.dart';
+import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/distance_sort_service.dart';
 import 'package:sumple1/core/services/location_service.dart';
 import 'package:sumple1/core/utils/distance_utils.dart';
@@ -14,7 +15,11 @@ void main() {
       final fakeFirestore = FakeFirebaseFirestore();
       final mockUser = MockUser(isAnonymous: false, uid: 'worker-001', email: 'w@test.com');
       final mockAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
-      final chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+      final chatService = ChatService(
+        firestore: fakeFirestore,
+        auth: mockAuth,
+        notificationService: NotificationService(firestore: fakeFirestore),
+      );
 
       await fakeFirestore.collection('applications').doc('app-001').set({
         'applicantUid': 'worker-001',

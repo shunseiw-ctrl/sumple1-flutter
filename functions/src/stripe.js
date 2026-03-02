@@ -344,7 +344,40 @@ exports.handleStripeWebhook = onRequest(
 
       case "payout.paid": {
         const payout = event.data.object;
-        logger.info("Payout paid", { payoutId: payout.id, amount: payout.amount });
+        const destinationAccountId = payout.destination;
+        logger.info("Payout paid", { payoutId: payout.id, amount: payout.amount, destination: destinationAccountId });
+
+        if (destinationAccountId) {
+          // stripeAccountIdが一致するpaymentsを検索してpayoutStatus: 'paid'に更新
+          const paymentsQuery = await db
+            .collection("payments")
+            .where("payoutStatus", "!=", "paid")
+            .get();
+
+          const batch = db.batch();
+          let updatedCount = 0;
+
+          for (const paymentDoc of paymentsQuery.docs) {
+            const paymentData = paymentDoc.data();
+            // workerのstripeAccountIdを確認
+            if (paymentData.workerUid) {
+              const workerProfile = await db.collection("profiles").doc(paymentData.workerUid).get();
+              const workerStripeId = workerProfile.data()?.stripeAccountId;
+              if (workerStripeId === destinationAccountId && paymentData.payoutStatus !== "paid") {
+                batch.update(paymentDoc.ref, {
+                  payoutStatus: "paid",
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+                updatedCount++;
+              }
+            }
+          }
+
+          if (updatedCount > 0) {
+            await batch.commit();
+            logger.info("Payout status updated", { updatedCount, destinationAccountId });
+          }
+        }
         break;
       }
 

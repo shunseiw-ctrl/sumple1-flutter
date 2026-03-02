@@ -37,6 +37,10 @@ import '../../pages/work_detail/timeline_tab.dart';
 import '../../pages/qualifications_page.dart';
 import '../../pages/qualification_add_page.dart';
 import '../../pages/statement_detail_page.dart';
+import '../../pages/favorites_page.dart';
+import '../../pages/phone_auth_page.dart';
+import '../../pages/admin/admin_qualifications_page.dart';
+import '../../pages/admin/admin_early_payments_page.dart';
 
 /// GoRouter インスタンスプロバイダー
 final routerProvider = Provider<GoRouter>((ref) {
@@ -87,6 +91,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => fadeThroughTransition(
           key: state.pageKey,
           child: const AdminHomePage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.adminQualifications,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const AdminQualificationsPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.adminEarlyPayments,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const AdminEarlyPaymentsPage(),
         ),
       ),
 
@@ -299,6 +317,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: StatementDetailPage(statementId: statementId),
           );
         },
+      ),
+
+      // --- お気に入り ---
+      GoRoute(
+        path: RoutePaths.favorites,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const FavoritesPage(),
+        ),
+      ),
+
+      // --- 電話認証 ---
+      GoRoute(
+        path: RoutePaths.phoneAuth,
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const PhoneAuthPage(),
+        ),
       ),
 
       // --- マップ検索 ---

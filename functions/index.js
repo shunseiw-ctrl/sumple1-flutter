@@ -45,6 +45,11 @@ const kpiBatch = require("./src/kpiBatch");
 exports.dailyKpiAggregation = kpiBatch.dailyKpiAggregation;
 exports.monthlyKpiAggregation = kpiBatch.monthlyKpiAggregation;
 
+// --- 月次明細自動生成 (Phase 17) ---
+const monthlyStatements = require("./src/monthlyStatements");
+exports.onEarningCreatedStatement = monthlyStatements.onEarningCreated;
+exports.confirmMonthlyStatements = monthlyStatements.confirmMonthlyStatements;
+
 // --- Stripe決済 ---
 const stripe = require("./src/stripe");
 exports.createConnectAccount = stripe.createConnectAccount;

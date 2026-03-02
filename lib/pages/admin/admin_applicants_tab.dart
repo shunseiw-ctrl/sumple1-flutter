@@ -5,6 +5,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
+import 'package:sumple1/core/services/quality_score_service.dart';
 
 class AdminApplicantsTab extends StatefulWidget {
   const AdminApplicantsTab({super.key});
@@ -177,33 +178,71 @@ class _AdminApplicantsTabState extends State<AdminApplicantsTab> {
                                     children: [
                                       Text(jobTitle, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
                                       const SizedBox(height: 2),
-                                      Row(
-                                        children: [
-                                          Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                          if (dateStr.isNotEmpty) ...[
-                                            const SizedBox(width: 8),
-                                            Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                          ],
-                                        ],
-                                      ),
                                       if (applicantUid.isNotEmpty)
                                         StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                                           stream: FirebaseFirestore.instance.collection('profiles').doc(applicantUid).snapshots(),
                                           builder: (context, profileSnap) {
                                             final profileData = profileSnap.data?.data();
+                                            final familyName = (profileData?['familyName'] ?? '').toString().trim();
+                                            final givenName = (profileData?['givenName'] ?? '').toString().trim();
+                                            final displayName = (profileData?['displayName'] ?? '').toString().trim();
+                                            final workerName = displayName.isNotEmpty
+                                                ? displayName
+                                                : (familyName.isNotEmpty || givenName.isNotEmpty)
+                                                    ? '$familyName $givenName'.trim()
+                                                    : '';
                                             final avg = (profileData?['ratingAverage'] ?? 0).toDouble();
                                             final rCount = (profileData?['ratingCount'] ?? 0) as int;
-                                            if (rCount == 0) return const SizedBox.shrink();
-                                            return Padding(
-                                              padding: const EdgeInsets.only(top: 4),
-                                              child: RatingStarsDisplay(
-                                                average: avg,
-                                                count: rCount,
-                                                starSize: 14,
-                                                fontSize: 11,
-                                              ),
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    if (workerName.isNotEmpty) ...[
+                                                      Text(workerName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                                                      const SizedBox(width: 6),
+                                                    ],
+                                                    Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                                    if (dateStr.isNotEmpty) ...[
+                                                      const SizedBox(width: 8),
+                                                      Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                                    ],
+                                                  ],
+                                                ),
+                                                if (rCount > 0)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 4),
+                                                    child: Row(
+                                                      children: [
+                                                        RatingStarsDisplay(
+                                                          average: avg,
+                                                          count: rCount,
+                                                          starSize: 14,
+                                                          fontSize: 11,
+                                                        ),
+                                                        const SizedBox(width: 6),
+                                                        _QualityScoreBadge(uid: applicantUid),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                if (rCount == 0)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 4),
+                                                    child: _QualityScoreBadge(uid: applicantUid),
+                                                  ),
+                                              ],
                                             );
                                           },
+                                        ),
+                                      if (applicantUid.isEmpty)
+                                        Row(
+                                          children: [
+                                            Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                            if (dateStr.isNotEmpty) ...[
+                                              const SizedBox(width: 8),
+                                              Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                                            ],
+                                          ],
                                         ),
                                     ],
                                   ),
@@ -319,6 +358,53 @@ class _AdminApplicantsTabState extends State<AdminApplicantsTab> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide.none,
       ),
+    );
+  }
+}
+
+class _QualityScoreBadge extends StatelessWidget {
+  final String uid;
+  const _QualityScoreBadge({required this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    if (uid.isEmpty) return const SizedBox.shrink();
+
+    return FutureBuilder<WorkerQualityScore>(
+      future: QualityScoreService().calculateScore(uid),
+      builder: (context, snap) {
+        if (!snap.hasData) return const SizedBox.shrink();
+
+        final score = snap.data!.overallScore;
+        final Color bgColor;
+        final Color textColor;
+        if (score >= 4.0) {
+          bgColor = AppColors.success.withValues(alpha: 0.15);
+          textColor = AppColors.success;
+        } else if (score >= 3.0) {
+          bgColor = AppColors.warning.withValues(alpha: 0.15);
+          textColor = AppColors.warning;
+        } else {
+          bgColor = AppColors.error.withValues(alpha: 0.15);
+          textColor = AppColors.error;
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            '品質: ${score.toStringAsFixed(1)}',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+        );
+      },
     );
   }
 }

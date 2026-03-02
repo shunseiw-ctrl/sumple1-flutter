@@ -4,15 +4,22 @@ import 'package:firebase_performance/firebase_performance.dart';
 
 import '../constants/app_constants.dart';
 import '../utils/logger.dart';
+import 'notification_service.dart';
 
 /// チャット機能のビジネスロジックを管理
 class ChatService {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final NotificationService _notificationService;
 
-  ChatService({FirebaseFirestore? firestore, FirebaseAuth? auth})
-      : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  ChatService({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+    NotificationService? notificationService,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance,
+        _notificationService =
+            notificationService ?? NotificationService();
 
   /// 現在のユーザーUID
   String get currentUserId => _auth.currentUser?.uid ?? '';
@@ -271,6 +278,30 @@ class ChatService {
 
         await chatRef.update(update);
 
+        // プッシュ通知作成（失敗してもメッセージ送信は成功とする）
+        try {
+          final recipientUid = (currentUserId == applicantUid)
+              ? adminUid
+              : applicantUid;
+          final trimmedText = text.trim();
+          final truncatedBody = trimmedText.length > 50
+              ? '${trimmedText.substring(0, 50)}...'
+              : trimmedText;
+          await _notificationService.createNotification(
+            targetUid: recipientUid,
+            title: 'チャット',
+            body: truncatedBody,
+            type: 'chat_message',
+            data: {'applicationId': applicationId},
+          );
+        } catch (e) {
+          Logger.warning(
+            'Failed to create chat notification',
+            tag: 'ChatService',
+            data: {'error': e.toString()},
+          );
+        }
+
         Logger.info(
           'Message sent successfully',
           tag: 'ChatService',
@@ -392,6 +423,26 @@ class ChatService {
 
         await chatRef.update(update);
 
+        // プッシュ通知作成（失敗してもメッセージ送信は成功とする）
+        try {
+          final recipientUid = (currentUserId == applicantUid)
+              ? adminUid
+              : applicantUid;
+          await _notificationService.createNotification(
+            targetUid: recipientUid,
+            title: 'チャット',
+            body: '[画像]',
+            type: 'chat_message',
+            data: {'applicationId': applicationId},
+          );
+        } catch (e) {
+          Logger.warning(
+            'Failed to create chat image notification',
+            tag: 'ChatService',
+            data: {'error': e.toString()},
+          );
+        }
+
         Logger.info(
           'Image message sent successfully',
           tag: 'ChatService',
@@ -440,6 +491,29 @@ class ChatService {
     );
 
     return SendMessageResult.error('画像の送信に失敗しました（$attempt回試行）');
+  }
+
+  /// チャットルームの既読タイムスタンプを更新
+  Future<void> markAsRead({
+    required String applicationId,
+    required bool isApplicant,
+  }) async {
+    try {
+      final field =
+          isApplicant ? 'lastReadAtApplicant' : 'lastReadAtAdmin';
+      await _firestore
+          .collection(AppConstants.collectionChats)
+          .doc(applicationId)
+          .update({
+        field: FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      Logger.warning(
+        'Failed to update lastReadAt',
+        tag: 'ChatService',
+        data: {'error': e.toString()},
+      );
+    }
   }
 
   /// リトライ不可能なエラーかどうかを判定

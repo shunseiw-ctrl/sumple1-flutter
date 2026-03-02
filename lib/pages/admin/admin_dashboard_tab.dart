@@ -139,6 +139,16 @@ class AdminDashboardTab extends StatelessWidget {
                 onTap: () => onNavigateToTab(3),
               ),
             ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionButton(
+                icon: Icons.workspace_premium,
+                label: '資格承認',
+                onTap: () {
+                  context.push(RoutePaths.adminQualifications);
+                },
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -151,21 +161,29 @@ class AdminDashboardTab extends StatelessWidget {
           builder: (context, reqSnap) {
             final count = reqSnap.data?.docs.length ?? 0;
             if (count == 0) return const SizedBox.shrink();
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.flash_on, color: Colors.orange),
-                  const SizedBox(width: 8),
-                  Text('即金申請 $count件 承認待ち',
-                      style: const TextStyle(
-                          color: Colors.orange, fontWeight: FontWeight.w700)),
-                ],
+            return GestureDetector(
+              onTap: () {
+                context.push(RoutePaths.adminEarlyPayments);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.flash_on, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('即金申請 $count件 承認待ち',
+                          style: const TextStyle(
+                              color: Colors.orange, fontWeight: FontWeight.w700)),
+                    ),
+                    const Icon(Icons.chevron_right, color: Colors.orange, size: 20),
+                  ],
+                ),
               ),
             );
           },

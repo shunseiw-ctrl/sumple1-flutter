@@ -166,11 +166,20 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: const Color(0xFF635BFF),
                       title: 'Stripe口座設定',
                       subtitle: '報酬の受取口座を設定',
-                      isLast: true,
                       onTap: () {
                         context.push(RoutePaths.stripeOnboarding, extra: {
                           'email': user?.email,
                         });
+                      },
+                    ),
+                    ProfileMenuTile(
+                      icon: Icons.favorite_outlined,
+                      iconColor: Colors.red,
+                      title: 'お気に入り案件',
+                      subtitle: '保存した案件を確認',
+                      isLast: true,
+                      onTap: () {
+                        context.push(RoutePaths.favorites);
                       },
                     ),
                   ],

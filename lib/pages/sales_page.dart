@@ -6,14 +6,12 @@ import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
-import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import '../core/services/analytics_service.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class SalesPage extends StatefulWidget {
@@ -34,7 +32,7 @@ class _SalesPageState extends State<SalesPage>
     super.initState();
     AnalyticsService.logScreenView('sales');
     _checkAdminRole();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -73,7 +71,7 @@ class _SalesPageState extends State<SalesPage>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('売上・お気に入り'),
+        title: const Text('収入・明細'),
         centerTitle: true,
         actions: [
           if (isAdmin)
@@ -93,8 +91,7 @@ class _SalesPageState extends State<SalesPage>
           labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: AppColors.ruri),
           unselectedLabelStyle: AppTextStyles.labelMedium,
           tabs: const [
-            Tab(text: '売上'),
-            Tab(icon: Icon(Icons.favorite, size: 18), text: 'お気に入り'),
+            Tab(text: '収入'),
             Tab(text: '明細'),
           ],
         ),
@@ -103,7 +100,6 @@ class _SalesPageState extends State<SalesPage>
         controller: _tabController,
         children: [
           _SalesContent(uid: uid, isAdmin: isAdmin),
-          const _FavoritesContent(),
           _StatementsContent(uid: uid),
         ],
       ),
@@ -154,6 +150,12 @@ class _SalesContentState extends State<_SalesContent> {
   }
 
   String _monthLabel(DateTime m) => '${m.month}月';
+
+  int _nextPaymentMonth() {
+    final now = DateTime.now();
+    final next = DateTime(now.year, now.month + 1, 1);
+    return next.month;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -233,33 +235,61 @@ class _SalesContentState extends State<_SalesContent> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
           children: [
-            _ShadowCard(
+            // --- Gradient Header Card ---
+            Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
+                boxShadow: AppShadows.card,
+              ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.lg, AppSpacing.base, AppSpacing.base),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      '今月の売上',
-                      style: AppTextStyles.sectionTitle,
+                      '今月の収入',
+                      style: AppTextStyles.sectionTitle.copyWith(color: Colors.white.withValues(alpha: 0.85)),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       _yen(thisMonth),
-                      style: AppTextStyles.displayLarge,
+                      style: AppTextStyles.displayLarge.copyWith(
+                        color: Colors.white,
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      ),
+                      child: Text(
+                        '次回支払日: ${_nextPaymentMonth()}月10日',
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '獲得売上',
-                          style: AppTextStyles.labelSmall,
+                          '累計収入',
+                          style: AppTextStyles.labelSmall.copyWith(color: Colors.white.withValues(alpha: 0.7)),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           _yen(total),
-                          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
+                          style: AppTextStyles.labelLarge.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -270,6 +300,12 @@ class _SalesContentState extends State<_SalesContent> {
 
             const SizedBox(height: AppSpacing.base),
 
+            // --- 未確定の報酬 ---
+            _UnconfirmedEarningsSection(uid: widget.uid),
+
+            const SizedBox(height: AppSpacing.base),
+
+            // --- Monthly Bar Chart ---
             _ShadowCard(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.base),
@@ -357,7 +393,7 @@ class _SalesContentState extends State<_SalesContent> {
 
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '※売上は支払い確定日に反映されます',
+                      '※収入は支払い確定日に反映されます',
                       style: AppTextStyles.labelSmall,
                     ),
                     const SizedBox(height: AppSpacing.xs),
@@ -369,6 +405,11 @@ class _SalesContentState extends State<_SalesContent> {
                 ),
               ),
             ),
+
+            const SizedBox(height: AppSpacing.base),
+
+            // --- 支払い履歴 ---
+            _PaymentHistorySection(docs: docs),
 
             if (widget.isAdmin) ...[
               const SizedBox(height: AppSpacing.sectionGap),
@@ -387,212 +428,243 @@ class _SalesContentState extends State<_SalesContent> {
   }
 }
 
-class _FavoritesContent extends StatefulWidget {
-  const _FavoritesContent();
+/// 未確定の報酬セクション
+class _UnconfirmedEarningsSection extends StatelessWidget {
+  final String uid;
+  const _UnconfirmedEarningsSection({required this.uid});
 
   @override
-  State<_FavoritesContent> createState() => _FavoritesContentState();
+  Widget build(BuildContext context) {
+    final db = FirebaseFirestore.instance;
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: db.collection('applications')
+          .where('applicantUid', isEqualTo: uid)
+          .where('status', whereIn: ['completed', 'done'])
+          .snapshots(),
+      builder: (context, appSnap) {
+        if (appSnap.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+        final appDocs = appSnap.data?.docs ?? [];
+        if (appDocs.isEmpty) return const SizedBox.shrink();
+
+        // applicationId一覧
+        final appIds = appDocs.map((d) => d.id).toList();
+
+        // earningsからapplicationIdで確認
+        return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: db.collection('earnings')
+              .where('uid', isEqualTo: uid)
+              .snapshots(),
+          builder: (context, earningsSnap) {
+            if (earningsSnap.connectionState == ConnectionState.waiting) {
+              return const SizedBox.shrink();
+            }
+            final earningsDocs = earningsSnap.data?.docs ?? [];
+            final earningsAppIds = <String>{};
+            for (final doc in earningsDocs) {
+              final appId = (doc.data()['applicationId'] ?? '').toString();
+              if (appId.isNotEmpty) earningsAppIds.add(appId);
+            }
+
+            // earningsが無いapplication = 未確定
+            final unconfirmed = appDocs.where((d) => !earningsAppIds.contains(d.id)).toList();
+            if (unconfirmed.isEmpty) return const SizedBox.shrink();
+
+            return _ShadowCard(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.base),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.pending_actions, size: 20, color: AppColors.warning),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          '未確定の報酬',
+                          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                          ),
+                          child: Text(
+                            '${unconfirmed.length}件',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.warning,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ...unconfirmed.map((doc) {
+                      final data = doc.data();
+                      final jobTitle = (data['jobTitleSnapshot'] ?? '案件').toString();
+                      final status = (data['status'] ?? '').toString();
+                      final statusLabel = status == 'done' ? '完了' : '施工完了';
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                jobTitle,
+                                style: AppTextStyles.bodySmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.chipUnselected,
+                                borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                              ),
+                              child: Text(
+                                statusLabel,
+                                style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      '※報酬は管理者が確定後に反映されます',
+                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
-class _FavoritesContentState extends State<_FavoritesContent> {
-  final _db = FirebaseFirestore.instance;
-  Map<String, Map<String, dynamic>> _jobsCache = {};
-  List<String> _lastJobIds = [];
-  bool _isLoadingJobs = false;
+/// 支払い履歴セクション
+class _PaymentHistorySection extends StatelessWidget {
+  final List<QueryDocumentSnapshot<Map<String, dynamic>>> docs;
+  const _PaymentHistorySection({required this.docs});
 
-  Future<void> _fetchJobs(List<String> jobIds) async {
-    if (jobIds.isEmpty) {
-      setState(() {
-        _jobsCache = {};
-        _lastJobIds = [];
-      });
-      return;
+  String _formatYen(int value) {
+    final s = value.toString();
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      final idxFromEnd = s.length - i;
+      buf.write(s[i]);
+      if (idxFromEnd > 1 && idxFromEnd % 3 == 1) buf.write(',');
     }
-
-    // jobIdsが変わった場合のみ再取得
-    if (_listEquals(jobIds, _lastJobIds) && _jobsCache.isNotEmpty) return;
-
-    setState(() => _isLoadingJobs = true);
-    try {
-      final result = <String, Map<String, dynamic>>{};
-      const batchSize = 30;
-      for (var i = 0; i < jobIds.length; i += batchSize) {
-        final batch = jobIds.sublist(i, (i + batchSize).clamp(0, jobIds.length));
-        final snap = await _db.collection('jobs')
-            .where(FieldPath.documentId, whereIn: batch).get();
-        for (final doc in snap.docs) {
-          result[doc.id] = doc.data();
-        }
-      }
-      if (mounted) {
-        setState(() {
-          _jobsCache = result;
-          _lastJobIds = List.of(jobIds);
-          _isLoadingJobs = false;
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _isLoadingJobs = false);
-    }
-  }
-
-  bool _listEquals(List<String> a, List<String> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
+    return '¥${buf.toString()}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (uid.isEmpty) {
-      return const Center(child: Text('ログインが必要です'));
-    }
+    if (docs.isEmpty) return const SizedBox.shrink();
 
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: _db.collection('favorites').doc(uid).snapshots(),
-      builder: (context, favSnap) {
-        if (favSnap.connectionState == ConnectionState.waiting) {
-          return const SkeletonList();
-        }
+    return _ShadowCard(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.base),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.receipt_long, size: 20, color: AppColors.ruri),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  '支払い履歴',
+                  style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ...docs.take(20).map((doc) {
+              final data = doc.data();
+              final amount = (data['amount'] is int) ? (data['amount'] as int) : 0;
+              final paymentStatus = (data['paymentStatus'] ?? '').toString();
+              final paymentId = (data['paymentId'] ?? '').toString();
+              final isPaid = paymentStatus == 'paid';
 
-        final favData = favSnap.data?.data();
-        final jobIds = List<String>.from(favData?['jobIds'] ?? []);
+              DateTime? confirmedAt;
+              final ts = data['payoutConfirmedAt'];
+              if (ts is Timestamp) confirmedAt = ts.toDate();
 
-        if (jobIds.isEmpty) {
-          return const EmptyState(
-            icon: Icons.favorite_border,
-            title: 'お気に入りはまだありません',
-            description: '案件の♡をタップして追加できます',
-          );
-        }
+              final dateText = confirmedAt != null
+                  ? '${confirmedAt.year}/${confirmedAt.month.toString().padLeft(2, '0')}/${confirmedAt.day.toString().padLeft(2, '0')}'
+                  : '';
 
-        // jobIds変更時にバッチ取得
-        if (!_listEquals(jobIds, _lastJobIds)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _fetchJobs(jobIds);
-          });
-        }
-
-        if (_isLoadingJobs && _jobsCache.isEmpty) {
-          return const SkeletonList();
-        }
-
-        return RefreshIndicator(
-          onRefresh: () async {
-            _lastJobIds = []; // 強制再取得
-            await _fetchJobs(jobIds);
-          },
-          color: AppColors.ruri,
-          child: ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            cacheExtent: AppConstants.listCacheExtent,
-            padding: const EdgeInsets.all(AppSpacing.pagePadding),
-            itemCount: jobIds.length,
-            itemBuilder: (context, i) {
-              final jobId = jobIds[i];
-              final job = _jobsCache[jobId];
-              if (job == null) return const SizedBox.shrink();
-
-              final title = (job['title'] ?? 'タイトルなし').toString();
-              final location = (job['location'] ?? '').toString();
-              final price = (job['price'] ?? '').toString();
-              final date = (job['date'] ?? '').toString();
-              final imageUrl = (job['imageUrl'] ?? '').toString();
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                    boxShadow: AppShadows.card,
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                      onTap: () {
-                        context.push(RoutePaths.jobDetailPath(jobId), extra: job);
-                      },
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(AppSpacing.cardRadius),
-                              bottomLeft: Radius.circular(AppSpacing.cardRadius),
-                            ),
-                            child: SizedBox(
-                              width: 100,
-                              height: 90,
-                              child: imageUrl.isNotEmpty
-                                  ? AppCachedImage(
-                                      imageUrl: imageUrl,
-                                      width: 100,
-                                      height: 90,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      color: AppColors.chipUnselected,
-                                      child: const Icon(Icons.work, color: AppColors.textHint),
-                                    ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(title, style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  if (location.isNotEmpty)
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textHint),
-                                        const SizedBox(width: AppSpacing.xs),
-                                        Expanded(child: Text(location, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                      ],
-                                    ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Row(
-                                    children: [
-                                      if (price.isNotEmpty)
-                                        Text('¥$price', style: AppTextStyles.salary.copyWith(fontSize: 14)),
-                                      const Spacer(),
-                                      if (date.isNotEmpty)
-                                        Text(date, style: AppTextStyles.labelSmall),
-                                    ],
-                                  ),
-                                ],
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                  onTap: paymentId.isNotEmpty
+                      ? () {
+                          context.push(RoutePaths.paymentDetailPath(paymentId));
+                        }
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _formatYen(amount),
+                                style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w800),
                               ),
+                              if (dateText.isNotEmpty)
+                                Text(
+                                  dateText,
+                                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isPaid
+                                ? AppColors.success.withValues(alpha: 0.1)
+                                : AppColors.ruri.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                          ),
+                          child: Text(
+                            isPaid ? '振込済み ✓' : '確定済み',
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: isPaid ? AppColors.success : AppColors.ruri,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: AppSpacing.sm),
-                            child: IconButton(
-                              icon: const Icon(Icons.favorite, color: Colors.red, size: 22),
-                              onPressed: () async {
-                                await _db.collection('favorites').doc(uid).update({
-                                  'jobIds': FieldValue.arrayRemove([jobId]),
-                                  'updatedAt': FieldValue.serverTimestamp(),
-                                });
-                              },
-                            ),
+                        ),
+                        if (paymentId.isNotEmpty)
+                          const Padding(
+                            padding: EdgeInsets.only(left: 4),
+                            child: Icon(Icons.chevron_right, size: 18, color: AppColors.textHint),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
               );
-            },
-          ),
-        );
-      },
+            }),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -624,7 +696,7 @@ class _SelectedMonthCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '選択月の売上',
+                  '選択月の収入',
                   style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: AppSpacing.xs),

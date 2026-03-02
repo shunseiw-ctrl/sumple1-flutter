@@ -30,6 +30,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool _uploadingImage = false;
   bool _ready = false;
   String? _readyError;
+  bool _isApplicant = false;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -62,6 +63,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (!mounted) return;
 
     if (result.success) {
+      _isApplicant = result.isApplicant;
+      // 既読タイムスタンプを更新
+      _chatService.markAsRead(
+        applicationId: widget.applicationId,
+        isApplicant: _isApplicant,
+      );
       setState(() { _ready = true; _readyError = null; });
     } else {
       setState(() { _ready = false; _readyError = result.errorMessage; });
@@ -254,7 +261,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           : Column(
               children: [
                 Expanded(
-                  child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    stream: _chatRef.snapshots(),
+                    builder: (context, chatSnap) {
+                      // 相手のlastReadAtを取得
+                      final chatData = chatSnap.data?.data() ?? {};
+                      final peerReadField = _isApplicant
+                          ? 'lastReadAtAdmin'
+                          : 'lastReadAtApplicant';
+                      final peerLastReadAt =
+                          chatData[peerReadField] as Timestamp?;
+
+                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: _msgRef.orderBy('createdAt', descending: true).limit(100).snapshots(),
                     builder: (context, snap) {
                       if (snap.hasError) return const Center(child: Text('読み込みエラー'));
@@ -324,9 +342,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                     if (mine)
                                       Padding(
                                         padding: const EdgeInsets.only(right: 4, bottom: 2),
-                                        child: Text(
-                                          _formatTime(createdAt),
-                                          style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (peerLastReadAt != null &&
+                                                createdAt != null &&
+                                                createdAt.compareTo(peerLastReadAt) <= 0)
+                                              const Text(
+                                                '既読',
+                                                style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
+                                              ),
+                                            Text(
+                                              _formatTime(createdAt),
+                                              style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     Flexible(
@@ -380,6 +411,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           );
                         },
                       );
+                    },
+                  );
                     },
                   ),
                 ),

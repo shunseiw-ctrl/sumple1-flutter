@@ -5,6 +5,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/services/quality_score_service.dart';
 
 class MyProfilePage extends StatefulWidget {
   const MyProfilePage({super.key});
@@ -359,6 +360,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   );
                 },
               ),
+              const SizedBox(height: 12),
+              _QualityScoreCard(
+                uid: FirebaseAuth.instance.currentUser?.uid ?? '',
+              ),
               const SizedBox(height: 16),
 
               const _SectionTitle('Stripe連携'),
@@ -651,6 +656,142 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _QualityScoreCard extends StatelessWidget {
+  final String uid;
+  const _QualityScoreCard({required this.uid});
+
+  @override
+  Widget build(BuildContext context) {
+    if (uid.isEmpty) return const SizedBox.shrink();
+
+    return FutureBuilder<WorkerQualityScore>(
+      future: QualityScoreService().calculateScore(uid),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.ruriPale.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.ruriPale),
+            ),
+            child: const Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+        }
+
+        if (snap.hasError || !snap.hasData) {
+          return const SizedBox.shrink();
+        }
+
+        final score = snap.data!;
+        final overallScore = score.overallScore;
+        final completionPercent = (score.completionRate * 100).round();
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.ruriPale.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.ruriPale),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    '品質スコア',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ...List.generate(5, (i) {
+                    final starNum = i + 1;
+                    if (overallScore >= starNum) {
+                      return const Icon(Icons.star_rounded, size: 20, color: Colors.amber);
+                    } else if (overallScore >= starNum - 0.5) {
+                      return const Icon(Icons.star_half_rounded, size: 20, color: Colors.amber);
+                    } else {
+                      return const Icon(Icons.star_outline_rounded, size: 20, color: AppColors.textHint);
+                    }
+                  }),
+                  const SizedBox(width: 6),
+                  Text(
+                    overallScore.toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _ScoreRow(
+                label: '評価平均',
+                value: '${score.ratingsAverage.toStringAsFixed(1)} (${score.ratingsCount}件)',
+              ),
+              const SizedBox(height: 4),
+              _ScoreRow(
+                label: '完了率',
+                value: '$completionPercent% (${score.totalCompleted}/${score.totalAssigned})',
+              ),
+              const SizedBox(height: 4),
+              _ScoreRow(
+                label: '認定資格',
+                value: '${score.verifiedQualificationCount}件',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _ScoreRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(width: 8),
+        const Text('├ ', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }

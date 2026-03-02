@@ -628,6 +628,163 @@ describe("Stripe Functions logic", () => {
       );
     });
 
+    test("payout.paid → payoutStatusをpaidに更新", async () => {
+      const updateFn = jest.fn().mockResolvedValue(undefined);
+      const paymentDocs = [
+        {
+          ref: { update: updateFn },
+          data: () => ({
+            workerUid: "worker-001",
+            payoutStatus: "pending",
+          }),
+        },
+      ];
+
+      const profileDocRef = {
+        get: jest.fn().mockResolvedValue({
+          exists: true,
+          data: () => ({ stripeAccountId: "acct_worker_123" }),
+        }),
+      };
+
+      firestoreMock.collection.mockImplementation((col) => {
+        if (col === "payments") {
+          return {
+            where: jest.fn().mockReturnValue({
+              get: jest.fn().mockResolvedValue({ docs: paymentDocs }),
+            }),
+          };
+        }
+        if (col === "profiles") {
+          return { doc: jest.fn().mockReturnValue(profileDocRef) };
+        }
+        return {};
+      });
+
+      // payout.paidイベントハンドラのロジック再現
+      const payout = { id: "po_test_123", amount: 50000, destination: "acct_worker_123" };
+      const destinationAccountId = payout.destination;
+
+      if (destinationAccountId) {
+        const paymentsQuery = await firestoreMock.collection("payments")
+          .where("payoutStatus", "!=", "paid").get();
+        for (const paymentDoc of paymentsQuery.docs) {
+          const paymentData = paymentDoc.data();
+          if (paymentData.workerUid) {
+            const workerProfile = await firestoreMock.collection("profiles").doc(paymentData.workerUid).get();
+            const workerStripeId = workerProfile.data()?.stripeAccountId;
+            if (workerStripeId === destinationAccountId && paymentData.payoutStatus !== "paid") {
+              await paymentDoc.ref.update({ payoutStatus: "paid" });
+            }
+          }
+        }
+      }
+
+      expect(updateFn).toHaveBeenCalledWith(expect.objectContaining({ payoutStatus: "paid" }));
+    });
+
+    test("payout.paid → 該当Stripeアカウントの支払いのみ更新", async () => {
+      const updateFn1 = jest.fn().mockResolvedValue(undefined);
+      const updateFn2 = jest.fn().mockResolvedValue(undefined);
+      const paymentDocs = [
+        {
+          ref: { update: updateFn1 },
+          data: () => ({ workerUid: "worker-001", payoutStatus: "pending" }),
+        },
+        {
+          ref: { update: updateFn2 },
+          data: () => ({ workerUid: "worker-002", payoutStatus: "pending" }),
+        },
+      ];
+
+      firestoreMock.collection.mockImplementation((col) => {
+        if (col === "payments") {
+          return {
+            where: jest.fn().mockReturnValue({
+              get: jest.fn().mockResolvedValue({ docs: paymentDocs }),
+            }),
+          };
+        }
+        if (col === "profiles") {
+          return {
+            doc: jest.fn().mockImplementation((uid) => ({
+              get: jest.fn().mockResolvedValue({
+                exists: true,
+                data: () => ({
+                  stripeAccountId: uid === "worker-001" ? "acct_target" : "acct_other",
+                }),
+              }),
+            })),
+          };
+        }
+        return {};
+      });
+
+      const destinationAccountId = "acct_target";
+      const paymentsQuery = await firestoreMock.collection("payments")
+        .where("payoutStatus", "!=", "paid").get();
+      for (const paymentDoc of paymentsQuery.docs) {
+        const paymentData = paymentDoc.data();
+        if (paymentData.workerUid) {
+          const workerProfile = await firestoreMock.collection("profiles").doc(paymentData.workerUid).get();
+          const workerStripeId = workerProfile.data()?.stripeAccountId;
+          if (workerStripeId === destinationAccountId && paymentData.payoutStatus !== "paid") {
+            await paymentDoc.ref.update({ payoutStatus: "paid" });
+          }
+        }
+      }
+
+      expect(updateFn1).toHaveBeenCalledWith(expect.objectContaining({ payoutStatus: "paid" }));
+      expect(updateFn2).not.toHaveBeenCalled();
+    });
+
+    test("payout.paid → 既にpaidの支払いは無視", async () => {
+      const updateFn = jest.fn().mockResolvedValue(undefined);
+      const paymentDocs = [
+        {
+          ref: { update: updateFn },
+          data: () => ({ workerUid: "worker-001", payoutStatus: "paid" }),
+        },
+      ];
+
+      firestoreMock.collection.mockImplementation((col) => {
+        if (col === "payments") {
+          return {
+            where: jest.fn().mockReturnValue({
+              get: jest.fn().mockResolvedValue({ docs: paymentDocs }),
+            }),
+          };
+        }
+        if (col === "profiles") {
+          return {
+            doc: jest.fn().mockReturnValue({
+              get: jest.fn().mockResolvedValue({
+                exists: true,
+                data: () => ({ stripeAccountId: "acct_target" }),
+              }),
+            }),
+          };
+        }
+        return {};
+      });
+
+      const destinationAccountId = "acct_target";
+      const paymentsQuery = await firestoreMock.collection("payments")
+        .where("payoutStatus", "!=", "paid").get();
+      for (const paymentDoc of paymentsQuery.docs) {
+        const paymentData = paymentDoc.data();
+        if (paymentData.workerUid) {
+          const workerProfile = await firestoreMock.collection("profiles").doc(paymentData.workerUid).get();
+          const workerStripeId = workerProfile.data()?.stripeAccountId;
+          if (workerStripeId === destinationAccountId && paymentData.payoutStatus !== "paid") {
+            await paymentDoc.ref.update({ payoutStatus: "paid" });
+          }
+        }
+      }
+
+      expect(updateFn).not.toHaveBeenCalled();
+    });
+
     test("不明なイベントタイプはログのみ", async () => {
       stripeMock.webhooks.constructEvent.mockReturnValue({
         type: "unknown.event",

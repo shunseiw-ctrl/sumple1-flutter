@@ -242,7 +242,8 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
           "lastMessageText","lastMessageAt","lastMessageSenderUid",
           "unreadCountApplicant","unreadCountAdmin",
-          "updatedAt","titleSnapshot"
+          "updatedAt","titleSnapshot",
+          "lastReadAtApplicant","lastReadAtAdmin"
         ]);
 
       allow delete: if false;

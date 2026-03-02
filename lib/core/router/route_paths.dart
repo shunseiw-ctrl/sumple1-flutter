@@ -48,6 +48,12 @@ class RoutePaths {
   // --- マップ ---
   static const String mapSearch = '/map-search';
 
+  // --- お気に入り ---
+  static const String favorites = '/favorites';
+
+  // --- 電話認証 ---
+  static const String phoneAuth = '/phone-auth';
+
   // --- 日報・検査・タイムライン ---
   static const String workReportCreate = '/work/:applicationId/report/new';
   static const String workInspection = '/work/:applicationId/inspection';
@@ -63,6 +69,8 @@ class RoutePaths {
 
   // --- 管理者 ---
   static const String adminHome = '/admin';
+  static const String adminQualifications = '/admin/qualifications';
+  static const String adminEarlyPayments = '/admin/early-payments';
 
   /// パスパラメータを展開するヘルパー
   static String jobDetailPath(String jobId) => '/jobs/$jobId';

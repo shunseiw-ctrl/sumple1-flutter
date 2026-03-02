@@ -429,7 +429,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _OverviewTab(app: app, jobId: jobId),
+                    _OverviewTab(app: app, jobId: jobId, applicationId: widget.applicationId),
                     WorkReportsTab(applicationId: widget.applicationId),
                     WorkPhotosTab(applicationId: widget.applicationId, jobId: jobId),
                     WorkDocsTab(applicationId: widget.applicationId),
@@ -447,11 +447,15 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
 class _OverviewTab extends StatelessWidget {
   final Map<String, dynamic> app;
   final String jobId;
+  final String applicationId;
 
-  const _OverviewTab({required this.app, required this.jobId});
+  const _OverviewTab({required this.app, required this.jobId, required this.applicationId});
 
   @override
   Widget build(BuildContext context) {
+    final status = (app['status'] ?? '').toString();
+    final showPayment = ['completed', 'done', 'inspection', 'fixing'].contains(status);
+
     if (jobId.trim().isEmpty) {
       final title = (app['jobTitleSnapshot'] ?? '').toString();
       final location = (app['jobLocationSnapshot'] ?? '').toString();
@@ -461,6 +465,10 @@ class _OverviewTab extends StatelessWidget {
       return ListView(
         padding: const EdgeInsets.all(12),
         children: [
+          if (showPayment) ...[
+            _PaymentInfoCard(applicationId: applicationId),
+            const SizedBox(height: 12),
+          ],
           _Card(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +507,148 @@ class _OverviewTab extends StatelessWidget {
 
         final jobData = doc.data() ?? <String, dynamic>{};
 
+        if (showPayment) {
+          return ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                child: _PaymentInfoCard(applicationId: applicationId),
+              ),
+              JobDetailBody(data: jobData),
+            ],
+          );
+        }
+
         return JobDetailBody(data: jobData);
+      },
+    );
+  }
+}
+
+class _PaymentInfoCard extends StatelessWidget {
+  final String applicationId;
+  const _PaymentInfoCard({required this.applicationId});
+
+  String _formatYen(int value) {
+    final s = value.toString();
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      final idxFromEnd = s.length - i;
+      buf.write(s[i]);
+      if (idxFromEnd > 1 && idxFromEnd % 3 == 1) buf.write(',');
+    }
+    return '¥${buf.toString()}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('earnings')
+          .where('applicationId', isEqualTo: applicationId)
+          .limit(1)
+          .snapshots(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+        final docs = snap.data?.docs ?? [];
+
+        Widget content;
+        VoidCallback? onTap;
+
+        if (docs.isEmpty) {
+          // 未確定
+          content = Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.payments_outlined, size: 22, color: Colors.grey.shade500),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('報酬', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                    const SizedBox(height: 2),
+                    Text('未確定', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
+                  ],
+                ),
+              ),
+            ],
+          );
+        } else {
+          final data = docs.first.data();
+          final amount = (data['amount'] is int) ? (data['amount'] as int) : 0;
+          final paymentStatus = (data['paymentStatus'] ?? '').toString();
+          final paymentId = (data['paymentId'] ?? '').toString();
+          final isSucceeded = paymentStatus == 'succeeded' || paymentStatus == 'paid';
+
+          final statusLabel = isSucceeded ? '振込済み' : '確定済み';
+          final statusColor = isSucceeded ? AppColors.success : AppColors.ruri;
+          final iconBgColor = isSucceeded ? AppColors.success.withValues(alpha: 0.15) : AppColors.ruri.withValues(alpha: 0.15);
+
+          if (paymentId.isNotEmpty) {
+            onTap = () {
+              context.push(RoutePaths.paymentDetailPath(paymentId));
+            };
+          }
+
+          content = Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isSucceeded ? Icons.check_circle : Icons.account_balance_wallet,
+                  size: 22,
+                  color: statusColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(statusLabel, style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 13)),
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatYen(amount),
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: statusColor),
+                    ),
+                  ],
+                ),
+              ),
+              if (paymentId.isNotEmpty)
+                Icon(Icons.chevron_right, color: statusColor, size: 22),
+            ],
+          );
+        }
+
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE6E8EB)),
+              ),
+              child: content,
+            ),
+          ),
+        );
       },
     );
   }

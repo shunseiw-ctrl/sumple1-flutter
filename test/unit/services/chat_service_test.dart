@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sumple1/core/services/chat_service.dart';
+import 'package:sumple1/core/services/notification_service.dart';
 
 void main() {
   group('ChatRoomInitResult', () {
@@ -66,7 +67,11 @@ void main() {
         email: 'worker@test.com',
       );
       mockAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
-      chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+      chatService = ChatService(
+        firestore: fakeFirestore,
+        auth: mockAuth,
+        notificationService: NotificationService(firestore: fakeFirestore),
+      );
     });
 
     group('initializeChatRoom', () {
@@ -197,7 +202,11 @@ void main() {
     test('未ログインでinitializeChatRoomはエラー', () async {
       final fakeFirestore = FakeFirebaseFirestore();
       final mockAuth = MockFirebaseAuth(signedIn: false);
-      final chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+      final chatService = ChatService(
+        firestore: fakeFirestore,
+        auth: mockAuth,
+        notificationService: NotificationService(firestore: fakeFirestore),
+      );
 
       final result = await chatService.initializeChatRoom('app-001');
 
@@ -208,7 +217,11 @@ void main() {
     test('未ログインでsendMessageはエラー', () async {
       final fakeFirestore = FakeFirebaseFirestore();
       final mockAuth = MockFirebaseAuth(signedIn: false);
-      final chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+      final chatService = ChatService(
+        firestore: fakeFirestore,
+        auth: mockAuth,
+        notificationService: NotificationService(firestore: fakeFirestore),
+      );
 
       final result = await chatService.sendMessage(
         applicationId: 'app-001',
@@ -233,7 +246,11 @@ void main() {
         email: 'worker@test.com',
       );
       mockAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
-      chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+      chatService = ChatService(
+        firestore: fakeFirestore,
+        auth: mockAuth,
+        notificationService: NotificationService(firestore: fakeFirestore),
+      );
     });
 
     test('空imageUrl→エラー', () async {
