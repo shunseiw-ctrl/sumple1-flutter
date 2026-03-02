@@ -11,6 +11,7 @@ import 'package:sumple1/presentation/widgets/white_card.dart';
 import 'package:sumple1/presentation/widgets/form_divider.dart';
 import 'package:sumple1/presentation/widgets/labeled_field.dart';
 import 'package:sumple1/presentation/widgets/hint_card.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -196,6 +197,7 @@ class _PostPageState extends State<PostPage> {
       });
 
       if (!mounted) return;
+      AppHaptics.success();
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;

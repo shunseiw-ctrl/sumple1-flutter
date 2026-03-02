@@ -13,6 +13,7 @@ import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import '../core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -117,6 +118,7 @@ class _SalesContent extends StatefulWidget {
 }
 
 class _SalesContentState extends State<_SalesContent> {
+  Key _refreshKey = UniqueKey();
   DateTime? _selectedMonth;
 
   String _two(int n) => n.toString().padLeft(2, '0');
@@ -159,10 +161,11 @@ class _SalesContentState extends State<_SalesContent> {
         .limit(200);
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      key: _refreshKey,
       stream: q.snapshots(),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return SkeletonList(itemBuilder: (_) => const SkeletonSalesCard());
         }
         if (snap.hasError) {
           return Center(child: Text('読み込みエラー: ${snap.error}'));
@@ -217,7 +220,14 @@ class _SalesContentState extends State<_SalesContent> {
           return (v / maxV).clamp(0.0, 1.0);
         }).toList();
 
-        return ListView(
+        return RefreshIndicator(
+          onRefresh: () async {
+            setState(() => _refreshKey = UniqueKey());
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          color: AppColors.ruri,
+          child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
           children: [
             _ShadowCard(
@@ -367,6 +377,7 @@ class _SalesContentState extends State<_SalesContent> {
               const _PaymentSummarySection(),
             ],
           ],
+        ),
         );
       },
     );
@@ -387,7 +398,7 @@ class _FavoritesContent extends StatelessWidget {
       stream: FirebaseFirestore.instance.collection('favorites').doc(uid).snapshots(),
       builder: (context, favSnap) {
         if (favSnap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const SkeletonList();
         }
 
         final favData = favSnap.data?.data();

@@ -17,6 +17,8 @@ import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'job_detail_page.dart' show JobDetailBody;
 import 'work_detail/photos_tab.dart';
 import 'work_detail/docs_tab.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class WorkDetailPage extends ConsumerStatefulWidget {
   final String applicationId;
@@ -117,7 +119,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
           return Scaffold(body: Center(child: Text('読み込みエラー: ${snap.error}')));
         }
         if (!snap.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(body: SkeletonList(itemBuilder: (_) => const SkeletonWorkCard()));
         }
         final doc = snap.data!;
         if (!doc.exists) {
@@ -212,6 +214,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                             );
                           }
                           if (!context.mounted) return;
+                          AppHaptics.success();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('開始しました（着工中）')),
                           );

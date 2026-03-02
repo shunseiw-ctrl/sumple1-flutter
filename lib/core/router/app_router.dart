@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../services/analytics_service.dart';
+import 'page_transitions.dart';
 import 'route_paths.dart';
 
 // --- ページインポート ---
@@ -46,142 +47,208 @@ final routerProvider = Provider<GoRouter>((ref) {
       // --- 認証 ---
       GoRoute(
         path: RoutePaths.login,
-        builder: (context, state) => const EmailAuthPage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const EmailAuthPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.adminLogin,
-        builder: (context, state) => const AdminLoginPage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const AdminLoginPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.onboarding,
-        builder: (context, state) => const OnboardingPage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const OnboardingPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.guestHome,
-        builder: (context, state) => const GuestHomePage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const GuestHomePage(),
+        ),
       ),
 
       // --- 管理者 ---
       GoRoute(
         path: RoutePaths.adminHome,
-        builder: (context, state) => const AdminHomePage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const AdminHomePage(),
+        ),
       ),
 
       // --- 案件系 ---
       GoRoute(
         path: RoutePaths.postJob,
-        builder: (context, state) => const PostPage(),
+        pageBuilder: (context, state) => slideUpTransition(
+          key: state.pageKey,
+          child: const PostPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.jobDetail,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final jobId = state.pathParameters['jobId'] ?? '';
           final extra = state.extra;
           final jobData = extra is Map<String, dynamic> ? extra : <String, dynamic>{};
-          return JobDetailPage(jobId: jobId, jobData: jobData);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: JobDetailPage(jobId: jobId, jobData: jobData),
+          );
         },
       ),
       GoRoute(
         path: RoutePaths.jobEdit,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final jobId = state.pathParameters['jobId'] ?? '';
           final extra = state.extra;
           final jobData = extra is Map<String, dynamic> ? extra : <String, dynamic>{};
-          return JobEditPage(jobId: jobId, jobData: jobData);
+          return slideRightTransition(
+            key: state.pageKey,
+            child: JobEditPage(jobId: jobId, jobData: jobData),
+          );
         },
       ),
 
       // --- 応募・作業系 ---
       GoRoute(
         path: RoutePaths.workDetail,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final applicationId = state.pathParameters['applicationId'] ?? '';
-          return WorkDetailPage(applicationId: applicationId);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: WorkDetailPage(applicationId: applicationId),
+          );
         },
       ),
       GoRoute(
         path: RoutePaths.chatRoom,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final applicationId = state.pathParameters['applicationId'] ?? '';
-          return ChatRoomPage(applicationId: applicationId);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: ChatRoomPage(applicationId: applicationId),
+          );
         },
       ),
       GoRoute(
         path: RoutePaths.qrCheckin,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final applicationId = state.pathParameters['applicationId'] ?? '';
           final extra = state.extra;
           final isCheckOut = extra is Map && extra['isCheckOut'] == true;
-          return QrCheckinPage(applicationId: applicationId, isCheckOut: isCheckOut);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: QrCheckinPage(applicationId: applicationId, isCheckOut: isCheckOut),
+          );
         },
       ),
       GoRoute(
         path: RoutePaths.shiftQr,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final jobId = state.pathParameters['jobId'] ?? '';
           final extra = state.extra;
           final jobTitle = extra is Map ? (extra['jobTitle'] ?? '').toString() : '';
-          return ShiftQrPage(jobId: jobId, jobTitle: jobTitle);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: ShiftQrPage(jobId: jobId, jobTitle: jobTitle),
+          );
         },
       ),
 
       // --- プロフィール・設定 ---
       GoRoute(
         path: RoutePaths.myProfile,
-        builder: (context, state) => const MyProfilePage(),
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const MyProfilePage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.accountSettings,
-        builder: (context, state) => const AccountSettingsPage(),
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const AccountSettingsPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.identityVerification,
-        builder: (context, state) => const IdentityVerificationPage(),
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const IdentityVerificationPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.stripeOnboarding,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra;
           final email = extra is Map ? extra['email'] as String? : null;
-          return StripeOnboardingPage(email: email);
+          return slideRightTransition(
+            key: state.pageKey,
+            child: StripeOnboardingPage(email: email),
+          );
         },
       ),
 
       // --- 通知 ---
       GoRoute(
         path: RoutePaths.notifications,
-        builder: (context, state) => const NotificationsPage(),
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const NotificationsPage(),
+        ),
       ),
 
       // --- 売上 ---
       GoRoute(
         path: RoutePaths.earningsCreate,
-        builder: (context, state) => const EarningsCreatePage(),
+        pageBuilder: (context, state) => slideUpTransition(
+          key: state.pageKey,
+          child: const EarningsCreatePage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.paymentDetail,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final paymentId = state.pathParameters['paymentId'] ?? '';
-          return PaymentDetailPage(paymentId: paymentId);
+          return slideUpTransition(
+            key: state.pageKey,
+            child: PaymentDetailPage(paymentId: paymentId),
+          );
         },
       ),
 
       // --- その他 ---
       GoRoute(
         path: RoutePaths.contact,
-        builder: (context, state) => const ContactPage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const ContactPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.faq,
-        builder: (context, state) => const FaqPage(),
+        pageBuilder: (context, state) => fadeThroughTransition(
+          key: state.pageKey,
+          child: const FaqPage(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.legal,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra;
           final title = extra is Map ? (extra['title'] ?? '').toString() : '';
           final htmlContent = extra is Map ? (extra['htmlContent'] ?? '').toString() : '';
-          return LegalPage(title: title, htmlContent: htmlContent);
+          return fadeThroughTransition(
+            key: state.pageKey,
+            child: LegalPage(title: title, htmlContent: htmlContent),
+          );
         },
       ),
     ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
 
 import 'job_list_page.dart';
 import 'work_page.dart';
@@ -180,7 +181,10 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       bottomNavigationBar: _ModernBottomNav(
         currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+        onTap: (i) {
+          AppHaptics.selection();
+          setState(() => _index = i);
+        },
       ),
     );
   }

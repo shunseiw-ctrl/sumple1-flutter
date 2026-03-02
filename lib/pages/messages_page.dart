@@ -17,6 +17,9 @@ import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/core/providers/connectivity_provider.dart';
 import 'package:sumple1/presentation/widgets/offline_banner.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
+import 'package:sumple1/core/utils/debouncer.dart';
 
 class MessagesPage extends ConsumerStatefulWidget {
   const MessagesPage({super.key});
@@ -33,6 +36,9 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
   String _query = '';
   bool _isAdmin = false;
 
+  Key _refreshKey = UniqueKey();
+  final _debouncer = Debouncer();
+
   String get _myUid => _auth.currentUser?.uid ?? '';
   String get _myEmail => _auth.currentUser?.email ?? '';
 
@@ -41,6 +47,12 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
     super.initState();
     AnalyticsService.logScreenView('messages');
     _checkAdminRole();
+  }
+
+  @override
+  void dispose() {
+    _debouncer.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAdminRole() async {
@@ -236,15 +248,20 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                 ),
                 isDense: true,
               ),
-              onChanged: (v) => setState(() => _query = v.trim()),
+              onChanged: (v) {
+                _debouncer.run(() {
+                  if (mounted) setState(() => _query = v.trim());
+                });
+              },
             ),
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              key: _refreshKey,
               stream: applicationsQuery.snapshots(),
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return SkeletonList(itemBuilder: (_) => const SkeletonMessageCard());
                 }
                 if (snap.hasError) {
                   return Center(child: Text('読み込みエラー: ${snap.error}'));
@@ -281,141 +298,150 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                 filtered.sort(_compareByLastMessageAtDesc);
 
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-                  itemBuilder: (context, i) {
-                    final doc = filtered[i];
-                    final appId = doc.id;
-                    final app = doc.data();
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() => _refreshKey = UniqueKey());
+                    await Future.delayed(const Duration(milliseconds: 500));
+                  },
+                  color: AppColors.ruri,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (context, i) {
+                      final doc = filtered[i];
+                      final appId = doc.id;
+                      final app = doc.data();
 
-                    final title = (app['projectNameSnapshot'] ??
-                        app['jobTitleSnapshot'] ??
-                        app['titleSnapshot'] ??
-                        '案件')
-                        .toString();
+                      final title = (app['projectNameSnapshot'] ??
+                          app['jobTitleSnapshot'] ??
+                          app['titleSnapshot'] ??
+                          '案件')
+                          .toString();
 
-                    final status = (app['status'] ?? '').toString();
-                    final chatStream = _db.collection('chats').doc(appId).snapshots();
+                      final status = (app['status'] ?? '').toString();
+                      final chatStream = _db.collection('chats').doc(appId).snapshots();
 
-                    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                      stream: chatStream,
-                      builder: (context, chatSnap) {
-                        final chatData = chatSnap.data?.data();
-                        final unread = _unreadFromChat(chatData);
-                        final lastText = _lastMessageTextFromChat(chatData);
-                        final lastAt = _lastMessageAtFromChat(chatData);
+                      return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        stream: chatStream,
+                        builder: (context, chatSnap) {
+                          final chatData = chatSnap.data?.data();
+                          final unread = _unreadFromChat(chatData);
+                          final lastText = _lastMessageTextFromChat(chatData);
+                          final lastAt = _lastMessageAtFromChat(chatData);
 
-                        final ymdText = _formatYmd(lastAt);
+                          final ymdText = _formatYmd(lastAt);
 
-                        if (lastAt != null) {
-                          final prev = _lastAtCache[appId];
-                          if (prev == null || prev != lastAt) {
-                            _lastAtCache[appId] = lastAt;
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (mounted) setState(() {});
-                            });
+                          if (lastAt != null) {
+                            final prev = _lastAtCache[appId];
+                            if (prev == null || prev != lastAt) {
+                              _lastAtCache[appId] = lastAt;
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) setState(() {});
+                              });
+                            }
                           }
-                        }
 
-                        final sub1 = lastText.isNotEmpty
-                            ? lastText
-                            : (status.isEmpty ? ' ' : 'ステータス: $status');
-                        final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
+                          final sub1 = lastText.isNotEmpty
+                              ? lastText
+                              : (status.isEmpty ? ' ' : 'ステータス: $status');
+                          final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
 
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: unread > 0 ? AppColors.ruriPale : Colors.white,
-                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                            boxShadow: AppShadows.subtle,
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                            child: InkWell(
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: unread > 0 ? AppColors.ruriPale : Colors.white,
                               borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                              onTap: () async {
-                                await _resetUnreadIfPossible(appId);
+                              boxShadow: AppShadows.subtle,
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                                onTap: () async {
+                                  AppHaptics.tap();
+                                  await _resetUnreadIfPossible(appId);
 
-                                if (!context.mounted) return;
+                                  if (!context.mounted) return;
 
-                                context.push(RoutePaths.chatRoomPath(appId));
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(AppSpacing.md),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.ruriPale,
-                                        borderRadius: BorderRadius.circular(14),
+                                  context.push(RoutePaths.chatRoomPath(appId));
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.ruriPale,
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                        child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
                                       ),
-                                      child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
-                                    ),
-                                    const SizedBox(width: AppSpacing.md),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  title,
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: AppTextStyles.labelLarge.copyWith(
-                                                    fontWeight: unread > 0 ? FontWeight.w800 : FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (ymdText.isNotEmpty)
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: AppSpacing.sm),
+                                      const SizedBox(width: AppSpacing.md),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
                                                   child: Text(
-                                                    ymdText,
-                                                    style: AppTextStyles.labelSmall,
+                                                    title,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: AppTextStyles.labelLarge.copyWith(
+                                                      fontWeight: unread > 0 ? FontWeight.w800 : FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: AppSpacing.xs),
-                                          Text(
-                                            sub1,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: AppTextStyles.bodySmall,
-                                          ),
-                                          if (sub2.isNotEmpty)
+                                                if (ymdText.isNotEmpty)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(left: AppSpacing.sm),
+                                                    child: Text(
+                                                      ymdText,
+                                                      style: AppTextStyles.labelSmall,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: AppSpacing.xs),
                                             Text(
-                                              sub2,
+                                              sub1,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: AppTextStyles.labelSmall,
+                                              style: AppTextStyles.bodySmall,
                                             ),
+                                            if (sub2.isNotEmpty)
+                                              Text(
+                                                sub2,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: AppTextStyles.labelSmall,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: AppSpacing.sm),
+                                      Column(
+                                        children: [
+                                          _unreadBadge(unread),
+                                          const SizedBox(height: AppSpacing.xs),
+                                          const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(width: AppSpacing.sm),
-                                    Column(
-                                      children: [
-                                        _unreadBadge(unread),
-                                        const SizedBox(height: AppSpacing.xs),
-                                        const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

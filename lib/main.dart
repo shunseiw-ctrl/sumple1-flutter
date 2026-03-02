@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -33,6 +34,8 @@ import 'core/router/app_router.dart';
 import 'presentation/widgets/error_retry_widget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
+import 'core/services/force_update_service.dart';
+import 'presentation/widgets/force_update_dialog.dart';
 
 /// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
 @pragma('vm:entry-point')
@@ -542,6 +545,28 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     _checkOnboarding();
+    _checkForUpdate();
+  }
+
+  Future<void> _checkForUpdate() async {
+    final result = await ForceUpdateService().checkForUpdate();
+    if (!mounted || result == ForceUpdateResult.upToDate) return;
+
+    final doc = await FirebaseFirestore.instance.doc('app_config/version').get();
+    final data = doc.data() ?? {};
+    if (!mounted) return;
+
+    final isIos = Theme.of(context).platform == TargetPlatform.iOS;
+    final storeUrl = isIos
+        ? (data['iosStoreUrl'] ?? '').toString()
+        : (data['androidStoreUrl'] ?? '').toString();
+
+    showForceUpdateDialog(
+      context,
+      isForced: result == ForceUpdateResult.forced,
+      storeUrl: storeUrl,
+      message: (data['updateMessage'] ?? '').toString(),
+    );
   }
 
   Future<void> _checkOnboarding() async {

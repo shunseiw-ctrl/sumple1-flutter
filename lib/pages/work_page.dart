@@ -11,6 +11,7 @@ import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class WorkPage extends StatefulWidget {
   const WorkPage({super.key});
@@ -22,6 +23,8 @@ class WorkPage extends StatefulWidget {
 class _WorkPageState extends State<WorkPage>
     with SingleTickerProviderStateMixin {
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
+
+  Key _refreshKey = UniqueKey();
 
   late final TabController _statusTabController;
 
@@ -136,6 +139,7 @@ class _WorkPageState extends State<WorkPage>
             ),
             Expanded(
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                key: _refreshKey,
                 stream: FirebaseFirestore.instance
                     .collection('applications')
                     .where('applicantUid', isEqualTo: uid)
@@ -147,7 +151,7 @@ class _WorkPageState extends State<WorkPage>
                     return Center(child: Text('読み込みエラー: ${snap.error}'));
                   }
                   if (!snap.hasData) {
-                    return const Center(child: CircularProgressIndicator());
+                    return SkeletonList(itemBuilder: (_) => const SkeletonWorkCard());
                   }
 
                   final allDocs = snap.data!.docs.toList();
@@ -192,7 +196,14 @@ class _WorkPageState extends State<WorkPage>
                       return s == 'completed' || s == 'inspection' || s == 'fixing' || s == 'done';
                     }).toList();
 
-                    return ListView(
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() => _refreshKey = UniqueKey());
+                        await Future.delayed(const Duration(milliseconds: 500));
+                      },
+                      color: AppColors.ruri,
+                      child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                       children: [
                         _StatusGroup(
@@ -222,10 +233,18 @@ class _WorkPageState extends State<WorkPage>
                           onTapItem: (appId) => _navigateToDetail(context, appId),
                         ),
                       ],
+                    ),
                     );
                   }
 
-                  return ListView.separated(
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() => _refreshKey = UniqueKey());
+                      await Future.delayed(const Duration(milliseconds: 500));
+                    },
+                    color: AppColors.ruri,
+                    child: ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
@@ -270,6 +289,7 @@ class _WorkPageState extends State<WorkPage>
                         ),
                       );
                     },
+                  ),
                   );
                 },
               ),

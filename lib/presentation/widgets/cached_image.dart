@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
+import 'skeleton_loader.dart';
 
 /// キャッシュ付きネットワーク画像ウィジェット
 class AppCachedImage extends StatelessWidget {
@@ -35,10 +36,10 @@ class AppCachedImage extends StatelessWidget {
         fit: fit,
         placeholder: (context, url) =>
             placeholder ??
-            Container(
-              width: width,
-              height: height,
-              color: const Color(0xFFEEEFF1),
+            SkeletonLoader(
+              width: width ?? double.infinity,
+              height: height ?? 160,
+              borderRadius: borderRadius,
             ),
         errorWidget: (context, url, error) =>
             errorWidget ??

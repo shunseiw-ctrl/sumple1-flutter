@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -34,6 +35,8 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
   final _favoritesService = FavoritesService();
   final Set<String> _guestFavorites = {};
+
+  Key _refreshKey = UniqueKey();
 
   JobFilterState _filterState = const JobFilterState();
 
@@ -162,7 +165,10 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                 _PrefChips(
                   prefs: _prefs,
                   selected: _selectedPref,
-                  onSelected: (p) => setState(() => _selectedPref = p),
+                  onSelected: (p) {
+                    AppHaptics.selection();
+                    setState(() => _selectedPref = p);
+                  },
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _MonthChips(
@@ -232,6 +238,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                 final firestoreFavs = favSnap.data ?? [];
 
                 return StreamBuilder<QuerySnapshot>(
+                  key: _refreshKey,
                   stream: (() {
                     Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection('jobs');
 
@@ -329,82 +336,92 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       );
                     }
 
-                    return ListView.builder(
-                      padding: AppSpacing.listInsets,
-                      itemCount: filteredDocs.length,
-                      itemBuilder: (context, index) {
-                        final doc = filteredDocs[index];
-                        final data = doc.data() as Map<String, dynamic>;
-
-                        final title = data['title']?.toString() ?? 'タイトルなし';
-                        final location = data['location']?.toString() ?? '未設定';
-                        final price = data['price']?.toString() ?? '0';
-                        final date = data['date']?.toString() ?? '未設定';
-                        final imageUrl = data['imageUrl']?.toString();
-                        final category = data['category']?.toString();
-
-                        final ownerId = data['ownerId']?.toString();
-                        final isOwner = currentUser != null &&
-                            ownerId != null &&
-                            ownerId.isNotEmpty &&
-                            ownerId == currentUser.uid;
-
-                        final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
-
-                        final badges = <BadgeSpec>[];
-
-                        final isFav = _favoritesService.isRegistered
-                            ? firestoreFavs.contains(doc.id)
-                            : _guestFavorites.contains(doc.id);
-
-                        return StaggeredFadeSlide(
-                          index: index,
-                          child: Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.base),
-                          child: JobCard(
-                            title: title,
-                            location: location,
-                            dateText: date,
-                            priceText: '¥$price',
-                            imageUrl: imageUrl,
-                            category: category,
-                            badges: badges,
-                            showLegacyWarning: !hasOwnerId,
-                            data: data,
-                            isOwner: isOwner,
-                            isFavorite: isFav,
-                            onToggleFavorite: () {
-                              if (_favoritesService.isRegistered) {
-                                _favoritesService.toggleFavorite(doc.id);
-                              } else {
-                                setState(() {
-                                  if (_guestFavorites.contains(doc.id)) {
-                                    _guestFavorites.remove(doc.id);
-                                  } else {
-                                    _guestFavorites.add(doc.id);
-                                  }
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('登録するとお気に入りが保存されます'),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            },
-                            onTap: () {
-                              context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
-                            },
-                            onEdit: isOwner
-                                ? () {
-                              context.push(RoutePaths.jobEditPath(doc.id), extra: data);
-                            }
-                                : null,
-                            onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
-                          ),
-                        ),
-                        );
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() => _refreshKey = UniqueKey());
+                        await Future.delayed(const Duration(milliseconds: 500));
                       },
+                      color: AppColors.ruri,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: AppSpacing.listInsets,
+                        itemCount: filteredDocs.length,
+                        itemBuilder: (context, index) {
+                          final doc = filteredDocs[index];
+                          final data = doc.data() as Map<String, dynamic>;
+
+                          final title = data['title']?.toString() ?? 'タイトルなし';
+                          final location = data['location']?.toString() ?? '未設定';
+                          final price = data['price']?.toString() ?? '0';
+                          final date = data['date']?.toString() ?? '未設定';
+                          final imageUrl = data['imageUrl']?.toString();
+                          final category = data['category']?.toString();
+
+                          final ownerId = data['ownerId']?.toString();
+                          final isOwner = currentUser != null &&
+                              ownerId != null &&
+                              ownerId.isNotEmpty &&
+                              ownerId == currentUser.uid;
+
+                          final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
+
+                          final badges = <BadgeSpec>[];
+
+                          final isFav = _favoritesService.isRegistered
+                              ? firestoreFavs.contains(doc.id)
+                              : _guestFavorites.contains(doc.id);
+
+                          return StaggeredFadeSlide(
+                            index: index,
+                            child: Padding(
+                            padding: const EdgeInsets.only(bottom: AppSpacing.base),
+                            child: JobCard(
+                              title: title,
+                              location: location,
+                              dateText: date,
+                              priceText: '¥$price',
+                              imageUrl: imageUrl,
+                              heroTag: imageUrl != null ? 'hero-job-image-${doc.id}' : null,
+                              category: category,
+                              badges: badges,
+                              showLegacyWarning: !hasOwnerId,
+                              data: data,
+                              isOwner: isOwner,
+                              isFavorite: isFav,
+                              onToggleFavorite: () {
+                                AppHaptics.tap();
+                                if (_favoritesService.isRegistered) {
+                                  _favoritesService.toggleFavorite(doc.id);
+                                } else {
+                                  setState(() {
+                                    if (_guestFavorites.contains(doc.id)) {
+                                      _guestFavorites.remove(doc.id);
+                                    } else {
+                                      _guestFavorites.add(doc.id);
+                                    }
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('登録するとお気に入りが保存されます'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                              onTap: () {
+                                context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
+                              },
+                              onEdit: isOwner
+                                  ? () {
+                                context.push(RoutePaths.jobEditPath(doc.id), extra: data);
+                              }
+                                  : null,
+                              onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
+                            ),
+                          ),
+                          );
+                        },
+                      ),
                     );
                   },
                 );

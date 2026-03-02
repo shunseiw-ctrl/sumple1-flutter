@@ -31,12 +31,21 @@ class AsyncValueBuilder<T> extends StatelessWidget {
           );
         }
 
-        if (!snapshot.hasData) {
-          return loading?.call() ??
-              const Center(child: CircularProgressIndicator());
-        }
+        final child = !snapshot.hasData
+            ? KeyedSubtree(
+                key: const ValueKey('loading'),
+                child: loading?.call() ??
+                    const Center(child: CircularProgressIndicator()),
+              )
+            : KeyedSubtree(
+                key: const ValueKey('data'),
+                child: builder(context, snapshot.data as T),
+              );
 
-        return builder(context, snapshot.data as T);
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: child,
+        );
       },
     );
   }
@@ -104,12 +113,21 @@ class _FutureRetryBuilderState<T> extends State<FutureRetryBuilder<T>> {
           return ErrorRetryWidget.general(onRetry: _retry);
         }
 
-        if (!snapshot.hasData) {
-          return widget.loading?.call() ??
-              const Center(child: CircularProgressIndicator());
-        }
+        final child = !snapshot.hasData
+            ? KeyedSubtree(
+                key: const ValueKey('loading'),
+                child: widget.loading?.call() ??
+                    const Center(child: CircularProgressIndicator()),
+              )
+            : KeyedSubtree(
+                key: const ValueKey('data'),
+                child: widget.builder(context, snapshot.data as T),
+              );
 
-        return widget.builder(context, snapshot.data as T);
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: child,
+        );
       },
     );
   }

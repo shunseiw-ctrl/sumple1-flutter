@@ -10,6 +10,8 @@ import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/providers/auth_provider.dart';
 import 'package:sumple1/core/providers/notification_providers.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
@@ -22,7 +24,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   static const _pageSize = 20;
   int _currentLimit = _pageSize;
   final _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
@@ -67,6 +68,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           TextButton(
             onPressed: () async {
               await NotificationService().markAllAsRead(uid);
+              AppHaptics.success();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('すべて既読にしました')),
@@ -80,7 +82,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         builder: (context, ref, _) {
           final snapAsync = ref.watch(notificationsStreamProvider(_currentLimit));
           return snapAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => SkeletonList(itemBuilder: (_) => const SkeletonNotificationCard()),
             error: (error, _) => Center(child: Text('エラー: $error')),
             data: (snap) {
           final docs = snap.docs;
@@ -91,8 +93,15 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               description: '新しい通知が届くとここに表示されます',
             );
           }
-          return ListView.separated(
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(notificationsStreamProvider(_currentLimit));
+              await Future.delayed(const Duration(milliseconds: 500));
+            },
+            color: AppColors.ruri,
+            child: ListView.separated(
             controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(AppSpacing.pagePadding),
             itemCount: docs.length,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
@@ -191,6 +200,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 ),
               );
             },
+          ),
           );
             },
           );

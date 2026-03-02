@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 void main() {
   group('AppCachedImage', () {
@@ -82,6 +83,40 @@ void main() {
       );
 
       expect(find.byType(AppCachedImage), findsOneWidget);
+    });
+
+    testWidgets('デフォルトplaceholderはSkeletonLoaderを使用する', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              width: 100,
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      // SkeletonLoaderがデフォルトplaceholderとして使われる
+      expect(find.byType(SkeletonLoader), findsOneWidget);
+    });
+
+    testWidgets('カスタムplaceholder指定時はSkeletonLoader不使用', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              width: 100,
+              height: 100,
+              placeholder: SizedBox(width: 100, height: 100),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(SkeletonLoader), findsNothing);
     });
   });
 }

@@ -120,9 +120,123 @@ class SkeletonJobCard extends StatelessWidget {
   }
 }
 
+class SkeletonMessageCard extends StatelessWidget {
+  const SkeletonMessageCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      ),
+      child: const Row(
+        children: [
+          SkeletonLoader(width: 48, height: 48, borderRadius: 14),
+          SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonLoader(height: 16, borderRadius: 6),
+                SizedBox(height: 8),
+                SkeletonLoader(width: 180, height: 12, borderRadius: 6),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SkeletonNotificationCard extends StatelessWidget {
+  const SkeletonNotificationCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.base),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonLoader(width: 44, height: 44, borderRadius: 14),
+          SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonLoader(height: 16, borderRadius: 6),
+                SizedBox(height: 8),
+                SkeletonLoader(height: 12, borderRadius: 6),
+                SizedBox(height: 6),
+                SkeletonLoader(width: 80, height: 10, borderRadius: 6),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SkeletonWorkCard extends StatelessWidget {
+  const SkeletonWorkCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonLoader(height: 18, borderRadius: 6),
+          SizedBox(height: 8),
+          SkeletonLoader(width: 100, height: 24, borderRadius: 12),
+        ],
+      ),
+    );
+  }
+}
+
+class SkeletonSalesCard extends StatelessWidget {
+  const SkeletonSalesCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.base),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SkeletonLoader(width: 100, height: 16, borderRadius: 6),
+          SizedBox(height: 12),
+          SkeletonLoader(width: 160, height: 32, borderRadius: 8),
+          SizedBox(height: 12),
+          SkeletonLoader(width: 140, height: 14, borderRadius: 6),
+        ],
+      ),
+    );
+  }
+}
+
 class SkeletonList extends StatelessWidget {
   final int itemCount;
-  const SkeletonList({super.key, this.itemCount = 3});
+  final Widget Function(BuildContext context)? itemBuilder;
+  const SkeletonList({super.key, this.itemCount = 3, this.itemBuilder});
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +245,7 @@ class SkeletonList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.base),
-      itemBuilder: (_, __) => const SkeletonJobCard(),
+      itemBuilder: (ctx, __) => itemBuilder?.call(ctx) ?? const SkeletonJobCard(),
     );
   }
 }

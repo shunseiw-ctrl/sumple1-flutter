@@ -87,4 +87,63 @@ void main() {
       expect(find.text('¥0'), findsOneWidget);
     });
   });
+
+  group('JobDetailBody Hero', () {
+    testWidgets('詳細画面にHero widgetが存在（jobId + imageUrl指定時）', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: JobDetailBody(
+            data: const {
+              'title': 'テスト',
+              'location': '東京',
+              'price': '10000',
+              'date': '2026-04-01',
+              'imageUrl': 'https://example.com/test.jpg',
+            },
+            jobId: 'abc123',
+          ),
+        ),
+      ));
+
+      expect(find.byType(Hero), findsOneWidget);
+    });
+
+    testWidgets('Heroタグフォーマットがjob_cardと一致', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: JobDetailBody(
+            data: const {
+              'title': 'テスト',
+              'location': '東京',
+              'price': '10000',
+              'date': '2026-04-01',
+              'imageUrl': 'https://example.com/test.jpg',
+            },
+            jobId: 'abc123',
+          ),
+        ),
+      ));
+
+      final hero = tester.widget<Hero>(find.byType(Hero));
+      expect(hero.tag, 'hero-job-image-abc123');
+    });
+
+    testWidgets('jobId未指定時はHeroなし', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: JobDetailBody(
+            data: const {
+              'title': 'テスト',
+              'location': '東京',
+              'price': '10000',
+              'date': '2026-04-01',
+              'imageUrl': 'https://example.com/test.jpg',
+            },
+          ),
+        ),
+      ));
+
+      expect(find.byType(Hero), findsNothing);
+    });
+  });
 }

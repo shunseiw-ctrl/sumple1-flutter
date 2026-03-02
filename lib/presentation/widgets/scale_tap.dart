@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
 
 class ScaleTap extends StatefulWidget {
   final Widget child;
@@ -47,6 +48,7 @@ class _ScaleTapState extends State<ScaleTap>
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
         _controller.reverse();
+        AppHaptics.tap();
         widget.onTap?.call();
       },
       onTapCancel: () => _controller.reverse(),

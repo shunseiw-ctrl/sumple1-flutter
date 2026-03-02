@@ -33,6 +33,7 @@ class JobCard extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onToggleFavorite;
+  final String? heroTag;
 
   const JobCard({
     super.key,
@@ -51,6 +52,7 @@ class JobCard extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     this.onToggleFavorite,
+    this.heroTag,
   });
 
   /// Returns the icon for a given construction category.
@@ -100,11 +102,20 @@ class JobCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (hasImage)
-                    AppCachedImage(
-                      imageUrl: imageUrl!,
-                      fit: BoxFit.cover,
-                      errorWidget: _placeholderImage(),
-                    )
+                    heroTag != null
+                        ? Hero(
+                            tag: heroTag!,
+                            child: AppCachedImage(
+                              imageUrl: imageUrl!,
+                              fit: BoxFit.cover,
+                              errorWidget: _placeholderImage(),
+                            ),
+                          )
+                        : AppCachedImage(
+                            imageUrl: imageUrl!,
+                            fit: BoxFit.cover,
+                            errorWidget: _placeholderImage(),
+                          )
                   else
                     _placeholderImage(),
 

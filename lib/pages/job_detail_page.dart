@@ -14,6 +14,8 @@ import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
+import 'package:sumple1/core/services/in_app_review_service.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -187,6 +189,8 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     }
 
     if (!context.mounted) return;
+    AppHaptics.success();
+    InAppReviewService().onApplicationCompleted();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('応募しました')));
   }
 
@@ -360,14 +364,15 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
           ),
         ),
       ),
-      body: JobDetailBody(data: data),
+      body: JobDetailBody(data: data, jobId: widget.jobId),
     );
   }
 }
 
 class JobDetailBody extends StatelessWidget {
   final Map<String, dynamic> data;
-  const JobDetailBody({super.key, required this.data});
+  final String? jobId;
+  const JobDetailBody({super.key, required this.data, this.jobId});
 
   @override
   Widget build(BuildContext context) {
@@ -407,11 +412,20 @@ class JobDetailBody extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 if (hasImage)
-                  AppCachedImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.cover,
-                    errorWidget: _buildGradientPlaceholder(),
-                  )
+                  jobId != null
+                      ? Hero(
+                          tag: 'hero-job-image-$jobId',
+                          child: AppCachedImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            errorWidget: _buildGradientPlaceholder(),
+                          ),
+                        )
+                      : AppCachedImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: _buildGradientPlaceholder(),
+                        )
                 else
                   _buildGradientPlaceholder(),
                 Positioned(

@@ -21,6 +21,7 @@ void main() {
       VoidCallback? onEdit,
       VoidCallback? onDelete,
       VoidCallback? onToggleFavorite,
+      String? heroTag,
     }) {
       return buildTestApp(
         SingleChildScrollView(
@@ -40,6 +41,7 @@ void main() {
             onEdit: onEdit,
             onDelete: onDelete,
             onToggleFavorite: onToggleFavorite,
+            heroTag: heroTag,
           ),
         ),
       );
@@ -119,6 +121,64 @@ void main() {
       expect(badge.label, 'テスト');
       expect(badge.bg, Colors.blue);
       expect(badge.fg, Colors.white);
+    });
+  });
+
+  group('JobCard Hero', () {
+    Widget buildCard({
+      String? imageUrl,
+      String? heroTag,
+    }) {
+      return buildTestApp(
+        SingleChildScrollView(
+          child: JobCard(
+            title: 'テスト',
+            location: '東京',
+            dateText: '2026-04-01',
+            priceText: '¥15000',
+            imageUrl: imageUrl,
+            badges: const [],
+            showLegacyWarning: false,
+            data: const {'slots': '5', 'applicantCount': '0'},
+            isOwner: false,
+            onTap: () {},
+            onEdit: null,
+            onDelete: null,
+            heroTag: heroTag,
+          ),
+        ),
+      );
+    }
+
+    testWidgets('画像ありJobCardにheroTag指定でHero widgetが存在', (tester) async {
+      await tester.pumpWidget(buildCard(
+        imageUrl: 'https://example.com/test.jpg',
+        heroTag: 'hero-job-image-abc123',
+      ));
+      await tester.pump();
+
+      expect(find.byType(Hero), findsOneWidget);
+    });
+
+    testWidgets('Heroタグがjob IDを含む', (tester) async {
+      await tester.pumpWidget(buildCard(
+        imageUrl: 'https://example.com/test.jpg',
+        heroTag: 'hero-job-image-abc123',
+      ));
+      await tester.pump();
+
+      final hero = tester.widget<Hero>(find.byType(Hero));
+      expect(hero.tag, 'hero-job-image-abc123');
+    });
+
+    testWidgets('画像なしJobCardにHeroなし', (tester) async {
+      await tester.pumpWidget(buildCard(
+        imageUrl: null,
+        heroTag: 'hero-job-image-abc123',
+      ));
+      await tester.pump();
+
+      expect(find.byType(Hero), findsNothing);
     });
   });
 }
