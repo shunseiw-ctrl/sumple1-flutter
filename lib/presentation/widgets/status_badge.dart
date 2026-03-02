@@ -16,6 +16,34 @@ class StatusBadge extends StatelessWidget {
     this.filled = false,
   });
 
+  /// ステータスキーから日本語ラベルを取得
+  static String labelFor(String statusKey) {
+    switch (statusKey) {
+      case 'applied': return '応募中';
+      case 'assigned': return '着工前';
+      case 'in_progress': return '着工中';
+      case 'completed': return '施工完了';
+      case 'inspection': return '検収中';
+      case 'fixing': return '是正中';
+      case 'done': return '完了';
+      default: return statusKey;
+    }
+  }
+
+  /// ステータスキーからカラーを取得
+  static Color colorFor(String statusKey) {
+    switch (statusKey) {
+      case 'applied': return AppColors.warning;
+      case 'assigned': return AppColors.info;
+      case 'in_progress': return AppColors.ruri;
+      case 'completed': return AppColors.success;
+      case 'inspection': return const Color(0xFF8B5CF6);
+      case 'fixing': return AppColors.error;
+      case 'done': return AppColors.success;
+      default: return AppColors.textSecondary;
+    }
+  }
+
   factory StatusBadge.fromStatus(String statusKey) {
     switch (statusKey) {
       case 'applied':

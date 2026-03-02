@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/account_service.dart';
@@ -225,7 +227,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       await FirebaseAuth.instance.signOut();
 
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+        context.go(RoutePaths.home);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {

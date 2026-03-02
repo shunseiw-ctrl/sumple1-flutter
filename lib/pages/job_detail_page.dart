@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import 'job_edit_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -42,12 +42,7 @@ class JobDetailPage extends StatelessWidget {
               title: Text('案件詳細', style: AppTextStyles.appBarTitle),
             ),
             body: ErrorRetryWidget.general(
-              onRetry: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => JobDetailPage(jobId: jobId, jobData: jobData),
-                ),
-              ),
+              onRetry: () => context.go(RoutePaths.jobDetailPath(jobId), extra: jobData),
               message: 'データの読み込みに失敗しました',
             ),
           );
@@ -271,13 +266,8 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
               return Row(
                 children: [
                   TextButton.icon(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JobEditPage(jobId: jobId, jobData: data),
-                        ),
-                      );
+                    onPressed: () {
+                      context.push(RoutePaths.jobEditPath(jobId), extra: data);
                     },
                     icon: const Icon(Icons.edit, size: 18, color: AppColors.textPrimary),
                     label: const Text(

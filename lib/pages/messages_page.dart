@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'chat_room_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
@@ -340,12 +340,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                                 if (!context.mounted) return;
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ChatRoomPage(applicationId: appId),
-                                  ),
-                                );
+                                context.push(RoutePaths.chatRoomPath(appId));
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(AppSpacing.md),

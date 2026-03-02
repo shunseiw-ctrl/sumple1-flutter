@@ -3,6 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/utils/prefecture_utils.dart';
+import 'package:sumple1/core/utils/job_date_utils.dart' as date_utils;
+import 'package:sumple1/presentation/widgets/section_title.dart';
+import 'package:sumple1/presentation/widgets/white_card.dart';
+import 'package:sumple1/presentation/widgets/form_divider.dart';
+import 'package:sumple1/presentation/widgets/labeled_field.dart';
+import 'package:sumple1/presentation/widgets/hint_card.dart';
 
 class JobEditPage extends StatefulWidget {
   final String jobId;
@@ -68,41 +75,6 @@ class _JobEditPageState extends State<JobEditPage> {
     super.dispose();
   }
 
-  String _guessPrefecture(String location) {
-    const prefs = [
-      '千葉県','東京都','神奈川県',
-      '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
-      '茨城県','栃木県','群馬県','埼玉県',
-      '新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県',
-      '三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
-      '鳥取県','島根県','岡山県','広島県','山口県',
-      '徳島県','香川県','愛媛県','高知県',
-      '福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県',
-      '沖縄県',
-    ];
-
-    for (final p in prefs) {
-      if (location.contains(p)) return p;
-    }
-    if (location.contains('東京')) return '東京都';
-    if (location.contains('千葉')) return '千葉県';
-    if (location.contains('神奈川')) return '神奈川県';
-    if (location.contains('大阪')) return '大阪府';
-    if (location.contains('京都')) return '京都府';
-    return '未設定';
-  }
-
-  String _dateKey(DateTime d) {
-    final y = d.year.toString();
-    final m = d.month.toString().padLeft(2, '0');
-    final day = d.day.toString().padLeft(2, '0');
-    return '$y-$m-$day';
-  }
-
-  String _monthKeyFromDateKey(String dateKey) {
-    if (dateKey.length >= 7) return dateKey.substring(0, 7);
-    return '';
-  }
 
   Future<void> _pickDate() async {
     DateTime initial = DateTime.now();
@@ -125,7 +97,7 @@ class _JobEditPageState extends State<JobEditPage> {
 
     if (picked == null) return;
 
-    _dateController.text = _dateKey(picked);
+    _dateController.text = date_utils.dateKey(picked);
   }
 
   Future<void> _update() async {
@@ -162,8 +134,8 @@ class _JobEditPageState extends State<JobEditPage> {
       return;
     }
 
-    final prefecture = _guessPrefecture(location);
-    final monthKey = _monthKeyFromDateKey(dateKey);
+    final prefecture = guessPrefecture(location);
+    final monthKey = date_utils.monthKeyFromDateKey(dateKey);
 
     final lat = double.tryParse(_latitudeController.text.trim());
     final lng = double.tryParse(_longitudeController.text.trim());
@@ -253,23 +225,23 @@ class _JobEditPageState extends State<JobEditPage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
           children: [
-            const _SectionTitle(
+            const SectionTitle(
               title: '編集内容',
               subtitle: '案件の情報を更新してください',
             ),
             const SizedBox(height: 10),
-            _WhiteCard(
+            WhiteCard(
               child: Column(
                 children: [
-                  _LabeledField(
+                  LabeledField(
                     label: 'タイトル',
                     hint: '例）クロス張替え（1LDK）',
                     controller: _titleController,
                     textInputAction: TextInputAction.next,
                     maxLength: AppConstants.maxJobTitleLength,
                   ),
-                  const _Divider(),
-                  _LabeledField(
+                  const FormDivider(),
+                  LabeledField(
                     label: '場所',
                     hint: '例）千葉県千葉市花見川区',
                     controller: _locationController,
@@ -280,10 +252,10 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            _WhiteCard(
+            WhiteCard(
               child: Column(
                 children: [
-                  _LabeledField(
+                  LabeledField(
                     label: '報酬（円）',
                     hint: '例）30000',
                     controller: _priceController,
@@ -291,8 +263,8 @@ class _JobEditPageState extends State<JobEditPage> {
                     textInputAction: TextInputAction.next,
                     prefixIcon: Icons.currency_yen,
                   ),
-                  const _Divider(),
-                  _LabeledField(
+                  const FormDivider(),
+                  LabeledField(
                     label: '日程',
                     hint: 'タップして日付を選択',
                     controller: _dateController,
@@ -305,10 +277,10 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            _WhiteCard(
+            WhiteCard(
               child: Column(
                 children: [
-                  _LabeledField(
+                  LabeledField(
                     label: '仕事内容',
                     hint: '例）現場作業の補助、清掃、資材運搬など',
                     controller: _descriptionController,
@@ -316,8 +288,8 @@ class _JobEditPageState extends State<JobEditPage> {
                     maxLines: 6,
                     maxLength: AppConstants.maxJobDescriptionLength,
                   ),
-                  const _Divider(),
-                  _LabeledField(
+                  const FormDivider(),
+                  LabeledField(
                     label: '注意事項',
                     hint: '例）遅刻厳禁、安全第一、詳細はチャットで確認など',
                     controller: _notesController,
@@ -330,10 +302,10 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            _WhiteCard(
+            WhiteCard(
               child: Column(
                 children: [
-                  _LabeledField(
+                  LabeledField(
                     label: '緯度（任意）',
                     hint: '例）35.6812',
                     controller: _latitudeController,
@@ -341,8 +313,8 @@ class _JobEditPageState extends State<JobEditPage> {
                     textInputAction: TextInputAction.next,
                     prefixIcon: Icons.my_location,
                   ),
-                  const _Divider(),
-                  _LabeledField(
+                  const FormDivider(),
+                  LabeledField(
                     label: '経度（任意）',
                     hint: '例）139.7671',
                     controller: _longitudeController,
@@ -354,7 +326,7 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            const _HintCard(
+            const HintCard(
               title: 'ヒント',
               body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。緯度・経度を設定するとQR出退勤時のGPS検証が有効になります。',
             ),
@@ -365,143 +337,3 @@ class _JobEditPageState extends State<JobEditPage> {
   }
 }
 
-// ===== UI Parts =====
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  const _SectionTitle({required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
-      ],
-    );
-  }
-}
-
-class _WhiteCard extends StatelessWidget {
-  final Widget child;
-  const _WhiteCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE6E8EB)),
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Divider(height: 1),
-    );
-  }
-}
-
-class _LabeledField extends StatelessWidget {
-  final String label;
-  final String hint;
-  final TextEditingController controller;
-  final TextInputAction textInputAction;
-  final TextInputType? keyboardType;
-  final IconData? prefixIcon;
-  final ValueChanged<String>? onSubmitted;
-  final int maxLines;
-  final int? maxLength;
-
-  final bool readOnly;
-  final VoidCallback? onTap;
-
-  const _LabeledField({
-    required this.label,
-    required this.hint,
-    required this.controller,
-    required this.textInputAction,
-    this.keyboardType,
-    this.prefixIcon,
-    this.onSubmitted,
-    this.maxLines = 1,
-    this.maxLength,
-    this.readOnly = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w900)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          textInputAction: textInputAction,
-          keyboardType: keyboardType,
-          onSubmitted: onSubmitted,
-          maxLines: maxLines,
-          maxLength: maxLength,
-          readOnly: readOnly,
-          onTap: onTap,
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
-            filled: true,
-            fillColor: AppColors.chipUnselected,
-            counterText: '',
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HintCard extends StatelessWidget {
-  final String title;
-  final String body;
-  const _HintCard({required this.title, required this.body});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFFFE0B2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
-          const SizedBox(height: 6),
-          Text(body, style: const TextStyle(color: AppColors.textPrimary, height: 1.35)),
-        ],
-      ),
-    );
-  }
-}

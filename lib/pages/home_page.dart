@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'job_list_page.dart';
@@ -7,12 +8,11 @@ import 'work_page.dart';
 import 'messages_page.dart';
 import 'sales_page.dart';
 import 'profile_page.dart';
-import 'post_page.dart';
 import '../services/push_token_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
-import 'notifications_page.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/analytics_service.dart';
 import '../core/providers/connectivity_provider.dart';
 import '../core/providers/auth_provider.dart';
@@ -54,10 +54,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   ];
 
   Future<void> _goToPost() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const PostPage()),
-    );
+    await context.push(RoutePaths.postJob);
   }
 
   @override
@@ -150,10 +147,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                   tooltip: 'お知らせ',
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const NotificationsPage()),
-                    );
+                    context.push(RoutePaths.notifications);
                   },
                 ),
               );

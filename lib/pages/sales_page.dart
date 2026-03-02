@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import 'earnings_create_page.dart';
-import 'job_detail_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -80,10 +79,7 @@ class _SalesPageState extends State<SalesPage>
               tooltip: '支払い確定を登録',
               icon: const Icon(Icons.add),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EarningsCreatePage()),
-                );
+                context.push(RoutePaths.earningsCreate);
               },
             ),
         ],
@@ -437,12 +433,7 @@ class _FavoritesContent extends StatelessWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => JobDetailPage(jobId: jobId, jobData: job),
-                            ),
-                          );
+                          context.push(RoutePaths.jobDetailPath(jobId), extra: job);
                         },
                         child: Row(
                           children: [

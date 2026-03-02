@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import 'work_detail_page.dart';
-import 'chat_room_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
@@ -88,12 +88,7 @@ class _WorkPageState extends State<WorkPage>
   }
 
   void _navigateToDetail(BuildContext context, String applicationId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => WorkDetailPage(applicationId: applicationId),
-      ),
-    );
+    context.push(RoutePaths.workDetailPath(applicationId));
   }
 
   @override
@@ -263,24 +258,14 @@ class _WorkPageState extends State<WorkPage>
                                 tooltip: 'チャット',
                                 icon: const Icon(Icons.chat_bubble_outline),
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ChatRoomPage(applicationId: applicationId),
-                                    ),
-                                  );
+                                  context.push(RoutePaths.chatRoomPath(applicationId));
                                 },
                               ),
                               const Icon(Icons.chevron_right),
                             ],
                           ),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => WorkDetailPage(applicationId: applicationId),
-                              ),
-                            );
+                            context.push(RoutePaths.workDetailPath(applicationId));
                           },
                         ),
                       );

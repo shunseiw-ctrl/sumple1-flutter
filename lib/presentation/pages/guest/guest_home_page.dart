@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/services/line_auth_service.dart';
 import 'package:sumple1/core/services/apple_auth_service.dart';
@@ -11,7 +13,6 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/pages/legal_page.dart';
-import 'package:sumple1/pages/email_auth_page.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 
@@ -86,10 +87,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
   void _goToEmailLogin() {
     Logger.info('Navigate to email login', tag: 'GuestHomePage');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const EmailAuthPage()),
-    );
+    context.push(RoutePaths.login);
   }
 
   @override
@@ -382,15 +380,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const LegalPage(
-                                        title: '利用規約',
-                                        htmlContent: LegalPage.termsHtml,
-                                      ),
-                                    ),
-                                  );
+                                  context.push(RoutePaths.legal, extra: {'title': '利用規約', 'htmlContent': LegalPage.termsHtml});
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -418,15 +408,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const LegalPage(
-                                        title: 'プライバシーポリシー',
-                                        htmlContent: LegalPage.privacyPolicyHtml,
-                                      ),
-                                    ),
-                                  );
+                                  context.push(RoutePaths.legal, extra: {'title': 'プライバシーポリシー', 'htmlContent': LegalPage.privacyPolicyHtml});
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

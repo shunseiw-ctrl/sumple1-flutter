@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 
 void main() {
@@ -140,6 +141,35 @@ void main() {
       );
 
       expect(find.text('custom_status'), findsOneWidget);
+    });
+  });
+
+  group('StatusBadge.labelFor', () {
+    test('returns correct Japanese labels for all statuses', () {
+      expect(StatusBadge.labelFor('applied'), '応募中');
+      expect(StatusBadge.labelFor('assigned'), '着工前');
+      expect(StatusBadge.labelFor('in_progress'), '着工中');
+      expect(StatusBadge.labelFor('completed'), '施工完了');
+      expect(StatusBadge.labelFor('inspection'), '検収中');
+      expect(StatusBadge.labelFor('fixing'), '是正中');
+      expect(StatusBadge.labelFor('done'), '完了');
+    });
+
+    test('returns key as-is for unknown status', () {
+      expect(StatusBadge.labelFor('unknown'), 'unknown');
+    });
+  });
+
+  group('StatusBadge.colorFor', () {
+    test('returns correct colors for known statuses', () {
+      expect(StatusBadge.colorFor('applied'), AppColors.warning);
+      expect(StatusBadge.colorFor('in_progress'), AppColors.ruri);
+      expect(StatusBadge.colorFor('done'), AppColors.success);
+      expect(StatusBadge.colorFor('fixing'), AppColors.error);
+    });
+
+    test('returns textSecondary for unknown status', () {
+      expect(StatusBadge.colorFor('unknown'), AppColors.textSecondary);
     });
   });
 }

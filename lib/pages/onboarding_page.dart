@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
-import 'package:sumple1/main.dart';
+import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 
@@ -59,10 +61,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     await prefs.setString('privacy_accepted_at', now);
 
     if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const AuthGate()),
-    );
+    context.go(RoutePaths.home);
   }
 
   void _nextPage() {
@@ -196,13 +195,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       value: _termsAccepted,
                       label: AppLocalizations.of(context)!.agreeToTerms,
                       onChanged: (v) => setState(() => _termsAccepted = v ?? false),
-                      onTap: () => Navigator.pushNamed(context, '/legal', arguments: 'terms'),
+                      onTap: () => context.push(RoutePaths.legal, extra: {
+                        'title': '利用規約',
+                        'htmlContent': LegalPage.termsHtml,
+                      }),
                     ),
                     _buildConsentCheckbox(
                       value: _privacyAccepted,
                       label: AppLocalizations.of(context)!.agreeToPrivacy,
                       onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
-                      onTap: () => Navigator.pushNamed(context, '/legal', arguments: 'privacy'),
+                      onTap: () => context.push(RoutePaths.legal, extra: {
+                        'title': 'プライバシーポリシー',
+                        'htmlContent': LegalPage.privacyPolicyHtml,
+                      }),
                     ),
                   ],
                   const SizedBox(height: AppSpacing.xl),

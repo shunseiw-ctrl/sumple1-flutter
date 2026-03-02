@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/services/line_auth_service.dart';
 import '../../core/utils/logger.dart';
-import '../../pages/email_auth_page.dart';
 
 /// 登録を促すモーダルダイアログウィジェット
 class RegistrationPromptModal {
@@ -176,9 +177,6 @@ class RegistrationPromptModal {
   /// メール登録を処理
   static void _handleEmailLogin(BuildContext context) {
     Logger.info('Email registration started from registration prompt', tag: 'RegistrationPromptModal');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const EmailAuthPage()),
-    );
+    context.push(RoutePaths.login);
   }
 }
