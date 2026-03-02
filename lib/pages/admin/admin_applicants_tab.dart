@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/core/providers/admin_applicants_provider.dart';
+import 'package:sumple1/core/providers/admin_list_state.dart';
+import 'package:sumple1/presentation/widgets/admin_search_bar.dart';
+import 'package:sumple1/presentation/widgets/admin_filter_chips.dart';
+import 'package:sumple1/presentation/widgets/load_more_button.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/core/services/quality_score_service.dart';
 
-class AdminApplicantsTab extends StatefulWidget {
+class AdminApplicantsTab extends ConsumerStatefulWidget {
   const AdminApplicantsTab({super.key});
 
   @override
-  State<AdminApplicantsTab> createState() => _AdminApplicantsTabState();
+  ConsumerState<AdminApplicantsTab> createState() => _AdminApplicantsTabState();
 }
 
-class _AdminApplicantsTabState extends State<AdminApplicantsTab> {
-  String _filterStatus = 'all';
-
+class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab> {
   Future<void> _updateStatus(String appId, String newStatus, String jobTitle) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -68,296 +72,334 @@ class _AdminApplicantsTabState extends State<AdminApplicantsTab> {
     }
   }
 
+  List<ApplicantItem> _applyFilters(AdminListState<ApplicantItem> state) {
+    var items = state.items;
+
+    // ステータスフィルタ
+    if (state.filterStatus != 'all') {
+      items = items.where((item) {
+        if (state.filterStatus == 'done') {
+          return item.status == 'completed' ||
+              item.status == 'inspection' ||
+              item.status == 'fixing' ||
+              item.status == 'done';
+        }
+        return item.status == state.filterStatus;
+      }).toList();
+    }
+
+    // 検索クエリ（ワーカー名 or 案件名）
+    if (state.searchQuery.isNotEmpty) {
+      final q = state.searchQuery.toLowerCase();
+      items = items.where((item) {
+        return item.jobTitle.toLowerCase().contains(q) ||
+            item.workerName.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _filterChip('all', 'すべて'),
-                _filterChip('applied', '応募中'),
-                _filterChip('assigned', '着工前'),
-                _filterChip('in_progress', '着工中'),
-                _filterChip('done', '完了'),
-              ],
+    final asyncState = ref.watch(adminApplicantsProvider);
+
+    return asyncState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('読み込みエラー: $error')),
+      data: (state) {
+        final filteredItems = _applyFilters(state);
+
+        return Column(
+          children: [
+            AdminFilterChips(
+              selectedKey: state.filterStatus,
+              options: const {
+                'all': 'すべて',
+                'applied': '応募中',
+                'assigned': '着工前',
+                'in_progress': '着工中',
+                'done': '完了',
+              },
+              onSelected: (key) {
+                ref.read(adminApplicantsProvider.notifier).setFilter(key);
+              },
             ),
-          ),
-        ),
-        Expanded(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: FirebaseFirestore.instance
-                .collection('applications')
-                .orderBy('createdAt', descending: true)
-                .limit(20)
-                .snapshots(),
-            builder: (context, snap) {
-              if (snap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snap.hasError) {
-                return Center(child: Text('読み込みエラー: ${snap.error}'));
-              }
-              var docs = snap.data?.docs ?? [];
-
-              if (_filterStatus != 'all') {
-                docs = docs.where((d) {
-                  final s = (d.data()['status'] ?? 'applied').toString();
-                  if (_filterStatus == 'done') {
-                    return s == 'completed' || s == 'inspection' || s == 'fixing' || s == 'done';
-                  }
-                  return s == _filterStatus;
-                }).toList();
-              }
-
-              if (docs.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
-                      const SizedBox(height: 12),
-                      Text(
-                        _filterStatus == 'all' ? '応募者はまだいません' : '${StatusBadge.labelFor(_filterStatus)}の応募はありません',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+            AdminSearchBar(
+              hintText: 'ワーカー名・案件名で検索',
+              onChanged: (query) {
+                ref.read(adminApplicantsProvider.notifier).setSearchQuery(query);
+              },
+            ),
+            Expanded(
+              child: filteredItems.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
+                          const SizedBox(height: 12),
+                          Text(
+                            state.filterStatus == 'all' ? '応募者はまだいません' : '${StatusBadge.labelFor(state.filterStatus)}の応募はありません',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                      itemCount: filteredItems.length + 1, // +1 for LoadMore
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        if (index == filteredItems.length) {
+                          return LoadMoreButton(
+                            hasMore: state.hasMore,
+                            isLoading: state.isLoadingMore,
+                            onPressed: () {
+                              ref.read(adminApplicantsProvider.notifier).loadMore();
+                            },
+                          );
+                        }
 
-              return ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                itemCount: docs.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final doc = docs[index];
-                  final data = doc.data();
-                  final jobTitle = (data['jobTitleSnapshot'] ?? '案件名なし').toString();
-                  final status = (data['status'] ?? 'applied').toString();
-                  final applicantUid = (data['applicantUid'] ?? '').toString();
-                  final createdAt = data['createdAt'];
-                  String dateStr = '';
-                  if (createdAt is Timestamp) {
-                    final d = createdAt.toDate();
-                    dateStr = '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
-                  }
-
-                  return Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    child: InkWell(
-                      onTap: () {
-                        context.push(RoutePaths.workDetailPath(doc.id));
+                        final item = filteredItems[index];
+                        return _ApplicantCard(
+                          item: item,
+                          onUpdateStatus: _updateStatus,
+                        );
                       },
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.divider),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: AppColors.ruriPale,
-                                  child: Icon(Icons.person, color: AppColors.ruri, size: 20),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(jobTitle, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                      const SizedBox(height: 2),
-                                      if (applicantUid.isNotEmpty)
-                                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                                          stream: FirebaseFirestore.instance.collection('profiles').doc(applicantUid).snapshots(),
-                                          builder: (context, profileSnap) {
-                                            final profileData = profileSnap.data?.data();
-                                            final familyName = (profileData?['familyName'] ?? '').toString().trim();
-                                            final givenName = (profileData?['givenName'] ?? '').toString().trim();
-                                            final displayName = (profileData?['displayName'] ?? '').toString().trim();
-                                            final workerName = displayName.isNotEmpty
-                                                ? displayName
-                                                : (familyName.isNotEmpty || givenName.isNotEmpty)
-                                                    ? '$familyName $givenName'.trim()
-                                                    : '';
-                                            final avg = (profileData?['ratingAverage'] ?? 0).toDouble();
-                                            final rCount = (profileData?['ratingCount'] ?? 0) as int;
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    if (workerName.isNotEmpty) ...[
-                                                      Text(workerName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                                                      const SizedBox(width: 6),
-                                                    ],
-                                                    Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                                    if (dateStr.isNotEmpty) ...[
-                                                      const SizedBox(width: 8),
-                                                      Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                                    ],
-                                                  ],
-                                                ),
-                                                if (rCount > 0)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 4),
-                                                    child: Row(
-                                                      children: [
-                                                        RatingStarsDisplay(
-                                                          average: avg,
-                                                          count: rCount,
-                                                          starSize: 14,
-                                                          fontSize: 11,
-                                                        ),
-                                                        const SizedBox(width: 6),
-                                                        _QualityScoreBadge(uid: applicantUid),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (rCount == 0)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 4),
-                                                    child: _QualityScoreBadge(uid: applicantUid),
-                                                  ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      if (applicantUid.isEmpty)
-                                        Row(
-                                          children: [
-                                            Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}', style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                            if (dateStr.isNotEmpty) ...[
-                                              const SizedBox(width: 8),
-                                              Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                                            ],
-                                          ],
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: StatusBadge.colorFor(status).withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(StatusBadge.labelFor(status), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: StatusBadge.colorFor(status))),
-                                ),
+                    ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ApplicantCard extends StatelessWidget {
+  final ApplicantItem item;
+  final Future<void> Function(String appId, String newStatus, String jobTitle) onUpdateStatus;
+
+  const _ApplicantCard({
+    required this.item,
+    required this.onUpdateStatus,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    String dateStr = '';
+    if (item.createdAt != null) {
+      final d = item.createdAt!;
+      dateStr = '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
+    }
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () {
+          context.push(RoutePaths.workDetailPath(item.id));
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.divider),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppColors.ruriPale,
+                    child: Icon(Icons.person, color: AppColors.ruri, size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.jobTitle,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 2),
+                        if (item.applicantUid.isNotEmpty)
+                          _WorkerInfoRow(
+                            applicantUid: item.applicantUid,
+                            dateStr: dateStr,
+                          ),
+                        if (item.applicantUid.isEmpty)
+                          Row(
+                            children: [
+                              Text('UID: ${item.applicantUid.length > 8 ? '${item.applicantUid.substring(0, 8)}...' : item.applicantUid}',
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                              if (dateStr.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
                               ],
-                            ),
-                            if (status == 'applied') ...[
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => _updateStatus(doc.id, 'rejected', jobTitle),
-                                      icon: const Icon(Icons.close, size: 18),
-                                      label: const Text('却下'),
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.error,
-                                        side: const BorderSide(color: AppColors.error),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () => _updateStatus(doc.id, 'assigned', jobTitle),
-                                      icon: const Icon(Icons.check, size: 18),
-                                      label: const Text('承認'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.success,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ],
-                            if (status == 'assigned') ...[
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _updateStatus(doc.id, 'in_progress', jobTitle),
-                                  icon: const Icon(Icons.play_arrow, size: 18),
-                                  label: const Text('着工開始'),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.ruri,
-                                    side: const BorderSide(color: AppColors.ruri),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                            if (status == 'in_progress') ...[
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _updateStatus(doc.id, 'completed', jobTitle),
-                                  icon: const Icon(Icons.check_circle_outline, size: 18),
-                                  label: const Text('施工完了'),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.success,
-                                    side: const BorderSide(color: AppColors.success),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: StatusBadge.colorFor(item.status).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(StatusBadge.labelFor(item.status),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: StatusBadge.colorFor(item.status))),
+                  ),
+                ],
+              ),
+              if (item.status == 'applied') ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => onUpdateStatus(item.id, 'rejected', item.jobTitle),
+                        icon: const Icon(Icons.close, size: 18),
+                        label: const Text('却下'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.error,
+                          side: const BorderSide(color: AppColors.error),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
                       ),
                     ),
-                  );
-                },
-              );
-            },
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => onUpdateStatus(item.id, 'assigned', item.jobTitle),
+                        icon: const Icon(Icons.check, size: 18),
+                        label: const Text('承認'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.success,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (item.status == 'assigned') ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => onUpdateStatus(item.id, 'in_progress', item.jobTitle),
+                    icon: const Icon(Icons.play_arrow, size: 18),
+                    label: const Text('着工開始'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.ruri,
+                      side: const BorderSide(color: AppColors.ruri),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                  ),
+                ),
+              ],
+              if (item.status == 'in_progress') ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => onUpdateStatus(item.id, 'completed', item.jobTitle),
+                    icon: const Icon(Icons.check_circle_outline, size: 18),
+                    label: const Text('施工完了'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.success,
+                      side: const BorderSide(color: AppColors.success),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
+}
 
-  Widget _filterChip(String key, String label) {
-    final selected = _filterStatus == key;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: selected,
-        onSelected: (v) => setState(() => _filterStatus = key),
-        selectedColor: AppColors.ruri,
-        labelStyle: TextStyle(
-          color: selected ? Colors.white : AppColors.textPrimary,
-          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          fontSize: 13,
-        ),
-        backgroundColor: AppColors.chipUnselected,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        side: BorderSide.none,
-      ),
+class _WorkerInfoRow extends StatelessWidget {
+  final String applicantUid;
+  final String dateStr;
+
+  const _WorkerInfoRow({
+    required this.applicantUid,
+    required this.dateStr,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('profiles').doc(applicantUid).snapshots(),
+      builder: (context, profileSnap) {
+        final profileData = profileSnap.data?.data();
+        final familyName = (profileData?['familyName'] ?? '').toString().trim();
+        final givenName = (profileData?['givenName'] ?? '').toString().trim();
+        final displayName = (profileData?['displayName'] ?? '').toString().trim();
+        final workerName = displayName.isNotEmpty
+            ? displayName
+            : (familyName.isNotEmpty || givenName.isNotEmpty)
+                ? '$familyName $givenName'.trim()
+                : '';
+        final avg = (profileData?['ratingAverage'] ?? 0).toDouble();
+        final rCount = (profileData?['ratingCount'] ?? 0) as int;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (workerName.isNotEmpty) ...[
+                  Text(workerName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                  const SizedBox(width: 6),
+                ],
+                Text('UID: ${applicantUid.length > 8 ? '${applicantUid.substring(0, 8)}...' : applicantUid}',
+                    style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                if (dateStr.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Text(dateStr, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                ],
+              ],
+            ),
+            if (rCount > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    RatingStarsDisplay(
+                      average: avg,
+                      count: rCount,
+                      starSize: 14,
+                      fontSize: 11,
+                    ),
+                    const SizedBox(width: 6),
+                    _QualityScoreBadge(uid: applicantUid),
+                  ],
+                ),
+              ),
+            if (rCount == 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: _QualityScoreBadge(uid: applicantUid),
+              ),
+          ],
+        );
+      },
     );
   }
 }

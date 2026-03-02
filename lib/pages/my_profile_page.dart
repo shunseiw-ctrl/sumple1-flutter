@@ -6,9 +6,13 @@ import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/quality_score_service.dart';
+import 'package:sumple1/core/services/profile_image_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
 
 class MyProfilePage extends StatefulWidget {
-  const MyProfilePage({super.key});
+  final ProfileImageService? profileImageService;
+
+  const MyProfilePage({super.key, this.profileImageService});
 
   @override
   State<MyProfilePage> createState() => _MyProfilePageState();
@@ -33,6 +37,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
   String? _gender;
   bool _isLoading = false;
   bool _loadedOnce = false;
+  bool _isUploadingAvatar = false;
+
+  late final ProfileImageService _profileImageService;
 
   bool get _isAnonymous {
     final u = FirebaseAuth.instance.currentUser;
@@ -42,6 +49,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   void initState() {
     super.initState();
+    _profileImageService = widget.profileImageService ?? ProfileImageService();
     AnalyticsService.logScreenView('my_profile');
   }
 
@@ -103,12 +111,59 @@ class _MyProfilePageState extends State<MyProfilePage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('プロフィールの読み込みに失敗しました: $e')),
-      );
+      ErrorHandler.showError(context, e, customMessage: 'プロフィールの読み込みに失敗しました');
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _showAvatarPicker(BuildContext context) async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('ギャラリーから選択'),
+              onTap: () => Navigator.pop(ctx, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('カメラで撮影'),
+              onTap: () => Navigator.pop(ctx, 'camera'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: const Text('キャンセル'),
+              onTap: () => Navigator.pop(ctx),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (choice == null || !mounted) return;
+
+    setState(() => _isUploadingAvatar = true);
+
+    final result = choice == 'camera'
+        ? await _profileImageService.captureAndUploadAvatar()
+        : await _profileImageService.pickAndUploadAvatar();
+
+    if (!mounted) return;
+    setState(() => _isUploadingAvatar = false);
+
+    if (result.isCancelled) return;
+    if (result.isSuccess) {
+      ErrorHandler.showSuccess(context, 'プロフィール画像を更新しました');
+    } else {
+      ErrorHandler.showError(context, null, customMessage: result.errorMessage ?? '画像のアップロードに失敗しました');
     }
   }
 
@@ -153,9 +208,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.isAnonymous) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('プロフィールの保存にはログインが必要です')),
-      );
+      ErrorHandler.showError(context, null, customMessage: 'プロフィールの保存にはログインが必要です');
       return;
     }
 
@@ -163,9 +216,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     if (!ok) return;
 
     if (_gender == null || _gender!.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('性別を選択してください')),
-      );
+      ErrorHandler.showError(context, null, customMessage: '性別を選択してください');
       return;
     }
 
@@ -198,17 +249,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
       await ref.set(data, SetOptions(merge: true));
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('プロフィールを保存しました')),
-      );
+      ErrorHandler.showSuccess(context, 'プロフィールを保存しました');
 
       Navigator.pop(context);
       return;
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存に失敗しました: $e')),
-      );
+      ErrorHandler.showError(context, e, customMessage: '保存に失敗しました');
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -289,15 +336,42 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   final data = snap.data?.data();
                   final photoUrl = (data?['profilePhotoUrl'] ?? '').toString();
                   final locked = data?['profilePhotoLocked'] == true;
+                  final canUpload = !isAnon && !locked;
 
                   return Center(
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColors.chipUnselected,
-                          backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                          child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: AppColors.textHint) : null,
+                        GestureDetector(
+                          onTap: canUpload ? () => _showAvatarPicker(context) : null,
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundColor: AppColors.chipUnselected,
+                                backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                                child: _isUploadingAvatar
+                                    ? const CircularProgressIndicator(strokeWidth: 2)
+                                    : photoUrl.isEmpty
+                                        ? const Icon(Icons.person, size: 50, color: AppColors.textHint)
+                                        : null,
+                              ),
+                              if (canUpload)
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.ruri,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 8),
                         if (locked)
@@ -309,6 +383,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               Text('本人確認済み', style: TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w600)),
                             ],
                           )
+                        else if (!isAnon)
+                          const Text('タップして写真を変更', style: TextStyle(fontSize: 12, color: AppColors.textHint))
                         else
                           const Text('本人確認で写真が設定されます', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
                       ],

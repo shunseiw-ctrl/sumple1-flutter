@@ -14,14 +14,18 @@ import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
 class FavoritesPage extends StatefulWidget {
-  const FavoritesPage({super.key});
+  final FirebaseFirestore? firestore;
+  final FirebaseAuth? firebaseAuth;
+
+  const FavoritesPage({super.key, this.firestore, this.firebaseAuth});
 
   @override
   State<FavoritesPage> createState() => _FavoritesPageState();
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
-  final _db = FirebaseFirestore.instance;
+  late final FirebaseFirestore _db;
+  late final FirebaseAuth _auth;
   Map<String, Map<String, dynamic>> _jobsCache = {};
   List<String> _lastJobIds = [];
   bool _isLoadingJobs = false;
@@ -29,6 +33,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   void initState() {
     super.initState();
+    _db = widget.firestore ?? FirebaseFirestore.instance;
+    _auth = widget.firebaseAuth ?? FirebaseAuth.instance;
     AnalyticsService.logScreenView('favorites');
   }
 
@@ -80,7 +86,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final uid = _auth.currentUser?.uid ?? '';
     if (uid.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.background,

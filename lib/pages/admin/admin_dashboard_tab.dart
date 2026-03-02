@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/core/providers/admin_pending_counts_provider.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 
-class AdminDashboardTab extends StatelessWidget {
+class AdminDashboardTab extends ConsumerWidget {
   final void Function(int index) onNavigateToTab;
 
   const AdminDashboardTab({super.key, required this.onNavigateToTab});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pendingCounts = ref.watch(adminPendingCountsProvider);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
@@ -111,6 +115,55 @@ class AdminDashboardTab extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
+
+        // 未処理アラートセクション
+        pendingCounts.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (counts) {
+            if (counts.total == 0) return const SizedBox.shrink();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '未処理アラート',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (counts.pendingApplications > 0)
+                  _AlertCard(
+                    icon: Icons.people,
+                    color: AppColors.ruri,
+                    label: '承認待ちの応募',
+                    count: counts.pendingApplications,
+                    onTap: () => onNavigateToTab(2),
+                  ),
+                if (counts.pendingQualifications > 0)
+                  _AlertCard(
+                    icon: Icons.workspace_premium,
+                    color: AppColors.warning,
+                    label: '資格承認待ち',
+                    count: counts.pendingQualifications,
+                    onTap: () => context.push(RoutePaths.adminQualifications),
+                  ),
+                if (counts.pendingEarlyPayments > 0)
+                  _AlertCard(
+                    icon: Icons.flash_on,
+                    color: Colors.orange,
+                    label: '即金申請待ち',
+                    count: counts.pendingEarlyPayments,
+                    onTap: () => context.push(RoutePaths.adminEarlyPayments),
+                  ),
+                const SizedBox(height: 20),
+              ],
+            );
+          },
+        ),
+
         const Text(
           'クイックアクション',
           style: TextStyle(
@@ -150,43 +203,6 @@ class AdminDashboardTab extends StatelessWidget {
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 16),
-        // 即金申請待ちカウント
-        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('early_payment_requests')
-              .where('status', isEqualTo: 'requested')
-              .snapshots(),
-          builder: (context, reqSnap) {
-            final count = reqSnap.data?.docs.length ?? 0;
-            if (count == 0) return const SizedBox.shrink();
-            return GestureDetector(
-              onTap: () {
-                context.push(RoutePaths.adminEarlyPayments);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.flash_on, color: Colors.orange),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text('即金申請 $count件 承認待ち',
-                          style: const TextStyle(
-                              color: Colors.orange, fontWeight: FontWeight.w700)),
-                    ),
-                    const Icon(Icons.chevron_right, color: Colors.orange, size: 20),
-                  ],
-                ),
-              ),
-            );
-          },
         ),
         const SizedBox(height: 20),
         const Text(
@@ -242,6 +258,57 @@ class AdminDashboardTab extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _AlertCard extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label;
+  final int count;
+  final VoidCallback onTap;
+
+  const _AlertCard({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '$label $count件',
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: color, size: 20),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

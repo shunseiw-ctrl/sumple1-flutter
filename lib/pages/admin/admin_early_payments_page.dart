@@ -6,11 +6,21 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/services/payment_cycle_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 
 /// 管理者向け即金申請一覧ページ
 class AdminEarlyPaymentsPage extends StatefulWidget {
-  const AdminEarlyPaymentsPage({super.key});
+  final PaymentCycleService? paymentCycleService;
+  final FirebaseFirestore? firestore;
+  final NotificationService? notificationService;
+
+  const AdminEarlyPaymentsPage({
+    super.key,
+    this.paymentCycleService,
+    this.firestore,
+    this.notificationService,
+  });
 
   @override
   State<AdminEarlyPaymentsPage> createState() =>
@@ -18,8 +28,9 @@ class AdminEarlyPaymentsPage extends StatefulWidget {
 }
 
 class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
-  final PaymentCycleService _paymentService = PaymentCycleService();
-  final NotificationService _notificationService = NotificationService();
+  late final PaymentCycleService _paymentService;
+  late final FirebaseFirestore _db;
+  late final NotificationService _notificationService;
 
   /// ワーカーUID -> 表示名キャッシュ
   final Map<String, String> _workerNameCache = {};
@@ -27,6 +38,9 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
   @override
   void initState() {
     super.initState();
+    _paymentService = widget.paymentCycleService ?? PaymentCycleService();
+    _db = widget.firestore ?? FirebaseFirestore.instance;
+    _notificationService = widget.notificationService ?? NotificationService();
     AnalyticsService.logScreenView('admin_early_payments');
   }
 
@@ -37,7 +51,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
     }
 
     try {
-      final doc = await FirebaseFirestore.instance
+      final doc = await _db
           .collection('profiles')
           .doc(uid)
           .get();
@@ -85,18 +99,11 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
         type: 'early_payment',
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('即金申請を承認しました'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        ErrorHandler.showSuccess(context, '即金申請を承認しました');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('承認に失敗しました: $e')),
-        );
+        ErrorHandler.showError(context, e, customMessage: '承認に失敗しました');
       }
     }
   }
@@ -142,9 +149,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
 
     if (reason.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('却下理由を入力してください')),
-        );
+        ErrorHandler.showError(context, null, customMessage: '却下理由を入力してください');
       }
       return;
     }
@@ -161,15 +166,11 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
         type: 'early_payment',
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('即金申請を却下しました')),
-        );
+        ErrorHandler.showSuccess(context, '即金申請を却下しました');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('却下に失敗しました: $e')),
-        );
+        ErrorHandler.showError(context, e, customMessage: '却下に失敗しました');
       }
     }
   }
@@ -181,7 +182,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
         title: const Text('即金申請一覧'),
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
+        stream: _db
             .collection('early_payment_requests')
             .where('status', isEqualTo: 'requested')
             .orderBy('createdAt', descending: true)

@@ -29,8 +29,8 @@ void main() {
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('理想の現場を見つけよう'), findsOneWidget);
-      expect(find.text('建設業界の豊富な案件から\nあなたにぴったりの仕事が見つかります'), findsOneWidget);
+      expect(find.text('仕事を見つけよう'), findsOneWidget);
+      expect(find.text('建設業界の仕事を簡単に検索・応募できます'), findsOneWidget);
     });
 
     testWidgets('スキップ button is present', (tester) async {

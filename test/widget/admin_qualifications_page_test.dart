@@ -1,99 +1,97 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../test/helpers/test_helpers.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:sumple1/core/services/qualification_service.dart';
+import 'package:sumple1/pages/admin/admin_qualifications_page.dart';
+
+class MockQualificationService extends Mock implements QualificationService {}
 
 void main() {
-  group('AdminQualificationsPage', () {
-    testWidgets('pending資格が一覧表示', (tester) async {
-      await tester.pumpWidget(
-        buildTestApp(
-          Scaffold(
-            appBar: AppBar(title: const Text('資格承認')),
-            body: ListView(
-              children: const [
-                ListTile(
-                  title: Text('内装仕上げ施工技能士'),
-                  subtitle: Text('ワーカー: 田中太郎 / カテゴリ: interior'),
-                  trailing: Text('pending'),
-                ),
-                ListTile(
-                  title: Text('足場組立作業主任者'),
-                  subtitle: Text('ワーカー: 佐藤花子 / カテゴリ: scaffold'),
-                  trailing: Text('pending'),
-                ),
-              ],
-            ),
-          ),
+  group('AdminQualificationsPage（実ページ）', () {
+    testWidgets('承認待ちなし→空状態表示', (tester) async {
+      final fakeFirestore = FakeFirebaseFirestore();
+      final mockService = MockQualificationService();
+
+      // profiles exists but no pending qualifications
+      await fakeFirestore.collection('profiles').doc('user1').set({
+        'displayName': 'テストユーザー',
+      });
+
+      await tester.pumpWidget(MaterialApp(
+        home: AdminQualificationsPage(
+          qualificationService: mockService,
+          firestore: fakeFirestore,
         ),
-      );
-
-      expect(find.text('資格承認'), findsOneWidget);
-      expect(find.text('内装仕上げ施工技能士'), findsOneWidget);
-      expect(find.text('足場組立作業主任者'), findsOneWidget);
-    });
-
-    testWidgets('承認ボタンが表示される', (tester) async {
-      bool approved = false;
-      await tester.pumpWidget(
-        buildTestApp(
-          Column(
-            children: [
-              ElevatedButton(
-                onPressed: () => approved = true,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                child: const Text('承認'),
-              ),
-            ],
-          ),
-        ),
-      );
-
-      expect(find.text('承認'), findsOneWidget);
-      await tester.tap(find.text('承認'));
-      expect(approved, isTrue);
-    });
-
-    testWidgets('却下時に理由入力ダイアログ', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('却下理由'),
-                      content: const TextField(
-                        decoration: InputDecoration(hintText: '理由を入力'),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('キャンセル'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('却下する'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                child: const Text('却下'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('却下'));
+      ));
       await tester.pumpAndSettle();
 
-      expect(find.text('却下理由'), findsOneWidget);
-      expect(find.text('却下する'), findsOneWidget);
+      expect(find.text('資格承認'), findsOneWidget);
+      expect(find.text('承認待ちの資格はありません'), findsOneWidget);
+    });
+
+    testWidgets('承認待ちリスト表示', (tester) async {
+      final fakeFirestore = FakeFirebaseFirestore();
+      final mockService = MockQualificationService();
+
+      // Profile with pending qualification
+      await fakeFirestore.collection('profiles').doc('worker1').set({
+        'displayName': '田中太郎',
+      });
+      await fakeFirestore
+          .collection('profiles')
+          .doc('worker1')
+          .collection('qualifications_v2')
+          .doc('qual1')
+          .set({
+        'name': '内装仕上げ施工技能士',
+        'category': 'interior',
+        'verificationStatus': 'pending',
+        'certPhotoUrl': '',
+      });
+
+      await tester.pumpWidget(MaterialApp(
+        home: AdminQualificationsPage(
+          qualificationService: mockService,
+          firestore: fakeFirestore,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('田中太郎'), findsOneWidget);
+      expect(find.text('内装仕上げ施工技能士'), findsOneWidget);
+      expect(find.text('承認待ち'), findsOneWidget);
+    });
+
+    testWidgets('承認・却下ボタン表示', (tester) async {
+      final fakeFirestore = FakeFirebaseFirestore();
+      final mockService = MockQualificationService();
+
+      await fakeFirestore.collection('profiles').doc('worker2').set({
+        'displayName': '佐藤花子',
+      });
+      await fakeFirestore
+          .collection('profiles')
+          .doc('worker2')
+          .collection('qualifications_v2')
+          .doc('qual2')
+          .set({
+        'name': '足場組立作業主任者',
+        'category': 'scaffold',
+        'verificationStatus': 'pending',
+        'certPhotoUrl': '',
+      });
+
+      await tester.pumpWidget(MaterialApp(
+        home: AdminQualificationsPage(
+          qualificationService: mockService,
+          firestore: fakeFirestore,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('承認'), findsOneWidget);
+      expect(find.text('却下'), findsOneWidget);
     });
   });
 }

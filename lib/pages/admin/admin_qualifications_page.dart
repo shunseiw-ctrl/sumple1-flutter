@@ -4,11 +4,19 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/services/qualification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 
 /// 管理者向け資格承認ページ
 class AdminQualificationsPage extends StatefulWidget {
-  const AdminQualificationsPage({super.key});
+  final QualificationService? qualificationService;
+  final FirebaseFirestore? firestore;
+
+  const AdminQualificationsPage({
+    super.key,
+    this.qualificationService,
+    this.firestore,
+  });
 
   @override
   State<AdminQualificationsPage> createState() =>
@@ -16,13 +24,16 @@ class AdminQualificationsPage extends StatefulWidget {
 }
 
 class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
-  final QualificationService _qualificationService = QualificationService();
+  late final QualificationService _qualificationService;
+  late final FirebaseFirestore _db;
   bool _isLoading = true;
   List<_PendingQualificationItem> _pendingItems = [];
 
   @override
   void initState() {
     super.initState();
+    _qualificationService = widget.qualificationService ?? QualificationService();
+    _db = widget.firestore ?? FirebaseFirestore.instance;
     AnalyticsService.logScreenView('admin_qualifications');
     _loadPendingQualifications();
   }
@@ -32,7 +43,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
 
     try {
       final profilesSnap =
-          await FirebaseFirestore.instance.collection('profiles').get();
+          await _db.collection('profiles').get();
 
       final List<_PendingQualificationItem> items = [];
 
@@ -41,7 +52,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
         final uid = profileDoc.id;
         final displayName = _buildDisplayName(profileData);
 
-        final qualsSnap = await FirebaseFirestore.instance
+        final qualsSnap = await _db
             .collection('profiles')
             .doc(uid)
             .collection('qualifications_v2')
@@ -70,9 +81,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('読み込みに失敗しました: $e')),
-        );
+        ErrorHandler.showError(context, e, customMessage: '読み込みに失敗しました');
       }
     }
   }
@@ -96,19 +105,12 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
         qualificationId: item.qualificationId,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${item.qualificationName} を承認しました'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        ErrorHandler.showSuccess(context, '${item.qualificationName} を承認しました');
       }
       await _loadPendingQualifications();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('承認に失敗しました: $e')),
-        );
+        ErrorHandler.showError(context, e, customMessage: '承認に失敗しました');
       }
     }
   }
@@ -154,9 +156,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
 
     if (reason.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('却下理由を入力してください')),
-        );
+        ErrorHandler.showError(context, null, customMessage: '却下理由を入力してください');
       }
       return;
     }
@@ -168,18 +168,12 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
         reason: reason,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${item.qualificationName} を却下しました'),
-          ),
-        );
+        ErrorHandler.showSuccess(context, '${item.qualificationName} を却下しました');
       }
       await _loadPendingQualifications();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('却下に失敗しました: $e')),
-        );
+        ErrorHandler.showError(context, e, customMessage: '却下に失敗しました');
       }
     }
   }

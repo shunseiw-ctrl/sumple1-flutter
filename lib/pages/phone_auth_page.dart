@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -11,14 +10,16 @@ import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 
 class PhoneAuthPage extends StatefulWidget {
-  const PhoneAuthPage({super.key});
+  final PhoneAuthService? phoneAuthService;
+
+  const PhoneAuthPage({super.key, this.phoneAuthService});
 
   @override
   State<PhoneAuthPage> createState() => _PhoneAuthPageState();
 }
 
 class _PhoneAuthPageState extends State<PhoneAuthPage> {
-  final _phoneAuthService = PhoneAuthService();
+  late final PhoneAuthService _phoneAuthService;
   final _phoneController = TextEditingController();
   final _otpController = TextEditingController();
 
@@ -34,6 +35,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
   @override
   void initState() {
     super.initState();
+    _phoneAuthService = widget.phoneAuthService ?? PhoneAuthService();
     AnalyticsService.logScreenView('phone_auth');
   }
 

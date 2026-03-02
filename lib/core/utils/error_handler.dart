@@ -155,6 +155,34 @@ class ErrorHandler {
     }
   }
 
+  /// AppResult を処理してSnackBar表示
+  static void handleResult<T>(
+    BuildContext context,
+    dynamic result, {
+    void Function(T data)? onSuccess,
+    String? successMessage,
+  }) {
+    // Import-free: duck-type check for AppResult-like objects
+    if (result.isSuccess == true) {
+      if (onSuccess != null && result.data != null) {
+        onSuccess(result.data as T);
+      }
+      if (successMessage != null) {
+        showSuccess(context, successMessage);
+      }
+    } else {
+      final msg = result.errorMessage?.toString() ?? 'エラーが発生しました';
+      showError(context, null, customMessage: msg);
+    }
+  }
+
+  /// AppResult のエラーのみSnackBar表示
+  static void showResultError(BuildContext context, dynamic result) {
+    if (result.isSuccess == true) return;
+    final msg = result.errorMessage?.toString() ?? 'エラーが発生しました';
+    showError(context, null, customMessage: msg);
+  }
+
   /// 確認ダイアログを表示
   static Future<bool> showConfirmDialog(
     BuildContext context, {

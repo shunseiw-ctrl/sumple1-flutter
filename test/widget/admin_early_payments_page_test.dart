@@ -1,142 +1,104 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../test/helpers/test_helpers.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:sumple1/core/services/payment_cycle_service.dart';
+import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/pages/admin/admin_early_payments_page.dart';
+
+class MockPaymentCycleService extends Mock implements PaymentCycleService {}
+
+class MockNotificationService extends Mock implements NotificationService {}
 
 void main() {
-  group('AdminEarlyPaymentsPage', () {
-    testWidgets('申請リスト表示', (tester) async {
-      await tester.pumpWidget(
-        buildTestApp(
-          Scaffold(
-            appBar: AppBar(title: const Text('即金申請管理')),
-            body: ListView(
-              children: const [
-                ListTile(
-                  title: Text('田中太郎'),
-                  subtitle: Text('2025-04 / ¥150,000'),
-                ),
-                ListTile(
-                  title: Text('佐藤花子'),
-                  subtitle: Text('2025-04 / ¥80,000'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+  group('AdminEarlyPaymentsPage（実ページ）', () {
+    late FakeFirebaseFirestore fakeFirestore;
+    late MockPaymentCycleService mockPaymentService;
+    late MockNotificationService mockNotificationService;
 
-      expect(find.text('即金申請管理'), findsOneWidget);
-      expect(find.text('田中太郎'), findsOneWidget);
-      expect(find.text('佐藤花子'), findsOneWidget);
+    setUp(() {
+      fakeFirestore = FakeFirebaseFirestore();
+      mockPaymentService = MockPaymentCycleService();
+      mockNotificationService = MockNotificationService();
     });
 
-    testWidgets('申請詳細（金額・手数料・受取額）表示', (tester) async {
-      const amount = 150000;
-      const fee = 15000; // 10%
-      const payout = 135000;
-
-      await tester.pumpWidget(
-        buildTestApp(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('申請額: ¥${_formatYen(amount)}'),
-              Text('手数料 (10%): ¥${_formatYen(fee)}'),
-              Text('受取額: ¥${_formatYen(payout)}'),
-            ],
-          ),
+    Widget buildPage() {
+      return MaterialApp(
+        home: AdminEarlyPaymentsPage(
+          paymentCycleService: mockPaymentService,
+          firestore: fakeFirestore,
+          notificationService: mockNotificationService,
         ),
       );
+    }
 
-      expect(find.textContaining('申請額'), findsOneWidget);
-      expect(find.textContaining('手数料'), findsOneWidget);
-      expect(find.textContaining('受取額'), findsOneWidget);
-    });
-
-    testWidgets('承認ボタンで承認処理', (tester) async {
-      bool approved = false;
-      await tester.pumpWidget(
-        buildTestApp(
-          ElevatedButton(
-            onPressed: () => approved = true,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('承認'),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('承認'));
-      expect(approved, isTrue);
-    });
-
-    testWidgets('却下ボタンで理由入力ダイアログ', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => OutlinedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('却下理由'),
-                      content: const TextField(
-                        decoration: InputDecoration(hintText: '理由を入力してください'),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('キャンセル'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text('却下する'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                child: const Text('却下'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('却下'));
+    testWidgets('申請0件→空状態表示', (tester) async {
+      await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      expect(find.text('却下理由'), findsOneWidget);
+      expect(find.text('即金申請一覧'), findsOneWidget);
+      expect(find.text('承認待ちの即金申請はありません'), findsOneWidget);
     });
 
-    testWidgets('申請0件で空状態表示', (tester) async {
-      await tester.pumpWidget(
-        buildTestApp(
-          const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, size: 48, color: Colors.grey),
-                SizedBox(height: 12),
-                Text('承認待ちの申請はありません'),
-              ],
-            ),
-          ),
-        ),
-      );
+    testWidgets('申請リスト表示・金額フォーマット確認', (tester) async {
+      // Worker profile
+      await fakeFirestore.collection('profiles').doc('worker1').set({
+        'displayName': '田中太郎',
+      });
 
-      expect(find.text('承認待ちの申請はありません'), findsOneWidget);
+      // Early payment request
+      await fakeFirestore
+          .collection('early_payment_requests')
+          .doc('req1')
+          .set({
+        'workerUid': 'worker1',
+        'month': '2025-04',
+        'status': 'requested',
+        'requestedAmount': 150000,
+        'earlyPaymentFee': 15000,
+        'payoutAmount': 135000,
+        'createdAt': Timestamp.now(),
+      });
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      // Worker name (via FutureBuilder)
+      expect(find.text('田中太郎'), findsOneWidget);
+      // Amount formatting
+      expect(find.text('150,000円'), findsOneWidget);
+      // Fee
+      expect(find.text('-15,000円'), findsOneWidget);
+      // Payout
+      expect(find.text('135,000円'), findsOneWidget);
+      // Month
+      expect(find.text('2025-04'), findsOneWidget);
+    });
+
+    testWidgets('承認・却下ボタン表示', (tester) async {
+      await fakeFirestore.collection('profiles').doc('worker2').set({
+        'displayName': '佐藤花子',
+      });
+
+      await fakeFirestore
+          .collection('early_payment_requests')
+          .doc('req2')
+          .set({
+        'workerUid': 'worker2',
+        'month': '2025-05',
+        'status': 'requested',
+        'requestedAmount': 80000,
+        'earlyPaymentFee': 8000,
+        'payoutAmount': 72000,
+        'createdAt': Timestamp.now(),
+      });
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.text('承認'), findsOneWidget);
+      expect(find.text('却下'), findsOneWidget);
     });
   });
-}
-
-String _formatYen(int value) {
-  final s = value.toString();
-  final buf = StringBuffer();
-  for (int i = 0; i < s.length; i++) {
-    final idxFromEnd = s.length - i;
-    buf.write(s[i]);
-    if (idxFromEnd > 1 && idxFromEnd % 3 == 1) buf.write(',');
-  }
-  return buf.toString();
 }

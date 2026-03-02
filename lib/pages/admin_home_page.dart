@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sales_page.dart';
 import 'profile_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -7,18 +8,19 @@ import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/core/providers/admin_pending_counts_provider.dart';
 import 'package:sumple1/pages/admin/admin_dashboard_tab.dart';
 import 'package:sumple1/pages/admin/admin_job_management_tab.dart';
 import 'package:sumple1/pages/admin/admin_applicants_tab.dart';
 
-class AdminHomePage extends StatefulWidget {
+class AdminHomePage extends ConsumerStatefulWidget {
   const AdminHomePage({super.key});
 
   @override
-  State<AdminHomePage> createState() => _AdminHomePageState();
+  ConsumerState<AdminHomePage> createState() => _AdminHomePageState();
 }
 
-class _AdminHomePageState extends State<AdminHomePage> {
+class _AdminHomePageState extends ConsumerState<AdminHomePage> {
   int _currentIndex = 0;
 
   @override
@@ -29,6 +31,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final pendingCounts = ref.watch(adminPendingCountsProvider);
+    final pendingApplicants = pendingCounts.valueOrNull?.pendingApplications ?? 0;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -133,12 +138,30 @@ class _AdminHomePageState extends State<AdminHomePage> {
         selectedItemColor: AppColors.ruri,
         unselectedItemColor: AppColors.textSecondary,
         onTap: (i) => setState(() => _currentIndex = i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'ダッシュボード'),
-          BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: '案件管理'),
-          BottomNavigationBarItem(icon: Icon(Icons.people_outline), activeIcon: Icon(Icons.people), label: '応募者'),
-          BottomNavigationBarItem(icon: Icon(Icons.payments_outlined), activeIcon: Icon(Icons.payments), label: '売上管理'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: '設定'),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'ダッシュボード'),
+          const BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: '案件管理'),
+          BottomNavigationBarItem(
+            icon: Badge(
+              isLabelVisible: pendingApplicants > 0,
+              label: Text(
+                pendingApplicants > 99 ? '99+' : pendingApplicants.toString(),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
+              ),
+              child: const Icon(Icons.people_outline),
+            ),
+            activeIcon: Badge(
+              isLabelVisible: pendingApplicants > 0,
+              label: Text(
+                pendingApplicants > 99 ? '99+' : pendingApplicants.toString(),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
+              ),
+              child: const Icon(Icons.people),
+            ),
+            label: '応募者',
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.payments_outlined), activeIcon: Icon(Icons.payments), label: '売上管理'),
+          const BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: '設定'),
         ],
       ),
     );

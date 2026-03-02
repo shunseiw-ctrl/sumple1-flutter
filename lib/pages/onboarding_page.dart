@@ -28,34 +28,38 @@ class _OnboardingPageState extends State<OnboardingPage> {
     AnalyticsService.logScreenView('onboarding');
   }
 
-  static const List<_OnboardingData> _pages = [
-    _OnboardingData(
-      image: 'assets/images/onboarding_search.png',
-      title: '理想の現場を見つけよう',
-      description: '建設業界の豊富な案件から\nあなたにぴったりの仕事が見つかります',
-    ),
-    _OnboardingData(
-      image: 'assets/images/onboarding_earn.png',
-      title: 'すぐに稼げる',
-      description: '応募から就業までスムーズ\n日払い・週払いにも対応',
-    ),
-    _OnboardingData(
-      image: 'assets/images/onboarding_safety.png',
-      title: '安心のサポート体制',
-      description: '本人確認済みの企業のみ掲載\nトラブル時もサポートします',
-    ),
-  ];
+  List<_OnboardingData> _buildPages(AppLocalizations l10n) {
+    return [
+      _OnboardingData(
+        image: 'assets/images/onboarding_search.png',
+        fallbackIcon: Icons.search,
+        title: l10n.onboardingTitle1,
+        description: l10n.onboardingDesc1,
+      ),
+      _OnboardingData(
+        image: 'assets/images/onboarding_earn.png',
+        fallbackIcon: Icons.payments,
+        title: l10n.onboardingTitle2,
+        description: l10n.onboardingDesc2,
+      ),
+      _OnboardingData(
+        image: 'assets/images/onboarding_safety.png',
+        fallbackIcon: Icons.verified_user,
+        title: l10n.onboardingTitle3,
+        description: l10n.onboardingDesc3,
+      ),
+    ];
+  }
 
   bool get _canComplete => _termsAccepted && _privacyAccepted;
 
   Future<void> _completeOnboarding() async {
-    // 最終ページの場合、同意チェックが必要
-    if (_currentPage == _pages.length - 1 && !_canComplete) return;
+    final pages = _buildPages(AppLocalizations.of(context)!);
+    if (_currentPage == pages.length - 1 && !_canComplete) return;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
 
-    // 同意日時を保存
     final now = DateTime.now().toIso8601String();
     await prefs.setString('terms_accepted_at', now);
     await prefs.setString('privacy_accepted_at', now);
@@ -65,7 +69,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+    final pages = _buildPages(AppLocalizations.of(context)!);
+    if (_currentPage < pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
@@ -116,6 +121,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _buildPages(l10n);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -128,15 +136,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: Semantics(
                   button: true,
                   label: 'オンボーディングをスキップ',
-                  enabled: !(_currentPage == _pages.length - 1 && !_canComplete),
+                  enabled: !(_currentPage == pages.length - 1 && !_canComplete),
                   child: TextButton(
-                    onPressed: (_currentPage == _pages.length - 1 && !_canComplete)
+                    onPressed: (_currentPage == pages.length - 1 && !_canComplete)
                         ? null
                         : _completeOnboarding,
                     child: Text(
-                      AppLocalizations.of(context)!.skip,
+                      l10n.skip,
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: (_currentPage == _pages.length - 1 && !_canComplete)
+                        color: (_currentPage == pages.length - 1 && !_canComplete)
                             ? AppColors.divider
                             : AppColors.textSecondary,
                       ),
@@ -146,17 +154,24 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _pages.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return _OnboardingPageContent(data: _pages[index]);
-                },
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: PageView.builder(
+                  key: const ValueKey('onboarding_pageview'),
+                  controller: _pageController,
+                  itemCount: pages.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return _OnboardingPageContent(
+                      key: ValueKey('onboarding_page_$index'),
+                      data: pages[index],
+                    );
+                  },
+                ),
               ),
             ),
             Padding(
@@ -169,11 +184,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Column(
                 children: [
                   Semantics(
-                    label: 'ページ${_currentPage + 1} / ${_pages.length}',
+                    label: 'ページ${_currentPage + 1} / ${pages.length}',
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
-                        _pages.length,
+                        pages.length,
                         (index) => AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -189,11 +204,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                     ),
                   ),
-                  if (_currentPage == _pages.length - 1) ...[
+                  if (_currentPage == pages.length - 1) ...[
                     const SizedBox(height: AppSpacing.base),
                     _buildConsentCheckbox(
                       value: _termsAccepted,
-                      label: AppLocalizations.of(context)!.agreeToTerms,
+                      label: l10n.agreeToTerms,
                       onChanged: (v) => setState(() => _termsAccepted = v ?? false),
                       onTap: () => context.push(RoutePaths.legal, extra: {
                         'title': '利用規約',
@@ -202,7 +217,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                     _buildConsentCheckbox(
                       value: _privacyAccepted,
-                      label: AppLocalizations.of(context)!.agreeToPrivacy,
+                      label: l10n.agreeToPrivacy,
                       onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
                       onTap: () => context.push(RoutePaths.legal, extra: {
                         'title': 'プライバシーポリシー',
@@ -213,14 +228,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   const SizedBox(height: AppSpacing.xl),
                   Semantics(
                     button: true,
-                    label: _currentPage == _pages.length - 1 ? 'アプリを始める' : '次のページへ進む',
-                    enabled: !(_currentPage == _pages.length - 1 && !_canComplete),
+                    label: _currentPage == pages.length - 1 ? 'アプリを始める' : '次のページへ進む',
+                    enabled: !(_currentPage == pages.length - 1 && !_canComplete),
                     child: SizedBox(
                       width: double.infinity,
                       height: 52,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: (_currentPage == _pages.length - 1 && !_canComplete)
+                          gradient: (_currentPage == pages.length - 1 && !_canComplete)
                               ? const LinearGradient(colors: [Colors.grey, Colors.grey])
                               : AppColors.primaryGradient,
                           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -233,7 +248,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: (_currentPage == _pages.length - 1 && !_canComplete)
+                          onPressed: (_currentPage == pages.length - 1 && !_canComplete)
                               ? null
                               : _nextPage,
                           style: ElevatedButton.styleFrom(
@@ -244,7 +259,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                           child: Text(
-                            _currentPage == _pages.length - 1 ? AppLocalizations.of(context)!.getStarted : AppLocalizations.of(context)!.next,
+                            _currentPage == pages.length - 1 ? l10n.getStarted : l10n.next,
                             style: AppTextStyles.button.copyWith(color: Colors.white),
                           ),
                         ),
@@ -264,7 +279,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 class _OnboardingPageContent extends StatelessWidget {
   final _OnboardingData data;
 
-  const _OnboardingPageContent({required this.data});
+  const _OnboardingPageContent({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -288,6 +303,11 @@ class _OnboardingPageContent extends StatelessWidget {
                     data.image,
                     fit: BoxFit.contain,
                     height: screenHeight * 0.35,
+                    errorBuilder: (_, __, ___) => Icon(
+                      data.fallbackIcon,
+                      size: 80,
+                      color: AppColors.ruri,
+                    ),
                   ),
                 ),
               ),
@@ -316,11 +336,13 @@ class _OnboardingPageContent extends StatelessWidget {
 
 class _OnboardingData {
   final String image;
+  final IconData fallbackIcon;
   final String title;
   final String description;
 
   const _OnboardingData({
     required this.image,
+    required this.fallbackIcon,
     required this.title,
     required this.description,
   });
