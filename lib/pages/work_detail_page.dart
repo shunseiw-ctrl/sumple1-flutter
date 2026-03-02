@@ -2,20 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import 'chat_room_page.dart';
-import 'job_detail_page.dart';
-import 'qr_checkin_page.dart';
-import 'shift_qr_page.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
-import 'package:sumple1/core/services/image_upload_service.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/presentation/widgets/rating_dialog.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/core/providers/connectivity_provider.dart';
 import 'package:sumple1/presentation/widgets/offline_banner.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
+
+import 'job_detail_page.dart' show JobDetailBody;
+import 'work_detail/photos_tab.dart';
+import 'work_detail/docs_tab.dart';
 
 class WorkDetailPage extends ConsumerStatefulWidget {
   final String applicationId;
@@ -66,27 +67,6 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  String _statusLabel(String key) {
-    switch (key) {
-      case 'assigned':
-        return '着工前';
-      case 'applied':
-        return '応募中';
-      case 'in_progress':
-        return '着工中';
-      case 'completed':
-        return '施工完了';
-      case 'inspection':
-        return '検収中';
-      case 'fixing':
-        return '是正中';
-      case 'done':
-        return '完了';
-      default:
-        return key;
-    }
   }
 
   Future<bool> _hasRated(String applicationId) async {
@@ -172,27 +152,16 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                   tooltip: 'QR出退勤管理',
                   icon: const Icon(Icons.qr_code),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ShiftQrPage(
-                          jobId: jobId,
-                          jobTitle: title,
-                        ),
-                      ),
-                    );
+                    context.push(RoutePaths.shiftQrPath(jobId), extra: {
+                      'jobTitle': title,
+                    });
                   },
                 ),
               IconButton(
                 tooltip: 'チャット',
                 icon: const Icon(Icons.chat_bubble_outline),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatRoomPage(applicationId: widget.applicationId),
-                    ),
-                  );
+                  context.push(RoutePaths.chatRoomPath(widget.applicationId));
                 },
               ),
             ],
@@ -223,7 +192,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        _statusLabel(status),
+                        StatusBadge.labelFor(status),
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -366,15 +335,9 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           if (!isCheckedIn && !isCheckedOut)
                             ElevatedButton.icon(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => QrCheckinPage(
-                                      applicationId: widget.applicationId,
-                                      isCheckOut: false,
-                                    ),
-                                  ),
-                                );
+                                context.push(RoutePaths.qrCheckinPath(widget.applicationId), extra: {
+                                  'isCheckOut': false,
+                                });
                               },
                               icon: const Icon(Icons.qr_code_scanner, size: 18),
                               label: const Text('QR出勤'),
@@ -388,15 +351,9 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           if (isCheckedIn && !isCheckedOut)
                             ElevatedButton.icon(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => QrCheckinPage(
-                                      applicationId: widget.applicationId,
-                                      isCheckOut: true,
-                                    ),
-                                  ),
-                                );
+                                context.push(RoutePaths.qrCheckinPath(widget.applicationId), extra: {
+                                  'isCheckOut': true,
+                                });
                               },
                               icon: const Icon(Icons.qr_code_scanner, size: 18),
                               label: const Text('QR退勤'),
@@ -434,8 +391,8 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                   controller: _tabController,
                   children: [
                     _OverviewTab(app: app, jobId: jobId),
-                    _PhotosTab(applicationId: widget.applicationId, jobId: jobId),
-                    _DocsTab(applicationId: widget.applicationId),
+                    WorkPhotosTab(applicationId: widget.applicationId, jobId: jobId),
+                    WorkDocsTab(applicationId: widget.applicationId),
                   ],
                 ),
               ),
@@ -504,420 +461,6 @@ class _OverviewTab extends StatelessWidget {
 
         return JobDetailBody(data: jobData);
       },
-    );
-  }
-}
-
-class _PhotosTab extends StatefulWidget {
-  final String applicationId;
-  final String jobId;
-  const _PhotosTab({required this.applicationId, required this.jobId});
-
-  @override
-  State<_PhotosTab> createState() => _PhotosTabState();
-}
-
-class _PhotosTabState extends State<_PhotosTab> {
-  final _imageService = ImageUploadService();
-  bool _uploading = false;
-
-  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
-
-  CollectionReference<Map<String, dynamic>> get _photosRef =>
-      FirebaseFirestore.instance
-          .collection('applications')
-          .doc(widget.applicationId)
-          .collection('photos');
-
-  Future<void> _uploadPhotos() async {
-    if (_uploading || _uid.isEmpty) return;
-    setState(() => _uploading = true);
-
-    try {
-      final results = await _imageService.pickAndUploadMultipleImages(
-        userId: _uid,
-        folder: 'work_photos/${widget.jobId}',
-        documentId: 'photo',
-        maxImages: 10,
-        quality: 80,
-      );
-
-      for (final result in results) {
-        if (result.isSuccess && result.downloadUrl != null) {
-          await _photosRef.add({
-            'url': result.downloadUrl,
-            'uploadedBy': _uid,
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-        }
-      }
-
-      final successCount = results.where((r) => r.isSuccess).length;
-      if (mounted && successCount > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$successCount枚の写真をアップロードしました')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('アップロードに失敗しました: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _uploading = false);
-    }
-  }
-
-  Future<void> _deletePhoto(String docId, String url) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('写真を削除'),
-        content: const Text('この写真を削除しますか？'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('キャンセル')),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('削除'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-    try {
-      await _photosRef.doc(docId).delete();
-      await _imageService.deleteImage(url);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('写真を削除しました')));
-      }
-    } catch (e) {
-      Logger.warning('写真の削除に失敗', tag: 'WorkDetail', data: {'docId': docId, 'error': '$e'});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
-          child: Row(
-            children: [
-              const Icon(Icons.photo_library, size: 20, color: AppColors.ruri),
-              const SizedBox(width: 8),
-              const Expanded(child: Text('現場写真', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
-              if (_uploading)
-                const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
-              else
-                ElevatedButton.icon(
-                  onPressed: _uploadPhotos,
-                  icon: const Icon(Icons.add_a_photo, size: 18),
-                  label: const Text('追加'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    textStyle: const TextStyle(fontSize: 13),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-        Expanded(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _photosRef.orderBy('createdAt', descending: true).limit(200).snapshots(),
-            builder: (context, snap) {
-              if (snap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final docs = snap.data?.docs ?? [];
-              if (docs.isEmpty) {
-                return const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.photo_outlined, size: 56, color: AppColors.textHint),
-                      SizedBox(height: 12),
-                      Text('写真はまだありません', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                      SizedBox(height: 6),
-                      Text('「追加」ボタンから写真をアップロード', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
-                    ],
-                  ),
-                );
-              }
-
-              return GridView.builder(
-                padding: const EdgeInsets.all(8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 6,
-                  mainAxisSpacing: 6,
-                ),
-                itemCount: docs.length,
-                itemBuilder: (context, i) {
-                  final data = docs[i].data();
-                  final url = (data['url'] ?? '').toString();
-                  return GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => Dialog(
-                          insetPadding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: AppCachedImage(
-                                      imageUrl: url,
-                                      fit: BoxFit.contain,
-                                      borderRadius: 12,
-                                      errorWidget: const SizedBox(height: 200, child: Center(child: Icon(Icons.broken_image))),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8, right: 8,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.close, color: Colors.white),
-                                      style: IconButton.styleFrom(backgroundColor: Colors.black45),
-                                      onPressed: () => Navigator.pop(ctx),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: TextButton.icon(
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    _deletePhoto(docs[i].id, url);
-                                  },
-                                  icon: const Icon(Icons.delete, color: AppColors.error, size: 18),
-                                  label: const Text('削除', style: TextStyle(color: AppColors.error)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    child: AppCachedImage(
-                      imageUrl: url,
-                      fit: BoxFit.cover,
-                      borderRadius: 8,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DocsTab extends StatefulWidget {
-  final String applicationId;
-  const _DocsTab({required this.applicationId});
-
-  @override
-  State<_DocsTab> createState() => _DocsTabState();
-}
-
-class _DocsTabState extends State<_DocsTab> {
-  final _imageService = ImageUploadService();
-  bool _uploading = false;
-  String _selectedFolder = '御見積書';
-
-  static const _folders = ['御見積書', '図面', '仕様', '工程', 'その他'];
-
-  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
-
-  CollectionReference<Map<String, dynamic>> get _docsRef =>
-      FirebaseFirestore.instance
-          .collection('applications')
-          .doc(widget.applicationId)
-          .collection('documents');
-
-  Future<void> _uploadDoc() async {
-    if (_uploading || _uid.isEmpty) return;
-    setState(() => _uploading = true);
-    try {
-      final result = await _imageService.pickAndUploadImage(
-        userId: _uid,
-        folder: 'work_documents/${widget.applicationId}',
-        documentId: 'doc_$_selectedFolder',
-        quality: 90,
-        compress: false,
-      );
-
-      if (result.isSuccess && result.downloadUrl != null) {
-        await _docsRef.add({
-          'url': result.downloadUrl,
-          'folder': _selectedFolder,
-          'uploadedBy': _uid,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$_selectedFolderにアップロードしました')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('アップロードに失敗しました: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _uploading = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
-          child: Row(
-            children: [
-              const Icon(Icons.folder_outlined, size: 20, color: AppColors.ruri),
-              const SizedBox(width: 8),
-              const Expanded(child: Text('資料管理', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
-              if (_uploading)
-                const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
-              else
-                ElevatedButton.icon(
-                  onPressed: _uploadDoc,
-                  icon: const Icon(Icons.upload_file, size: 18),
-                  label: const Text('追加'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    textStyle: const TextStyle(fontSize: 13),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: _folders.map((f) {
-              final selected = f == _selectedFolder;
-              return Padding(
-                padding: const EdgeInsets.only(right: 6),
-                child: ChoiceChip(
-                  label: Text(f, style: const TextStyle(fontSize: 12)),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _selectedFolder = f),
-                  selectedColor: AppColors.ruri,
-                  labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  ),
-                  backgroundColor: AppColors.chipUnselected,
-                  side: BorderSide.none,
-                  visualDensity: VisualDensity.compact,
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        const Divider(height: 1),
-        Expanded(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _docsRef
-                .where('folder', isEqualTo: _selectedFolder)
-                .orderBy('createdAt', descending: true)
-                .snapshots(),
-            builder: (context, snap) {
-              if (snap.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final docs = snap.data?.docs ?? [];
-              if (docs.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.folder_off_outlined, size: 48, color: AppColors.textHint),
-                      const SizedBox(height: 12),
-                      Text('「$_selectedFolder」の資料はまだありません', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.separated(
-                padding: const EdgeInsets.all(12),
-                itemCount: docs.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (context, i) {
-                  final data = docs[i].data();
-                  final url = (data['url'] ?? '').toString();
-                  final createdAt = data['createdAt'];
-                  String dateStr = '';
-                  if (createdAt is Timestamp) {
-                    final d = createdAt.toDate();
-                    dateStr = '${d.month}/${d.day} ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
-                  }
-
-                  return _Card(
-                    child: Row(
-                      children: [
-                        AppCachedImage(
-                          imageUrl: url,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          borderRadius: 8,
-                          errorWidget: Container(
-                            width: 60,
-                            height: 60,
-                            color: AppColors.chipUnselected,
-                            child: const Icon(Icons.description, color: AppColors.textHint),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(_selectedFolder, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                              if (dateStr.isNotEmpty)
-                                Text(dateStr, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
-                          onPressed: () async {
-                            try {
-                              await _docsRef.doc(docs[i].id).delete();
-                              await _imageService.deleteImage(url);
-                            } catch (e) {
-                              Logger.warning('資料の削除に失敗', tag: 'WorkDetail', data: {'error': '$e'});
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }
