@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -245,6 +246,7 @@ class _WorkPageState extends State<WorkPage>
                     color: AppColors.ruri,
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
+                      cacheExtent: AppConstants.listCacheExtent,
                     padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),

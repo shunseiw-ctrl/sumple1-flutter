@@ -9,6 +9,7 @@ import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 import '../core/services/analytics_service.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -38,6 +39,10 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
   Key _refreshKey = UniqueKey();
   final _debouncer = Debouncer();
+
+  /// バッチ取得したチャットデータキャッシュ
+  Map<String, Map<String, dynamic>> _chatsCache = {};
+  List<String> _lastAppIds = [];
 
   String get _myUid => _auth.currentUser?.uid ?? '';
   String get _myEmail => _auth.currentUser?.email ?? '';
@@ -115,6 +120,47 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
         style: AppTextStyles.badgeText.copyWith(color: Colors.white),
       ),
     );
+  }
+
+  /// チャットデータをバッチ取得（whereIn最大30件）
+  Future<void> _fetchChats(List<String> appIds) async {
+    if (appIds.isEmpty) {
+      if (mounted) setState(() => _chatsCache = {});
+      return;
+    }
+
+    final result = <String, Map<String, dynamic>>{};
+    const batchSize = 30;
+    for (var i = 0; i < appIds.length; i += batchSize) {
+      final batch = appIds.sublist(i, (i + batchSize).clamp(0, appIds.length));
+      final snap = await _db.collection('chats')
+          .where(FieldPath.documentId, whereIn: batch).get();
+      for (final doc in snap.docs) {
+        result[doc.id] = doc.data();
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _chatsCache = result;
+        _lastAppIds = List.of(appIds);
+        // _lastAtCacheも更新
+        for (final entry in result.entries) {
+          final lastAt = _lastMessageAtFromChat(entry.value);
+          if (lastAt != null) {
+            _lastAtCache[entry.key] = lastAt;
+          }
+        }
+      });
+    }
+  }
+
+  bool _appIdsChanged(List<String> newIds) {
+    if (newIds.length != _lastAppIds.length) return true;
+    for (var i = 0; i < newIds.length; i++) {
+      if (newIds[i] != _lastAppIds[i]) return true;
+    }
+    return false;
   }
 
   int _compareByLastMessageAtDesc(
@@ -277,6 +323,14 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                   );
                 }
 
+                // チャットデータをバッチ取得
+                final appIds = docs.map((d) => d.id).toList();
+                if (_appIdsChanged(appIds)) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _fetchChats(appIds);
+                  });
+                }
+
                 final filtered = docs.where((d) {
                   final data = d.data();
                   final title = (data['projectNameSnapshot'] ??
@@ -300,12 +354,14 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
+                    _lastAppIds = []; // 強制再取得
+                    await _fetchChats(appIds);
                     setState(() => _refreshKey = UniqueKey());
-                    await Future.delayed(const Duration(milliseconds: 500));
                   },
                   color: AppColors.ruri,
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    cacheExtent: AppConstants.listCacheExtent,
                     padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
@@ -321,124 +377,107 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                           .toString();
 
                       final status = (app['status'] ?? '').toString();
-                      final chatStream = _db.collection('chats').doc(appId).snapshots();
+                      final chatData = _chatsCache[appId];
+                      final unread = _unreadFromChat(chatData);
+                      final lastText = _lastMessageTextFromChat(chatData);
+                      final lastAt = _lastMessageAtFromChat(chatData);
 
-                      return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: chatStream,
-                        builder: (context, chatSnap) {
-                          final chatData = chatSnap.data?.data();
-                          final unread = _unreadFromChat(chatData);
-                          final lastText = _lastMessageTextFromChat(chatData);
-                          final lastAt = _lastMessageAtFromChat(chatData);
+                      final ymdText = _formatYmd(lastAt);
 
-                          final ymdText = _formatYmd(lastAt);
+                      final sub1 = lastText.isNotEmpty
+                          ? lastText
+                          : (status.isEmpty ? ' ' : 'ステータス: $status');
+                      final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
 
-                          if (lastAt != null) {
-                            final prev = _lastAtCache[appId];
-                            if (prev == null || prev != lastAt) {
-                              _lastAtCache[appId] = lastAt;
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) setState(() {});
-                              });
-                            }
-                          }
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: unread > 0 ? AppColors.ruriPale : Colors.white,
+                          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                          boxShadow: AppShadows.subtle,
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                            onTap: () async {
+                              AppHaptics.tap();
+                              await _resetUnreadIfPossible(appId);
 
-                          final sub1 = lastText.isNotEmpty
-                              ? lastText
-                              : (status.isEmpty ? ' ' : 'ステータス: $status');
-                          final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
+                              if (!context.mounted) return;
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: unread > 0 ? AppColors.ruriPale : Colors.white,
-                              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                              boxShadow: AppShadows.subtle,
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                                onTap: () async {
-                                  AppHaptics.tap();
-                                  await _resetUnreadIfPossible(appId);
-
-                                  if (!context.mounted) return;
-
-                                  context.push(RoutePaths.chatRoomPath(appId));
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 48,
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.ruriPale,
-                                          borderRadius: BorderRadius.circular(14),
-                                        ),
-                                        child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
-                                      ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                              context.push(RoutePaths.chatRoomPath(appId));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.ruriPale,
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
                                           children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    title,
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: AppTextStyles.labelLarge.copyWith(
-                                                      fontWeight: unread > 0 ? FontWeight.w800 : FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (ymdText.isNotEmpty)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(left: AppSpacing.sm),
-                                                    child: Text(
-                                                      ymdText,
-                                                      style: AppTextStyles.labelSmall,
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: AppSpacing.xs),
-                                            Text(
-                                              sub1,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: AppTextStyles.bodySmall,
-                                            ),
-                                            if (sub2.isNotEmpty)
-                                              Text(
-                                                sub2,
+                                            Expanded(
+                                              child: Text(
+                                                title,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: AppTextStyles.labelSmall,
+                                                style: AppTextStyles.labelLarge.copyWith(
+                                                  fontWeight: unread > 0 ? FontWeight.w800 : FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            if (ymdText.isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: AppSpacing.sm),
+                                                child: Text(
+                                                  ymdText,
+                                                  style: AppTextStyles.labelSmall,
+                                                ),
                                               ),
                                           ],
                                         ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Column(
-                                        children: [
-                                          _unreadBadge(unread),
-                                          const SizedBox(height: AppSpacing.xs),
-                                          const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
-                                        ],
-                                      ),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          sub1,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppTextStyles.bodySmall,
+                                        ),
+                                        if (sub2.isNotEmpty)
+                                          Text(
+                                            sub2,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTextStyles.labelSmall,
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Column(
+                                    children: [
+                                      _unreadBadge(unread),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
                                     ],
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       );
                     },
                   ),

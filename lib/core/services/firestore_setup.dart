@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import '../constants/app_constants.dart';
 import '../utils/logger.dart';
 
 class FirestoreSetup {
   static Future<void> initialize() async {
     try {
-      final settings = const Settings(
+      final settings = Settings(
         persistenceEnabled: true,
-        cacheSizeBytes: kIsWeb ? 40 * 1024 * 1024 : Settings.CACHE_SIZE_UNLIMITED,
+        cacheSizeBytes: kIsWeb ? 40 * 1024 * 1024 : AppConstants.firestoreCacheSizeBytes,
       );
 
       FirebaseFirestore.instance.settings = settings;
@@ -18,7 +19,7 @@ class FirestoreSetup {
         tag: 'FirestoreSetup',
         data: {
           'persistence': true,
-          'cacheSize': kIsWeb ? '40MB' : 'unlimited',
+          'cacheSize': kIsWeb ? '40MB' : '${AppConstants.firestoreCacheSizeBytes ~/ (1024 * 1024)}MB',
           'platform': kIsWeb ? 'web' : 'native',
         },
       );

@@ -13,6 +13,8 @@ class AppCachedImage extends StatelessWidget {
   final double borderRadius;
   final Widget? placeholder;
   final Widget? errorWidget;
+  final int? memCacheWidth;
+  final int? memCacheHeight;
 
   const AppCachedImage({
     super.key,
@@ -23,10 +25,18 @@ class AppCachedImage extends StatelessWidget {
     this.borderRadius = 0,
     this.placeholder,
     this.errorWidget,
+    this.memCacheWidth,
+    this.memCacheHeight,
   });
 
   @override
   Widget build(BuildContext context) {
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final effectiveMemCacheWidth = memCacheWidth ??
+        (width != null ? (width! * dpr).round() : null);
+    final effectiveMemCacheHeight = memCacheHeight ??
+        (height != null ? (height! * dpr).round() : null);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: CachedNetworkImage(
@@ -34,6 +44,8 @@ class AppCachedImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        memCacheWidth: effectiveMemCacheWidth,
+        memCacheHeight: effectiveMemCacheHeight,
         placeholder: (context, url) =>
             placeholder ??
             SkeletonLoader(

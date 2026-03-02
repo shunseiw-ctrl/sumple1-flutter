@@ -14,6 +14,35 @@ class BadgeSpec {
   const BadgeSpec({required this.label, required this.bg, required this.fg});
 }
 
+/// JobCard内のメトリクス計算を集約するデータクラス
+class JobCardMetrics {
+  final int remainingSlots;
+  final bool isUrgent;
+  final bool showQuickStart;
+
+  const JobCardMetrics({
+    required this.remainingSlots,
+    required this.isUrgent,
+    required this.showQuickStart,
+  });
+
+  factory JobCardMetrics.fromData(Map<String, dynamic> data) {
+    final totalSlots = int.tryParse((data['slots'] ?? '5').toString()) ?? 5;
+    final applicantCount = int.tryParse((data['applicantCount'] ?? '0').toString()) ?? 0;
+    final remaining = (totalSlots - applicantCount).clamp(1, totalSlots);
+    final isUrgent = remaining <= 2;
+    final dateDiff = DateTime.tryParse(data['date'] ?? '')
+        ?.difference(DateTime.now()).inDays ?? 999;
+    final showQuickStart =
+        (data['quickStart'] ?? false) == true || dateDiff.abs() <= 3;
+    return JobCardMetrics(
+      remainingSlots: remaining,
+      isUrgent: isUrgent,
+      showQuickStart: showQuickStart,
+    );
+  }
+}
+
 /// A card widget that displays a job listing with image, badges,
 /// favorite button, popup menu, price, location, and date.
 class JobCard extends StatelessWidget {
@@ -269,58 +298,7 @@ class JobCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
 
-                  Builder(
-                    builder: (context) {
-                      final totalSlots = int.tryParse((data['slots'] ?? '5').toString()) ?? 5;
-                      final applicantCount = int.tryParse((data['applicantCount'] ?? '0').toString()) ?? 0;
-                      final remaining = (totalSlots - applicantCount).clamp(1, totalSlots);
-                      final isUrgent = remaining <= 2;
-                      final dateDiff = DateTime.tryParse(data['date'] ?? '')?.difference(DateTime.now()).inDays ?? 999;
-                      final showQuickStart = (data['quickStart'] ?? false) == true || dateDiff.abs() <= 3;
-
-                      return Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isUrgent ? AppColors.errorLight : AppColors.warningLight,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isUrgent ? Icons.local_fire_department : Icons.people_outline,
-                                  size: 12,
-                                  color: isUrgent ? AppColors.error : AppColors.warning,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '残り$remaining枠',
-                                  style: AppTextStyles.badgeText.copyWith(
-                                    color: isUrgent ? AppColors.error : AppColors.warning,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (showQuickStart)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.successLight,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '即日勤務OK',
-                                style: AppTextStyles.badgeText.copyWith(color: AppColors.success),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                  _buildMetricsRow(JobCardMetrics.fromData(data)),
                   const SizedBox(height: AppSpacing.md),
 
                   Row(
@@ -363,6 +341,50 @@ class JobCard extends StatelessWidget {
         ),
       ),
     ),
+    );
+  }
+
+  Widget _buildMetricsRow(JobCardMetrics metrics) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: metrics.isUrgent ? AppColors.errorLight : AppColors.warningLight,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                metrics.isUrgent ? Icons.local_fire_department : Icons.people_outline,
+                size: 12,
+                color: metrics.isUrgent ? AppColors.error : AppColors.warning,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '残り${metrics.remainingSlots}枠',
+                style: AppTextStyles.badgeText.copyWith(
+                  color: metrics.isUrgent ? AppColors.error : AppColors.warning,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        if (metrics.showQuickStart)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.successLight,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '即日勤務OK',
+              style: AppTextStyles.badgeText.copyWith(color: AppColors.success),
+            ),
+          ),
+      ],
     );
   }
 

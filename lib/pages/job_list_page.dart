@@ -9,6 +9,7 @@ import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
@@ -344,6 +345,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       color: AppColors.ruri,
                       child: ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
+                        cacheExtent: AppConstants.listCacheExtent,
                         padding: AppSpacing.listInsets,
                         itemCount: filteredDocs.length,
                         itemBuilder: (context, index) {

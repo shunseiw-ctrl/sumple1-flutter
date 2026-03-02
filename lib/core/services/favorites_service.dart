@@ -51,4 +51,21 @@ class FavoritesService {
       return List<String>.from(data['jobIds'] ?? []);
     });
   }
+
+  /// Firestore whereIn は最大30件なのでバッチ分割して一括取得
+  Future<Map<String, Map<String, dynamic>>> fetchJobsByIds(List<String> jobIds) async {
+    if (jobIds.isEmpty) return {};
+    final result = <String, Map<String, dynamic>>{};
+    const batchSize = 30;
+    for (var i = 0; i < jobIds.length; i += batchSize) {
+      final batch = jobIds.sublist(i, (i + batchSize).clamp(0, jobIds.length));
+      final snap = await _db.collection('jobs')
+          .where(FieldPath.documentId, whereIn: batch).get();
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        result[doc.id] = data;
+      }
+    }
+    return result;
+  }
 }

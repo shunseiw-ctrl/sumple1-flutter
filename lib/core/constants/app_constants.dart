@@ -47,4 +47,8 @@ class AppConstants {
   static const int maxContactSubjectLength = 200;
   static const int maxContactBodyLength = 5000;
   static const String postalCodePattern = r'^\d{3}-?\d{4}$';
+
+  // === Performance ===
+  static const double listCacheExtent = 500.0;
+  static const int firestoreCacheSizeBytes = 100 * 1024 * 1024; // 100MB
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
@@ -102,6 +103,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             child: ListView.separated(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
+            cacheExtent: AppConstants.listCacheExtent,
             padding: const EdgeInsets.all(AppSpacing.pagePadding),
             itemCount: docs.length,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),

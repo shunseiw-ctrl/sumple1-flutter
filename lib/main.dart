@@ -56,45 +56,10 @@ const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
   importance: Importance.high,
 );
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: AppConfig.firebaseOptions,
-  );
-
-  Logger.info('Environment: ${AppConfig.environmentName}', tag: 'main');
-
-  // --- App Check ---
-  if (kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-    );
-  } else {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.deviceCheck,
-    );
-  }
-
-  // --- Crashlytics ---
-  if (!kIsWeb) {
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
-  }
-
-  await FirestoreSetup.initialize();
-
-  Logger.info('Firebase initialized', tag: 'main');
-
-  // --- FCM ---
-  if (!kIsWeb) {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
+/// FCM初期化（パーミッション要求、チャンネル作成、リスナー登録）
+/// 起動速度のためaddPostFrameCallbackで遅延実行する
+Future<void> _initializeFCM() async {
+  try {
     await FirebaseMessaging.instance.requestPermission();
 
     // Android通知チャンネル作成
@@ -140,6 +105,54 @@ Future<void> main() async {
         _goRouterInstance?.go(path);
       }
     });
+
+    Logger.info('FCM initialized (deferred)', tag: 'FCM');
+  } catch (e) {
+    Logger.error('FCM initialization failed', tag: 'FCM', error: e);
+  }
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: AppConfig.firebaseOptions,
+  );
+
+  Logger.info('Environment: ${AppConfig.environmentName}', tag: 'main');
+
+  // --- App Check ---
+  if (kDebugMode) {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+    );
+  } else {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.deviceCheck,
+    );
+  }
+
+  // --- Crashlytics ---
+  if (!kIsWeb) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  await FirestoreSetup.initialize();
+
+  Logger.info('Firebase initialized', tag: 'main');
+
+  // --- FCM ---
+  if (!kIsWeb) {
+    // バックグラウンドハンドラはmain()に残す（Firebase要件）
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // 残りのFCM初期化は初回フレーム後に遅延（起動時間短縮）
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeFCM());
   }
 
   await LineAuthService().handleLineCallbackIfNeeded();

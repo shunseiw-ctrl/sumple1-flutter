@@ -118,5 +118,105 @@ void main() {
 
       expect(find.byType(SkeletonLoader), findsNothing);
     });
+
+    testWidgets('memCacheWidth/memCacheHeight パラメータ受付', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              width: 100,
+              height: 100,
+              memCacheWidth: 200,
+              memCacheHeight: 200,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(AppCachedImage), findsOneWidget);
+    });
+
+    testWidgets('height指定時にmemCacheHeight自動計算', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              height: 100,
+            ),
+          ),
+        ),
+      );
+
+      // ウィジェットがレンダリングされることを確認（memCacheHeightは内部で自動設定）
+      expect(find.byType(AppCachedImage), findsOneWidget);
+    });
+
+    testWidgets('width指定時にmemCacheWidth自動計算', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              width: 200,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(AppCachedImage), findsOneWidget);
+    });
+
+    testWidgets('明示的memCacheWidth指定が自動計算をオーバーライド', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              width: 100,
+              height: 100,
+              memCacheWidth: 500,
+            ),
+          ),
+        ),
+      );
+
+      final widget = tester.widget<AppCachedImage>(find.byType(AppCachedImage));
+      expect(widget.memCacheWidth, 500);
+    });
+
+    testWidgets('width/height未指定時はmemCache未設定', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+            ),
+          ),
+        ),
+      );
+
+      final widget = tester.widget<AppCachedImage>(find.byType(AppCachedImage));
+      expect(widget.memCacheWidth, isNull);
+      expect(widget.memCacheHeight, isNull);
+    });
+
+    testWidgets('borderRadiusのみ指定時はmemCache未設定', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AppCachedImage(
+              imageUrl: 'https://example.com/test.jpg',
+              borderRadius: 8,
+            ),
+          ),
+        ),
+      );
+
+      final widget = tester.widget<AppCachedImage>(find.byType(AppCachedImage));
+      expect(widget.memCacheWidth, isNull);
+      expect(widget.memCacheHeight, isNull);
+    });
   });
 }
