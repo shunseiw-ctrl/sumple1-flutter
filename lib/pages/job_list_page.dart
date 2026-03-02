@@ -4,14 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/core/services/distance_sort_service.dart';
 import 'package:sumple1/core/services/favorites_service.dart';
+import 'package:sumple1/core/services/location_service.dart';
+import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
@@ -35,11 +37,15 @@ class _JobListPageState extends ConsumerState<JobListPage> {
   String _sortLabel = '新着順';
 
   final _favoritesService = FavoritesService();
+  final _distanceSortService = DistanceSortService();
   final Set<String> _guestFavorites = {};
 
   Key _refreshKey = UniqueKey();
 
   JobFilterState _filterState = const JobFilterState();
+
+  List<JobWithDistance>? _sortedByDistance;
+  bool _loadingLocation = false;
 
   final List<String> _prefs = const [
     '千葉県',
@@ -78,34 +84,96 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     return '$y-$m';
   }
 
-  Future<void> _openMapByQuery(String query) async {
-    try {
-      final encoded = Uri.encodeComponent(query);
-      final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$encoded');
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Open: $url')),
-      );
-
-      final ok = await launchUrl(url, mode: LaunchMode.externalApplication);
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('launchUrl result: $ok')),
-      );
-
-      if (!ok) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('地図アプリを開けませんでした（launchUrl=false）')),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('地図エラー: $e')),
-      );
+  void _onSortSelected(String value) {
+    if (value == '距離順') {
+      _loadDistanceSort();
+    } else {
+      setState(() {
+        _sortLabel = value;
+        _sortedByDistance = null;
+      });
     }
+  }
+
+  Future<void> _loadDistanceSort() async {
+    if (_loadingLocation) return;
+    setState(() {
+      _loadingLocation = true;
+      _sortLabel = '距離順';
+    });
+
+    try {
+      final pos = await _distanceSortService.getCurrentPosition();
+
+      // 現在のFirestoreデータから距離を計算
+      final snapshot = await FirebaseFirestore.instance
+          .collection('jobs')
+          .orderBy('createdAt', descending: true)
+          .limit(100)
+          .get();
+
+      final jobMaps = snapshot.docs.map((d) => {
+        'data': d.data(),
+        'docId': d.id,
+      }).toList();
+
+      final withDistance = _distanceSortService.calculateDistances(
+        jobMaps,
+        pos.lat,
+        pos.lng,
+      );
+      final sorted = _distanceSortService.sortByDistance(withDistance);
+
+      if (!mounted) return;
+      setState(() {
+        _sortedByDistance = sorted;
+        _loadingLocation = false;
+      });
+    } on LocationException catch (e) {
+      Logger.warning('Location permission denied', tag: 'JobListPage', data: {'error': e.message});
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+      setState(() {
+        _sortLabel = '新着順';
+        _sortedByDistance = null;
+        _loadingLocation = false;
+      });
+    } catch (e) {
+      Logger.error('Failed to load distance sort', tag: 'JobListPage', error: e);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('位置情報の取得に失敗しました')),
+      );
+      setState(() {
+        _sortLabel = '新着順';
+        _sortedByDistance = null;
+        _loadingLocation = false;
+      });
+    }
+  }
+
+  void _openMapSearch() {
+    // 現在のFirestoreから最新のjobsを取得してMapSearchPageへ渡す
+    FirebaseFirestore.instance
+        .collection('jobs')
+        .orderBy('createdAt', descending: true)
+        .limit(100)
+        .get()
+        .then((snapshot) {
+      if (!mounted) return;
+      final jobMaps = snapshot.docs.map((d) => <String, dynamic>{
+        'data': d.data(),
+        'docId': d.id,
+      }).toList();
+      context.push(RoutePaths.mapSearch, extra: jobMaps);
+    }).catchError((e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('案件データの取得に失敗しました')),
+      );
+    });
   }
 
   Future<void> _showFilterSheet() async {
@@ -185,7 +253,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                   children: [
                     _SortDropDown(
                       label: _sortLabel,
-                      onSelected: (value) => setState(() => _sortLabel = value),
+                      onSelected: (value) => _onSortSelected(value),
                     ),
                     const Spacer(),
                     Semantics(
@@ -329,6 +397,26 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       });
                     }
 
+                    // 距離ソート結果のマップ（docId → distanceLabel）
+                    final distanceLabels = <String, String>{};
+                    if (_sortLabel == '距離順' && _sortedByDistance != null) {
+                      for (final jwd in _sortedByDistance!) {
+                        if (jwd.distanceLabel != null) {
+                          distanceLabels[jwd.docId] = jwd.distanceLabel!;
+                        }
+                      }
+                      // 距離ソート順にfilteredDocsを並べ替え
+                      final orderMap = <String, int>{};
+                      for (int i = 0; i < _sortedByDistance!.length; i++) {
+                        orderMap[_sortedByDistance![i].docId] = i;
+                      }
+                      filteredDocs.sort((a, b) {
+                        final aIdx = orderMap[a.id] ?? 99999;
+                        final bIdx = orderMap[b.id] ?? 99999;
+                        return aIdx.compareTo(bIdx);
+                      });
+                    }
+
                     if (filteredDocs.isEmpty) {
                       return const EmptyState(
                         icon: Icons.search_off_rounded,
@@ -390,6 +478,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                               data: data,
                               isOwner: isOwner,
                               isFavorite: isFav,
+                              distanceLabel: distanceLabels[doc.id],
                               onToggleFavorite: () {
                                 AppHaptics.tap();
                                 if (_favoritesService.isRegistered) {
@@ -443,14 +532,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
             boxShadow: AppShadows.button,
           ),
           child: FloatingActionButton.extended(
-            onPressed: () {
-              final pref = _selectedPref == 'その他' ? '日本' : _selectedPref;
-
-              final month = _selectedMonthKey;
-              final query = (month == null) ? pref : '$pref $month';
-
-              _openMapByQuery(query);
-            },
+            onPressed: () => _openMapSearch(),
             backgroundColor: Colors.transparent,
             elevation: 0,
             icon: const Icon(Icons.map_outlined, color: Colors.white),
@@ -650,8 +732,8 @@ class _SortDropDown extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
       itemBuilder: (_) => [
         PopupMenuItem(value: '新着順', child: Text('新着順', style: AppTextStyles.bodyMedium)),
-        PopupMenuItem(value: '現在地から近い順', child: Text('現在地から近い順（UIのみ）', style: AppTextStyles.bodyMedium)),
-        PopupMenuItem(value: '金額が高い順', child: Text('金額が高い順（UIのみ）', style: AppTextStyles.bodyMedium)),
+        PopupMenuItem(value: '距離順', child: Text('距離順', style: AppTextStyles.bodyMedium)),
+        PopupMenuItem(value: '金額が高い順', child: Text('金額が高い順', style: AppTextStyles.bodyMedium)),
       ],
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),

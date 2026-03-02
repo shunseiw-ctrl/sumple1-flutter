@@ -90,6 +90,21 @@ class TestFixtures {
     };
   }
 
+  /// 画像メッセージテストデータ
+  static Map<String, dynamic> imageMessageData({
+    String? senderUid,
+    String? text,
+    String? imageUrl,
+  }) {
+    return {
+      'senderUid': senderUid ?? 'worker-001',
+      'text': text ?? '',
+      'imageUrl': imageUrl ?? 'https://example.com/test-image.jpg',
+      'messageType': 'image',
+      'createdAt': DateTime(2025, 1, 1),
+    };
+  }
+
   /// シフトテストデータ
   static Map<String, dynamic> shiftData({
     String? date,

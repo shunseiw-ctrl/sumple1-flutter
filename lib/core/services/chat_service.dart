@@ -329,6 +329,119 @@ class ChatService {
     return SendMessageResult.error('メッセージの送信に失敗しました（$attempt回試行）');
   }
 
+  /// 画像メッセージを送信（リトライ機能付き）
+  Future<SendMessageResult> sendImageMessage({
+    required String applicationId,
+    required String imageUrl,
+    String text = '',
+    int maxRetries = 3,
+  }) async {
+    if (imageUrl.trim().isEmpty) {
+      return SendMessageResult.error('画像URLが空です');
+    }
+
+    if (currentUserId.isEmpty) {
+      return SendMessageResult.error('ログインしてください');
+    }
+
+    int attempt = 0;
+    Exception? lastError;
+
+    while (attempt < maxRetries) {
+      attempt++;
+
+      try {
+        Logger.debug(
+          'Attempting to send image message',
+          tag: 'ChatService',
+          data: {'attempt': attempt, 'maxRetries': maxRetries},
+        );
+
+        final chatRef = _firestore.collection(AppConstants.collectionChats).doc(applicationId);
+        final appRef = _firestore.collection(AppConstants.collectionApplications).doc(applicationId);
+
+        final appSnap = await appRef.get();
+        final app = appSnap.data() ?? {};
+
+        final applicantUid = (app['applicantUid'] ?? '').toString();
+        final adminUid = (app['adminUid'] ?? '').toString();
+
+        // 画像メッセージを追加
+        final messageData = <String, dynamic>{
+          'senderUid': currentUserId,
+          'text': text.trim(),
+          'imageUrl': imageUrl.trim(),
+          'messageType': 'image',
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        await chatRef.collection('messages').add(messageData);
+
+        // チャット情報を更新
+        final update = <String, dynamic>{
+          'lastMessageText': '[画像]',
+          'lastMessageAt': FieldValue.serverTimestamp(),
+          'lastMessageSenderUid': currentUserId,
+          'updatedAt': FieldValue.serverTimestamp(),
+        };
+
+        if (currentUserId == applicantUid) {
+          update['unreadCountAdmin'] = FieldValue.increment(1);
+        } else if (currentUserId == adminUid) {
+          update['unreadCountApplicant'] = FieldValue.increment(1);
+        }
+
+        await chatRef.update(update);
+
+        Logger.info(
+          'Image message sent successfully',
+          tag: 'ChatService',
+          data: {'attempt': attempt, 'applicationId': applicationId},
+        );
+
+        return SendMessageResult.success();
+      } on FirebaseException catch (e) {
+        lastError = e;
+
+        Logger.warning(
+          'Firebase error during image message send',
+          tag: 'ChatService',
+          data: {'attempt': attempt, 'code': e.code, 'message': e.message},
+        );
+
+        if (_isNonRetryableError(e)) {
+          return SendMessageResult.error(_getFirebaseErrorMessage(e));
+        }
+
+        if (attempt < maxRetries) {
+          await Future.delayed(Duration(milliseconds: 500 * attempt));
+        }
+      } catch (e, stackTrace) {
+        lastError = e is Exception ? e : Exception(e.toString());
+
+        Logger.error(
+          'Unexpected error during image message send',
+          tag: 'ChatService',
+          error: e,
+          stackTrace: stackTrace,
+          data: {'attempt': attempt},
+        );
+
+        if (attempt < maxRetries) {
+          await Future.delayed(Duration(milliseconds: 500 * attempt));
+        }
+      }
+    }
+
+    Logger.error(
+      'All image message send attempts failed',
+      tag: 'ChatService',
+      error: lastError,
+      data: {'totalAttempts': attempt},
+    );
+
+    return SendMessageResult.error('画像の送信に失敗しました（$attempt回試行）');
+  }
+
   /// リトライ不可能なエラーかどうかを判定
   bool _isNonRetryableError(FirebaseException e) {
     const nonRetryableCodes = [

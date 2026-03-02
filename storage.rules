@@ -44,6 +44,13 @@ service firebase.storage {
       allow write: if isAuthenticated() && isImageType() && isUnder10MB();
     }
 
+    // === チャット画像 ===
+    // パス: chat_images/{applicationId}/...
+    match /chat_images/{applicationId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageType() && isUnder10MB();
+    }
+
     // === 書類 ===
     // パス: work_documents/{applicationId}/...
     match /work_documents/{applicationId}/{allPaths=**} {

@@ -45,6 +45,9 @@ class RoutePaths {
   static const String faq = '/faq';
   static const String legal = '/legal';
 
+  // --- マップ ---
+  static const String mapSearch = '/map-search';
+
   // --- 管理者 ---
   static const String adminHome = '/admin';
 

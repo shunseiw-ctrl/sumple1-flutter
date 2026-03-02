@@ -68,6 +68,9 @@ dependencies:
   go_router: ^14.8.1
   cached_network_image: ^3.4.1
 
+  # Google Maps (Phase 15)
+  google_maps_flutter: ^2.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

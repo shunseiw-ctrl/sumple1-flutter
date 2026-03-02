@@ -219,4 +219,76 @@ void main() {
       expect(result.errorMessage, 'ログインしてください');
     });
   });
+
+  group('ChatService.sendImageMessage', () {
+    late FakeFirebaseFirestore fakeFirestore;
+    late MockFirebaseAuth mockAuth;
+    late ChatService chatService;
+
+    setUp(() {
+      fakeFirestore = FakeFirebaseFirestore();
+      final mockUser = MockUser(
+        isAnonymous: false,
+        uid: 'worker-001',
+        email: 'worker@test.com',
+      );
+      mockAuth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
+      chatService = ChatService(firestore: fakeFirestore, auth: mockAuth);
+    });
+
+    test('空imageUrl→エラー', () async {
+      final result = await chatService.sendImageMessage(
+        applicationId: 'app-001',
+        imageUrl: '',
+      );
+
+      expect(result.success, isFalse);
+      expect(result.errorMessage, '画像URLが空です');
+    });
+
+    test('空白のみimageUrl→エラー', () async {
+      final result = await chatService.sendImageMessage(
+        applicationId: 'app-001',
+        imageUrl: '   ',
+      );
+
+      expect(result.success, isFalse);
+      expect(result.errorMessage, '画像URLが空です');
+    });
+
+    test('成功時にimageUrl・messageTypeがFirestoreに書き込まれる', () async {
+      await fakeFirestore.collection('applications').doc('app-001').set({
+        'applicantUid': 'worker-001',
+        'adminUid': 'admin-001',
+        'jobId': 'job-001',
+      });
+      await fakeFirestore.collection('chats').doc('app-001').set({
+        'applicantUid': 'worker-001',
+        'adminUid': 'admin-001',
+        'jobId': 'job-001',
+        'titleSnapshot': 'テスト案件',
+      });
+
+      final result = await chatService.sendImageMessage(
+        applicationId: 'app-001',
+        imageUrl: 'https://example.com/image.jpg',
+      );
+
+      expect(result.success, isTrue);
+
+      final messages = await fakeFirestore
+          .collection('chats')
+          .doc('app-001')
+          .collection('messages')
+          .get();
+      expect(messages.docs.length, 1);
+      expect(messages.docs.first.data()['imageUrl'], 'https://example.com/image.jpg');
+      expect(messages.docs.first.data()['messageType'], 'image');
+      expect(messages.docs.first.data()['senderUid'], 'worker-001');
+
+      // チャット情報更新も確認
+      final chatDoc = await fakeFirestore.collection('chats').doc('app-001').get();
+      expect(chatDoc.data()?['lastMessageText'], '[画像]');
+    });
+  });
 }

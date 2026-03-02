@@ -205,10 +205,20 @@ service cloud.firestore {
 
         allow create: if chatPartyByApp(chatId)
           && request.resource.data.senderUid == uid()
-          && request.resource.data.keys().hasOnly(["senderUid","text","createdAt"])
+          && request.resource.data.keys().hasOnly(["senderUid","text","createdAt","imageUrl","messageType"])
           && isString(request.resource.data.text)
-          && request.resource.data.text.size() > 0
-          && request.resource.data.text.size() <= 5000;
+          && request.resource.data.text.size() <= 5000
+          && (
+            // テキストメッセージ: text必須
+            (request.resource.data.text.size() > 0
+              && (!("imageUrl" in request.resource.data.keys()) || request.resource.data.imageUrl == ""))
+            ||
+            // 画像メッセージ: imageUrl必須
+            ("imageUrl" in request.resource.data.keys()
+              && isString(request.resource.data.imageUrl)
+              && request.resource.data.imageUrl.size() > 0
+              && request.resource.data.imageUrl.size() <= 2000)
+          );
 
         allow update, delete: if false;
       }

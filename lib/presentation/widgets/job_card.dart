@@ -63,6 +63,7 @@ class JobCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onToggleFavorite;
   final String? heroTag;
+  final String? distanceLabel;
 
   const JobCard({
     super.key,
@@ -82,6 +83,7 @@ class JobCard extends StatelessWidget {
     required this.onDelete,
     this.onToggleFavorite,
     this.heroTag,
+    this.distanceLabel,
   });
 
   /// Returns the icon for a given construction category.
@@ -325,6 +327,23 @@ class JobCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      if (distanceLabel != null) ...[
+                        const SizedBox(width: AppSpacing.sm),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.ruriPale,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            distanceLabel!,
+                            style: AppTextStyles.badgeText.copyWith(
+                              color: AppColors.ruri,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(width: AppSpacing.md),
                       const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
                       const SizedBox(width: AppSpacing.xs),

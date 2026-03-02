@@ -30,6 +30,7 @@ import '../../pages/notifications_page.dart';
 import '../../pages/contact_page.dart';
 import '../../pages/faq_page.dart';
 import '../../pages/legal_page.dart';
+import '../../pages/map_search_page.dart';
 
 /// GoRouter インスタンスプロバイダー
 final routerProvider = Provider<GoRouter>((ref) {
@@ -220,6 +221,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return slideUpTransition(
             key: state.pageKey,
             child: PaymentDetailPage(paymentId: paymentId),
+          );
+        },
+      ),
+
+      // --- マップ検索 ---
+      GoRoute(
+        path: RoutePaths.mapSearch,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          final initialJobs = extra is List<Map<String, dynamic>> ? extra : null;
+          return slideUpTransition(
+            key: state.pageKey,
+            child: MapSearchPage(initialJobs: initialJobs),
           );
         },
       ),

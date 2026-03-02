@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_constants.dart';
+import '../core/services/chat_image_service.dart';
 import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import '../core/services/analytics_service.dart';
+import '../presentation/widgets/chat_image_bubble.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String applicationId;
@@ -21,9 +23,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
   final _chatService = ChatService();
+  final _chatImageService = ChatImageService();
   final _focusNode = FocusNode();
 
   bool _sending = false;
+  bool _uploadingImage = false;
   bool _ready = false;
   String? _readyError;
 
@@ -92,6 +96,91 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       ErrorHandler.showError(context, e);
     } finally {
       if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  void _showImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.ruri),
+              title: const Text('カメラで撮影'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _sendImage(useCamera: true);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.ruri),
+              title: const Text('ギャラリーから選択'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _sendImage(useCamera: false);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _sendImage({required bool useCamera}) async {
+    if (_uploadingImage) return;
+    setState(() => _uploadingImage = true);
+
+    try {
+      if (!_ready) {
+        await _initializeChatRoom();
+        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
+      }
+
+      final userId = _uid;
+      if (userId.isEmpty) {
+        ErrorHandler.showError(context, 'ログインしてください');
+        return;
+      }
+
+      final uploadResult = useCamera
+          ? await _chatImageService.captureAndUpload(
+              userId: userId,
+              applicationId: widget.applicationId,
+            )
+          : await _chatImageService.pickAndUpload(
+              userId: userId,
+              applicationId: widget.applicationId,
+            );
+
+      if (!mounted) return;
+
+      if (uploadResult.cancelled) return;
+
+      if (!uploadResult.isSuccess) {
+        ErrorHandler.showError(context, uploadResult.errorMessage ?? '画像のアップロードに失敗しました');
+        return;
+      }
+
+      final sendResult = await _chatService.sendImageMessage(
+        applicationId: widget.applicationId,
+        imageUrl: uploadResult.downloadUrl!,
+      );
+
+      if (!mounted) return;
+      if (!sendResult.success) {
+        ErrorHandler.showError(context, sendResult.errorMessage ?? '画像の送信に失敗しました');
+      }
+    } catch (e, stackTrace) {
+      Logger.error('Error sending image', tag: 'ChatRoomPage', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e);
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
     }
   }
 
@@ -194,9 +283,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           final m = docs[i].data();
                           final sender = (m['senderUid'] ?? '').toString();
                           final text = (m['text'] ?? '').toString();
+                          final imageUrl = (m['imageUrl'] ?? '').toString();
+                          final messageType = (m['messageType'] ?? 'text').toString();
                           final createdAt = m['createdAt'] as Timestamp?;
                           final mine = sender == myUid;
                           final showDate = _shouldShowDate(docs, i);
+                          final isImageMessage = messageType == 'image' && imageUrl.isNotEmpty;
 
                           return Column(
                             children: [
@@ -238,34 +330,40 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         ),
                                       ),
                                     Flexible(
-                                      child: Container(
-                                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: mine ? const Color(0xFF7BC67E) : Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: const Radius.circular(18),
-                                            topRight: const Radius.circular(18),
-                                            bottomLeft: Radius.circular(mine ? 18 : 4),
-                                            bottomRight: Radius.circular(mine ? 4 : 18),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.06),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
+                                      child: isImageMessage
+                                          ? ChatImageBubble(
+                                              imageUrl: imageUrl,
+                                              isMine: mine,
+                                              caption: text.isNotEmpty ? text : null,
+                                            )
+                                          : Container(
+                                              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+                                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                              decoration: BoxDecoration(
+                                                color: mine ? const Color(0xFF7BC67E) : Colors.white,
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: const Radius.circular(18),
+                                                  topRight: const Radius.circular(18),
+                                                  bottomLeft: Radius.circular(mine ? 18 : 4),
+                                                  bottomRight: Radius.circular(mine ? 4 : 18),
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withValues(alpha: 0.06),
+                                                    blurRadius: 4,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Text(
+                                                text,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: mine ? Colors.white : AppColors.textPrimary,
+                                                  height: 1.4,
+                                                ),
+                                              ),
                                             ),
-                                          ],
-                                        ),
-                                        child: Text(
-                                          text,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: mine ? Colors.white : AppColors.textPrimary,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     if (!mine)
                                       Padding(
@@ -293,6 +391,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                       child: Row(
                         children: [
+                          _uploadingImage
+                              ? const SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.ruri),
+                                  ),
+                                )
+                              : IconButton(
+                                  onPressed: _showImageOptions,
+                                  icon: const Icon(Icons.add, color: AppColors.ruri),
+                                  tooltip: '画像を添付',
+                                ),
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(

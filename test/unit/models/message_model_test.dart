@@ -36,6 +36,54 @@ void main() {
       });
     });
 
+    group('fromMap - 画像メッセージ', () {
+      test('imageUrl・messageType正常パース', () {
+        final model = MessageModel.fromMap('msg-img', {
+          'senderUid': 'worker-001',
+          'text': '',
+          'imageUrl': 'https://example.com/image.jpg',
+          'messageType': 'image',
+          'createdAt': DateTime(2025, 1, 1),
+        });
+
+        expect(model.imageUrl, 'https://example.com/image.jpg');
+        expect(model.messageType, 'image');
+      });
+
+      test('imageUrl未設定→null、messageType未設定→text', () {
+        final model = MessageModel.fromMap('msg-old', {
+          'senderUid': 'worker-001',
+          'text': 'テスト',
+          'createdAt': DateTime(2025, 1, 1),
+        });
+
+        expect(model.imageUrl, isNull);
+        expect(model.messageType, 'text');
+      });
+    });
+
+    group('isImage', () {
+      test('messageType==image→true', () {
+        final model = MessageModel(
+          id: 'msg-001',
+          senderUid: 'worker-001',
+          text: '',
+          imageUrl: 'https://example.com/image.jpg',
+          messageType: 'image',
+        );
+        expect(model.isImage, isTrue);
+      });
+
+      test('messageType==text→false', () {
+        final model = MessageModel(
+          id: 'msg-002',
+          senderUid: 'worker-001',
+          text: 'テスト',
+        );
+        expect(model.isImage, isFalse);
+      });
+    });
+
     group('isSender', () {
       test('送信者UIDで真', () {
         final model = MessageModel.fromMap('msg-001', TestFixtures.messageData());
@@ -62,6 +110,17 @@ void main() {
       test('空白のみでfalse', () {
         final model = MessageModel.fromMap('msg-003', TestFixtures.messageData(text: '   '));
         expect(model.isNotEmpty, isFalse);
+      });
+
+      test('画像メッセージ（text空・imageUrlあり）→true', () {
+        final model = MessageModel(
+          id: 'msg-img',
+          senderUid: 'worker-001',
+          text: '',
+          imageUrl: 'https://example.com/image.jpg',
+          messageType: 'image',
+        );
+        expect(model.isNotEmpty, isTrue);
       });
     });
 
@@ -102,6 +161,34 @@ void main() {
       expect(copied.text, '新しいテキスト');
       expect(copied.id, original.id);
       expect(copied.senderUid, original.senderUid);
+    });
+
+    test('copyWithでimageUrl更新が反映', () {
+      final original = MessageModel(
+        id: 'msg-001',
+        senderUid: 'worker-001',
+        text: '',
+        messageType: 'image',
+      );
+      final copied = original.copyWith(imageUrl: 'https://example.com/new.jpg');
+
+      expect(copied.imageUrl, 'https://example.com/new.jpg');
+      expect(copied.messageType, 'image');
+    });
+
+    test('toMapでimageUrl含む場合に出力', () {
+      final model = MessageModel(
+        id: 'msg-001',
+        senderUid: 'worker-001',
+        text: '',
+        imageUrl: 'https://example.com/image.jpg',
+        messageType: 'image',
+      );
+      final map = model.toMap();
+
+      expect(map['imageUrl'], 'https://example.com/image.jpg');
+      expect(map['messageType'], 'image');
+      expect(map['senderUid'], 'worker-001');
     });
   });
 }
