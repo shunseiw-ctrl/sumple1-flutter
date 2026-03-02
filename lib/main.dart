@@ -9,6 +9,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,14 +21,15 @@ import 'pages/onboarding_page.dart';
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
 import 'core/services/auth_service.dart';
-import 'core/services/analytics_service.dart';
 import 'core/enums/user_role.dart';
 import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'core/services/splash_remover.dart';
+import 'package:go_router/go_router.dart';
 import 'core/services/deep_link_service.dart';
+import 'core/router/app_router.dart';
 import 'presentation/widgets/error_retry_widget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
@@ -127,19 +129,19 @@ Future<void> main() async {
       );
     });
 
-    // 通知タップ時の処理 — Deep Link ルーティング
+    // 通知タップ時の処理 — go_router で Deep Link ルーティング
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       Logger.info('Notification tapped', tag: 'FCM', data: message.data);
-      final route = _deepLinkService.parseNotificationData(message.data);
-      if (route != null) {
-        navigatorKey.currentState?.pushNamed(route.path, arguments: route.params);
+      final path = _deepLinkService.goRouterPathFromNotification(message.data);
+      if (path != null) {
+        _goRouterInstance?.go(path);
       }
     });
   }
 
   await LineAuthService().handleLineCallbackIfNeeded();
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 
   if (kIsWeb) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -154,14 +156,17 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 /// Deep Link サービス
 final DeepLinkService _deepLinkService = DeepLinkService();
 
-class MyApp extends StatefulWidget {
+/// go_router インスタンス（FCM通知タップ時に使用）
+GoRouter? _goRouterInstance;
+
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
@@ -176,15 +181,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final router = ref.watch(routerProvider);
+    _goRouterInstance = router;
     final baseTextTheme = GoogleFonts.notoSansJpTextTheme(
       Theme.of(context).textTheme,
     );
 
-    return MaterialApp(
-      navigatorKey: navigatorKey,
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'ALBAWORK',
-      navigatorObservers: [AnalyticsService.observer],
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: AppColors.ruri,
@@ -515,7 +521,6 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('ja'),
-      home: const AuthGate(),
     );
   }
 }

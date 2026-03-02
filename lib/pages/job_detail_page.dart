@@ -13,6 +13,7 @@ import 'package:sumple1/core/services/favorites_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -416,10 +417,10 @@ class JobDetailBody extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 if (hasImage)
-                  Image.network(
-                    imageUrl,
+                  AppCachedImage(
+                    imageUrl: imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildGradientPlaceholder(),
+                    errorWidget: _buildGradientPlaceholder(),
                   )
                 else
                   _buildGradientPlaceholder(),

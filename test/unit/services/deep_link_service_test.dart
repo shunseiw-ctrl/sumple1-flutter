@@ -152,5 +152,85 @@ void main() {
         expect(route, isNull);
       });
     });
+
+    group('goRouterPath', () {
+      test('jobs/{jobId} URI を go_router パスに変換', () {
+        final uri = Uri.parse('https://albawork.app/jobs/job123');
+        final path = service.goRouterPath(uri);
+
+        expect(path, '/jobs/job123');
+      });
+
+      test('jobs URI を一覧パスに変換', () {
+        final uri = Uri.parse('https://albawork.app/jobs');
+        final path = service.goRouterPath(uri);
+
+        expect(path, '/jobs');
+      });
+
+      test('chat/{chatId} URI を go_router パスに変換', () {
+        final uri = Uri.parse('https://albawork.app/chat/chat456');
+        final path = service.goRouterPath(uri);
+
+        expect(path, '/chat/chat456');
+      });
+
+      test('notifications URI を go_router パスに変換', () {
+        final uri = Uri.parse('https://albawork.app/notifications');
+        final path = service.goRouterPath(uri);
+
+        expect(path, '/notifications');
+      });
+
+      test('profile URI を go_router パスに変換', () {
+        final uri = Uri.parse('https://albawork.app/profile');
+        final path = service.goRouterPath(uri);
+
+        expect(path, '/profile');
+      });
+
+      test('不明な URI ではnullを返す', () {
+        final uri = Uri.parse('https://albawork.app/unknown');
+        final path = service.goRouterPath(uri);
+
+        expect(path, isNull);
+      });
+    });
+
+    group('goRouterPathFromNotification', () {
+      test('job_posted 通知を go_router パスに変換', () {
+        final path = service.goRouterPathFromNotification({
+          'type': 'job_posted',
+          'jobId': 'job123',
+        });
+
+        expect(path, '/jobs/job123');
+      });
+
+      test('chat_message 通知を go_router パスに変換', () {
+        final path = service.goRouterPathFromNotification({
+          'type': 'chat_message',
+          'chatId': 'chat456',
+        });
+
+        expect(path, '/chat/chat456');
+      });
+
+      test('application_update 通知を go_router パスに変換', () {
+        final path = service.goRouterPathFromNotification({
+          'type': 'application_update',
+        });
+
+        expect(path, '/notifications');
+      });
+
+      test('未知のタイプではnullを返す', () {
+        final path = service.goRouterPathFromNotification({
+          'type': 'unknown',
+        });
+
+        expect(path, isNull);
+      });
+    });
   });
 }

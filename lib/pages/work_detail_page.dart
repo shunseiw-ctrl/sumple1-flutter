@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_room_page.dart';
 import 'job_detail_page.dart';
@@ -12,16 +13,19 @@ import 'package:sumple1/presentation/widgets/rating_dialog.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/core/providers/connectivity_provider.dart';
+import 'package:sumple1/presentation/widgets/offline_banner.dart';
 
-class WorkDetailPage extends StatefulWidget {
+class WorkDetailPage extends ConsumerStatefulWidget {
   final String applicationId;
   const WorkDetailPage({super.key, required this.applicationId});
 
   @override
-  State<WorkDetailPage> createState() => _WorkDetailPageState();
+  ConsumerState<WorkDetailPage> createState() => _WorkDetailPageState();
 }
 
-class _WorkDetailPageState extends State<WorkDetailPage>
+class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -206,6 +210,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
           ),
           body: Column(
             children: [
+              if (!ref.watch(isOnlineProvider)) const OfflineBanner(),
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
@@ -667,8 +672,11 @@ class _PhotosTabState extends State<_PhotosTab> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(url, fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => const SizedBox(height: 200, child: Center(child: Icon(Icons.broken_image))),
+                                    child: AppCachedImage(
+                                      imageUrl: url,
+                                      fit: BoxFit.contain,
+                                      borderRadius: 12,
+                                      errorWidget: const SizedBox(height: 200, child: Center(child: Icon(Icons.broken_image))),
                                     ),
                                   ),
                                   Positioned(
@@ -697,16 +705,10 @@ class _PhotosTabState extends State<_PhotosTab> {
                         ),
                       );
                     },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: AppColors.chipUnselected,
-                          child: const Icon(Icons.broken_image, color: AppColors.textHint),
-                        ),
-                      ),
+                    child: AppCachedImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                      borderRadius: 8,
                     ),
                   );
                 },
@@ -872,16 +874,17 @@ class _DocsTabState extends State<_DocsTab> {
                   return _Card(
                     child: Row(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: SizedBox(
-                            width: 60, height: 60,
-                            child: Image.network(url, fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: AppColors.chipUnselected,
-                                child: const Icon(Icons.description, color: AppColors.textHint),
-                              ),
-                            ),
+                        AppCachedImage(
+                          imageUrl: url,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          borderRadius: 8,
+                          errorWidget: Container(
+                            width: 60,
+                            height: 60,
+                            color: AppColors.chipUnselected,
+                            child: const Icon(Icons.description, color: AppColors.textHint),
                           ),
                         ),
                         const SizedBox(width: 12),

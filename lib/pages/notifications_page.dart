@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -8,15 +8,17 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/providers/auth_provider.dart';
+import 'package:sumple1/core/providers/notification_providers.dart';
 
-class NotificationsPage extends StatefulWidget {
+class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
 
   @override
-  State<NotificationsPage> createState() => _NotificationsPageState();
+  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   static const _pageSize = 20;
   int _currentLimit = _pageSize;
   final _scrollController = ScrollController();
@@ -45,7 +47,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final uid = ref.watch(currentUserUidProvider);
     if (uid.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('お知らせ')),
@@ -74,21 +76,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('notifications')
-            .where('targetUid', isEqualTo: uid)
-            .orderBy('createdAt', descending: true)
-            .limit(_currentLimit)
-            .snapshots(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snap.hasError) {
-            return Center(child: Text('エラー: ${snap.error}'));
-          }
-          final docs = snap.data?.docs ?? [];
+      body: Consumer(
+        builder: (context, ref, _) {
+          final snapAsync = ref.watch(notificationsStreamProvider(_currentLimit));
+          return snapAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('エラー: $error')),
+            data: (snap) {
+          final docs = snap.docs;
           if (docs.isEmpty) {
             return const EmptyState(
               icon: Icons.notifications_none,
@@ -195,6 +190,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   ),
                 ),
               );
+            },
+          );
             },
           );
         },

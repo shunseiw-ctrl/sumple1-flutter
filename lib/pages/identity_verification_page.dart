@@ -5,6 +5,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
   const IdentityVerificationPage({super.key});
@@ -170,18 +171,16 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           child: Column(
             children: [
               if (photoUrl != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    photoUrl,
+                AppCachedImage(
+                  imageUrl: photoUrl,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  borderRadius: 12,
+                  errorWidget: Container(
                     height: 160,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 160,
-                      color: AppColors.chipUnselected,
-                      child: Icon(icon, size: 48, color: AppColors.textHint),
-                    ),
+                    color: AppColors.chipUnselected,
+                    child: Icon(icon, size: 48, color: AppColors.textHint),
                   ),
                 )
               else

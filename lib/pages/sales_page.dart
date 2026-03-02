@@ -13,6 +13,7 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import '../core/services/analytics_service.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class SalesPage extends StatefulWidget {
   const SalesPage({super.key});
@@ -454,11 +455,11 @@ class _FavoritesContent extends StatelessWidget {
                                 width: 100,
                                 height: 90,
                                 child: imageUrl.isNotEmpty
-                                    ? Image.network(imageUrl, fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Container(
-                                          color: AppColors.chipUnselected,
-                                          child: const Icon(Icons.work, color: AppColors.textHint),
-                                        ),
+                                    ? AppCachedImage(
+                                        imageUrl: imageUrl,
+                                        width: 100,
+                                        height: 90,
+                                        fit: BoxFit.cover,
                                       )
                                     : Container(
                                         color: AppColors.chipUnselected,

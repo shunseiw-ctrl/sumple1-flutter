@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'job_list_page.dart';
@@ -9,52 +9,41 @@ import 'sales_page.dart';
 import 'profile_page.dart';
 import 'post_page.dart';
 import '../services/push_token_service.dart';
-import '../core/services/auth_service.dart';
-import '../core/services/notification_service.dart';
 import '../core/enums/user_role.dart';
-import '../core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'notifications_page.dart';
 import '../core/services/analytics_service.dart';
+import '../core/providers/connectivity_provider.dart';
+import '../core/providers/auth_provider.dart';
+import '../core/providers/notification_providers.dart';
+import '../presentation/widgets/offline_banner.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final _authService = AuthService();
+class _HomePageState extends ConsumerState<HomePage> {
   int _index = 0;
-  UserRole _userRole = UserRole.user;
 
   @override
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('home');
-    _initializeUserRole();
     Future.microtask(() => PushTokenService.syncFcmToken());
   }
 
-  Future<void> _initializeUserRole() async {
-    try {
-      final role = await _authService.getCurrentUserRole();
-      if (mounted) {
-        setState(() => _userRole = role);
-        Logger.info(
-          'User role loaded',
-          tag: 'HomePage',
-          data: {'role': role.displayName},
-        );
-      }
-    } catch (e) {
-      Logger.error('Failed to load user role', tag: 'HomePage', error: e);
-    }
+  bool get _isAdmin {
+    final roleAsync = ref.watch(userRoleProvider);
+    return roleAsync.when(
+      data: (role) => role.isAdmin,
+      loading: () => false,
+      error: (_, __) => false,
+    );
   }
-
-  bool get _isAdmin => _userRole.isAdmin;
 
   late final List<Widget> _pages = const [
     JobListPage(),
@@ -73,6 +62,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isOnline = ref.watch(isOnlineProvider);
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 12,
@@ -126,12 +117,14 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-          StreamBuilder<int>(
-            stream: NotificationService().unreadCountStream(
-              FirebaseAuth.instance.currentUser?.uid ?? '',
-            ),
-            builder: (context, snap) {
-              final count = snap.data ?? 0;
+          Consumer(
+            builder: (context, ref, _) {
+              final countAsync = ref.watch(unreadNotificationCountProvider);
+              final count = countAsync.when(
+                data: (c) => c,
+                loading: () => 0,
+                error: (_, __) => 0,
+              );
               return Semantics(
                 button: true,
                 label: count > 0 ? 'お知らせ、未読$count件' : 'お知らせ',
@@ -179,9 +172,16 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: IndexedStack(
-          index: _index,
-          children: _pages,
+        child: Column(
+          children: [
+            if (!isOnline) const OfflineBanner(),
+            Expanded(
+              child: IndexedStack(
+                index: _index,
+                children: _pages,
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: _ModernBottomNav(

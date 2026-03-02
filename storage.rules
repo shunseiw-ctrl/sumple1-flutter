@@ -1,0 +1,66 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // === ヘルパー関数 ===
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isUnder10MB() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    function isUnder50MB() {
+      return request.resource.size < 50 * 1024 * 1024;
+    }
+
+    // === プロフィール写真 ===
+    // パス: profile_images/{userId}/...
+    match /profile_images/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isImageType() && isUnder10MB();
+    }
+
+    // === 案件画像 ===
+    // パス: job_images/{jobId}/...
+    match /job_images/{jobId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageType() && isUnder10MB();
+    }
+
+    // === 現場写真 ===
+    // パス: work_photos/{jobId}/...
+    match /work_photos/{jobId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageType() && isUnder10MB();
+    }
+
+    // === 書類 ===
+    // パス: work_documents/{applicationId}/...
+    match /work_documents/{applicationId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isUnder50MB();
+    }
+
+    // === 身分証明書 ===
+    // パス: identity_documents/{userId}/...
+    match /identity_documents/{userId}/{allPaths=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isUnder10MB();
+    }
+
+    // === デフォルト: 全拒否 ===
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

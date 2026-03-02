@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chat_room_page.dart';
 import '../core/services/auth_service.dart';
@@ -14,15 +15,17 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
+import 'package:sumple1/core/providers/connectivity_provider.dart';
+import 'package:sumple1/presentation/widgets/offline_banner.dart';
 
-class MessagesPage extends StatefulWidget {
+class MessagesPage extends ConsumerStatefulWidget {
   const MessagesPage({super.key});
 
   @override
-  State<MessagesPage> createState() => _MessagesPageState();
+  ConsumerState<MessagesPage> createState() => _MessagesPageState();
 }
 
-class _MessagesPageState extends State<MessagesPage> {
+class _MessagesPageState extends ConsumerState<MessagesPage> {
   final _auth = FirebaseAuth.instance;
   final _db = FirebaseFirestore.instance;
   final _authService = AuthService();
@@ -221,6 +224,7 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       body: Column(
         children: [
+          if (!ref.watch(isOnlineProvider)) const OfflineBanner(),
           Padding(
             padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
             child: TextField(

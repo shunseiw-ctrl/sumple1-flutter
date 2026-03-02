@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'job_detail_page.dart';
 import 'job_edit_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,15 +16,16 @@ import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/presentation/widgets/scale_tap.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 
-class JobListPage extends StatefulWidget {
+class JobListPage extends ConsumerStatefulWidget {
   const JobListPage({super.key});
 
   @override
-  State<JobListPage> createState() => _JobListPageState();
+  ConsumerState<JobListPage> createState() => _JobListPageState();
 }
 
-class _JobListPageState extends State<JobListPage> {
+class _JobListPageState extends ConsumerState<JobListPage> {
   String _selectedPref = '東京都';
 
   String? _selectedMonthKey;
@@ -998,10 +1000,10 @@ class _JobCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (hasImage)
-                    Image.network(
-                      imageUrl!,
+                    AppCachedImage(
+                      imageUrl: imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _placeholderImage(),
+                      errorWidget: _placeholderImage(),
                     )
                   else
                     _placeholderImage(),

@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/logger.dart';
+import '../router/route_paths.dart';
 
 /// Deep Link ルート情報
 class DeepLinkRoute {
@@ -106,6 +107,60 @@ class DeepLinkService {
         return const DeepLinkRoute(path: '/notifications');
       case 'earning_confirmed':
         return const DeepLinkRoute(path: '/notifications');
+      default:
+        return null;
+    }
+  }
+
+  /// URI を go_router パスに変換
+  String? goRouterPath(Uri uri) {
+    final route = parseUri(uri);
+    if (route == null) return null;
+
+    switch (route.path) {
+      case '/jobs/detail':
+        final jobId = route.params['jobId'];
+        if (jobId != null && jobId.isNotEmpty) {
+          return RoutePaths.jobDetailPath(jobId);
+        }
+        return RoutePaths.jobList;
+      case '/jobs':
+        return RoutePaths.jobList;
+      case '/chat/room':
+        final chatId = route.params['chatId'];
+        if (chatId != null && chatId.isNotEmpty) {
+          return RoutePaths.chatRoomPath(chatId);
+        }
+        return null;
+      case '/notifications':
+        return RoutePaths.notifications;
+      case '/profile':
+        return RoutePaths.profile;
+      default:
+        return null;
+    }
+  }
+
+  /// 通知データを go_router パスに変換
+  String? goRouterPathFromNotification(Map<String, dynamic> data) {
+    final route = parseNotificationData(data);
+    if (route == null) return null;
+
+    switch (route.path) {
+      case '/jobs/detail':
+        final jobId = route.params['jobId'];
+        if (jobId != null && jobId.isNotEmpty) {
+          return RoutePaths.jobDetailPath(jobId);
+        }
+        return null;
+      case '/chat/room':
+        final chatId = route.params['chatId'];
+        if (chatId != null && chatId.isNotEmpty) {
+          return RoutePaths.chatRoomPath(chatId);
+        }
+        return null;
+      case '/notifications':
+        return RoutePaths.notifications;
       default:
         return null;
     }
