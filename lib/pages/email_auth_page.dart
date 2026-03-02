@@ -245,7 +245,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
 
   Widget _buildLoginForm() {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(AppSpacing.pagePadding),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
       child: Form(
         key: _loginFormKey,
         child: Column(
@@ -291,7 +291,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _showPasswordResetDialog,
-                child: Text(
+                child: const Text(
                   'パスワードを忘れた方',
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -325,7 +325,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
 
   Widget _buildRegisterForm() {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(AppSpacing.pagePadding),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
       child: Form(
         key: _registerFormKey,
         child: Column(

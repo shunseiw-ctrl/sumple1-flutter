@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/services/line_auth_service.dart';
+import 'package:sumple1/core/services/apple_auth_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -11,6 +13,7 @@ import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/pages/email_auth_page.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 
 class GuestHomePage extends StatefulWidget {
   const GuestHomePage({super.key});
@@ -21,6 +24,7 @@ class GuestHomePage extends StatefulWidget {
 
 class _GuestHomePageState extends State<GuestHomePage> {
   final _authService = AuthService();
+  final _appleAuthService = AppleAuthService();
   bool _isLoading = false;
   double _opacity = 0.0;
 
@@ -47,6 +51,30 @@ class _GuestHomePageState extends State<GuestHomePage> {
       ErrorHandler.showSuccess(context, 'ゲストとしてログインしました');
     } catch (e) {
       Logger.error('Guest sign in failed', tag: 'GuestHomePage', error: e);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await _appleAuthService.signInWithApple();
+      if (result == null) {
+        // ユーザーがキャンセル
+        Logger.info('Apple sign in cancelled', tag: 'GuestHomePage');
+        return;
+      }
+      Logger.info('Apple sign in successful', tag: 'GuestHomePage');
+      if (!mounted) return;
+      ErrorHandler.showSuccess(context, 'Appleでログインしました');
+    } catch (e) {
+      Logger.error('Apple sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
       ErrorHandler.showError(context, e);
     } finally {
@@ -85,7 +113,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
+                    padding: const EdgeInsets.fromLTRB(
                       AppSpacing.pagePadding,
                       AppSpacing.xxxl,
                       AppSpacing.pagePadding,
@@ -195,7 +223,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                   child: SafeArea(
                     top: false,
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(
+                      padding: const EdgeInsets.fromLTRB(
                         AppSpacing.xl,
                         AppSpacing.xxl,
                         AppSpacing.xl,
@@ -281,13 +309,49 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                             ),
                           ),
+                          // Apple Sign In (iOS/macOS のみ表示)
+                          if (!kIsWeb &&
+                              (Theme.of(context).platform ==
+                                      TargetPlatform.iOS ||
+                                  Theme.of(context).platform ==
+                                      TargetPlatform.macOS))
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 54,
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      _isLoading ? null : _signInWithApple,
+                                  icon: const Icon(Icons.apple, size: 24),
+                                  label: Text(
+                                    AppLocalizations.of(context)
+                                            ?.signInWithApple ??
+                                        'Appleでサインイン',
+                                    style: AppTextStyles.button.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    foregroundColor: Colors.white,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          AppSpacing.buttonRadius),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
                             height: 54,
                             child: OutlinedButton.icon(
                               onPressed: _isLoading ? null : _goToEmailLogin,
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.email_outlined,
                                 size: 20,
                                 color: AppColors.ruri,
@@ -301,7 +365,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppColors.ruri,
-                                side: BorderSide(
+                                side: const BorderSide(
                                   color: AppColors.border,
                                   width: 1.5,
                                 ),
@@ -321,7 +385,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => LegalPage(
+                                      builder: (_) => const LegalPage(
                                         title: '利用規約',
                                         htmlContent: LegalPage.termsHtml,
                                       ),
@@ -342,8 +406,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4),
                                 child: Text(
                                   '・',
                                   style: TextStyle(
@@ -357,7 +421,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => LegalPage(
+                                      builder: (_) => const LegalPage(
                                         title: 'プライバシーポリシー',
                                         htmlContent: LegalPage.privacyPolicyHtml,
                                       ),

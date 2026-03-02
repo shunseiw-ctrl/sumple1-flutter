@@ -52,6 +52,18 @@ jest.mock("https", () => ({
   request: jest.fn(),
 }));
 
+// rateLimiter モック（レート制限はrateLimiter.test.jsでテスト済み）
+jest.mock("../src/rateLimiter", () => ({
+  enforceRateLimitForRequest: jest.fn().mockResolvedValue(true),
+  enforceRateLimit: jest.fn().mockResolvedValue(undefined),
+  PRESETS: {
+    auth: { maxRequests: 5, windowMs: 60000 },
+    api: { maxRequests: 20, windowMs: 60000 },
+    deletion: { maxRequests: 1, windowMs: 3600000 },
+    payment: { maxRequests: 5, windowMs: 60000 },
+  },
+}));
+
 const lineAuth = require("../src/lineAuth");
 
 describe("lineAuth", () => {
@@ -209,7 +221,7 @@ describe("lineAuth", () => {
     });
 
     it("should return 400 when code is missing", async () => {
-      const req = { method: "POST", body: {} };
+      const req = { method: "POST", body: {}, headers: {} };
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -226,7 +238,7 @@ describe("lineAuth", () => {
       const docMock = jest.fn().mockReturnValue({ get: getMock, delete: jest.fn() });
       db.collection.mockReturnValue({ doc: docMock });
 
-      const req = { method: "POST", body: { code: "invalid-code" } };
+      const req = { method: "POST", body: { code: "invalid-code" }, headers: {} };
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -251,7 +263,7 @@ describe("lineAuth", () => {
       const docMock = jest.fn().mockReturnValue({ get: getMock, delete: deleteMock });
       db.collection.mockReturnValue({ doc: docMock });
 
-      const req = { method: "POST", body: { code: "expired-code" } };
+      const req = { method: "POST", body: { code: "expired-code" }, headers: {} };
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -277,7 +289,7 @@ describe("lineAuth", () => {
       const docMock = jest.fn().mockReturnValue({ get: getMock, delete: deleteMock });
       db.collection.mockReturnValue({ doc: docMock });
 
-      const req = { method: "POST", body: { code: "valid-code" } };
+      const req = { method: "POST", body: { code: "valid-code" }, headers: {} };
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),

@@ -153,7 +153,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (_readyError == null)
-                      CircularProgressIndicator(color: AppColors.ruri)
+                      const CircularProgressIndicator(color: AppColors.ruri)
                     else
                       Text(_readyError!, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
@@ -168,8 +168,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: _msgRef.orderBy('createdAt', descending: true).limit(100).snapshots(),
                     builder: (context, snap) {
-                      if (snap.hasError) return Center(child: Text('読み込みエラー'));
-                      if (!snap.hasData) return Center(child: CircularProgressIndicator(color: AppColors.ruri));
+                      if (snap.hasError) return const Center(child: Text('読み込みエラー'));
+                      if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.ruri));
 
                       final docs = snap.data!.docs;
                       if (docs.isEmpty) {
@@ -222,7 +222,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     if (!mine) ...[
-                                      CircleAvatar(
+                                      const CircleAvatar(
                                         radius: 16,
                                         backgroundColor: AppColors.ruriPale,
                                         child: Icon(Icons.person, size: 18, color: AppColors.ruri),
@@ -307,12 +307,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 maxLength: AppConstants.maxMessageLength,
                                 textInputAction: TextInputAction.send,
                                 onSubmitted: (_) => _send(),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   hintText: 'メッセージを入力',
                                   hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
                                   border: InputBorder.none,
                                   counterText: '',
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                                 ),
                               ),
                             ),

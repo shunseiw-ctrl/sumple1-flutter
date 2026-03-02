@@ -290,6 +290,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // --- レート制限 (Cloud Functions のみ管理) ---
+    match /rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
     // --- LINE認証 (Cloud Functions のみ管理 — クライアント禁止) ---
     match /line_auth_states/{stateId} {
       allow read, write: if false;

@@ -63,7 +63,7 @@ class FaqPage extends StatelessWidget {
               tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               shape: const Border(),
-              leading: Icon(Icons.help_outline, color: AppColors.ruri, size: 20),
+              leading: const Icon(Icons.help_outline, color: AppColors.ruri, size: 20),
               title: Text(
                 item['q']!,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
@@ -71,7 +71,7 @@ class FaqPage extends StatelessWidget {
               children: [
                 Text(
                   item['a']!,
-                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6),
+                  style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6),
                 ),
               ],
             ),

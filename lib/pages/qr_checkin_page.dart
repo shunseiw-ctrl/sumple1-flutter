@@ -70,11 +70,11 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Row(
+            title: const Row(
               children: [
                 Icon(Icons.error_outline, color: AppColors.error),
-                const SizedBox(width: 8),
-                const Expanded(
+                SizedBox(width: 8),
+                Expanded(
                   child: Text('エラー', style: TextStyle(fontSize: 18)),
                 ),
               ],

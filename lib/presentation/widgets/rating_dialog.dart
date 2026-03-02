@@ -94,14 +94,14 @@ class _RatingDialogState extends State<RatingDialog> {
           children: [
             const Icon(Icons.star_rounded, size: 48, color: Colors.amber),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'お仕事の評価',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
               widget.jobTitle,
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -124,7 +124,7 @@ class _RatingDialogState extends State<RatingDialog> {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   ['', '不満', 'やや不満', '普通', '良い', '最高！'][_stars],
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
               ),
             const SizedBox(height: 16),
@@ -155,7 +155,7 @@ class _RatingDialogState extends State<RatingDialog> {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('後で', style: TextStyle(color: AppColors.textSecondary)),
+              child: const Text('後で', style: TextStyle(color: AppColors.textSecondary)),
             ),
           ],
         ),

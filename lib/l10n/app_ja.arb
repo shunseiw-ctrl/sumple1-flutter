@@ -19,6 +19,12 @@
   "navProfile": "プロフィール",
   "@navProfile": { "description": "BottomNavigation: プロフィール" },
 
+  "navSearch": "検索",
+  "@navSearch": { "description": "BottomNavigation: 検索" },
+
+  "navMyPage": "マイページ",
+  "@navMyPage": { "description": "BottomNavigation: マイページ" },
+
   "cancel": "キャンセル",
   "@cancel": { "description": "汎用キャンセルボタン" },
 
@@ -33,6 +39,24 @@
 
   "close": "閉じる",
   "@close": { "description": "汎用閉じるボタン" },
+
+  "send": "送信",
+  "@send": { "description": "汎用送信ボタン" },
+
+  "edit": "編集",
+  "@edit": { "description": "汎用編集ボタン" },
+
+  "update": "更新",
+  "@update": { "description": "汎用更新ボタン" },
+
+  "back": "戻る",
+  "@back": { "description": "汎用戻るボタン" },
+
+  "search": "検索",
+  "@search": { "description": "汎用検索" },
+
+  "apply": "応募する",
+  "@apply": { "description": "応募ボタン" },
 
   "skip": "スキップ",
   "@skip": { "description": "オンボーディング: スキップ" },
@@ -49,14 +73,62 @@
   "loading": "読み込み中...",
   "@loading": { "description": "ローディング表示" },
 
-  "errorGeneric": "エラーが発生しました",
-  "@errorGeneric": { "description": "汎用エラーメッセージ" },
-
-  "errorNetwork": "ネットワークエラーが発生しました",
-  "@errorNetwork": { "description": "ネットワークエラーメッセージ" },
-
   "noData": "データがありません",
   "@noData": { "description": "データなし表示" },
+
+  "login": "ログイン",
+  "@login": { "description": "ログインボタン" },
+
+  "logout": "ログアウト",
+  "@logout": { "description": "ログアウトボタン" },
+
+  "register": "新規登録",
+  "@register": { "description": "新規登録ボタン" },
+
+  "email": "メールアドレス",
+  "@email": { "description": "メールアドレスラベル" },
+
+  "password": "パスワード",
+  "@password": { "description": "パスワードラベル" },
+
+  "displayName": "表示名",
+  "@displayName": { "description": "表示名ラベル" },
+
+  "signInWithApple": "Appleでサインイン",
+  "@signInWithApple": { "description": "Apple Sign In ボタン" },
+
+  "signInWithLine": "LINEでログイン",
+  "@signInWithLine": { "description": "LINE ログインボタン" },
+
+  "signInWithEmail": "メールアドレスでログイン",
+  "@signInWithEmail": { "description": "メールログインボタン" },
+
+  "startAsGuest": "ゲストとして始める",
+  "@startAsGuest": { "description": "ゲストログインボタン" },
+
+  "guestLoginSuccess": "ゲストとしてログインしました",
+  "@guestLoginSuccess": { "description": "ゲストログイン成功メッセージ" },
+
+  "appleLoginSuccess": "Appleでログインしました",
+  "@appleLoginSuccess": { "description": "Appleログイン成功メッセージ" },
+
+  "appTagline": "建設業界の仕事マッチングアプリ",
+  "@appTagline": { "description": "アプリのキャッチコピー" },
+
+  "featureSearch": "仕事を探す",
+  "@featureSearch": { "description": "特徴カード: 検索" },
+
+  "featureQuickEarn": "すぐに稼げる",
+  "@featureQuickEarn": { "description": "特徴カード: 即収入" },
+
+  "featureSecurePayment": "安心の支払い",
+  "@featureSecurePayment": { "description": "特徴カード: 安全決済" },
+
+  "termsOfService": "利用規約",
+  "@termsOfService": { "description": "利用規約リンク" },
+
+  "privacyPolicy": "プライバシーポリシー",
+  "@privacyPolicy": { "description": "プライバシーポリシーリンク" },
 
   "statusApplied": "応募中",
   "@statusApplied": { "description": "ステータス: 応募済み" },
@@ -69,6 +141,12 @@
 
   "statusCancelled": "キャンセル",
   "@statusCancelled": { "description": "ステータス: キャンセル" },
+
+  "statusPending": "審査中",
+  "@statusPending": { "description": "ステータス: 審査中" },
+
+  "statusRejected": "不採用",
+  "@statusRejected": { "description": "ステータス: 不採用" },
 
   "accountSettings": "アカウント設定",
   "@accountSettings": { "description": "アカウント設定ページタイトル" },
@@ -85,17 +163,14 @@
   "agreeToPrivacy": "プライバシーポリシーに同意する",
   "@agreeToPrivacy": { "description": "プライバシーポリシー同意チェック" },
 
-  "login": "ログイン",
-  "@login": { "description": "ログインボタン" },
+  "changePassword": "パスワードを変更",
+  "@changePassword": { "description": "パスワード変更ボタン" },
 
-  "logout": "ログアウト",
-  "@logout": { "description": "ログアウトボタン" },
+  "errorGeneric": "エラーが発生しました",
+  "@errorGeneric": { "description": "汎用エラーメッセージ" },
 
-  "email": "メールアドレス",
-  "@email": { "description": "メールアドレスラベル" },
-
-  "password": "パスワード",
-  "@password": { "description": "パスワードラベル" },
+  "errorNetwork": "ネットワークエラーが発生しました",
+  "@errorNetwork": { "description": "ネットワークエラーメッセージ" },
 
   "errorNetworkTitle": "ネットワークエラー",
   "@errorNetworkTitle": { "description": "ネットワークエラータイトル" },
@@ -121,9 +196,517 @@
   "errorLabel": "エラー",
   "@errorLabel": { "description": "コンパクトエラーラベル" },
 
-  "displayName": "表示名",
-  "@displayName": { "description": "表示名ラベル" },
+  "adminBadge": "管理者",
+  "@adminBadge": { "description": "管理者バッジ" },
 
-  "changePassword": "パスワードを変更",
-  "@changePassword": { "description": "パスワード変更ボタン" }
+  "notifications": "お知らせ",
+  "@notifications": { "description": "お知らせタイトル" },
+
+  "postJob": "案件を投稿",
+  "@postJob": { "description": "案件投稿ボタン" },
+
+  "emailAlreadyInUse": "このメールアドレスは既に登録されています",
+  "@emailAlreadyInUse": { "description": "メール重複エラー" },
+
+  "wrongPassword": "パスワードが正しくありません",
+  "@wrongPassword": { "description": "パスワード不正エラー" },
+
+  "userNotFound": "アカウントが見つかりません",
+  "@userNotFound": { "description": "アカウント未検出エラー" },
+
+  "invalidEmail": "メールアドレスの形式が正しくありません",
+  "@invalidEmail": { "description": "メール形式エラー" },
+
+  "userDisabled": "このアカウントは無効化されています",
+  "@userDisabled": { "description": "アカウント無効エラー" },
+
+  "tooManyRequests": "リクエストが多すぎます。しばらくしてからお試しください",
+  "@tooManyRequests": { "description": "リクエスト過多エラー" },
+
+  "weakPassword": "パスワードが弱すぎます。6文字以上で設定してください",
+  "@weakPassword": { "description": "弱パスワードエラー" },
+
+  "networkCheckConnection": "ネットワーク接続を確認してください",
+  "@networkCheckConnection": { "description": "ネットワーク確認メッセージ" },
+
+  "authError": "認証エラーが発生しました",
+  "@authError": { "description": "認証エラー" },
+
+  "loginSuccess": "ログインしました",
+  "@loginSuccess": { "description": "ログイン成功メッセージ" },
+
+  "registerSuccess": "アカウントを作成しました",
+  "@registerSuccess": { "description": "登録成功メッセージ" },
+
+  "passwordResetSent": "パスワードリセットメールを送信しました",
+  "@passwordResetSent": { "description": "パスワードリセットメール送信" },
+
+  "forgotPassword": "パスワードを忘れた方",
+  "@forgotPassword": { "description": "パスワード忘れリンク" },
+
+  "passwordResetTitle": "パスワードリセット",
+  "@passwordResetTitle": { "description": "パスワードリセットタイトル" },
+
+  "passwordResetDescription": "登録されたメールアドレスにリセットリンクを送信します",
+  "@passwordResetDescription": { "description": "パスワードリセット説明" },
+
+  "sendResetLink": "リセットリンクを送信",
+  "@sendResetLink": { "description": "リセットリンク送信ボタン" },
+
+  "showPassword": "パスワードを表示",
+  "@showPassword": { "description": "パスワード表示切替" },
+
+  "hidePassword": "パスワードを非表示",
+  "@hidePassword": { "description": "パスワード非表示切替" },
+
+  "jobListTitle": "仕事一覧",
+  "@jobListTitle": { "description": "仕事一覧ページタイトル" },
+
+  "jobDetail": "案件詳細",
+  "@jobDetail": { "description": "案件詳細タイトル" },
+
+  "jobTitle": "案件名",
+  "@jobTitle": { "description": "案件名ラベル" },
+
+  "jobLocation": "勤務地",
+  "@jobLocation": { "description": "勤務地ラベル" },
+
+  "jobDate": "勤務日",
+  "@jobDate": { "description": "勤務日ラベル" },
+
+  "jobPrice": "報酬",
+  "@jobPrice": { "description": "報酬ラベル" },
+
+  "jobDescription": "仕事内容",
+  "@jobDescription": { "description": "仕事内容ラベル" },
+
+  "jobNotes": "備考",
+  "@jobNotes": { "description": "備考ラベル" },
+
+  "jobOverview": "概要",
+  "@jobOverview": { "description": "概要ラベル" },
+
+  "noJobsFound": "条件に合う仕事が見つかりません",
+  "@noJobsFound": { "description": "仕事なしメッセージ" },
+
+  "searchJobs": "仕事を検索",
+  "@searchJobs": { "description": "仕事検索ヒント" },
+
+  "filterByPrefecture": "都道府県で絞り込み",
+  "@filterByPrefecture": { "description": "都道府県フィルター" },
+
+  "allPrefectures": "全国",
+  "@allPrefectures": { "description": "全都道府県" },
+
+  "sortByNewest": "新着順",
+  "@sortByNewest": { "description": "新着順ソート" },
+
+  "sortByPriceHigh": "報酬が高い順",
+  "@sortByPriceHigh": { "description": "報酬高い順ソート" },
+
+  "applyForJob": "この案件に応募する",
+  "@applyForJob": { "description": "案件応募ボタン" },
+
+  "alreadyApplied": "応募済み",
+  "@alreadyApplied": { "description": "応募済み表示" },
+
+  "applicationSuccess": "応募が完了しました",
+  "@applicationSuccess": { "description": "応募成功メッセージ" },
+
+  "applicationConfirm": "この案件に応募しますか？",
+  "@applicationConfirm": { "description": "応募確認メッセージ" },
+
+  "guestCannotApply": "ゲストは応募できません。ログインしてください",
+  "@guestCannotApply": { "description": "ゲスト応募不可メッセージ" },
+
+  "workTitle": "はたらく",
+  "@workTitle": { "description": "はたらくページタイトル" },
+
+  "workDetail": "仕事詳細",
+  "@workDetail": { "description": "仕事詳細タイトル" },
+
+  "checkIn": "出勤",
+  "@checkIn": { "description": "出勤ボタン" },
+
+  "checkOut": "退勤",
+  "@checkOut": { "description": "退勤ボタン" },
+
+  "checkedIn": "出勤済み",
+  "@checkedIn": { "description": "出勤済み表示" },
+
+  "checkedOut": "退勤済み",
+  "@checkedOut": { "description": "退勤済み表示" },
+
+  "checkInSuccess": "出勤しました",
+  "@checkInSuccess": { "description": "出勤成功メッセージ" },
+
+  "checkOutSuccess": "退勤しました",
+  "@checkOutSuccess": { "description": "退勤成功メッセージ" },
+
+  "noWork": "現在の仕事はありません",
+  "@noWork": { "description": "仕事なしメッセージ" },
+
+  "workStatus": "勤務状況",
+  "@workStatus": { "description": "勤務状況ラベル" },
+
+  "projectName": "案件名",
+  "@projectName": { "description": "プロジェクト名" },
+
+  "profileTitle": "マイページ",
+  "@profileTitle": { "description": "マイページタイトル" },
+
+  "editProfile": "プロフィール編集",
+  "@editProfile": { "description": "プロフィール編集" },
+
+  "myProfile": "プロフィール",
+  "@myProfile": { "description": "マイプロフィール" },
+
+  "name": "氏名",
+  "@name": { "description": "氏名ラベル" },
+
+  "familyName": "姓",
+  "@familyName": { "description": "姓ラベル" },
+
+  "givenName": "名",
+  "@givenName": { "description": "名ラベル" },
+
+  "familyNameKana": "姓（カナ）",
+  "@familyNameKana": { "description": "姓カナラベル" },
+
+  "givenNameKana": "名（カナ）",
+  "@givenNameKana": { "description": "名カナラベル" },
+
+  "phone": "電話番号",
+  "@phone": { "description": "電話番号ラベル" },
+
+  "birthDate": "生年月日",
+  "@birthDate": { "description": "生年月日ラベル" },
+
+  "gender": "性別",
+  "@gender": { "description": "性別ラベル" },
+
+  "genderMale": "男性",
+  "@genderMale": { "description": "男性" },
+
+  "genderFemale": "女性",
+  "@genderFemale": { "description": "女性" },
+
+  "genderOther": "その他",
+  "@genderOther": { "description": "その他" },
+
+  "postalCode": "郵便番号",
+  "@postalCode": { "description": "郵便番号ラベル" },
+
+  "address": "住所",
+  "@address": { "description": "住所ラベル" },
+
+  "introduction": "自己紹介",
+  "@introduction": { "description": "自己紹介ラベル" },
+
+  "experienceYears": "経験年数",
+  "@experienceYears": { "description": "経験年数ラベル" },
+
+  "qualifications": "資格",
+  "@qualifications": { "description": "資格ラベル" },
+
+  "profileSaved": "プロフィールを保存しました",
+  "@profileSaved": { "description": "プロフィール保存成功" },
+
+  "profilePhotoChange": "写真を変更",
+  "@profilePhotoChange": { "description": "プロフィール写真変更" },
+
+  "adminLogin": "管理者ログイン",
+  "@adminLogin": { "description": "管理者ログインタイトル" },
+
+  "adminLoginDescription": "管理者パスワードを入力してください",
+  "@adminLoginDescription": { "description": "管理者ログイン説明" },
+
+  "adminPassword": "管理者パスワード",
+  "@adminPassword": { "description": "管理者パスワードラベル" },
+
+  "adminHome": "管理者ダッシュボード",
+  "@adminHome": { "description": "管理者ホームタイトル" },
+
+  "adminJobManagement": "案件管理",
+  "@adminJobManagement": { "description": "案件管理メニュー" },
+
+  "adminApplications": "応募管理",
+  "@adminApplications": { "description": "応募管理メニュー" },
+
+  "adminPayments": "決済管理",
+  "@adminPayments": { "description": "決済管理メニュー" },
+
+  "adminUsers": "ユーザー管理",
+  "@adminUsers": { "description": "ユーザー管理メニュー" },
+
+  "messagesTitle": "メッセージ",
+  "@messagesTitle": { "description": "メッセージページタイトル" },
+
+  "noMessages": "メッセージはありません",
+  "@noMessages": { "description": "メッセージなし" },
+
+  "typeMessage": "メッセージを入力",
+  "@typeMessage": { "description": "メッセージ入力ヒント" },
+
+  "salesTitle": "売上",
+  "@salesTitle": { "description": "売上ページタイトル" },
+
+  "totalEarnings": "合計報酬",
+  "@totalEarnings": { "description": "合計報酬ラベル" },
+
+  "earningsDetail": "売上詳細",
+  "@earningsDetail": { "description": "売上詳細タイトル" },
+
+  "createEarnings": "売上を登録",
+  "@createEarnings": { "description": "売上登録ボタン" },
+
+  "amount": "金額",
+  "@amount": { "description": "金額ラベル" },
+
+  "payoutDate": "支払い日",
+  "@payoutDate": { "description": "支払い日ラベル" },
+
+  "noEarnings": "売上データがありません",
+  "@noEarnings": { "description": "売上なしメッセージ" },
+
+  "earningsCreated": "売上を登録しました",
+  "@earningsCreated": { "description": "売上登録成功" },
+
+  "noNotifications": "お知らせはありません",
+  "@noNotifications": { "description": "通知なしメッセージ" },
+
+  "markAsRead": "既読にする",
+  "@markAsRead": { "description": "既読マークボタン" },
+
+  "contactTitle": "お問い合わせ",
+  "@contactTitle": { "description": "お問い合わせタイトル" },
+
+  "contactSubject": "件名",
+  "@contactSubject": { "description": "件名ラベル" },
+
+  "contactBody": "お問い合わせ内容",
+  "@contactBody": { "description": "問い合わせ内容ラベル" },
+
+  "contactCategory": "カテゴリ",
+  "@contactCategory": { "description": "カテゴリラベル" },
+
+  "contactSent": "お問い合わせを送信しました",
+  "@contactSent": { "description": "問い合わせ送信成功" },
+
+  "contactCategoryGeneral": "一般",
+  "@contactCategoryGeneral": { "description": "カテゴリ: 一般" },
+
+  "contactCategoryBug": "不具合報告",
+  "@contactCategoryBug": { "description": "カテゴリ: 不具合" },
+
+  "contactCategoryFeature": "機能要望",
+  "@contactCategoryFeature": { "description": "カテゴリ: 機能要望" },
+
+  "contactCategoryPayment": "お支払い",
+  "@contactCategoryPayment": { "description": "カテゴリ: 支払い" },
+
+  "contactCategoryOther": "その他",
+  "@contactCategoryOther": { "description": "カテゴリ: その他" },
+
+  "faqTitle": "よくある質問",
+  "@faqTitle": { "description": "FAQタイトル" },
+
+  "paymentDetail": "決済詳細",
+  "@paymentDetail": { "description": "決済詳細タイトル" },
+
+  "paymentStatus": "決済状況",
+  "@paymentStatus": { "description": "決済状況ラベル" },
+
+  "paymentSucceeded": "決済完了",
+  "@paymentSucceeded": { "description": "決済成功" },
+
+  "paymentFailed": "決済失敗",
+  "@paymentFailed": { "description": "決済失敗" },
+
+  "paymentPending": "決済待ち",
+  "@paymentPending": { "description": "決済待ち" },
+
+  "platformFee": "プラットフォーム手数料",
+  "@platformFee": { "description": "手数料ラベル" },
+
+  "netAmount": "振込金額",
+  "@netAmount": { "description": "振込金額ラベル" },
+
+  "stripeOnboarding": "口座設定",
+  "@stripeOnboarding": { "description": "Stripe口座設定タイトル" },
+
+  "stripeOnboardingDescription": "報酬を受け取るために口座情報を設定してください",
+  "@stripeOnboardingDescription": { "description": "Stripe設定説明" },
+
+  "startOnboarding": "口座設定を開始",
+  "@startOnboarding": { "description": "口座設定開始ボタン" },
+
+  "qrCheckIn": "QR出勤",
+  "@qrCheckIn": { "description": "QR出勤タイトル" },
+
+  "scanQrCode": "QRコードをスキャン",
+  "@scanQrCode": { "description": "QRスキャン説明" },
+
+  "shiftQr": "シフトQR",
+  "@shiftQr": { "description": "シフトQRタイトル" },
+
+  "identityVerification": "本人確認",
+  "@identityVerification": { "description": "本人確認タイトル" },
+
+  "jobEditTitle": "案件編集",
+  "@jobEditTitle": { "description": "案件編集タイトル" },
+
+  "jobCreateTitle": "案件作成",
+  "@jobCreateTitle": { "description": "案件作成タイトル" },
+
+  "jobSaved": "案件を保存しました",
+  "@jobSaved": { "description": "案件保存成功" },
+
+  "jobDeleted": "案件を削除しました",
+  "@jobDeleted": { "description": "案件削除成功" },
+
+  "deleteJobConfirm": "この案件を削除しますか？",
+  "@deleteJobConfirm": { "description": "案件削除確認" },
+
+  "deleteAccountConfirm": "アカウントを削除しますか？この操作は取り消せません。",
+  "@deleteAccountConfirm": { "description": "アカウント削除確認" },
+
+  "deleteAccountTitle": "アカウント削除",
+  "@deleteAccountTitle": { "description": "アカウント削除タイトル" },
+
+  "deleteAccountSuccess": "アカウントを削除しました",
+  "@deleteAccountSuccess": { "description": "アカウント削除成功" },
+
+  "dataExportSuccess": "データをエクスポートしました",
+  "@dataExportSuccess": { "description": "データエクスポート成功" },
+
+  "logoutConfirm": "ログアウトしますか？",
+  "@logoutConfirm": { "description": "ログアウト確認" },
+
+  "logoutSuccess": "ログアウトしました",
+  "@logoutSuccess": { "description": "ログアウト成功" },
+
+  "currentPassword": "現在のパスワード",
+  "@currentPassword": { "description": "現在のパスワードラベル" },
+
+  "newPassword": "新しいパスワード",
+  "@newPassword": { "description": "新しいパスワードラベル" },
+
+  "confirmPassword": "パスワード確認",
+  "@confirmPassword": { "description": "パスワード確認ラベル" },
+
+  "passwordChanged": "パスワードを変更しました",
+  "@passwordChanged": { "description": "パスワード変更成功" },
+
+  "changeName": "名前を変更",
+  "@changeName": { "description": "名前変更ボタン" },
+
+  "nameChanged": "名前を変更しました",
+  "@nameChanged": { "description": "名前変更成功" },
+
+  "prefecture": "都道府県",
+  "@prefecture": { "description": "都道府県ラベル" },
+
+  "dateSelect": "日付を選択",
+  "@dateSelect": { "description": "日付選択" },
+
+  "required": "必須",
+  "@required": { "description": "必須ラベル" },
+
+  "optional": "任意",
+  "@optional": { "description": "任意ラベル" },
+
+  "yen": "円",
+  "@yen": { "description": "円" },
+
+  "itemCount": "{count}件",
+  "@itemCount": {
+    "description": "件数表示",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "unreadCount": "未読{count}件",
+  "@unreadCount": {
+    "description": "未読件数",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "onboardingTitle1": "仕事を見つけよう",
+  "@onboardingTitle1": { "description": "オンボーディング1タイトル" },
+
+  "onboardingDesc1": "建設業界の仕事を簡単に検索・応募できます",
+  "@onboardingDesc1": { "description": "オンボーディング1説明" },
+
+  "onboardingTitle2": "QRで出退勤",
+  "@onboardingTitle2": { "description": "オンボーディング2タイトル" },
+
+  "onboardingDesc2": "QRコードをスキャンして簡単に出退勤管理",
+  "@onboardingDesc2": { "description": "オンボーディング2説明" },
+
+  "onboardingTitle3": "安心の支払い",
+  "@onboardingTitle3": { "description": "オンボーディング3タイトル" },
+
+  "onboardingDesc3": "Stripe決済で安全・確実に報酬を受け取れます",
+  "@onboardingDesc3": { "description": "オンボーディング3説明" },
+
+  "tabSelected": "選択中",
+  "@tabSelected": { "description": "タブ選択中アクセシビリティ" },
+
+  "cameraPermissionRequired": "カメラの許可が必要です",
+  "@cameraPermissionRequired": { "description": "カメラ許可要求" },
+
+  "locationPermissionRequired": "位置情報の許可が必要です",
+  "@locationPermissionRequired": { "description": "位置情報許可要求" },
+
+  "openSettings": "設定を開く",
+  "@openSettings": { "description": "設定を開くボタン" },
+
+  "ratingLabel": "評価",
+  "@ratingLabel": { "description": "評価ラベル" },
+
+  "applicant": "応募者",
+  "@applicant": { "description": "応募者ラベル" },
+
+  "employer": "雇用主",
+  "@employer": { "description": "雇用主ラベル" },
+
+  "chatWith": "チャット",
+  "@chatWith": { "description": "チャットタイトル" },
+
+  "sendMessage": "メッセージを送信",
+  "@sendMessage": { "description": "メッセージ送信ボタン" },
+
+  "today": "今日",
+  "@today": { "description": "今日ラベル" },
+
+  "yesterday": "昨日",
+  "@yesterday": { "description": "昨日ラベル" },
+
+  "postJobTitle": "案件を投稿",
+  "@postJobTitle": { "description": "案件投稿ページタイトル" },
+
+  "postJobSuccess": "案件を投稿しました",
+  "@postJobSuccess": { "description": "案件投稿成功" },
+
+  "loadMore": "もっと見る",
+  "@loadMore": { "description": "もっと見るボタン" },
+
+  "noMoreData": "これ以上データはありません",
+  "@noMoreData": { "description": "追加データなし" },
+
+  "refreshing": "更新中...",
+  "@refreshing": { "description": "リフレッシュ中" },
+
+  "workerLabel": "ワーカー",
+  "@workerLabel": { "description": "ワーカーラベル" },
+
+  "applicationDate": "応募日",
+  "@applicationDate": { "description": "応募日ラベル" },
+
+  "guestModeWarning": "ゲストモードでは一部機能が制限されます",
+  "@guestModeWarning": { "description": "ゲストモード警告" }
 }

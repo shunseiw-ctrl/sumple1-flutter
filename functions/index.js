@@ -62,6 +62,14 @@ exports.deleteUserData = deleteUserData;
 const { exportUserData } = require("./src/dataExport");
 exports.exportUserData = exportUserData;
 
+// --- Firestore 自動バックアップ (Phase 10) ---
+const { dailyFirestoreBackup } = require("./src/firestoreBackup");
+exports.dailyFirestoreBackup = dailyFirestoreBackup;
+
+// --- レート制限クリーンアップ (Phase 10) ---
+const { cleanupRateLimits } = require("./src/rateLimiter");
+exports.cleanupRateLimits = cleanupRateLimits;
+
 // --- 監査ログ (Phase 9) ---
 const auditLog = require("./src/auditLog");
 exports.onAuditJobWrite = auditLog.onAuditJobWrite;

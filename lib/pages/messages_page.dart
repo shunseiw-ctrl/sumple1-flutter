@@ -222,11 +222,11 @@ class _MessagesPageState extends State<MessagesPage> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
             child: TextField(
               decoration: InputDecoration(
                 hintText: '案件名で検索',
-                prefixIcon: Icon(Icons.search, color: AppColors.textHint),
+                prefixIcon: const Icon(Icons.search, color: AppColors.textHint),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                 ),
@@ -268,7 +268,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return EmptyState(
+                  return const EmptyState(
                     icon: Icons.search_off,
                     title: '検索結果がありません',
                     description: '別のキーワードで検索してみてください',
@@ -278,7 +278,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 filtered.sort(_compareByLastMessageAtDesc);
 
                 return ListView.separated(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.sm, AppSpacing.pagePadding, AppSpacing.xl),
                   itemCount: filtered.length,
                   separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, i) {
@@ -354,7 +354,7 @@ class _MessagesPageState extends State<MessagesPage> {
                                         color: AppColors.ruriPale,
                                         borderRadius: BorderRadius.circular(14),
                                       ),
-                                      child: Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
+                                      child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
                                     ),
                                     const SizedBox(width: AppSpacing.md),
                                     Expanded(

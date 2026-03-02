@@ -197,7 +197,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                     children: [
                       Icon(icon, size: 40, color: AppColors.textHint),
                       const SizedBox(height: 8),
-                      Text('タップして選択', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
+                      const Text('タップして選択', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
                     ],
                   ),
                 ),
@@ -205,16 +205,16 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               Row(
                 children: [
                   if (photoUrl != null)
-                    Icon(Icons.check_circle, color: AppColors.success, size: 20)
+                    const Icon(Icons.check_circle, color: AppColors.success, size: 20)
                   else
-                    Icon(Icons.upload_file, color: AppColors.ruri, size: 20),
+                    const Icon(Icons.upload_file, color: AppColors.ruri, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                        Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       ],
                     ),
                   ),
@@ -289,10 +289,10 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               color: AppColors.ruriPale,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Row(
+            child: const Row(
               children: [
                 Icon(Icons.info_outline, color: AppColors.ruri, size: 22),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     '身分証明書（運転免許証・マイナンバーカード等）と顔写真を提出してください。顔写真はプロフィール写真として使用されます。',

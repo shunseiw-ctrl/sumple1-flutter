@@ -83,32 +83,32 @@ class SkeletonJobCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SkeletonLoader(height: 160, borderRadius: 16),
+          SkeletonLoader(height: 160, borderRadius: 16),
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.cardPadding),
+            padding: EdgeInsets.all(AppSpacing.cardPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const SkeletonLoader(width: 60, height: 24, borderRadius: 12),
-                    const SizedBox(width: 8),
-                    const SkeletonLoader(width: 60, height: 24, borderRadius: 12),
+                    SkeletonLoader(width: 60, height: 24, borderRadius: 12),
+                    SizedBox(width: 8),
+                    SkeletonLoader(width: 60, height: 24, borderRadius: 12),
                   ],
                 ),
-                const SizedBox(height: 12),
-                const SkeletonLoader(height: 20, borderRadius: 6),
-                const SizedBox(height: 8),
-                const SkeletonLoader(width: 200, height: 16, borderRadius: 6),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
+                SkeletonLoader(height: 20, borderRadius: 6),
+                SizedBox(height: 8),
+                SkeletonLoader(width: 200, height: 16, borderRadius: 6),
+                SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SkeletonLoader(width: 100, height: 28, borderRadius: 8),
-                    const SkeletonLoader(width: 80, height: 16, borderRadius: 6),
+                    SkeletonLoader(width: 100, height: 28, borderRadius: 8),
+                    SkeletonLoader(width: 80, height: 16, borderRadius: 6),
                   ],
                 ),
               ],

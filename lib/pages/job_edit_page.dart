@@ -208,7 +208,7 @@ class _JobEditPageState extends State<JobEditPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '案件を編集',
           style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
         ),
@@ -379,7 +379,7 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 4),
-        Text(subtitle, style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -499,7 +499,7 @@ class _HintCard extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
           const SizedBox(height: 6),
-          Text(body, style: TextStyle(color: AppColors.textPrimary, height: 1.35)),
+          Text(body, style: const TextStyle(color: AppColors.textPrimary, height: 1.35)),
         ],
       ),
     );

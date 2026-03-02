@@ -48,6 +48,13 @@ dependencies:
   # セキュリティ
   firebase_app_check: ^0.3.1+3
 
+  # Apple Sign In
+  sign_in_with_apple: ^6.1.0
+  crypto: ^3.0.3
+
+  # Deep Linking
+  app_links: ^6.3.0
+
   # Analytics & Performance
   firebase_analytics: ^11.3.6
   firebase_performance: ^0.10.0+8

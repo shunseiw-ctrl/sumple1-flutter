@@ -313,7 +313,7 @@ class _DashboardTab extends StatelessWidget {
             }
             final docs = snap.data?.docs ?? [];
             if (docs.isEmpty) {
-              return _EmptyCard(message: 'まだ応募はありません');
+              return const _EmptyCard(message: 'まだ応募はありません');
             }
             return Column(
               children: docs.map((doc) {
@@ -629,13 +629,13 @@ class _JobManagementTab extends StatelessWidget {
           }
           final docs = snap.data?.docs ?? [];
           if (docs.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.work_off_outlined, size: 48, color: AppColors.textHint),
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     '案件がまだありません',
                     style: TextStyle(
                       fontSize: 16,
@@ -643,8 +643,8 @@ class _JobManagementTab extends StatelessWidget {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     '右下のボタンから案件を投稿できます',
                     style: TextStyle(
                       fontSize: 13,
@@ -958,7 +958,7 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
+                      const Icon(Icons.people_outline, size: 48, color: AppColors.textHint),
                       const SizedBox(height: 12),
                       Text(
                         _filterStatus == 'all' ? '応募者はまだいません' : '${_statusLabel(_filterStatus)}の応募はありません',
@@ -1007,10 +1007,10 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 20,
                                   backgroundColor: AppColors.ruriPale,
-                                  child: const Icon(Icons.person, color: AppColors.ruri, size: 20),
+                                  child: Icon(Icons.person, color: AppColors.ruri, size: 20),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -1071,7 +1071,7 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                                       label: const Text('却下'),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: AppColors.error,
-                                        side: BorderSide(color: AppColors.error),
+                                        side: const BorderSide(color: AppColors.error),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                         padding: const EdgeInsets.symmetric(vertical: 8),
                                       ),
@@ -1105,7 +1105,7 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                                   label: const Text('着工開始'),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.ruri,
-                                    side: BorderSide(color: AppColors.ruri),
+                                    side: const BorderSide(color: AppColors.ruri),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     padding: const EdgeInsets.symmetric(vertical: 8),
                                   ),
@@ -1122,7 +1122,7 @@ class _ApplicantsTabState extends State<_ApplicantsTab> {
                                   label: const Text('施工完了'),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.success,
-                                    side: BorderSide(color: AppColors.success),
+                                    side: const BorderSide(color: AppColors.success),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     padding: const EdgeInsets.symmetric(vertical: 8),
                                   ),

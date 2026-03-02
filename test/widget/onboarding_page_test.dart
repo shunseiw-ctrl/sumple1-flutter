@@ -11,16 +11,16 @@ void main() {
   });
 
   Widget buildApp() {
-    return MaterialApp(
-      localizationsDelegates: const [
+    return const MaterialApp(
+      localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('ja'),
-      home: const OnboardingPage(),
+      locale: Locale('ja'),
+      home: OnboardingPage(),
     );
   }
 

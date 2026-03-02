@@ -282,7 +282,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                         'status: $status  uid:${applicantUid.isNotEmpty ? applicantUid.substring(0, applicantUid.length > 8 ? 8 : applicantUid.length) : "-"}…',
                       ),
                       trailing: selected
-                          ? Icon(Icons.check_circle, color: AppColors.ruri)
+                          ? const Icon(Icons.check_circle, color: AppColors.ruri)
                           : const Icon(Icons.chevron_right),
                       onTap: () {
                         setState(() {
@@ -299,12 +299,12 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(top: BorderSide(color: AppColors.divider)),
             ),
             child: _selectedApp == null
-                ? Text(
+                ? const Text(
               '上のリストから案件を選択してください',
               style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700),
             )
@@ -378,7 +378,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
+                const Text(
                   '※売上は支払い確定日に反映されます（タイミー方式）',
                   style: TextStyle(fontSize: 12, color: AppColors.textHint, fontWeight: FontWeight.w600),
                 ),
@@ -417,11 +417,11 @@ class _SelectedSummary extends StatelessWidget {
           Text(name, style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
           Text('appId: ${short(app.id)}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('applicantUid: ${short(uid)}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('status: $status',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
         ],
       ),
     );

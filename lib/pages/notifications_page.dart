@@ -98,7 +98,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           }
           return ListView.separated(
             controller: _scrollController,
-            padding: EdgeInsets.all(AppSpacing.pagePadding),
+            padding: const EdgeInsets.all(AppSpacing.pagePadding),
             itemCount: docs.length,
             separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
             itemBuilder: (context, i) {

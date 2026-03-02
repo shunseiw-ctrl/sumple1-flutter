@@ -103,7 +103,7 @@ class _SalesPageState extends State<SalesPage>
         controller: _tabController,
         children: [
           _SalesContent(uid: uid, isAdmin: isAdmin),
-          _FavoritesContent(),
+          const _FavoritesContent(),
         ],
       ),
     );
@@ -221,7 +221,7 @@ class _SalesContentState extends State<_SalesContent> {
         }).toList();
 
         return ListView(
-          padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
           children: [
             _ShadowCard(
               child: Padding(
@@ -405,7 +405,7 @@ class _FavoritesContent extends StatelessWidget {
         }
 
         return ListView.builder(
-          padding: EdgeInsets.all(AppSpacing.pagePadding),
+          padding: const EdgeInsets.all(AppSpacing.pagePadding),
           itemCount: jobIds.length,
           itemBuilder: (context, i) {
             final jobId = jobIds[i];
@@ -457,12 +457,12 @@ class _FavoritesContent extends StatelessWidget {
                                     ? Image.network(imageUrl, fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => Container(
                                           color: AppColors.chipUnselected,
-                                          child: Icon(Icons.work, color: AppColors.textHint),
+                                          child: const Icon(Icons.work, color: AppColors.textHint),
                                         ),
                                       )
                                     : Container(
                                         color: AppColors.chipUnselected,
-                                        child: Icon(Icons.work, color: AppColors.textHint),
+                                        child: const Icon(Icons.work, color: AppColors.textHint),
                                       ),
                               ),
                             ),
@@ -477,7 +477,7 @@ class _FavoritesContent extends StatelessWidget {
                                     if (location.isNotEmpty)
                                       Row(
                                         children: [
-                                          Icon(Icons.location_on_outlined, size: 14, color: AppColors.textHint),
+                                          const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textHint),
                                           const SizedBox(width: AppSpacing.xs),
                                           Expanded(child: Text(location, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis)),
                                         ],
@@ -782,7 +782,7 @@ class _PaymentSummarySection extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.calendar_month, size: 18, color: AppColors.ruri),
+                      const Icon(Icons.calendar_month, size: 18, color: AppColors.ruri),
                       const SizedBox(width: AppSpacing.sm),
                       Text(month, style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
                       const Spacer(),

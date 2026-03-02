@@ -177,6 +177,14 @@ exports.createPaymentIntent = onCall(
       throw new HttpsError("unauthenticated", "ログインが必要です");
     }
 
+    // レート制限（5 req/min）
+    const { enforceRateLimit, PRESETS } = require("./rateLimiter");
+    await enforceRateLimit(
+      `payment:${request.auth.uid}`,
+      PRESETS.payment.maxRequests,
+      PRESETS.payment.windowMs,
+    );
+
     const { applicationId, amount } = request.data;
 
     if (!applicationId || !amount || amount <= 0) {

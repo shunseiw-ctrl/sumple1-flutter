@@ -9,10 +9,23 @@ import 'package:http/http.dart' as http;
 class LineAuthService {
   static final LineAuthService _instance = LineAuthService._();
   factory LineAuthService() => _instance;
-  LineAuthService._();
+  LineAuthService._()
+      : _auth = FirebaseAuth.instance,
+        _db = FirebaseFirestore.instance,
+        _httpClient = http.Client();
 
-  final _auth = FirebaseAuth.instance;
-  final _db = FirebaseFirestore.instance;
+  /// テスト用コンストラクタ（DI対応）
+  LineAuthService.forTesting({
+    required FirebaseAuth auth,
+    required FirebaseFirestore firestore,
+    required http.Client httpClient,
+  })  : _auth = auth,
+        _db = firestore,
+        _httpClient = httpClient;
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
+  final http.Client _httpClient;
 
   /// Cloud Functions LINE Auth エンドポイントのベース URL
   /// 本番環境では Firebase Hosting の rewrite で CF にプロキシされるため、
@@ -58,7 +71,7 @@ class LineAuthService {
       final baseUrl = _getLineAuthBaseUrl().isNotEmpty
           ? _getLineAuthBaseUrl()
           : Uri.base.origin;
-      final response = await http.post(
+      final response = await _httpClient.post(
         Uri.parse('$baseUrl/auth/line/exchange'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'code': code}),

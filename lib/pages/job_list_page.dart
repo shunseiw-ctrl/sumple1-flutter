@@ -31,7 +31,7 @@ class _JobListPageState extends State<JobListPage> {
   String _sortLabel = '新着順';
 
   final _favoritesService = FavoritesService();
-  Set<String> _guestFavorites = {};
+  final Set<String> _guestFavorites = {};
 
   RangeValues _priceRange = const RangeValues(0, 100000);
   String _areaFilter = '';
@@ -273,7 +273,7 @@ class _JobListPageState extends State<JobListPage> {
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
+                                      const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
                                       const SizedBox(width: AppSpacing.sm),
                                       Text(tempDateFrom ?? '開始日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateFrom != null ? AppColors.textPrimary : AppColors.textHint)),
                                     ],
@@ -307,7 +307,7 @@ class _JobListPageState extends State<JobListPage> {
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
+                                      const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
                                       const SizedBox(width: AppSpacing.sm),
                                       Text(tempDateTo ?? '終了日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateTo != null ? AppColors.textPrimary : AppColors.textHint)),
                                     ],
@@ -1183,7 +1183,7 @@ class _JobCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '残り${remaining}枠',
+                                  '残り$remaining枠',
                                   style: AppTextStyles.badgeText.copyWith(
                                     color: isUrgent ? AppColors.error : AppColors.warning,
                                   ),

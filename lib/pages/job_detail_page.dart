@@ -184,7 +184,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
       NotificationService().createNotification(
         targetUid: jobOwnerId,
         title: '新しい応募',
-        body: '${resolvedProjectName}に応募がありました',
+        body: '$resolvedProjectNameに応募がありました',
         type: 'application',
         data: {'jobId': jobId},
       );
@@ -278,8 +278,8 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                         ),
                       );
                     },
-                    icon: Icon(Icons.edit, size: 18, color: AppColors.textPrimary),
-                    label: Text(
+                    icon: const Icon(Icons.edit, size: 18, color: AppColors.textPrimary),
+                    label: const Text(
                       '編集',
                       style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900),
                     ),
@@ -488,7 +488,7 @@ class JobDetailBody extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  Icon(Icons.place, size: 16, color: AppColors.textSecondary),
+                  const Icon(Icons.place, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Text(location, style: AppTextStyles.bodySmall),
@@ -529,7 +529,7 @@ class JobDetailBody extends StatelessWidget {
                 child: Column(
                   children: [
                     _InfoRow(icon: Icons.event, label: '日程', value: date),
-                    Divider(height: AppSpacing.lg, color: AppColors.divider),
+                    const Divider(height: AppSpacing.lg, color: AppColors.divider),
                     _InfoRow(icon: Icons.place, label: '場所', value: location),
                   ],
                 ),

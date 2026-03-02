@@ -198,7 +198,7 @@ class _WorkPageState extends State<WorkPage>
                     }).toList();
 
                     return ListView(
-                      padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                       children: [
                         _StatusGroup(
                           title: '応募中',
@@ -231,7 +231,7 @@ class _WorkPageState extends State<WorkPage>
                   }
 
                   return ListView.separated(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
                     itemBuilder: (context, i) {

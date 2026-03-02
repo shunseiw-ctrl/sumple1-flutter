@@ -227,6 +227,17 @@ exports.lineAuthExchange = onRequest(
         return;
       }
 
+      // レート制限（IP ベース）
+      const { enforceRateLimitForRequest, PRESETS } = require("./rateLimiter");
+      const clientIp = req.ip || req.headers["x-forwarded-for"] || "unknown";
+      const allowed = await enforceRateLimitForRequest(
+        res,
+        `auth:${clientIp}`,
+        PRESETS.auth.maxRequests,
+        PRESETS.auth.windowMs,
+      );
+      if (!allowed) return;
+
       const { code } = req.body || {};
       if (!code) {
         res.status(400).json({ error: "missing_code" });

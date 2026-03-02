@@ -326,7 +326,7 @@ class ChatService {
       data: {'totalAttempts': attempt},
     );
 
-    return SendMessageResult.error('メッセージの送信に失敗しました（${attempt}回試行）');
+    return SendMessageResult.error('メッセージの送信に失敗しました（$attempt回試行）');
   }
 
   /// リトライ不可能なエラーかどうかを判定

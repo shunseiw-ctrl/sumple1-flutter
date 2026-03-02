@@ -84,7 +84,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'QR出退勤管理',
           style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
         ),
@@ -142,12 +142,12 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                 }
                 final docs = snap.data?.docs ?? [];
                 if (docs.isEmpty) {
-                  return Center(
+                  return const Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.qr_code_2, size: 56, color: AppColors.textHint),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(
                           'QRコードはまだ生成されていません',
                           style: TextStyle(
@@ -182,7 +182,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
+                              const Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
                               const SizedBox(width: 6),
                               Text(date, style: const TextStyle(fontWeight: FontWeight.w700)),
                               const Spacer(),
@@ -194,7 +194,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                                 ),
                                 child: Text(
                                   qrCode,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.ruri,
@@ -219,7 +219,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
+                          const Text(
                             '職人にこのQRコードをスキャンしてもらってください',
                             style: TextStyle(
                               fontSize: 12,

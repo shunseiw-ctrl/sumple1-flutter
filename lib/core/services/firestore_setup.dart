@@ -6,7 +6,7 @@ import '../utils/logger.dart';
 class FirestoreSetup {
   static Future<void> initialize() async {
     try {
-      final settings = Settings(
+      final settings = const Settings(
         persistenceEnabled: true,
         cacheSizeBytes: kIsWeb ? 40 * 1024 * 1024 : Settings.CACHE_SIZE_UNLIMITED,
       );

@@ -160,7 +160,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
           appBar: AppBar(
             title: Text(
               title,
-              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+              style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
             ),
             actions: [
               if (_isAdminUser && jobId.isNotEmpty)
@@ -233,7 +233,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                             NotificationService().createNotification(
                               targetUid: applicantUid,
                               title: 'ステータス更新',
-                              body: '${title}が「着工中」になりました',
+                              body: '$titleが「着工中」になりました',
                               type: 'status_update',
                             );
                           }
@@ -262,7 +262,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                             NotificationService().createNotification(
                               targetUid: applicantUid,
                               title: 'ステータス更新',
-                              body: '${title}が「施工完了」になりました',
+                              body: '$titleが「施工完了」になりました',
                               type: 'status_update',
                             );
                           }
@@ -296,7 +296,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.star_rounded, size: 18, color: Colors.amber),
+                                  const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
                                   const SizedBox(width: 4),
                                   Text('評価済み', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
                                 ],
@@ -327,7 +327,7 @@ class _WorkDetailPageState extends State<WorkDetailPage>
               ),
 
               if (status == 'in_progress' || status == 'assigned')
-                Divider(height: 1, color: AppColors.divider),
+                const Divider(height: 1, color: AppColors.divider),
               if (status == 'in_progress' || status == 'assigned')
                 Container(
                   color: Colors.white,
@@ -409,11 +409,11 @@ class _WorkDetailPageState extends State<WorkDetailPage>
                                 color: AppColors.chipUnselected,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(Icons.check_circle, size: 16, color: Colors.green),
-                                  const SizedBox(width: 4),
+                                  SizedBox(width: 4),
                                   Text('完了', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
                                 ],
                               ),
@@ -470,7 +470,7 @@ class _OverviewTab extends StatelessWidget {
                 Text('報酬: ${price.isNotEmpty ? price : "-"}'),
                 Text('日程: ${date.isNotEmpty ? date : "未定"}'),
                 const SizedBox(height: 12),
-                Text(
+                const Text(
                   '※jobIdが無いデータのため、詳細本文を表示できません',
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
@@ -601,7 +601,7 @@ class _PhotosTabState extends State<_PhotosTab> {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
           child: Row(
             children: [
-              Icon(Icons.photo_library, size: 20, color: AppColors.ruri),
+              const Icon(Icons.photo_library, size: 20, color: AppColors.ruri),
               const SizedBox(width: 8),
               const Expanded(child: Text('現場写真', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
               if (_uploading)
@@ -629,14 +629,14 @@ class _PhotosTabState extends State<_PhotosTab> {
               }
               final docs = snap.data?.docs ?? [];
               if (docs.isEmpty) {
-                return Center(
+                return const Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.photo_outlined, size: 56, color: AppColors.textHint),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Text('写真はまだありません', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Text('「追加」ボタンから写真をアップロード', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
                     ],
                   ),
@@ -688,8 +688,8 @@ class _PhotosTabState extends State<_PhotosTab> {
                                     Navigator.pop(ctx);
                                     _deletePhoto(docs[i].id, url);
                                   },
-                                  icon: Icon(Icons.delete, color: AppColors.error, size: 18),
-                                  label: Text('削除', style: TextStyle(color: AppColors.error)),
+                                  icon: const Icon(Icons.delete, color: AppColors.error, size: 18),
+                                  label: const Text('削除', style: TextStyle(color: AppColors.error)),
                                 ),
                               ),
                             ],
@@ -704,7 +704,7 @@ class _PhotosTabState extends State<_PhotosTab> {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: AppColors.chipUnselected,
-                          child: Icon(Icons.broken_image, color: AppColors.textHint),
+                          child: const Icon(Icons.broken_image, color: AppColors.textHint),
                         ),
                       ),
                     ),
@@ -786,7 +786,7 @@ class _DocsTabState extends State<_DocsTab> {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
           child: Row(
             children: [
-              Icon(Icons.folder_outlined, size: 20, color: AppColors.ruri),
+              const Icon(Icons.folder_outlined, size: 20, color: AppColors.ruri),
               const SizedBox(width: 8),
               const Expanded(child: Text('資料管理', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
               if (_uploading)
@@ -814,7 +814,7 @@ class _DocsTabState extends State<_DocsTab> {
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
                 child: ChoiceChip(
-                  label: Text(f, style: TextStyle(fontSize: 12)),
+                  label: Text(f, style: const TextStyle(fontSize: 12)),
                   selected: selected,
                   onSelected: (_) => setState(() => _selectedFolder = f),
                   selectedColor: AppColors.ruri,
@@ -847,9 +847,9 @@ class _DocsTabState extends State<_DocsTab> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.folder_off_outlined, size: 48, color: AppColors.textHint),
+                      const Icon(Icons.folder_off_outlined, size: 48, color: AppColors.textHint),
                       const SizedBox(height: 12),
-                      Text('「$_selectedFolder」の資料はまだありません', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      Text('「$_selectedFolder」の資料はまだありません', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                     ],
                   ),
                 );
@@ -879,7 +879,7 @@ class _DocsTabState extends State<_DocsTab> {
                             child: Image.network(url, fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => Container(
                                 color: AppColors.chipUnselected,
-                                child: Icon(Icons.description, color: AppColors.textHint),
+                                child: const Icon(Icons.description, color: AppColors.textHint),
                               ),
                             ),
                           ),
@@ -891,12 +891,12 @@ class _DocsTabState extends State<_DocsTab> {
                             children: [
                               Text(_selectedFolder, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                               if (dateStr.isNotEmpty)
-                                Text(dateStr, style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                                Text(dateStr, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
                             ],
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                          icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
                           onPressed: () async {
                             try {
                               await _docsRef.doc(docs[i].id).delete();

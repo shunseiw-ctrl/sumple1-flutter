@@ -40,7 +40,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     final remaining = _lockoutUntil!.difference(DateTime.now());
     final minutes = remaining.inMinutes;
     final seconds = remaining.inSeconds % 60;
-    return 'ログイン試行回数の上限に達しました。${minutes}分${seconds}秒後にお試しください';
+    return 'ログイン試行回数の上限に達しました。$minutes分$seconds秒後にお試しください';
   }
 
   Future<void> _signIn() async {

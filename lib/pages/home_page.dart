@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage> {
               final count = snap.data ?? 0;
               return Semantics(
                 button: true,
-                label: count > 0 ? 'お知らせ、未読${count}件' : 'お知らせ',
+                label: count > 0 ? 'お知らせ、未読$count件' : 'お知らせ',
                 child: IconButton(
                   icon: Stack(
                     clipBehavior: Clip.none,

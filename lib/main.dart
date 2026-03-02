@@ -27,6 +27,7 @@ import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'core/services/splash_remover.dart';
+import 'core/services/deep_link_service.dart';
 import 'presentation/widgets/error_retry_widget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
@@ -126,9 +127,13 @@ Future<void> main() async {
       );
     });
 
-    // 通知タップ時の処理
+    // 通知タップ時の処理 — Deep Link ルーティング
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       Logger.info('Notification tapped', tag: 'FCM', data: message.data);
+      final route = _deepLinkService.parseNotificationData(message.data);
+      if (route != null) {
+        navigatorKey.currentState?.pushNamed(route.path, arguments: route.params);
+      }
     });
   }
 
@@ -143,8 +148,31 @@ Future<void> main() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+/// グローバル navigator key（Deep Link / 通知ナビゲーション用）
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+/// Deep Link サービス
+final DeepLinkService _deepLinkService = DeepLinkService();
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _deepLinkService.initialize(navigatorKey);
+  }
+
+  @override
+  void dispose() {
+    _deepLinkService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +181,7 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'ALBAWORK',
       navigatorObservers: [AnalyticsService.observer],
@@ -172,7 +201,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),
-          shape: Border(
+          shape: const Border(
             bottom: BorderSide(color: AppColors.divider, width: 0.5),
           ),
         ),
@@ -209,7 +238,7 @@ class MyApp extends StatelessWidget {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.ruri,
-            side: BorderSide(color: AppColors.ruri, width: 1.5),
+            side: const BorderSide(color: AppColors.ruri, width: 1.5),
             textStyle: GoogleFonts.notoSansJp(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -236,15 +265,15 @@ class MyApp extends StatelessWidget {
           fillColor: AppColors.surfaceElevated,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.borderLight),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.borderLight),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppColors.ruri, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.ruri, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           hintStyle: GoogleFonts.notoSansJp(
@@ -269,7 +298,7 @@ class MyApp extends StatelessWidget {
           side: BorderSide.none,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
-        dividerTheme: DividerThemeData(
+        dividerTheme: const DividerThemeData(
           color: AppColors.divider,
           thickness: 0.5,
           space: 0,
@@ -333,7 +362,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w700,
             color: AppDarkColors.textPrimary,
           ),
-          shape: Border(
+          shape: const Border(
             bottom: BorderSide(color: AppDarkColors.divider, width: 0.5),
           ),
         ),
@@ -370,7 +399,7 @@ class MyApp extends StatelessWidget {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.ruri,
-            side: BorderSide(color: AppColors.ruri, width: 1.5),
+            side: const BorderSide(color: AppColors.ruri, width: 1.5),
             textStyle: GoogleFonts.notoSansJp(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -397,15 +426,15 @@ class MyApp extends StatelessWidget {
           fillColor: AppDarkColors.surfaceElevated,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppDarkColors.border),
+            borderSide: const BorderSide(color: AppDarkColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppDarkColors.border),
+            borderSide: const BorderSide(color: AppDarkColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(color: AppColors.ruri, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.ruri, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           hintStyle: GoogleFonts.notoSansJp(
@@ -430,7 +459,7 @@ class MyApp extends StatelessWidget {
           side: BorderSide.none,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
-        dividerTheme: DividerThemeData(
+        dividerTheme: const DividerThemeData(
           color: AppDarkColors.divider,
           thickness: 0.5,
           space: 0,
@@ -533,7 +562,7 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     if (_onboardingComplete == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(color: AppColors.ruri),
         ),
@@ -548,7 +577,7 @@ class _AuthGateState extends State<AuthGate> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(color: AppColors.ruri),
             ),
@@ -591,7 +620,7 @@ class _AuthGateState extends State<AuthGate> {
           future: _resolveRole(user),
           builder: (context, roleSnap) {
             if (roleSnap.connectionState == ConnectionState.waiting) {
-              return Scaffold(
+              return const Scaffold(
                 body: Center(
                   child: CircularProgressIndicator(color: AppColors.ruri),
                 ),

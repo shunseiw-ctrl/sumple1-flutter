@@ -198,11 +198,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                        borderSide: BorderSide(color: AppColors.ruri, width: 2),
+                        borderSide: const BorderSide(color: AppColors.ruri, width: 2),
                       ),
                       filled: true,
                       fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
@@ -229,11 +229,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                        borderSide: BorderSide(color: AppColors.border),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                        borderSide: BorderSide(color: AppColors.ruri, width: 2),
+                        borderSide: const BorderSide(color: AppColors.ruri, width: 2),
                       ),
                       filled: true,
                       fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
@@ -286,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.pagePadding, AppSpacing.pagePadding, 24),
+        padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.pagePadding, AppSpacing.pagePadding, 24),
         children: [
           StaggeredFadeSlide(
             index: 0,
@@ -602,11 +602,11 @@ class _ProfileHeaderCard extends StatelessWidget {
             excludeSemantics: true,
             child: Container(
               padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppColors.primaryGradient,
               ),
-              child: CircleAvatar(
+              child: const CircleAvatar(
                 radius: 32,
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
@@ -708,7 +708,7 @@ class _InfoBanner extends StatelessWidget {
           Container(
             width: 4,
             height: 140,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: AppColors.primaryGradient,
             ),
           ),
@@ -825,13 +825,13 @@ class _MenuTile extends StatelessWidget {
             subtitle: subtitle == null
                 ? null
                 : Text(subtitle!, style: AppTextStyles.labelSmall),
-            trailing: Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
             onTap: onTap,
           ),
         ),
         if (!isLast)
-          Padding(
-            padding: const EdgeInsets.only(left: 66),
+          const Padding(
+            padding: EdgeInsets.only(left: 66),
             child: Divider(height: 1, color: AppColors.borderLight),
           ),
       ],

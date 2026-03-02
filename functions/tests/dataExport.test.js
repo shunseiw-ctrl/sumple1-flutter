@@ -15,6 +15,17 @@ admin.firestore.FieldValue = {
   serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP"),
 };
 
+// rateLimiter モック（レート制限はrateLimiter.test.jsでテスト済み）
+jest.mock("../src/rateLimiter", () => ({
+  enforceRateLimit: jest.fn().mockResolvedValue(undefined),
+  PRESETS: {
+    auth: { maxRequests: 5, windowMs: 60000 },
+    api: { maxRequests: 20, windowMs: 60000 },
+    deletion: { maxRequests: 1, windowMs: 3600000 },
+    payment: { maxRequests: 5, windowMs: 60000 },
+  },
+}));
+
 const { exportUserData } = require("../src/dataExport");
 
 describe("exportUserData", () => {

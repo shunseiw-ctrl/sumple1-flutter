@@ -20,6 +20,14 @@ exports.deleteUserData = onCall(
     }
 
     const uid = request.auth.uid;
+
+    // レート制限（1 req/hour）
+    const { enforceRateLimit, PRESETS } = require("./rateLimiter");
+    await enforceRateLimit(
+      `deletion:${uid}`,
+      PRESETS.deletion.maxRequests,
+      PRESETS.deletion.windowMs,
+    );
     const db = admin.firestore();
     const BATCH_LIMIT = 400; // Firestore batch limit is 500, leave margin
 

@@ -296,20 +296,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           radius: 50,
                           backgroundColor: AppColors.chipUnselected,
                           backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                          child: photoUrl.isEmpty ? Icon(Icons.person, size: 50, color: AppColors.textHint) : null,
+                          child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: AppColors.textHint) : null,
                         ),
                         const SizedBox(height: 8),
                         if (locked)
-                          Row(
+                          const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.lock, size: 14, color: AppColors.success),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 4),
                               Text('本人確認済み', style: TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w600)),
                             ],
                           )
                         else
-                          Text('本人確認で写真が設定されます', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                          const Text('本人確認で写真が設定されます', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
                       ],
                     ),
                   );
@@ -345,7 +345,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ),
                         if (count > 0) ...[
                           const SizedBox(height: 8),
-                          Text(
+                          const Text(
                             '管理者からの評価',
                             style: TextStyle(
                               fontSize: 12,
@@ -405,7 +405,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         Expanded(
                           child: Text(
                             label,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
@@ -474,7 +474,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               const SizedBox(height: 12),
 
               DropdownButtonFormField<String>(
-                value: _gender,
+                initialValue: _gender,
                 decoration: const InputDecoration(labelText: '性別（必須）'),
                 items: const [
                   DropdownMenuItem(value: '未回答', child: Text('未回答')),
@@ -562,7 +562,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         setState(() => _qualifications.removeAt(i));
                       },
                       backgroundColor: AppColors.ruriPale,
-                      labelStyle: TextStyle(color: AppColors.ruri, fontWeight: FontWeight.w600),
+                      labelStyle: const TextStyle(color: AppColors.ruri, fontWeight: FontWeight.w600),
                     ),
                 ],
               ),
@@ -592,7 +592,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         _qualificationInputCtrl.clear();
                       });
                     },
-                    icon: Icon(Icons.add_circle, color: AppColors.ruri, size: 32),
+                    icon: const Icon(Icons.add_circle, color: AppColors.ruri, size: 32),
                     tooltip: '資格を追加',
                   ),
                 ],
@@ -644,7 +644,7 @@ class _SectionTitle extends StatelessWidget {
         padding: const EdgeInsets.only(left: 2, bottom: 10),
         child: Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
             color: AppColors.textSecondary,
@@ -678,7 +678,7 @@ class _Banner extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
-          Text(message, style: TextStyle(color: AppColors.textSecondary)),
+          Text(message, style: const TextStyle(color: AppColors.textSecondary)),
         ],
       ),
     );

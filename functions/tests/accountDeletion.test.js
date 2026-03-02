@@ -23,6 +23,17 @@ admin.firestore.FieldValue = {
 
 const { HttpsError } = require("firebase-functions/v2/https");
 
+// rateLimiter モック（レート制限はrateLimiter.test.jsでテスト済み）
+jest.mock("../src/rateLimiter", () => ({
+  enforceRateLimit: jest.fn().mockResolvedValue(undefined),
+  PRESETS: {
+    auth: { maxRequests: 5, windowMs: 60000 },
+    api: { maxRequests: 20, windowMs: 60000 },
+    deletion: { maxRequests: 1, windowMs: 3600000 },
+    payment: { maxRequests: 5, windowMs: 60000 },
+  },
+}));
+
 // テスト用モジュールインポート（firebase-admin モック後）
 const { deleteUserData } = require("../src/accountDeletion");
 

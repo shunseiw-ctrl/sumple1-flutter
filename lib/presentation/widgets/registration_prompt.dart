@@ -56,7 +56,7 @@ class RegistrationPromptModal {
                 const SizedBox(height: 12),
 
                 // 説明文
-                Text(
+                const Text(
                   'LINEまたはメールアドレスで登録して、\nすべての機能をご利用ください。',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -132,7 +132,7 @@ class RegistrationPromptModal {
                   height: 48,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(
+                    child: const Text(
                       '後で',
                       style: TextStyle(
                         fontSize: 16,

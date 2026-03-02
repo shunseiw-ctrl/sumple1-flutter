@@ -93,10 +93,10 @@ class _ContactPageState extends State<ContactPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('カテゴリ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          const Text('カテゴリ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _category,
+            initialValue: _category,
             decoration: InputDecoration(
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -109,7 +109,7 @@ class _ContactPageState extends State<ContactPage> {
           ),
 
           const SizedBox(height: 16),
-          Text('件名', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          const Text('件名', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _subjectController,
@@ -121,7 +121,7 @@ class _ContactPageState extends State<ContactPage> {
           ),
 
           const SizedBox(height: 16),
-          Text('内容', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          const Text('内容', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _bodyController,

@@ -171,7 +171,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalizations.of(context)!.delete, style: TextStyle(color: AppColors.error)),
+            child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -198,7 +198,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, controller.text),
-              child: Text(AppLocalizations.of(context)!.confirm, style: TextStyle(color: AppColors.error)),
+              child: Text(AppLocalizations.of(context)!.confirm, style: const TextStyle(color: AppColors.error)),
             ),
           ],
         );
@@ -267,13 +267,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             child: Row(
               children: [
-                Icon(Icons.email_outlined, color: AppColors.textSecondary, size: 20),
+                const Icon(Icons.email_outlined, color: AppColors.textSecondary, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppLocalizations.of(context)!.email, style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      Text(AppLocalizations.of(context)!.email, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
                       Text(email, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     ],
@@ -286,7 +286,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 20),
 
           // 表示名変更
-          Text(AppLocalizations.of(context)!.displayName, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(AppLocalizations.of(context)!.displayName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
@@ -294,7 +294,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               hintText: '名前を入力',
               suffixIcon: IconButton(
                 onPressed: _saving ? null : _updateDisplayName,
-                icon: Icon(Icons.check, color: AppColors.ruri),
+                icon: const Icon(Icons.check, color: AppColors.ruri),
               ),
             ),
           ),
@@ -302,7 +302,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 28),
 
           // パスワード変更
-          Text(AppLocalizations.of(context)!.changePassword, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(AppLocalizations.of(context)!.changePassword, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _currentPassController,
@@ -332,8 +332,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Center(
             child: TextButton.icon(
               onPressed: _saving ? null : _exportData,
-              icon: Icon(Icons.download, color: AppColors.ruri, size: 18),
-              label: Text(AppLocalizations.of(context)!.downloadData, style: TextStyle(color: AppColors.ruri, fontSize: 13)),
+              icon: const Icon(Icons.download, color: AppColors.ruri, size: 18),
+              label: Text(AppLocalizations.of(context)!.downloadData, style: const TextStyle(color: AppColors.ruri, fontSize: 13)),
             ),
           ),
 
@@ -343,7 +343,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Center(
             child: TextButton(
               onPressed: _saving ? null : _showDeleteConfirmation,
-              child: Text(AppLocalizations.of(context)!.deleteAccount, style: TextStyle(color: AppColors.error, fontSize: 13)),
+              child: Text(AppLocalizations.of(context)!.deleteAccount, style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ),
         ],

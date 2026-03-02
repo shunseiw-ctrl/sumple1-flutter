@@ -23,7 +23,7 @@ class StatusBadge extends StatelessWidget {
       case 'assigned':
         return const StatusBadge(label: '着工前', color: AppColors.info, icon: Icons.assignment_turned_in);
       case 'in_progress':
-        return StatusBadge(label: '着工中', color: AppColors.ruri, icon: Icons.engineering, filled: true);
+        return const StatusBadge(label: '着工中', color: AppColors.ruri, icon: Icons.engineering, filled: true);
       case 'completed':
         return const StatusBadge(label: '施工完了', color: AppColors.success, icon: Icons.check_circle_outline);
       case 'inspection':
@@ -31,7 +31,7 @@ class StatusBadge extends StatelessWidget {
       case 'fixing':
         return const StatusBadge(label: '是正中', color: AppColors.error, icon: Icons.build);
       case 'done':
-        return StatusBadge(label: '完了', color: AppColors.success, icon: Icons.done_all, filled: true);
+        return const StatusBadge(label: '完了', color: AppColors.success, icon: Icons.done_all, filled: true);
       default:
         return StatusBadge(label: statusKey, color: AppColors.textSecondary);
     }

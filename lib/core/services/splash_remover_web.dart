@@ -1,12 +1,11 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 import 'package:flutter/foundation.dart';
 
 void removeSplashScreenImpl() {
   try {
-    final splash = html.document.getElementById('splash');
+    final splash = web.document.getElementById('splash');
     if (splash != null) {
-      splash.classes.add('fade-out');
+      splash.classList.add('fade-out');
       Future.delayed(const Duration(milliseconds: 500), () {
         try {
           splash.remove();

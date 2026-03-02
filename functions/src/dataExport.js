@@ -17,6 +17,15 @@ exports.exportUserData = onCall(
     }
 
     const uid = request.auth.uid;
+
+    // レート制限（20 req/min）
+    const { enforceRateLimit, PRESETS } = require("./rateLimiter");
+    await enforceRateLimit(
+      `api:${uid}`,
+      PRESETS.api.maxRequests,
+      PRESETS.api.windowMs,
+    );
+
     const db = admin.firestore();
 
     // 機密フィールドを除外するヘルパー

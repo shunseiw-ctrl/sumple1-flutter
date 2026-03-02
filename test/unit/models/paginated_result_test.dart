@@ -4,7 +4,7 @@ import 'package:sumple1/data/models/paginated_result.dart';
 void main() {
   group('PaginatedResult', () {
     test('creates with required parameters', () {
-      final result = PaginatedResult<String>(items: ['a', 'b']);
+      final result = const PaginatedResult<String>(items: ['a', 'b']);
 
       expect(result.items, ['a', 'b']);
       expect(result.lastDocument, isNull);
@@ -12,14 +12,14 @@ void main() {
     });
 
     test('creates with hasMore true', () {
-      final result = PaginatedResult<int>(items: [1, 2, 3], hasMore: true);
+      final result = const PaginatedResult<int>(items: [1, 2, 3], hasMore: true);
 
       expect(result.items.length, 3);
       expect(result.hasMore, isTrue);
     });
 
     test('creates with empty items', () {
-      final result = PaginatedResult<String>(items: []);
+      final result = const PaginatedResult<String>(items: []);
 
       expect(result.items, isEmpty);
       expect(result.hasMore, isFalse);
@@ -27,11 +27,11 @@ void main() {
 
     group('equality', () {
       test('同一フィールドのオブジェクトは等しい', () {
-        final result1 = PaginatedResult<String>(
+        final result1 = const PaginatedResult<String>(
           items: ['a', 'b', 'c'],
           hasMore: true,
         );
-        final result2 = PaginatedResult<String>(
+        final result2 = const PaginatedResult<String>(
           items: ['a', 'b', 'c'],
           hasMore: true,
         );
@@ -41,11 +41,11 @@ void main() {
       });
 
       test('異なるフィールドのオブジェクトは等しくない', () {
-        final result1 = PaginatedResult<String>(
+        final result1 = const PaginatedResult<String>(
           items: ['a', 'b'],
           hasMore: true,
         );
-        final result2 = PaginatedResult<String>(
+        final result2 = const PaginatedResult<String>(
           items: ['c', 'd'],
           hasMore: false,
         );
@@ -55,7 +55,7 @@ void main() {
     });
 
     test('preserves generic type', () {
-      final result = PaginatedResult<Map<String, dynamic>>(
+      final result = const PaginatedResult<Map<String, dynamic>>(
         items: [
           {'key': 'value'},
         ],
