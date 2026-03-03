@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
@@ -62,7 +62,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
       Logger.warning('本人確認ステータスの読み込みに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('本人確認ステータスの読み込みに失敗しました')),
+          SnackBar(content: Text(context.l10n.identityVerification_loadStatusFailed)),
         );
       }
     }
@@ -123,7 +123,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   Future<void> _submit() async {
     if (_idPhotoUrl == null || _selfieUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('身分証明書と顔写真の両方をアップロードしてください')),
+        SnackBar(content: Text(context.l10n.identityVerification_uploadBoth)),
       );
       return;
     }
@@ -152,13 +152,13 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('本人確認を申請しました。審査をお待ちください。')),
+          SnackBar(content: Text(context.l10n.identityVerification_submitted)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('申請に失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.identityVerification_submitFailed('$e'))),
         );
       }
     } finally {
@@ -175,7 +175,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: completed ? AppColors.success : AppColors.divider,
+              color: completed ? context.appColors.success : context.appColors.divider,
             ),
             child: Center(
               child: completed
@@ -184,7 +184,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary), textAlign: TextAlign.center),
+          Text(label, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -194,7 +194,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     return Expanded(
       child: Container(
         height: 2,
-        color: completed ? AppColors.success : AppColors.divider,
+        color: completed ? context.appColors.success : context.appColors.divider,
       ),
     );
   }
@@ -207,7 +207,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: _uploading ? null : onTap,
@@ -216,7 +216,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: photoUrl != null ? AppColors.success : AppColors.divider, width: photoUrl != null ? 2 : 1),
+            border: Border.all(color: photoUrl != null ? context.appColors.success : context.appColors.divider, width: photoUrl != null ? 2 : 1),
           ),
           child: Column(
             children: [
@@ -229,8 +229,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   borderRadius: 12,
                   errorWidget: Container(
                     height: 160,
-                    color: AppColors.chipUnselected,
-                    child: Icon(icon, size: 48, color: AppColors.textHint),
+                    color: context.appColors.chipUnselected,
+                    child: Icon(icon, size: 48, color: context.appColors.textHint),
                   ),
                 )
               else
@@ -238,15 +238,15 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   height: 120,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColors.chipUnselected,
+                    color: context.appColors.chipUnselected,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(icon, size: 40, color: AppColors.textHint),
+                      Icon(icon, size: 40, color: context.appColors.textHint),
                       const SizedBox(height: 8),
-                      const Text('タップして選択', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
+                      Text(context.l10n.identityVerification_tapToSelect, style: TextStyle(fontSize: 13, color: context.appColors.textHint)),
                     ],
                   ),
                 ),
@@ -254,16 +254,16 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               Row(
                 children: [
                   if (photoUrl != null)
-                    const Icon(Icons.check_circle, color: AppColors.success, size: 20)
+                    Icon(Icons.check_circle, color: context.appColors.success, size: 20)
                   else
-                    const Icon(Icons.upload_file, color: AppColors.ruri, size: 20),
+                    Icon(Icons.upload_file, color: context.appColors.primary, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                        Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        Text(subtitle, style: TextStyle(fontSize: 12, color: context.appColors.textSecondary)),
                       ],
                     ),
                   ),
@@ -286,20 +286,20 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     switch (_verificationStatus) {
       case 'pending':
         icon = Icons.hourglass_empty;
-        color = AppColors.warning;
-        message = '本人確認を審査中です。しばらくお待ちください。';
+        color = context.appColors.warning;
+        message = context.l10n.identityVerification_statusPending;
         break;
       case 'approved':
         icon = Icons.verified;
-        color = AppColors.success;
-        message = '本人確認が承認されました。';
+        color = context.appColors.success;
+        message = context.l10n.identityVerification_statusApproved;
         break;
       case 'rejected':
         icon = Icons.cancel;
-        color = AppColors.error;
-        message = '本人確認が却下されました。再度お試しください。';
+        color = context.appColors.error;
+        message = context.l10n.identityVerification_statusRejected;
         if (_rejectionReason != null && _rejectionReason!.isNotEmpty) {
-          message += '\n却下理由: $_rejectionReason';
+          message += '\n${context.l10n.identityVerification_rejectionReason(_rejectionReason!)}';
         }
         break;
       default:
@@ -330,7 +330,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     final isPending = _verificationStatus == 'pending';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('本人確認')),
+      appBar: AppBar(title: Text(context.l10n.identityVerification_title)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
@@ -339,11 +339,11 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             margin: const EdgeInsets.only(bottom: 20),
             child: Row(
               children: [
-                _buildStep(1, '身分証アップロード', _idPhotoUrl != null),
+                _buildStep(1, context.l10n.identityVerification_stepUploadId, _idPhotoUrl != null),
                 _buildStepConnector(_idPhotoUrl != null),
-                _buildStep(2, '自撮り', _selfieUrl != null),
+                _buildStep(2, context.l10n.identityVerification_stepSelfie, _selfieUrl != null),
                 _buildStepConnector(_selfieUrl != null),
-                _buildStep(3, '送信', _verificationStatus == 'pending' || _verificationStatus == 'approved'),
+                _buildStep(3, context.l10n.identityVerification_stepSubmit, _verificationStatus == 'pending' || _verificationStatus == 'approved'),
               ],
             ),
           ),
@@ -351,17 +351,17 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.ruriPale,
+              color: context.appColors.primaryPale,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppColors.ruri, size: 22),
-                SizedBox(width: 10),
+                Icon(Icons.info_outline, color: context.appColors.primary, size: 22),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    '身分証明書（運転免許証・マイナンバーカード等）と顔写真を提出してください。顔写真はプロフィール写真として使用されます。',
-                    style: TextStyle(fontSize: 13, color: AppColors.ruri, fontWeight: FontWeight.w500),
+                    context.l10n.identityVerification_instructions,
+                    style: TextStyle(fontSize: 13, color: context.appColors.primary, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -373,38 +373,37 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.infoLight,
+              color: context.appColors.infoLight,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+              border: Border.all(color: context.appColors.info.withValues(alpha: 0.3)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.verified_user, color: AppColors.info, size: 22),
-                SizedBox(width: 10),
+                Icon(Icons.verified_user, color: context.appColors.info, size: 22),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'eKYC（電子本人確認）対応予定 — より迅速な本人確認が可能になります',
-                    style: TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+                    context.l10n.identityVerification_ekycBanner,
+                    style: TextStyle(fontSize: 12, color: context.appColors.info, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
-          // 身分証の種類ドロップダウン
           if (!isApproved && !isPending)
             Container(
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.appColors.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.divider),
+                border: Border.all(color: context.appColors.divider),
               ),
               child: DropdownButtonFormField<String>(
                 value: _documentType,
-                decoration: const InputDecoration(
-                  labelText: '身分証の種類',
+                decoration: InputDecoration(
+                  labelText: context.l10n.identityVerification_documentTypeLabel,
                   border: InputBorder.none,
                 ),
                 items: IdentityVerificationModel.documentTypes.entries
@@ -421,16 +420,16 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               ),
             ),
           _buildPhotoUploadCard(
-            title: '身分証明書',
-            subtitle: '運転免許証・マイナンバーカード・パスポート等',
+            title: context.l10n.identityVerification_idDocumentTitle,
+            subtitle: context.l10n.identityVerification_idDocumentSubtitle,
             icon: Icons.credit_card,
             photoUrl: _idPhotoUrl,
             onTap: (isApproved || isPending) ? () {} : _pickIdPhoto,
           ),
           const SizedBox(height: 16),
           _buildPhotoUploadCard(
-            title: '顔写真（プロフィール写真）',
-            subtitle: '正面からのはっきりした写真',
+            title: context.l10n.identityVerification_selfieTitle,
+            subtitle: context.l10n.identityVerification_selfieSubtitle,
             icon: Icons.face,
             photoUrl: _selfieUrl,
             onTap: (isApproved || isPending) ? () {} : _pickSelfie,
@@ -445,7 +444,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               child: ElevatedButton.icon(
                 onPressed: (_idPhotoUrl != null && _selfieUrl != null) ? _submit : null,
                 icon: const Icon(Icons.send),
-                label: const Text('本人確認を申請する', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                label: Text(context.l10n.identityVerification_submitButton, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               ),
             ),
           if (_verificationStatus == 'rejected' && !_uploading)
@@ -465,7 +464,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                     });
                   },
                   icon: const Icon(Icons.refresh),
-                  label: const Text('再申請する', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  label: Text(context.l10n.identityVerification_resubmitButton, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                 ),
               ),
             ),

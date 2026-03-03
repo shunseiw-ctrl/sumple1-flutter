@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/pages/profile/profile_widgets.dart';
 import 'package:sumple1/pages/legal_page.dart';
@@ -32,8 +32,8 @@ class _LegalIndexPageState extends State<LegalIndexPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '法的情報',
+        title: Text(
+          context.l10n.legalIndex_title,
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
@@ -48,59 +48,59 @@ class _LegalIndexPageState extends State<LegalIndexPage> {
               24,
             ),
             children: [
-              const ProfileSectionHeader(title: '法的ドキュメント'),
+              ProfileSectionHeader(title: context.l10n.legalIndex_legalDocuments),
               ProfileMenuGroup(
                 children: [
                   ProfileMenuTile(
                     icon: Icons.privacy_tip_outlined,
-                    iconColor: AppColors.ruri,
-                    title: 'プライバシーポリシー',
+                    iconColor: context.appColors.primary,
+                    title: context.l10n.legalIndex_privacyPolicy,
                     onTap: () => _navigateToLegal(
-                      'プライバシーポリシー',
+                      context.l10n.legalIndex_privacyPolicy,
                       LegalPage.privacyPolicyHtml,
                     ),
                   ),
                   ProfileMenuTile(
                     icon: Icons.description_outlined,
-                    iconColor: AppColors.ruri,
-                    title: '利用規約',
+                    iconColor: context.appColors.primary,
+                    title: context.l10n.legalIndex_termsOfService,
                     isLast: true,
                     onTap: () => _navigateToLegal(
-                      '利用規約',
+                      context.l10n.legalIndex_termsOfService,
                       LegalPage.termsHtml,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              const ProfileSectionHeader(title: '法令遵守'),
+              ProfileSectionHeader(title: context.l10n.legalIndex_compliance),
               ProfileMenuGroup(
                 children: [
                   ProfileMenuTile(
                     icon: Icons.health_and_safety_outlined,
-                    iconColor: AppColors.warning,
-                    title: '労災保険について',
+                    iconColor: context.appColors.warning,
+                    title: context.l10n.legalIndex_laborInsurance,
                     onTap: () => _navigateToLegal(
-                      '労災保険について',
+                      context.l10n.legalIndex_laborInsurance,
                       LegalPage.laborInsuranceHtml,
                     ),
                   ),
                   ProfileMenuTile(
                     icon: Icons.business_outlined,
-                    iconColor: AppColors.info,
-                    title: '労働者派遣法について',
+                    iconColor: context.appColors.info,
+                    title: context.l10n.legalIndex_dispatchLaw,
                     onTap: () => _navigateToLegal(
-                      '労働者派遣法について',
+                      context.l10n.legalIndex_dispatchLaw,
                       LegalPage.dispatchLawHtml,
                     ),
                   ),
                   ProfileMenuTile(
                     icon: Icons.work_outline,
-                    iconColor: AppColors.success,
-                    title: '職業安定法について',
+                    iconColor: context.appColors.success,
+                    title: context.l10n.legalIndex_employmentSecurityLaw,
                     isLast: true,
                     onTap: () => _navigateToLegal(
-                      '職業安定法について',
+                      context.l10n.legalIndex_employmentSecurityLaw,
                       LegalPage.employmentSecurityLawHtml,
                     ),
                   ),

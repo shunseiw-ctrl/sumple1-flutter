@@ -34,6 +34,7 @@ void main() {
           ),
         ),
       ));
+      await tester.pumpAndSettle();
 
       expect(find.text('すべて'), findsOneWidget);
       expect(find.text('応募中'), findsOneWidget);
@@ -45,7 +46,8 @@ void main() {
 
     testWidgets('応募者カードにステータスバッジとアクションボタンが表示される', (tester) async {
       await tester.pumpWidget(buildTestApp(
-        ListView(
+        Builder(
+          builder: (context) => ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Material(
@@ -75,11 +77,11 @@ void main() {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: StatusBadge.colorFor('applied').withValues(alpha: 0.1),
+                            color: StatusBadge.colorFor(context, 'applied').withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text(StatusBadge.labelFor('applied'),
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: StatusBadge.colorFor('applied'))),
+                          child: Text(StatusBadge.labelFor('applied', context),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: StatusBadge.colorFor(context, 'applied'))),
                         ),
                       ],
                     ),
@@ -116,8 +118,9 @@ void main() {
               ),
             ),
           ],
-        ),
+        )),
       ));
+      await tester.pumpAndSettle();
 
       expect(find.text('内装工事案件'), findsOneWidget);
       expect(find.text('応募中'), findsOneWidget);
@@ -140,6 +143,7 @@ void main() {
           ),
         ),
       ));
+      await tester.pumpAndSettle();
 
       expect(find.text('応募者はまだいません'), findsOneWidget);
       expect(find.byIcon(Icons.people_outline), findsOneWidget);

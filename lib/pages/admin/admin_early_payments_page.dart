@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/services/payment_cycle_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
@@ -72,8 +72,8 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
       }
     } catch (_) {}
 
-    _workerNameCache[uid] = '名前未設定';
-    return '名前未設定';
+    _workerNameCache[uid] = context.l10n.adminEarlyPayments_nameNotSet;
+    return context.l10n.adminEarlyPayments_nameNotSet;
   }
 
   /// 金額フォーマット（カンマ区切り + 円）
@@ -86,7 +86,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
       }
       buffer.write(str[i]);
     }
-    return '${buffer.toString()}円';
+    return context.l10n.adminEarlyPayments_yenFormat(buffer.toString());
   }
 
   Future<void> _approveRequest(String requestId, String workerUid) async {
@@ -94,16 +94,16 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
       await _paymentService.approveEarlyPayment(requestId);
       await _notificationService.createNotification(
         targetUid: workerUid,
-        title: '即金申請が承認されました',
-        body: '即金申請が承認されました。まもなく振り込まれます。',
+        title: context.l10n.adminEarlyPayments_notifyApprovedTitle,
+        body: context.l10n.adminEarlyPayments_notifyApprovedBody,
         type: 'early_payment',
       );
       if (mounted) {
-        ErrorHandler.showSuccess(context, '即金申請を承認しました');
+        ErrorHandler.showSuccess(context, context.l10n.adminEarlyPayments_snackApproved);
       }
     } catch (e) {
       if (mounted) {
-        ErrorHandler.showError(context, e, customMessage: '承認に失敗しました');
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminEarlyPayments_snackApproveFailed);
       }
     }
   }
@@ -113,27 +113,27 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('却下理由'),
+        title: Text(context.l10n.adminEarlyPayments_rejectReasonTitle),
         content: TextField(
           controller: reasonCtrl,
-          decoration: const InputDecoration(
-            hintText: '却下の理由を入力してください',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: context.l10n.adminEarlyPayments_rejectReasonHint,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('キャンセル'),
+            child: Text(context.l10n.adminEarlyPayments_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: context.appColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('却下する'),
+            child: Text(context.l10n.adminEarlyPayments_rejectButton),
           ),
         ],
       ),
@@ -149,7 +149,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
 
     if (reason.isEmpty) {
       if (mounted) {
-        ErrorHandler.showError(context, null, customMessage: '却下理由を入力してください');
+        ErrorHandler.showError(context, null, customMessage: context.l10n.adminEarlyPayments_rejectReasonRequired);
       }
       return;
     }
@@ -161,16 +161,16 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
       );
       await _notificationService.createNotification(
         targetUid: workerUid,
-        title: '即金申請が却下されました',
-        body: '即金申請が却下されました。理由: $reason',
+        title: context.l10n.adminEarlyPayments_notifyRejectedTitle,
+        body: context.l10n.adminEarlyPayments_notifyRejectedBody(reason),
         type: 'early_payment',
       );
       if (mounted) {
-        ErrorHandler.showSuccess(context, '即金申請を却下しました');
+        ErrorHandler.showSuccess(context, context.l10n.adminEarlyPayments_snackRejected);
       }
     } catch (e) {
       if (mounted) {
-        ErrorHandler.showError(context, e, customMessage: '却下に失敗しました');
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminEarlyPayments_snackRejectFailed);
       }
     }
   }
@@ -179,7 +179,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('即金申請一覧'),
+        title: Text(context.l10n.adminEarlyPayments_title),
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _db
@@ -192,17 +192,17 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snap.hasError) {
-            return Center(child: Text('読み込みエラー: ${snap.error}'));
+            return Center(child: Text(context.l10n.adminEarlyPayments_loadError(snap.error.toString())));
           }
 
           final docs = snap.data?.docs ?? [];
 
           if (docs.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.flash_on,
-              title: '承認待ちの即金申請はありません',
-              description: 'ワーカーが即金申請を行うと、ここに表示されます。',
-              iconColor: AppColors.warning,
+              title: context.l10n.adminEarlyPayments_emptyTitle,
+              description: context.l10n.adminEarlyPayments_emptyDescription,
+              iconColor: context.appColors.warning,
             );
           }
 
@@ -231,7 +231,7 @@ class _AdminEarlyPaymentsPageState extends State<AdminEarlyPaymentsPage> {
               return FutureBuilder<String>(
                 future: _getWorkerName(workerUid),
                 builder: (context, nameSnap) {
-                  final workerName = nameSnap.data ?? '読み込み中...';
+                  final workerName = nameSnap.data ?? context.l10n.adminEarlyPayments_loading;
                   return _EarlyPaymentCard(
                     workerName: workerName,
                     workerUid: workerUid,
@@ -286,14 +286,14 @@ class _EarlyPaymentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        border: Border.all(color: AppColors.divider),
-        boxShadow: const [
+        border: Border.all(color: context.appColors.divider),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
+            color: context.appColors.cardShadow,
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -302,11 +302,11 @@ class _EarlyPaymentCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.ruriPale,
+                backgroundColor: context.appColors.primaryPale,
                 child:
-                    Icon(Icons.person, color: AppColors.ruri, size: 20),
+                    Icon(Icons.person, color: context.appColors.primary, size: 20),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -315,10 +315,10 @@ class _EarlyPaymentCard extends StatelessWidget {
                   children: [
                     Text(
                       workerName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -326,9 +326,9 @@ class _EarlyPaymentCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'UID: ${workerUid.length > 8 ? '${workerUid.substring(0, 8)}...' : workerUid}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textHint,
+                        color: context.appColors.textHint,
                       ),
                     ),
                   ],
@@ -341,9 +341,9 @@ class _EarlyPaymentCard extends StatelessWidget {
                   color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                 ),
-                child: const Text(
-                  '申請中',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.adminEarlyPayments_statusRequested,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: Colors.orange,
@@ -357,7 +357,7 @@ class _EarlyPaymentCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.chipUnselected,
+              color: context.appColors.chipUnselected,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -367,15 +367,15 @@ class _EarlyPaymentCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '対象月',
+                      context.l10n.adminEarlyPayments_targetMonth,
                       style: AppTextStyles.labelMedium,
                     ),
                     Text(
                       month,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                   ],
@@ -385,15 +385,15 @@ class _EarlyPaymentCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '申請額',
+                      context.l10n.adminEarlyPayments_requestedAmount,
                       style: AppTextStyles.labelMedium,
                     ),
                     Text(
                       formatYen(requestedAmount),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                   ],
@@ -403,15 +403,15 @@ class _EarlyPaymentCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '手数料 (10%)',
+                      context.l10n.adminEarlyPayments_fee,
                       style: AppTextStyles.labelMedium,
                     ),
                     Text(
                       '-${formatYen(fee)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.error,
+                        color: context.appColors.error,
                       ),
                     ),
                   ],
@@ -421,17 +421,17 @@ class _EarlyPaymentCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '支払額',
+                      context.l10n.adminEarlyPayments_payoutAmount,
                       style: AppTextStyles.labelMedium.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
                       formatYen(payout),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.ruri,
+                        color: context.appColors.primary,
                       ),
                     ),
                   ],
@@ -442,10 +442,10 @@ class _EarlyPaymentCard extends StatelessWidget {
           if (dateStr.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '申請日時: $dateStr',
-              style: const TextStyle(
+              context.l10n.adminEarlyPayments_requestDate(dateStr),
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textHint,
+                color: context.appColors.textHint,
               ),
             ),
           ],
@@ -456,10 +456,10 @@ class _EarlyPaymentCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onReject,
                   icon: const Icon(Icons.close, size: 18),
-                  label: const Text('却下'),
+                  label: Text(context.l10n.adminEarlyPayments_rejectLabel),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: context.appColors.error,
+                    side: BorderSide(color: context.appColors.error),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -471,9 +471,9 @@ class _EarlyPaymentCard extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onApprove,
                   icon: const Icon(Icons.check, size: 18),
-                  label: const Text('承認'),
+                  label: Text(context.l10n.adminEarlyPayments_approveLabel),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.success,
+                    backgroundColor: context.appColors.success,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),

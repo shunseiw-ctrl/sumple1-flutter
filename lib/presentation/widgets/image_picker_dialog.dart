@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/services/image_upload_service.dart';
 import '../../core/utils/error_handler.dart';
 import '../../core/utils/logger.dart';
@@ -27,10 +28,10 @@ class ImagePickerDialog {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // タイトル
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Text(
-                    '画像を選択',
+                    context.l10n.imagePicker_selectImage,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -49,7 +50,7 @@ class ImagePickerDialog {
                     ),
                     child: const Icon(Icons.camera_alt, color: Colors.blue),
                   ),
-                  title: const Text('カメラで撮影'),
+                  title: Text(context.l10n.imagePicker_camera),
                   onTap: () async {
                     Navigator.pop(context);
                     await _captureImage(
@@ -71,7 +72,7 @@ class ImagePickerDialog {
                     ),
                     child: const Icon(Icons.photo_library, color: Colors.green),
                   ),
-                  title: Text(allowMultiple ? 'ギャラリーから選択（複数可）' : 'ギャラリーから選択'),
+                  title: Text(allowMultiple ? context.l10n.imagePicker_galleryMultiple : context.l10n.imagePicker_gallery),
                   onTap: () async {
                     Navigator.pop(context);
                     if (allowMultiple) {
@@ -100,7 +101,7 @@ class ImagePickerDialog {
                     width: double.infinity,
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('キャンセル'),
+                      child: Text(context.l10n.imagePicker_cancel),
                     ),
                   ),
                 ),
@@ -209,7 +210,7 @@ class ImagePickerDialog {
     Navigator.pop(context);
 
     if (results.isEmpty) {
-      ErrorHandler.showInfo(context, '画像が選択されませんでした');
+      ErrorHandler.showInfo(context, context.l10n.imagePicker_noImageSelected);
       return;
     }
 
@@ -217,11 +218,11 @@ class ImagePickerDialog {
     final failedCount = results.length - successCount;
 
     if (failedCount == 0) {
-      ErrorHandler.showSuccess(context, '$successCount枚の画像をアップロードしました');
+      ErrorHandler.showSuccess(context, context.l10n.imagePicker_uploadSuccess(successCount.toString()));
     } else {
       ErrorHandler.showError(
         context,
-        '$successCount枚成功、$failedCount枚失敗しました',
+        context.l10n.imagePicker_uploadPartial(successCount.toString(), failedCount.toString()),
       );
     }
 
@@ -235,7 +236,7 @@ class ImagePickerDialog {
   /// 結果を処理
   static void _handleResult(BuildContext context, ImageUploadResult result) {
     if (result.success) {
-      ErrorHandler.showSuccess(context, '画像をアップロードしました');
+      ErrorHandler.showSuccess(context, context.l10n.imagePicker_uploaded);
       Logger.info(
         'Image uploaded',
         tag: 'ImagePickerDialog',
@@ -245,7 +246,7 @@ class ImagePickerDialog {
       // キャンセル時は何も表示しない
       Logger.info('Image selection cancelled', tag: 'ImagePickerDialog');
     } else {
-      ErrorHandler.showError(context, result.errorMessage ?? 'エラーが発生しました');
+      ErrorHandler.showError(context, result.errorMessage ?? context.l10n.imagePicker_error);
     }
   }
 }

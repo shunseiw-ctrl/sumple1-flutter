@@ -1,10 +1,10 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -33,20 +33,30 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystorePath = System.getenv("KEYSTORE_PATH")
-            if (keystorePath != null) {
-                storeFile = file(keystorePath)
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEY_ALIAS")
-                keyPassword = System.getenv("KEY_PASSWORD")
+            val keystorePropertiesFile = rootProject.file("key.properties")
+            if (keystorePropertiesFile.exists()) {
+                val keystoreProperties = Properties()
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+                keyAlias = keystoreProperties["keyAlias"] as? String
+                keyPassword = keystoreProperties["keyPassword"] as? String
+                storeFile = file(keystoreProperties["storeFile"] as? String ?: "upload-keystore.jks")
+                storePassword = keystoreProperties["storePassword"] as? String
+            } else {
+                val envKeystorePath = System.getenv("KEYSTORE_PATH")
+                if (envKeystorePath != null) {
+                    storeFile = file(envKeystorePath)
+                    storePassword = System.getenv("KEYSTORE_PASSWORD")
+                    keyAlias = System.getenv("KEY_ALIAS")
+                    keyPassword = System.getenv("KEY_PASSWORD")
+                }
             }
         }
     }
 
     buildTypes {
         release {
-            val keystorePath = System.getenv("KEYSTORE_PATH")
-            signingConfig = if (keystorePath != null) {
+            val hasReleaseConfig = rootProject.file("key.properties").exists() || System.getenv("KEYSTORE_PATH") != null
+            signingConfig = if (hasReleaseConfig) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")

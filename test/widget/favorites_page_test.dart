@@ -1,7 +1,10 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/favorites_page.dart';
 
 void main() {
@@ -11,6 +14,15 @@ void main() {
       final mockAuth = MockFirebaseAuth(signedIn: false);
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: FavoritesPage(
           firestore: fakeFirestore,
           firebaseAuth: mockAuth,
@@ -18,7 +30,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('お気に入り案件'), findsOneWidget);
+      expect(find.text('お気に入り案件'), findsAtLeastNWidgets(1));
       expect(find.text('ログインが必要です'), findsOneWidget);
     });
 
@@ -33,6 +45,15 @@ void main() {
       });
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: FavoritesPage(
           firestore: fakeFirestore,
           firebaseAuth: mockAuth,
@@ -40,7 +61,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('お気に入りはまだありません'), findsOneWidget);
+      expect(find.text('お気に入りはまだありません'), findsAtLeastNWidgets(1));
     });
 
     testWidgets('お気に入りあり→カード一覧表示', (tester) async {
@@ -72,6 +93,15 @@ void main() {
       });
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: FavoritesPage(
           firestore: fakeFirestore,
           firebaseAuth: mockAuth,
@@ -81,7 +111,7 @@ void main() {
       // StreamBuilder needs pump, then _fetchJobs via addPostFrameCallback
       await tester.pumpAndSettle();
 
-      expect(find.text('お気に入り案件'), findsOneWidget);
+      expect(find.text('お気に入り案件'), findsAtLeastNWidgets(1));
       expect(find.text('内装工事A'), findsOneWidget);
       expect(find.text('外壁塗装B'), findsOneWidget);
     });

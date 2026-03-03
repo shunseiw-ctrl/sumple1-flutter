@@ -11,8 +11,8 @@ import 'sales_page.dart';
 import 'profile_page.dart';
 import '../services/push_token_service.dart';
 import '../core/enums/user_role.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/analytics_service.dart';
 import '../core/providers/connectivity_provider.dart';
@@ -46,11 +46,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  String get _greeting {
+  String _greeting(BuildContext context) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'おはようございます';
-    if (hour < 18) return 'こんにちは';
-    return 'こんばんは';
+    if (hour < 12) return context.l10n.home_greetingMorning;
+    if (hour < 18) return context.l10n.home_greetingAfternoon;
+    return context.l10n.home_greetingEvening;
   }
 
   late final List<Widget> _pages = const [
@@ -113,25 +113,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.5,
-                            color: AppColors.textPrimary,
+                            color: context.appColors.textPrimary,
                           ),
                         ),
                       ),
                       if (_isAdmin)
                         Semantics(
-                          label: 'ステータス: 管理者',
+                          label: context.l10n.home_statusAdmin,
                           child: Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.ruriPale,
+                                color: context.appColors.primaryPale,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                '管理者',
+                                context.l10n.home_admin,
                                 style: AppTextStyles.badgeText.copyWith(
-                                  color: AppColors.ruri,
+                                  color: context.appColors.primary,
                                 ),
                               ),
                             ),
@@ -140,7 +140,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ],
                   ),
                   Text(
-                    _greeting,
+                    _greeting(context),
                     style: AppTextStyles.bodySmall.copyWith(fontSize: 12),
                   ),
                 ],
@@ -159,7 +159,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               );
               return Semantics(
                 button: true,
-                label: count > 0 ? 'お知らせ、未読$count件' : 'お知らせ',
+                label: count > 0 ? context.l10n.home_notificationsUnread(count.toString()) : context.l10n.home_notifications(count.toString()),
                 child: IconButton(
                   icon: Stack(
                     clipBehavior: Clip.none,
@@ -172,15 +172,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                           child: Container(
                             width: 10,
                             height: 10,
-                            decoration: const BoxDecoration(
-                              color: AppColors.error,
+                            decoration: BoxDecoration(
+                              color: context.appColors.error,
                               shape: BoxShape.circle,
                             ),
                           ),
                         ),
                     ],
                   ),
-                  tooltip: 'お知らせ',
+                  tooltip: context.l10n.home_notifications(count.toString()),
                   onPressed: () {
                     context.push(RoutePaths.notifications);
                   },
@@ -191,10 +191,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (_index == 0 && _isAdmin)
             Semantics(
               button: true,
-              label: '案件を投稿',
+              label: context.l10n.home_postJob,
               child: IconButton(
                 icon: const Icon(Icons.add),
-                tooltip: '案件を投稿',
+                tooltip: context.l10n.home_postJob,
                 onPressed: _goToPost,
               ),
             ),
@@ -245,22 +245,22 @@ class _ModernBottomNav extends StatelessWidget {
     required this.onTap,
   });
 
-  static const List<_NavItem> _items = [
-    _NavItem(selectedIcon: Icons.search, unselectedIcon: Icons.search_outlined, label: '検索'),
-    _NavItem(selectedIcon: Icons.work, unselectedIcon: Icons.work_outline, label: 'はたらく'),
-    _NavItem(selectedIcon: Icons.chat_bubble, unselectedIcon: Icons.chat_bubble_outline, label: 'メッセージ'),
-    _NavItem(selectedIcon: Icons.payments, unselectedIcon: Icons.payments_outlined, label: '売上'),
-    _NavItem(selectedIcon: Icons.person, unselectedIcon: Icons.person_outline, label: 'マイページ'),
+  static List<_NavItem> _items(BuildContext context) => [
+    _NavItem(selectedIcon: Icons.search, unselectedIcon: Icons.search_outlined, label: context.l10n.home_navSearch),
+    _NavItem(selectedIcon: Icons.work, unselectedIcon: Icons.work_outline, label: context.l10n.home_navWork),
+    _NavItem(selectedIcon: Icons.chat_bubble, unselectedIcon: Icons.chat_bubble_outline, label: context.l10n.home_navMessages),
+    _NavItem(selectedIcon: Icons.payments, unselectedIcon: Icons.payments_outlined, label: context.l10n.home_navSales),
+    _NavItem(selectedIcon: Icons.person, unselectedIcon: Icons.person_outline, label: context.l10n.home_navProfile),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: context.appColors.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -271,13 +271,13 @@ class _ModernBottomNav extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(top: 6, bottom: 4),
           child: Row(
-            children: List.generate(_items.length, (index) {
-              final item = _items[index];
+            children: List.generate(_items(context).length, (index) {
+              final item = _items(context)[index];
               final isSelected = index == currentIndex;
               return Expanded(
                 child: Semantics(
                   button: true,
-                  label: '${item.label}タブ${isSelected ? "、選択中" : ""}',
+                  label: context.l10n.home_navTabLabel(item.label, isSelected ? context.l10n.home_navSelected : ''),
                   selected: isSelected,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -291,7 +291,7 @@ class _ModernBottomNav extends StatelessWidget {
                           width: isSelected ? 20 : 0,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.ruri : Colors.transparent,
+                            color: isSelected ? context.appColors.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -299,7 +299,7 @@ class _ModernBottomNav extends StatelessWidget {
                         Icon(
                           isSelected ? item.selectedIcon : item.unselectedIcon,
                           size: 26,
-                          color: isSelected ? AppColors.ruri : AppColors.textHint,
+                          color: isSelected ? context.appColors.primary : context.appColors.textHint,
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -307,7 +307,7 @@ class _ModernBottomNav extends StatelessWidget {
                           style: GoogleFonts.notoSansJp(
                             fontSize: 11,
                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                            color: isSelected ? AppColors.ruri : AppColors.textHint,
+                            color: isSelected ? context.appColors.primary : context.appColors.textHint,
                           ),
                         ),
                       ],

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/qualification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
@@ -81,7 +81,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ErrorHandler.showError(context, e, customMessage: '読み込みに失敗しました');
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminQualifications_loadError);
       }
     }
   }
@@ -95,7 +95,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
     if (familyName.isNotEmpty || givenName.isNotEmpty) {
       return '$familyName $givenName'.trim();
     }
-    return '名前未設定';
+    return '';
   }
 
   Future<void> _approve(_PendingQualificationItem item) async {
@@ -105,12 +105,12 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
         qualificationId: item.qualificationId,
       );
       if (mounted) {
-        ErrorHandler.showSuccess(context, '${item.qualificationName} を承認しました');
+        ErrorHandler.showSuccess(context, context.l10n.adminQualifications_approveSuccess(item.qualificationName));
       }
       await _loadPendingQualifications();
     } catch (e) {
       if (mounted) {
-        ErrorHandler.showError(context, e, customMessage: '承認に失敗しました');
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminQualifications_approveError);
       }
     }
   }
@@ -120,27 +120,27 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('却下理由'),
+        title: Text(context.l10n.adminQualifications_rejectReasonTitle),
         content: TextField(
           controller: reasonCtrl,
-          decoration: const InputDecoration(
-            hintText: '却下の理由を入力してください',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: context.l10n.adminQualifications_rejectReasonHint,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('キャンセル'),
+            child: Text(context.l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: context.appColors.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('却下する'),
+            child: Text(context.l10n.adminQualifications_rejectButton),
           ),
         ],
       ),
@@ -156,7 +156,7 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
 
     if (reason.isEmpty) {
       if (mounted) {
-        ErrorHandler.showError(context, null, customMessage: '却下理由を入力してください');
+        ErrorHandler.showError(context, null, customMessage: context.l10n.adminQualifications_rejectReasonRequired);
       }
       return;
     }
@@ -168,12 +168,12 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
         reason: reason,
       );
       if (mounted) {
-        ErrorHandler.showSuccess(context, '${item.qualificationName} を却下しました');
+        ErrorHandler.showSuccess(context, context.l10n.adminQualifications_rejectSuccess(item.qualificationName));
       }
       await _loadPendingQualifications();
     } catch (e) {
       if (mounted) {
-        ErrorHandler.showError(context, e, customMessage: '却下に失敗しました');
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminQualifications_rejectError);
       }
     }
   }
@@ -182,15 +182,15 @@ class _AdminQualificationsPageState extends State<AdminQualificationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('資格承認'),
+        title: Text(context.l10n.adminQualifications_title),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _pendingItems.isEmpty
-              ? const EmptyState(
+              ? EmptyState(
                   icon: Icons.workspace_premium,
-                  title: '承認待ちの資格はありません',
-                  description: 'ワーカーが資格を申請すると、ここに表示されます。',
+                  title: context.l10n.adminQualifications_emptyTitle,
+                  description: context.l10n.adminQualifications_emptyDescription,
                 )
               : RefreshIndicator(
                   onRefresh: _loadPendingQualifications,
@@ -247,14 +247,14 @@ class _QualificationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-        border: Border.all(color: AppColors.divider),
-        boxShadow: const [
+        border: Border.all(color: context.appColors.divider),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
+            color: context.appColors.cardShadow,
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -263,11 +263,11 @@ class _QualificationCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.ruriPale,
+                backgroundColor: context.appColors.primaryPale,
                 child:
-                    Icon(Icons.person, color: AppColors.ruri, size: 20),
+                    Icon(Icons.person, color: context.appColors.primary, size: 20),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -275,11 +275,11 @@ class _QualificationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.workerName,
-                      style: const TextStyle(
+                      item.workerName.isNotEmpty ? item.workerName : context.l10n.adminQualifications_noName,
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -287,9 +287,9 @@ class _QualificationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'UID: ${item.workerUid.length > 8 ? '${item.workerUid.substring(0, 8)}...' : item.workerUid}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textHint,
+                        color: context.appColors.textHint,
                       ),
                     ),
                   ],
@@ -299,15 +299,15 @@ class _QualificationCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
+                  color: context.appColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                 ),
-                child: const Text(
-                  '承認待ち',
+                child: Text(
+                  context.l10n.adminQualifications_pendingApproval,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.warning,
+                    color: context.appColors.warning,
                   ),
                 ),
               ),
@@ -318,7 +318,7 @@ class _QualificationCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.ruriPale.withValues(alpha: 0.5),
+              color: context.appColors.primaryPale.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -326,16 +326,16 @@ class _QualificationCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.workspace_premium,
-                        size: 18, color: AppColors.ruri),
+                    Icon(Icons.workspace_premium,
+                        size: 18, color: context.appColors.primary),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         item.qualificationName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.appColors.textPrimary,
                         ),
                       ),
                     ),
@@ -344,10 +344,10 @@ class _QualificationCard extends StatelessWidget {
                 if (item.category.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
-                    'カテゴリ: ${item.category}',
-                    style: const TextStyle(
+                    context.l10n.adminQualifications_category(item.category),
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.appColors.textSecondary,
                     ),
                   ),
                 ],
@@ -365,12 +365,12 @@ class _QualificationCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 80,
-                  color: AppColors.chipUnselected,
-                  child: const Center(
+                  color: context.appColors.chipUnselected,
+                  child: Center(
                     child: Text(
-                      '画像を読み込めませんでした',
+                      context.l10n.adminQualifications_imageLoadError,
                       style: TextStyle(
-                          fontSize: 12, color: AppColors.textHint),
+                          fontSize: 12, color: context.appColors.textHint),
                     ),
                   ),
                 ),
@@ -384,10 +384,10 @@ class _QualificationCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onReject,
                   icon: const Icon(Icons.close, size: 18),
-                  label: const Text('却下'),
+                  label: Text(context.l10n.adminQualifications_reject),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: context.appColors.error,
+                    side: BorderSide(color: context.appColors.error),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -399,9 +399,9 @@ class _QualificationCard extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onApprove,
                   icon: const Icon(Icons.check, size: 18),
-                  label: const Text('承認'),
+                  label: Text(context.l10n.adminQualifications_approve),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.success,
+                    backgroundColor: context.appColors.success,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),

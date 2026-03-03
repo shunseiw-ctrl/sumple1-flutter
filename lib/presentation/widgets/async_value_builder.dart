@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 
 class AsyncValueBuilder<T> extends StatelessWidget {
@@ -27,7 +28,7 @@ class AsyncValueBuilder<T> extends StatelessWidget {
           }
           return ErrorRetryWidget.general(
             onRetry: () {},
-            message: _errorMessage(snapshot.error),
+            message: _errorMessage(context, snapshot.error),
           );
         }
 
@@ -50,14 +51,14 @@ class AsyncValueBuilder<T> extends StatelessWidget {
     );
   }
 
-  String _errorMessage(Object? error) {
-    if (error == null) return 'エラーが発生しました';
+  String _errorMessage(BuildContext context, Object? error) {
+    if (error == null) return context.l10n.asyncValue_errorOccurred;
     final msg = error.toString();
-    if (msg.contains('permission-denied')) return '権限がありません';
+    if (msg.contains('permission-denied')) return context.l10n.asyncValue_permissionDenied;
     if (msg.contains('unavailable') || msg.contains('network')) {
-      return 'ネットワークエラーが発生しました';
+      return context.l10n.asyncValue_networkError;
     }
-    return 'データの読み込みに失敗しました';
+    return context.l10n.asyncValue_loadFailed;
   }
 }
 

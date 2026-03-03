@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/presentation/widgets/rating_dialog.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/config/feature_flags.dart';
 import 'package:sumple1/core/providers/connectivity_provider.dart';
 import 'package:sumple1/presentation/widgets/offline_banner.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
@@ -100,10 +101,10 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
     final user = FirebaseAuth.instance.currentUser;
 
     if (!_notAnonymous(user)) {
-      return const Scaffold(
+      return Scaffold(
         body: SafeArea(
           child: Center(
-            child: Text('「はたらく」を使うにはログインが必要です'),
+            child: Text(context.l10n.workDetail_loginRequired),
           ),
         ),
       );
@@ -118,24 +119,24 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
           .snapshots(),
       builder: (context, snap) {
         if (snap.hasError) {
-          return Scaffold(body: Center(child: Text('読み込みエラー: ${snap.error}')));
+          return Scaffold(body: Center(child: Text('${context.l10n.common_loadError}: ${snap.error}')));
         }
         if (!snap.hasData) {
           return Scaffold(body: SkeletonList(itemBuilder: (_) => const SkeletonWorkCard()));
         }
         final doc = snap.data!;
         if (!doc.exists) {
-          return const Scaffold(body: Center(child: Text('この案件は存在しません')));
+          return Scaffold(body: Center(child: Text(context.l10n.workDetail_jobNotFound)));
         }
 
         final app = doc.data() ?? <String, dynamic>{};
 
         final applicantUid = (app['applicantUid'] ?? '').toString();
         if (applicantUid.isNotEmpty && applicantUid != uid && !_isAdminUser) {
-          return const Scaffold(body: Center(child: Text('権限がありません')));
+          return Scaffold(body: Center(child: Text(context.l10n.workDetail_noPermission)));
         }
 
-        final title = (app['jobTitleSnapshot'] ?? '案件').toString();
+        final title = (app['jobTitleSnapshot'] ?? context.l10n.common_job).toString();
         final status = (app['status'] ?? 'applied').toString();
 
         final canStart = status == 'assigned' || status == 'applied';
@@ -144,15 +145,15 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
         final jobId = (app['jobId'] ?? '').toString();
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: context.appColors.background,
           appBar: AppBar(
             title: Text(
               title,
-              style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+              style: TextStyle(color: context.appColors.textPrimary, fontWeight: FontWeight.w800),
             ),
             actions: [
               IconButton(
-                tooltip: 'タイムライン',
+                tooltip: context.l10n.workDetail_timeline,
                 icon: const Icon(Icons.timeline),
                 onPressed: () {
                   context.push(RoutePaths.workTimelinePath(widget.applicationId));
@@ -160,7 +161,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
               ),
               if (_isAdminUser && jobId.isNotEmpty)
                 IconButton(
-                  tooltip: 'QR出退勤管理',
+                  tooltip: context.l10n.workDetail_qrAttendance,
                   icon: const Icon(Icons.qr_code),
                   onPressed: () {
                     context.push(RoutePaths.shiftQrPath(jobId), extra: {
@@ -169,7 +170,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                   },
                 ),
               IconButton(
-                tooltip: 'チャット',
+                tooltip: context.l10n.workDetail_chat,
                 icon: const Icon(Icons.chat_bubble_outline),
                 onPressed: () {
                   context.push(RoutePaths.chatRoomPath(widget.applicationId));
@@ -178,14 +179,14 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
             ],
             bottom: TabBar(
               controller: _tabController,
-              labelColor: AppColors.ruri,
-              unselectedLabelColor: AppColors.textSecondary,
-              indicatorColor: AppColors.ruri,
-              tabs: const [
-                Tab(text: '概要'),
-                Tab(text: '日報'),
-                Tab(text: '写真'),
-                Tab(text: '資料'),
+              labelColor: context.appColors.primary,
+              unselectedLabelColor: context.appColors.textSecondary,
+              indicatorColor: context.appColors.primary,
+              tabs: [
+                Tab(text: context.l10n.workDetail_tabOverview),
+                Tab(text: context.l10n.workDetail_tabDailyReport),
+                Tab(text: context.l10n.workDetail_tabPhotos),
+                Tab(text: context.l10n.workDetail_tabDocuments),
               ],
             ),
           ),
@@ -193,7 +194,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
             children: [
               if (!ref.watch(isOnlineProvider)) const OfflineBanner(),
               Container(
-                color: Colors.white,
+                color: context.appColors.surface,
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 child: Row(
                   children: [
@@ -218,25 +219,25 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           if (applicantUid.isNotEmpty) {
                             NotificationService().createNotification(
                               targetUid: applicantUid,
-                              title: 'ステータス更新',
-                              body: '$titleが「着工中」になりました',
+                              title: context.l10n.workDetail_statusUpdate,
+                              body: context.l10n.workDetail_statusInProgress(title),
                               type: 'status_update',
                             );
                           }
                           if (!context.mounted) return;
                           AppHaptics.success();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('開始しました（着工中）')),
+                            SnackBar(content: Text(context.l10n.workDetail_snackStarted)),
                           );
                         } catch (e) {
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('開始に失敗: $e')),
+                            SnackBar(content: Text('${context.l10n.workDetail_snackStartError}: $e')),
                           );
                         }
                       }
                           : null,
-                      child: const Text('開始'),
+                      child: Text(context.l10n.workDetail_startButton),
                     ),
                     const SizedBox(width: 6),
                     ElevatedButton(
@@ -249,7 +250,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           if (reportCount == 0) {
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('日報を1件以上提出してください')),
+                              SnackBar(content: Text(context.l10n.workDetail_reportRequired)),
                             );
                             return;
                           }
@@ -258,24 +259,24 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                           if (applicantUid.isNotEmpty) {
                             NotificationService().createNotification(
                               targetUid: applicantUid,
-                              title: 'ステータス更新',
-                              body: '$titleが「施工完了」になりました',
+                              title: context.l10n.workDetail_statusUpdate,
+                              body: context.l10n.workDetail_statusCompleted(title),
                               type: 'status_update',
                             );
                           }
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('完了しました（施工完了）')),
+                            SnackBar(content: Text(context.l10n.workDetail_snackCompleted)),
                           );
                         } catch (e) {
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('完了に失敗: $e')),
+                            SnackBar(content: Text('${context.l10n.workDetail_snackCompleteError}: $e')),
                           );
                         }
                       }
                           : null,
-                      child: const Text('完了'),
+                      child: Text(context.l10n.workDetail_completeButton),
                     ),
                     // 管理者: 検収ボタン
                     if (_isAdminUser && (status == 'completed' || status == 'fixing'))
@@ -286,7 +287,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                             context.push(RoutePaths.workInspectionPath(widget.applicationId));
                           },
                           icon: const Icon(Icons.checklist, size: 18),
-                          label: Text(status == 'fixing' ? '再検収' : '検収開始'),
+                          label: Text(status == 'fixing' ? context.l10n.workDetail_reinspect : context.l10n.workDetail_startInspection),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             foregroundColor: Colors.white,
@@ -311,7 +312,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                                 children: [
                                   const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
                                   const SizedBox(width: 4),
-                                  Text('評価済み', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
+                                  Text(context.l10n.workDetail_rated, style: TextStyle(fontWeight: FontWeight.w700, color: Colors.amber.shade800)),
                                 ],
                               ),
                             );
@@ -327,7 +328,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                               );
                             },
                             icon: const Icon(Icons.star_rounded, size: 18),
-                            label: const Text('評価する'),
+                            label: Text(context.l10n.workDetail_rateButton),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber,
                               foregroundColor: Colors.white,
@@ -340,10 +341,10 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
               ),
 
               if (status == 'in_progress' || status == 'assigned')
-                const Divider(height: 1, color: AppColors.divider),
+                Divider(height: 1, color: context.appColors.divider),
               if (status == 'in_progress' || status == 'assigned')
                 Container(
-                  color: Colors.white,
+                  color: context.appColors.surface,
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
                   child: Builder(
                     builder: (context) {
@@ -355,19 +356,19 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                         children: [
                           Icon(
                             isCheckedIn ? Icons.location_on : Icons.location_off_outlined,
-                            color: isCheckedIn ? Colors.green : AppColors.textHint,
+                            color: isCheckedIn ? Colors.green : context.appColors.textHint,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             isCheckedOut
-                                ? '退勤済み'
+                                ? context.l10n.workDetail_checkedOut
                                 : isCheckedIn
-                                    ? '出勤中'
-                                    : '未出勤',
+                                    ? context.l10n.workDetail_checkedIn
+                                    : context.l10n.workDetail_notCheckedIn,
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
-                              color: isCheckedIn ? Colors.green : AppColors.textSecondary,
+                              color: isCheckedIn ? Colors.green : context.appColors.textSecondary,
                             ),
                           ),
                           const Spacer(),
@@ -379,7 +380,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                                 });
                               },
                               icon: const Icon(Icons.qr_code_scanner, size: 18),
-                              label: const Text('QR出勤'),
+                              label: Text(context.l10n.workDetail_qrClockIn),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                                 foregroundColor: Colors.white,
@@ -395,7 +396,7 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                                 });
                               },
                               icon: const Icon(Icons.qr_code_scanner, size: 18),
-                              label: const Text('QR退勤'),
+                              label: Text(context.l10n.workDetail_qrClockOut),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 foregroundColor: Colors.white,
@@ -407,15 +408,15 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: AppColors.chipUnselected,
+                                color: context.appColors.chipUnselected,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.check_circle, size: 16, color: Colors.green),
-                                  SizedBox(width: 4),
-                                  Text('完了', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                                  const Icon(Icons.check_circle, size: 16, color: Colors.green),
+                                  const SizedBox(width: 4),
+                                  Text(context.l10n.common_completed, style: TextStyle(fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
                                 ],
                               ),
                             ),
@@ -465,7 +466,7 @@ class _OverviewTab extends StatelessWidget {
       return ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          if (showPayment) ...[
+          if (showPayment && FeatureFlags.enableStripePayments) ...[
             _PaymentInfoCard(applicationId: applicationId),
             const SizedBox(height: 12),
           ],
@@ -473,16 +474,16 @@ class _OverviewTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('概要', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                Text(context.l10n.workDetail_tabOverview, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                 const SizedBox(height: 10),
-                Text('案件名: ${title.isNotEmpty ? title : "-"}'),
-                Text('場所: ${location.isNotEmpty ? location : "-"}'),
-                Text('報酬: ${price.isNotEmpty ? price : "-"}'),
-                Text('日程: ${date.isNotEmpty ? date : "未定"}'),
+                Text('${context.l10n.workDetail_jobName}: ${title.isNotEmpty ? title : "-"}'),
+                Text('${context.l10n.workDetail_location}: ${location.isNotEmpty ? location : "-"}'),
+                Text('${context.l10n.workDetail_payment}: ${price.isNotEmpty ? price : "-"}'),
+                Text('${context.l10n.workDetail_schedule}: ${date.isNotEmpty ? date : context.l10n.common_undecided}'),
                 const SizedBox(height: 12),
-                const Text(
-                  '※jobIdが無いデータのため、詳細本文を表示できません',
-                  style: TextStyle(color: AppColors.textSecondary),
+                Text(
+                  context.l10n.workDetail_noJobIdWarning,
+                  style: TextStyle(color: context.appColors.textSecondary),
                 ),
               ],
             ),
@@ -498,16 +499,16 @@ class _OverviewTab extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snap.hasError) {
-          return Center(child: Text('読み込みエラー: ${snap.error}'));
+          return Center(child: Text('${context.l10n.common_loadError}: ${snap.error}'));
         }
         final doc = snap.data;
         if (doc == null || !doc.exists) {
-          return const Center(child: Text('案件が見つかりません'));
+          return Center(child: Text(context.l10n.workDetail_jobNotFound));
         }
 
         final jobData = doc.data() ?? <String, dynamic>{};
 
-        if (showPayment) {
+        if (showPayment && FeatureFlags.enableStripePayments) {
           return ListView(
             children: [
               Padding(
@@ -574,9 +575,9 @@ class _PaymentInfoCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('報酬', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                    Text(context.l10n.workDetail_payment, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                     const SizedBox(height: 2),
-                    Text('未確定', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
+                    Text(context.l10n.workDetail_paymentUnconfirmed, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
                   ],
                 ),
               ),
@@ -589,9 +590,9 @@ class _PaymentInfoCard extends StatelessWidget {
           final paymentId = (data['paymentId'] ?? '').toString();
           final isSucceeded = paymentStatus == 'succeeded' || paymentStatus == 'paid';
 
-          final statusLabel = isSucceeded ? '振込済み' : '確定済み';
-          final statusColor = isSucceeded ? AppColors.success : AppColors.ruri;
-          final iconBgColor = isSucceeded ? AppColors.success.withValues(alpha: 0.15) : AppColors.ruri.withValues(alpha: 0.15);
+          final statusLabel = isSucceeded ? context.l10n.common_transferred : context.l10n.common_confirmed;
+          final statusColor = isSucceeded ? context.appColors.success : context.appColors.primary;
+          final iconBgColor = isSucceeded ? context.appColors.success.withValues(alpha: 0.15) : context.appColors.primary.withValues(alpha: 0.15);
 
           if (paymentId.isNotEmpty) {
             onTap = () {
@@ -634,7 +635,7 @@ class _PaymentInfoCard extends StatelessWidget {
         }
 
         return Material(
-          color: Colors.white,
+          color: context.appColors.surface,
           borderRadius: BorderRadius.circular(14),
           child: InkWell(
             onTap: onTap,
@@ -661,13 +662,13 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE6E8EB)),
+          border: Border.all(color: context.appColors.divider),
         ),
         child: child,
       ),

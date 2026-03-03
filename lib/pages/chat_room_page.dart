@@ -7,7 +7,7 @@ import '../core/services/chat_image_service.dart';
 import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
 import '../presentation/widgets/chat_image_bubble.dart';
 
@@ -83,7 +83,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     try {
       if (!_ready) {
         await _initializeChatRoom();
-        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
+        if (!_ready) throw Exception(_readyError ?? context.l10n.chatRoom_notReady);
       }
 
       final result = await _chatService.sendMessage(
@@ -95,7 +95,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       if (result.success) {
         _controller.clear();
       } else {
-        ErrorHandler.showError(context, result.errorMessage ?? 'メッセージの送信に失敗しました');
+        ErrorHandler.showError(context, result.errorMessage ?? context.l10n.chatRoom_sendFailed);
       }
     } catch (e, stackTrace) {
       Logger.error('Error sending message', tag: 'ChatRoomPage', error: e, stackTrace: stackTrace);
@@ -117,16 +117,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppColors.ruri),
-              title: const Text('カメラで撮影'),
+              leading: Icon(Icons.camera_alt, color: context.appColors.primary),
+              title: Text(context.l10n.chatRoom_takePhoto),
               onTap: () {
                 Navigator.pop(ctx);
                 _sendImage(useCamera: true);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppColors.ruri),
-              title: const Text('ギャラリーから選択'),
+              leading: Icon(Icons.photo_library, color: context.appColors.primary),
+              title: Text(context.l10n.chatRoom_pickFromGallery),
               onTap: () {
                 Navigator.pop(ctx);
                 _sendImage(useCamera: false);
@@ -145,12 +145,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     try {
       if (!_ready) {
         await _initializeChatRoom();
-        if (!_ready) throw Exception(_readyError ?? 'チャットの準備ができていません');
+        if (!_ready) throw Exception(_readyError ?? context.l10n.chatRoom_notReady);
       }
 
       final userId = _uid;
       if (userId.isEmpty) {
-        ErrorHandler.showError(context, 'ログインしてください');
+        ErrorHandler.showError(context, context.l10n.chatRoom_loginRequired);
         return;
       }
 
@@ -169,7 +169,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       if (uploadResult.cancelled) return;
 
       if (!uploadResult.isSuccess) {
-        ErrorHandler.showError(context, uploadResult.errorMessage ?? '画像のアップロードに失敗しました');
+        ErrorHandler.showError(context, uploadResult.errorMessage ?? context.l10n.chatRoom_uploadFailed);
         return;
       }
 
@@ -180,7 +180,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
       if (!mounted) return;
       if (!sendResult.success) {
-        ErrorHandler.showError(context, sendResult.errorMessage ?? '画像の送信に失敗しました');
+        ErrorHandler.showError(context, sendResult.errorMessage ?? context.l10n.chatRoom_imageSendFailed);
       }
     } catch (e, stackTrace) {
       Logger.error('Error sending image', tag: 'ChatRoomPage', error: e, stackTrace: stackTrace);
@@ -197,16 +197,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
   }
 
-  String _formatDate(Timestamp? ts) {
+  String _formatDate(BuildContext context, Timestamp? ts) {
     if (ts == null) return '';
     final d = ts.toDate();
     final now = DateTime.now();
     if (d.year == now.year && d.month == now.month && d.day == now.day) {
-      return '今日';
+      return context.l10n.chatRoom_today;
     }
     final yesterday = now.subtract(const Duration(days: 1));
     if (d.year == yesterday.year && d.month == yesterday.month && d.day == yesterday.day) {
-      return '昨日';
+      return context.l10n.chatRoom_yesterday;
     }
     return '${d.month}/${d.day}';
   }
@@ -228,18 +228,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF8CABD9),
       appBar: AppBar(
-        backgroundColor: AppColors.ruri,
+        backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         title: _ready
             ? StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: _chatRef.snapshots(),
                 builder: (context, snap) {
-                  final title = (snap.data?.data()?['titleSnapshot'] ?? 'チャット').toString();
+                  final title = (snap.data?.data()?['titleSnapshot'] ?? context.l10n.chatRoom_title).toString();
                   return Text(title, style: const TextStyle(fontWeight: FontWeight.w700));
                 },
               )
-            : const Text('チャット'),
+            : Text(context.l10n.chatRoom_title),
       ),
       body: !_ready
           ? Center(
@@ -249,11 +249,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (_readyError == null)
-                      const CircularProgressIndicator(color: AppColors.ruri)
+                      CircularProgressIndicator(color: context.appColors.primary)
                     else
                       Text(_readyError!, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
-                    OutlinedButton(onPressed: _initializeChatRoom, child: const Text('再試行')),
+                    OutlinedButton(onPressed: _initializeChatRoom, child: Text(context.l10n.chatRoom_retry)),
                   ],
                 ),
               ),
@@ -275,8 +275,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: _msgRef.orderBy('createdAt', descending: true).limit(100).snapshots(),
                     builder: (context, snap) {
-                      if (snap.hasError) return const Center(child: Text('読み込みエラー'));
-                      if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: AppColors.ruri));
+                      if (snap.hasError) return Center(child: Text(context.l10n.chatRoom_loadError));
+                      if (!snap.hasData) return Center(child: CircularProgressIndicator(color: context.appColors.primary));
 
                       final docs = snap.data!.docs;
                       if (docs.isEmpty) {
@@ -287,7 +287,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               color: Colors.black26,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text('メッセージを始めましょう', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            child: Text(context.l10n.chatRoom_startConversation, style: const TextStyle(color: Colors.white, fontSize: 13)),
                           ),
                         );
                       }
@@ -320,7 +320,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      _formatDate(createdAt),
+                                      _formatDate(context, createdAt),
                                       style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                                     ),
                                   ),
@@ -332,10 +332,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     if (!mine) ...[
-                                      const CircleAvatar(
+                                      CircleAvatar(
                                         radius: 16,
-                                        backgroundColor: AppColors.ruriPale,
-                                        child: Icon(Icons.person, size: 18, color: AppColors.ruri),
+                                        backgroundColor: context.appColors.primaryPale,
+                                        child: Icon(Icons.person, size: 18, color: context.appColors.primary),
                                       ),
                                       const SizedBox(width: 6),
                                     ],
@@ -349,9 +349,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             if (peerLastReadAt != null &&
                                                 createdAt != null &&
                                                 createdAt.compareTo(peerLastReadAt) <= 0)
-                                              const Text(
-                                                '既読',
-                                                style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
+                                              Text(
+                                                context.l10n.chatRoom_read,
+                                                style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
                                               ),
                                             Text(
                                               _formatTime(createdAt),
@@ -371,7 +371,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                               decoration: BoxDecoration(
-                                                color: mine ? const Color(0xFF7BC67E) : Colors.white,
+                                                color: mine ? const Color(0xFF7BC67E) : context.appColors.surface,
                                                 borderRadius: BorderRadius.only(
                                                   topLeft: const Radius.circular(18),
                                                   topRight: const Radius.circular(18),
@@ -390,7 +390,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 text,
                                                 style: TextStyle(
                                                   fontSize: 15,
-                                                  color: mine ? Colors.white : AppColors.textPrimary,
+                                                  color: mine ? Colors.white : context.appColors.textPrimary,
                                                   height: 1.4,
                                                 ),
                                               ),
@@ -417,7 +417,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   ),
                 ),
                 Container(
-                  color: Colors.white,
+                  color: context.appColors.surface,
                   child: SafeArea(
                     top: false,
                     child: Padding(
@@ -425,23 +425,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       child: Row(
                         children: [
                           _uploadingImage
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 40,
                                   height: 40,
                                   child: Padding(
-                                    padding: EdgeInsets.all(8),
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.ruri),
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: context.appColors.primary),
                                   ),
                                 )
                               : IconButton(
                                   onPressed: _showImageOptions,
-                                  icon: const Icon(Icons.add, color: AppColors.ruri),
-                                  tooltip: '画像を添付',
+                                  icon: Icon(Icons.add, color: context.appColors.primary),
+                                  tooltip: context.l10n.chatRoom_attachImage,
                                 ),
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: AppColors.chipUnselected,
+                                color: context.appColors.chipUnselected,
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               child: TextField(
@@ -452,9 +452,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 maxLength: AppConstants.maxMessageLength,
                                 textInputAction: TextInputAction.send,
                                 onSubmitted: (_) => _send(),
-                                decoration: const InputDecoration(
-                                  hintText: 'メッセージを入力',
-                                  hintStyle: TextStyle(color: AppColors.textHint, fontSize: 15),
+                                decoration: InputDecoration(
+                                  hintText: context.l10n.chatRoom_inputHint,
+                                  hintStyle: TextStyle(color: context.appColors.textHint, fontSize: 15),
                                   border: InputBorder.none,
                                   counterText: '',
                                   contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -464,7 +464,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           ),
                           const SizedBox(width: 6),
                           Material(
-                            color: _sending ? AppColors.textHint : AppColors.ruri,
+                            color: _sending ? context.appColors.textHint : context.appColors.primary,
                             shape: const CircleBorder(),
                             child: InkWell(
                               onTap: _sending ? null : _send,

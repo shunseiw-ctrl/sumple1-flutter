@@ -201,8 +201,8 @@ void main() {
         ),
       );
 
-      expect(l10n.itemCount(5), equals('5件'));
-      expect(l10n.unreadCount(3), equals('未読3件'));
+      expect(l10n.itemCount(5.toString()), equals('5件'));
+      expect(l10n.unreadCount(3.toString()), equals('未読3件'));
     });
   });
 }

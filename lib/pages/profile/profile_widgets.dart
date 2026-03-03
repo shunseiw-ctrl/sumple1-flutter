@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 
@@ -22,7 +22,7 @@ class ProfileHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
@@ -32,17 +32,17 @@ class ProfileHeaderCard extends StatelessWidget {
             excludeSemantics: true,
             child: Container(
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: AppColors.primaryGradient,
+                gradient: context.appColors.primaryGradient,
               ),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 32,
-                backgroundColor: Colors.white,
+                backgroundColor: context.appColors.surface,
                 child: CircleAvatar(
                   radius: 30,
-                  backgroundColor: AppColors.ruriPale,
-                  child: Icon(Icons.person, color: AppColors.ruri, size: 30),
+                  backgroundColor: context.appColors.primaryPale,
+                  child: Icon(Icons.person, color: context.appColors.primary, size: 30),
                 ),
               ),
             ),
@@ -65,11 +65,11 @@ class ProfileHeaderCard extends StatelessWidget {
             ),
           ),
           Semantics(
-            label: 'ステータス: ${isLoggedIn ? "ログイン済み" : "ゲスト"}',
+            label: '${context.l10n.profileWidgets_status}: ${isLoggedIn ? context.l10n.profileWidgets_loggedIn : context.l10n.profileWidgets_guest}',
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: isLoggedIn ? AppColors.successLight : Colors.grey.shade100,
+                color: isLoggedIn ? context.appColors.successLight : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
               ),
               child: Row(
@@ -80,11 +80,11 @@ class ProfileHeaderCard extends StatelessWidget {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: AppColors.success,
+                        color: context.appColors.success,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.success.withValues(alpha: 0.4),
+                            color: context.appColors.success.withValues(alpha: 0.4),
                             blurRadius: 4,
                             spreadRadius: 1,
                           ),
@@ -94,9 +94,9 @@ class ProfileHeaderCard extends StatelessWidget {
                     const SizedBox(width: 6),
                   ],
                   Text(
-                    isLoggedIn ? 'ログイン済み' : 'ゲスト',
+                    isLoggedIn ? context.l10n.profileWidgets_loggedIn : context.l10n.profileWidgets_guest,
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: isLoggedIn ? AppColors.success : AppColors.textSecondary,
+                      color: isLoggedIn ? context.appColors.success : context.appColors.textSecondary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -128,7 +128,7 @@ class InfoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
@@ -139,8 +139,8 @@ class InfoBanner extends StatelessWidget {
           Container(
             width: 4,
             height: 140,
-            decoration: const BoxDecoration(
-              gradient: AppColors.primaryGradient,
+            decoration: BoxDecoration(
+              gradient: context.appColors.primaryGradient,
             ),
           ),
           Expanded(
@@ -184,7 +184,7 @@ class ProfileSectionHeader extends StatelessWidget {
             width: 3,
             height: 14,
             decoration: BoxDecoration(
-              color: AppColors.ruri,
+              color: context.appColors.primary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -207,7 +207,7 @@ class ProfileMenuGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.subtle,
       ),
@@ -257,14 +257,14 @@ class ProfileMenuTile extends StatelessWidget {
             subtitle: subtitle == null
                 ? null
                 : Text(subtitle!, style: AppTextStyles.labelSmall),
-            trailing: const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+            trailing: Icon(Icons.chevron_right, color: context.appColors.textHint, size: 20),
             onTap: onTap,
           ),
         ),
         if (!isLast)
-          const Padding(
-            padding: EdgeInsets.only(left: 66),
-            child: Divider(height: 1, color: AppColors.borderLight),
+          Padding(
+            padding: const EdgeInsets.only(left: 66),
+            child: Divider(height: 1, color: context.appColors.borderLight),
           ),
       ],
     );

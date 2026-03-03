@@ -3,11 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
@@ -29,21 +29,23 @@ class _WorkPageState extends State<WorkPage>
 
   late final TabController _statusTabController;
 
-  static const _statusTabs = <_StatusTab>[
-    _StatusTab(key: 'my_applications', label: '応募状況'),
-    _StatusTab(key: 'assigned', label: '着工前'),
-    _StatusTab(key: 'in_progress', label: '着工中'),
-    _StatusTab(key: 'completed', label: '施工完了'),
-    _StatusTab(key: 'inspection', label: '検収中'),
-    _StatusTab(key: 'fixing', label: '是正中'),
-    _StatusTab(key: 'done', label: '完了'),
+  List<_StatusTab> _buildStatusTabs(BuildContext context) => <_StatusTab>[
+    _StatusTab(key: 'my_applications', label: context.l10n.work_tabApplications),
+    _StatusTab(key: 'assigned', label: context.l10n.work_tabAssigned),
+    _StatusTab(key: 'in_progress', label: context.l10n.work_tabInProgress),
+    _StatusTab(key: 'completed', label: context.l10n.work_tabCompleted),
+    _StatusTab(key: 'inspection', label: context.l10n.work_tabInspection),
+    _StatusTab(key: 'fixing', label: context.l10n.work_tabFixing),
+    _StatusTab(key: 'done', label: context.l10n.work_tabDone),
   ];
+
+  static const _tabCount = 7;
 
   @override
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('work');
-    _statusTabController = TabController(length: _statusTabs.length, vsync: this);
+    _statusTabController = TabController(length: _tabCount, vsync: this);
     _statusTabController.addListener(() {
       if (mounted) setState(() {});
     });
@@ -55,24 +57,34 @@ class _WorkPageState extends State<WorkPage>
     super.dispose();
   }
 
-  String _emptyMessageFor(String statusKey) {
+  static const _statusKeys = [
+    'my_applications',
+    'assigned',
+    'in_progress',
+    'completed',
+    'inspection',
+    'fixing',
+    'done',
+  ];
+
+  String _emptyMessageFor(BuildContext context, String statusKey) {
     switch (statusKey) {
       case 'my_applications':
-        return '応募した案件はまだありません';
+        return context.l10n.work_emptyApplications;
       case 'assigned':
-        return '着工前の案件はまだありません';
+        return context.l10n.work_emptyAssigned;
       case 'in_progress':
-        return '着工中の案件はまだありません';
+        return context.l10n.work_emptyInProgress;
       case 'completed':
-        return '施工完了の案件はまだありません';
+        return context.l10n.work_emptyCompleted;
       case 'inspection':
-        return '検収中の案件はまだありません（管理側の更新待ちです）';
+        return context.l10n.work_emptyInspection;
       case 'fixing':
-        return '是正中の案件はまだありません（管理側の更新待ちです）';
+        return context.l10n.work_emptyFixing;
       case 'done':
-        return '完了した案件はまだありません';
+        return context.l10n.work_emptyDone;
       default:
-        return '案件はまだありません';
+        return context.l10n.work_emptyDefault;
     }
   }
 
@@ -98,17 +110,18 @@ class _WorkPageState extends State<WorkPage>
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final statusTabs = _buildStatusTabs(context);
 
     if (!_notAnonymous(user)) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         body: SafeArea(
           child: EmptyState(
             icon: Icons.work_outline,
-            title: '「はたらく」を使うには\n登録が必要です',
-            description: '応募・受託した案件の進捗を\nこのページで管理できます',
-            actionText: '登録して始める',
-            onAction: () => RegistrationPromptModal.show(context, featureName: 'はたらく機能を使う'),
+            title: context.l10n.work_registrationRequiredTitle,
+            description: context.l10n.work_registrationRequiredDescription,
+            actionText: context.l10n.common_registerToStart,
+            onAction: () => RegistrationPromptModal.show(context, featureName: context.l10n.work_featureName),
           ),
         ),
       );
@@ -116,26 +129,26 @@ class _WorkPageState extends State<WorkPage>
 
     final uid = user!.uid;
 
-    final tabIndex = _statusTabController.index.clamp(0, _statusTabs.length - 1);
-    final selectedStatusKey = _statusTabs[tabIndex].key;
+    final tabIndex = _statusTabController.index.clamp(0, statusTabs.length - 1);
+    final selectedStatusKey = _statusKeys[tabIndex];
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             Material(
-              color: Colors.white,
+              color: context.appColors.surface,
               elevation: 0,
               child: TabBar(
                 controller: _statusTabController,
                 isScrollable: true,
-                labelColor: AppColors.ruri,
-                unselectedLabelColor: AppColors.textSecondary,
-                indicatorColor: AppColors.ruri,
+                labelColor: context.appColors.primary,
+                unselectedLabelColor: context.appColors.textSecondary,
+                indicatorColor: context.appColors.primary,
                 indicatorWeight: 3,
-                labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: AppColors.ruri),
+                labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: context.appColors.primary),
                 unselectedLabelStyle: AppTextStyles.labelMedium,
-                tabs: _statusTabs.map((t) => Tab(text: t.label)).toList(),
+                tabs: statusTabs.map((t) => Tab(text: t.label)).toList(),
               ),
             ),
             Expanded(
@@ -149,7 +162,7 @@ class _WorkPageState extends State<WorkPage>
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasError) {
-                    return Center(child: Text('読み込みエラー: ${snap.error}'));
+                    return Center(child: Text(context.l10n.common_loadError('${snap.error}')));
                   }
                   if (!snap.hasData) {
                     return SkeletonList(itemBuilder: (_) => const SkeletonWorkCard());
@@ -176,7 +189,7 @@ class _WorkPageState extends State<WorkPage>
                   if (filtered.isEmpty) {
                     return EmptyState(
                       icon: Icons.inbox_outlined,
-                      title: _emptyMessageFor(selectedStatusKey),
+                      title: _emptyMessageFor(context, selectedStatusKey),
                       description: '',
                     );
                   }
@@ -202,33 +215,33 @@ class _WorkPageState extends State<WorkPage>
                         setState(() => _refreshKey = UniqueKey());
                         await Future.delayed(const Duration(milliseconds: 500));
                       },
-                      color: AppColors.ruri,
+                      color: context.appColors.primary,
                       child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.xl),
                       children: [
                         _StatusGroup(
-                          title: '応募中',
+                          title: context.l10n.work_groupApplied,
                           icon: Icons.hourglass_empty,
-                          color: AppColors.warning,
+                          color: context.appColors.warning,
                           count: pending.length,
                           docs: pending,
                           onTapItem: (appId) => _navigateToDetail(context, appId),
                         ),
                         const SizedBox(height: AppSpacing.base),
                         _StatusGroup(
-                          title: '承認済み（着工前・着工中）',
+                          title: context.l10n.work_groupApproved,
                           icon: Icons.check_circle_outline,
-                          color: AppColors.ruri,
+                          color: context.appColors.primary,
                           count: approved.length,
                           docs: approved,
                           onTapItem: (appId) => _navigateToDetail(context, appId),
                         ),
                         const SizedBox(height: AppSpacing.base),
                         _StatusGroup(
-                          title: '完了（施工完了・検収・是正・完了）',
+                          title: context.l10n.work_groupCompleted,
                           icon: Icons.done_all,
-                          color: AppColors.success,
+                          color: context.appColors.success,
                           count: completed.length,
                           docs: completed,
                           onTapItem: (appId) => _navigateToDetail(context, appId),
@@ -243,7 +256,7 @@ class _WorkPageState extends State<WorkPage>
                       setState(() => _refreshKey = UniqueKey());
                       await Future.delayed(const Duration(milliseconds: 500));
                     },
-                    color: AppColors.ruri,
+                    color: context.appColors.primary,
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
                       cacheExtent: AppConstants.listCacheExtent,
@@ -265,18 +278,18 @@ class _WorkPageState extends State<WorkPage>
                       return _WhiteCard(
                         child: ListTile(
                           title: Text(
-                            titleSnap.isNotEmpty ? titleSnap : '案件',
+                            titleSnap.isNotEmpty ? titleSnap : context.l10n.common_job,
                             style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
                           ),
                           subtitle: Padding(
                             padding: const EdgeInsets.only(top: AppSpacing.xs),
-                            child: StatusBadge.fromStatus(statusKey),
+                            child: StatusBadge.fromStatus(context, statusKey),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                tooltip: 'チャット',
+                                tooltip: context.l10n.work_chatTooltip,
                                 icon: const Icon(Icons.chat_bubble_outline),
                                 onPressed: () {
                                   context.push(RoutePaths.chatRoomPath(applicationId));
@@ -318,7 +331,7 @@ class _WhiteCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: [
           BoxShadow(
@@ -383,7 +396,7 @@ class _StatusGroup extends StatelessWidget {
         if (docs.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
-            child: Text('案件はありません', style: AppTextStyles.bodySmall),
+            child: Text(context.l10n.work_noJobs, style: AppTextStyles.bodySmall),
           )
         else
           ...docs.map((appDoc) {
@@ -397,12 +410,12 @@ class _StatusGroup extends StatelessWidget {
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   title: Text(
-                    titleSnap.isNotEmpty ? titleSnap : '案件',
+                    titleSnap.isNotEmpty ? titleSnap : context.l10n.common_job,
                     style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    child: StatusBadge.fromStatus(statusKey),
+                    child: StatusBadge.fromStatus(context, statusKey),
                   ),
                   trailing: const Icon(Icons.chevron_right, size: 20),
                   onTap: () => onTapItem(appDoc.id),

@@ -1,13 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/legal_index_page.dart';
 import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/pages/profile/profile_widgets.dart';
 
 void main() {
   Widget buildTestWidget() {
-    return const MaterialApp(
-      home: LegalIndexPage(),
+    return MaterialApp(
+      theme: ThemeData(extensions: const [AppColorsExtension.light]),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('ja'),
+      home: const LegalIndexPage(),
     );
   }
 
@@ -107,6 +119,15 @@ void main() {
       // MaterialApp + homeの場合、AppBarには戻るボタンは表示されないが、
       // Navigatorスタック内で表示される場合をシミュレート
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: Builder(
           builder: (context) {
             return Scaffold(

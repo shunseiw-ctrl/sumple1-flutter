@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
@@ -16,16 +16,38 @@ class _ContactPageState extends State<ContactPage> {
   final _subjectController = TextEditingController();
   final _bodyController = TextEditingController();
   bool _sending = false;
-  String _category = '一般的な質問';
+  String _categoryKey = 'general';
 
-  static const _categories = [
-    '一般的な質問',
-    'アカウントについて',
-    '案件・応募について',
-    '決済・報酬について',
-    '不具合の報告',
-    'その他',
+  static const _categoryKeys = [
+    'general',
+    'account',
+    'jobs',
+    'payment',
+    'bug',
+    'other',
   ];
+
+  static String _categoryLabel(BuildContext context, String key) {
+    switch (key) {
+      case 'general': return context.l10n.contact_categoryGeneral;
+      case 'account': return context.l10n.contact_categoryAccount;
+      case 'jobs': return context.l10n.contact_categoryJobs;
+      case 'payment': return context.l10n.contact_categoryPayment;
+      case 'bug': return context.l10n.contact_categoryBug;
+      case 'other': return context.l10n.contact_categoryOther;
+      default: return key;
+    }
+  }
+
+  // Map keys to Japanese values for Firestore storage
+  static const _categoryValues = {
+    'general': '一般的な質問',
+    'account': 'アカウントについて',
+    'jobs': '案件・応募について',
+    'payment': '決済・報酬について',
+    'bug': '不具合の報告',
+    'other': 'その他',
+  };
 
   @override
   void initState() {
@@ -46,7 +68,7 @@ class _ContactPageState extends State<ContactPage> {
 
     if (subject.isEmpty || body.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('件名と内容を入力してください')),
+        SnackBar(content: Text(context.l10n.contact_validationError)),
       );
       return;
     }
@@ -57,7 +79,7 @@ class _ContactPageState extends State<ContactPage> {
       await FirebaseFirestore.instance.collection('contacts').add({
         'uid': user?.uid ?? '',
         'email': user?.email ?? '',
-        'category': _category,
+        'category': _categoryValues[_categoryKey] ?? _categoryKey,
         'subject': subject,
         'body': body,
         'status': 'new',
@@ -69,14 +91,14 @@ class _ContactPageState extends State<ContactPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('お問い合わせを送信しました。ご回答までお待ちください。')),
+          SnackBar(content: Text(context.l10n.contact_sendSuccess)),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('送信に失敗しました: $e')),
+          SnackBar(content: Text('${context.l10n.contact_sendError}: $e')),
         );
       }
     } finally {
@@ -88,47 +110,47 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('お問い合わせ', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(context.l10n.contact_title, style: const TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text('カテゴリ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.contact_categoryLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            initialValue: _category,
+            initialValue: _categoryKey,
             decoration: InputDecoration(
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            items: _categories
-                .map((c) => DropdownMenuItem(value: c, child: Text(c, style: const TextStyle(fontSize: 14))))
+            items: _categoryKeys
+                .map((key) => DropdownMenuItem(value: key, child: Text(_categoryLabel(context, key), style: const TextStyle(fontSize: 14))))
                 .toList(),
             onChanged: (v) {
-              if (v != null) setState(() => _category = v);
+              if (v != null) setState(() => _categoryKey = v);
             },
           ),
 
           const SizedBox(height: 16),
-          const Text('件名', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.contact_subjectLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _subjectController,
             maxLength: AppConstants.maxContactSubjectLength,
-            decoration: const InputDecoration(
-              hintText: '件名を入力',
+            decoration: InputDecoration(
+              hintText: context.l10n.contact_subjectHint,
               counterText: '',
             ),
           ),
 
           const SizedBox(height: 16),
-          const Text('内容', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.contact_bodyLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _bodyController,
             maxLines: 6,
             maxLength: AppConstants.maxContactBodyLength,
-            decoration: const InputDecoration(
-              hintText: 'お問い合わせ内容を入力してください',
+            decoration: InputDecoration(
+              hintText: context.l10n.contact_bodyHint,
               counterText: '',
             ),
           ),
@@ -140,7 +162,7 @@ class _ContactPageState extends State<ContactPage> {
               onPressed: _sending ? null : _send,
               child: _sending
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('送信する'),
+                  : Text(context.l10n.contact_submitButton),
             ),
           ),
         ],

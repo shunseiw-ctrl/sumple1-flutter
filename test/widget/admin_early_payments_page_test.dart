@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/payment_cycle_service.dart';
 import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/admin/admin_early_payments_page.dart';
 
 class MockPaymentCycleService extends Mock implements PaymentCycleService {}
@@ -25,6 +28,15 @@ void main() {
 
     Widget buildPage() {
       return MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: AdminEarlyPaymentsPage(
           paymentCycleService: mockPaymentService,
           firestore: fakeFirestore,

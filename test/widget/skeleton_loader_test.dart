@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 void main() {
   group('SkeletonLoader variants', () {
     testWidgets('SkeletonMessageCard renders', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SkeletonMessageCard()),
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(body: SkeletonMessageCard()),
         ),
       );
 
@@ -17,8 +29,17 @@ void main() {
 
     testWidgets('SkeletonNotificationCard renders', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SkeletonNotificationCard()),
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(body: SkeletonNotificationCard()),
         ),
       );
 
@@ -28,8 +49,17 @@ void main() {
 
     testWidgets('SkeletonWorkCard renders', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SkeletonWorkCard()),
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(body: SkeletonWorkCard()),
         ),
       );
 
@@ -39,8 +69,17 @@ void main() {
 
     testWidgets('SkeletonSalesCard renders', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SkeletonSalesCard()),
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(body: SkeletonSalesCard()),
         ),
       );
 
@@ -51,6 +90,15 @@ void main() {
     testWidgets('SkeletonList uses custom itemBuilder', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
           home: Scaffold(
             body: SkeletonList(
               itemBuilder: (_) => const SkeletonMessageCard(),
@@ -65,8 +113,17 @@ void main() {
 
     testWidgets('SkeletonList defaults to SkeletonJobCard', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SkeletonList()),
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(body: SkeletonList()),
         ),
       );
 

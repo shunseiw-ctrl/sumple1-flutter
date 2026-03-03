@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
@@ -52,19 +52,19 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final uid = ref.watch(currentUserUidProvider);
     if (uid.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('お知らせ')),
-        body: const EmptyState(
+        appBar: AppBar(title: Text(context.l10n.notifications_title)),
+        body: EmptyState(
           icon: Icons.login,
-          title: 'ログインが必要です',
-          description: 'お知らせを表示するにはログインしてください',
+          title: context.l10n.notifications_loginRequired,
+          description: context.l10n.notifications_loginDescription,
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text('お知らせ'),
+        title: Text(context.l10n.notifications_title),
         actions: [
           TextButton(
             onPressed: () async {
@@ -72,10 +72,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               AppHaptics.success();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('すべて既読にしました')),
+                SnackBar(content: Text(context.l10n.notifications_allRead)),
               );
             },
-            child: const Text('すべて既読'),
+            child: Text(context.l10n.notifications_markAllRead),
           ),
         ],
       ),
@@ -84,14 +84,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           final snapAsync = ref.watch(notificationsStreamProvider(_currentLimit));
           return snapAsync.when(
             loading: () => SkeletonList(itemBuilder: (_) => const SkeletonNotificationCard()),
-            error: (error, _) => Center(child: Text('エラー: $error')),
+            error: (error, _) => Center(child: Text(context.l10n.notifications_error(error.toString()))),
             data: (snap) {
           final docs = snap.docs;
           if (docs.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.notifications_none,
-              title: 'お知らせはまだありません',
-              description: '新しい通知が届くとここに表示されます',
+              title: context.l10n.notifications_empty,
+              description: context.l10n.notifications_emptyDescription,
             );
           }
           return RefreshIndicator(
@@ -99,7 +99,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               ref.invalidate(notificationsStreamProvider(_currentLimit));
               await Future.delayed(const Duration(milliseconds: 500));
             },
-            color: AppColors.ruri,
+            color: context.appColors.primary,
             child: ListView.separated(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
@@ -126,7 +126,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               switch (type) {
                 case 'application':
                   icon = Icons.person_add;
-                  iconColor = AppColors.ruri;
+                  iconColor = context.appColors.primary;
                   break;
                 case 'status_update':
                   icon = Icons.update;
@@ -134,12 +134,12 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   break;
                 default:
                   icon = Icons.notifications;
-                  iconColor = AppColors.textSecondary;
+                  iconColor = context.appColors.textSecondary;
               }
 
               return Container(
                 decoration: BoxDecoration(
-                  color: isRead ? Colors.white : AppColors.ruriPale,
+                  color: isRead ? context.appColors.surface : context.appColors.primaryPale,
                   borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                   boxShadow: AppShadows.subtle,
                 ),
@@ -191,7 +191,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                               height: 10,
                               margin: const EdgeInsets.only(top: AppSpacing.xs),
                               decoration: BoxDecoration(
-                                color: AppColors.ruri,
+                                color: context.appColors.primary,
                                 borderRadius: BorderRadius.circular(5),
                               ),
                             ),

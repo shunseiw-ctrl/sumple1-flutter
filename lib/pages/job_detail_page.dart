@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
@@ -40,13 +40,13 @@ class JobDetailPage extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: context.appColors.background,
             appBar: AppBar(
-              title: Text('案件詳細', style: AppTextStyles.appBarTitle),
+              title: Text(context.l10n.jobDetail_title, style: AppTextStyles.appBarTitle),
             ),
             body: ErrorRetryWidget.general(
               onRetry: () => context.go(RoutePaths.jobDetailPath(jobId), extra: jobData),
-              message: 'データの読み込みに失敗しました',
+              message: context.l10n.common_dataLoadError,
             ),
           );
         }
@@ -54,11 +54,11 @@ class JobDetailPage extends StatelessWidget {
         final liveDoc = snapshot.data;
         if (liveDoc == null || !liveDoc.exists) {
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: context.appColors.background,
             appBar: AppBar(
-              title: Text('案件詳細', style: AppTextStyles.appBarTitle),
+              title: Text(context.l10n.jobDetail_title, style: AppTextStyles.appBarTitle),
             ),
-            body: const Center(child: Text('この案件は削除された可能性があります')),
+            body: Center(child: Text(context.l10n.jobDetail_mayBeDeleted)),
           );
         }
 
@@ -116,14 +116,14 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('削除しますか？'),
-        content: const Text('この案件を削除すると元に戻せません。'),
+        title: Text(context.l10n.jobDetail_deleteConfirmTitle),
+        content: Text(context.l10n.jobDetail_deleteConfirmMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('キャンセル')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.l10n.common_cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('削除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -133,11 +133,11 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     try {
       await FirebaseFirestore.instance.collection('jobs').doc(jobId).delete();
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('削除しました')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.common_deleted)));
       Navigator.pop(context);
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('削除に失敗しました: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.l10n.jobDetail_deleteError}: $e')));
     }
   }
 
@@ -145,7 +145,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (!_notAnonymous(user)) {
-      RegistrationPromptModal.show(context, featureName: '案件に応募する');
+      RegistrationPromptModal.show(context, featureName: context.l10n.jobDetail_applyToJob);
       return;
     }
 
@@ -159,7 +159,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     final projectNameSnapshot = (data['projectName'] ?? '').toString().trim();
     final resolvedProjectName = projectNameSnapshot.isNotEmpty
         ? projectNameSnapshot
-        : (data['title'] ?? title ?? '案件').toString();
+        : (data['title'] ?? title ?? context.l10n.common_job).toString();
 
     final jobOwnerId = (data['ownerId'] ?? data['adminUid'] ?? data['createdBy'] ?? '').toString();
     await FirebaseFirestore.instance.collection('applications').add({
@@ -182,8 +182,8 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     if (jobOwnerId.isNotEmpty) {
       NotificationService().createNotification(
         targetUid: jobOwnerId,
-        title: '新しい応募',
-        body: '$resolvedProjectNameに応募がありました',
+        title: context.l10n.jobDetail_newApplication,
+        body: context.l10n.jobDetail_applicationReceived(resolvedProjectName),
         type: 'application',
         data: {'jobId': jobId},
       );
@@ -192,7 +192,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
     if (!context.mounted) return;
     AppHaptics.success();
     InAppReviewService().onApplicationCompleted();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('応募しました')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.jobDetail_snackApplied)));
   }
 
   Future<bool> _hasApplied() async {
@@ -216,13 +216,13 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: Text('案件詳細', style: AppTextStyles.appBarTitle),
+        title: Text(context.l10n.jobDetail_title, style: AppTextStyles.appBarTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            tooltip: 'シェア',
+            tooltip: context.l10n.jobDetail_share,
             onPressed: () {
               final title = data['title']?.toString() ?? '';
               final price = data['price']?.toString() ?? '';
@@ -240,9 +240,9 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
 
               return Semantics(
                 button: true,
-                label: isFav ? 'お気に入りから削除' : 'お気に入りに追加',
+                label: isFav ? context.l10n.jobDetail_removeFromFavorites : context.l10n.jobDetail_addToFavorites,
                 child: IconButton(
-                  tooltip: 'お気に入り',
+                  tooltip: context.l10n.jobDetail_favorite,
                   onPressed: () {
                     if (_favoritesService.isRegistered) {
                       _favoritesService.toggleFavorite(jobId);
@@ -251,9 +251,9 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                         _guestFavorite = !_guestFavorite;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('登録するとお気に入りが保存されます'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text(context.l10n.common_registerToSaveFavorites),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     }
@@ -266,7 +266,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                     child: Icon(
                       isFav ? Icons.favorite : Icons.favorite_border,
                       key: ValueKey<bool>(isFav),
-                      color: isFav ? Colors.red : AppColors.textSecondary,
+                      color: isFav ? Colors.red : context.appColors.textSecondary,
                     ),
                   ),
                 ),
@@ -285,17 +285,17 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                     onPressed: () {
                       context.push(RoutePaths.jobEditPath(jobId), extra: data);
                     },
-                    icon: const Icon(Icons.edit, size: 18, color: AppColors.textPrimary),
-                    label: const Text(
-                      '編集',
-                      style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900),
+                    icon: Icon(Icons.edit, size: 18, color: context.appColors.textPrimary),
+                    label: Text(
+                      context.l10n.common_edit,
+                      style: TextStyle(color: context.appColors.textPrimary, fontWeight: FontWeight.w900),
                     ),
                   ),
                   Semantics(
                     button: true,
-                    label: 'この案件を削除',
+                    label: context.l10n.jobDetail_deleteThisJob,
                     child: IconButton(
-                      tooltip: '削除',
+                      tooltip: context.l10n.common_delete,
                       onPressed: () => _deleteJob(context),
                       icon: const Icon(Icons.delete_outline, color: Colors.red),
                     ),
@@ -311,7 +311,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
         child: Container(
           padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.md, AppSpacing.base, AppSpacing.md),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.appColors.surface,
             boxShadow: AppShadows.bottomNav,
           ),
           child: FutureBuilder<bool>(
@@ -327,12 +327,12 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                   Expanded(
                     child: Semantics(
                       button: true,
-                      label: isLoading ? '応募状況を確認中' : (hasApplied ? '応募済み' : 'この案件に応募する'),
+                      label: isLoading ? context.l10n.jobDetail_checkingStatus : (hasApplied ? context.l10n.jobDetail_applied : context.l10n.jobDetail_applyToThisJob),
                       enabled: enabled,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: enabled ? AppColors.primaryGradient : null,
-                          color: enabled ? null : AppColors.divider,
+                          gradient: enabled ? context.appColors.primaryGradient : null,
+                          color: enabled ? null : context.appColors.divider,
                           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                           boxShadow: enabled ? AppShadows.button : [],
                         ),
@@ -344,7 +344,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                             } catch (e) {
                               if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('応募に失敗しました: $e')),
+                                SnackBar(content: Text('${context.l10n.jobDetail_applyError}: $e')),
                               );
                             }
                           }
@@ -353,7 +353,7 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                             backgroundColor: Colors.transparent,
                             disabledBackgroundColor: Colors.transparent,
                             foregroundColor: Colors.white,
-                            disabledForegroundColor: AppColors.textHint,
+                            disabledForegroundColor: context.appColors.textHint,
                             shadowColor: Colors.transparent,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -361,9 +361,9 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
                             ),
                           ),
                           child: Text(
-                            isLoading ? '確認中...' : (hasApplied ? '応募済み' : '応募する'),
+                            isLoading ? context.l10n.jobDetail_checking : (hasApplied ? context.l10n.jobDetail_applied : context.l10n.jobDetail_applyButton),
                             style: AppTextStyles.button.copyWith(
-                              color: enabled ? Colors.white : AppColors.textHint,
+                              color: enabled ? Colors.white : context.appColors.textHint,
                             ),
                           ),
                         ),
@@ -388,10 +388,10 @@ class JobDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = data['title']?.toString() ?? 'タイトルなし';
-    final location = data['location']?.toString() ?? '未設定';
+    final title = data['title']?.toString() ?? context.l10n.common_noTitle;
+    final location = data['location']?.toString() ?? context.l10n.common_notSet;
     final price = data['price']?.toString() ?? '0';
-    final date = data['date']?.toString() ?? '未定';
+    final date = data['date']?.toString() ?? context.l10n.common_undecided;
     final imageUrl = data['imageUrl']?.toString();
     final category = data['category']?.toString();
 
@@ -400,11 +400,11 @@ class JobDetailBody extends StatelessWidget {
 
     final descriptionText = description.isNotEmpty
         ? description
-        : '・現場作業の補助\n・資材運搬／清掃\n・指示に従って作業\n\n※ここは次フェーズでFirestoreのdescriptionに置き換え';
+        : context.l10n.jobDetail_defaultDescription;
 
     final notesText = notes.isNotEmpty
         ? notes
-        : '・遅刻／無断欠勤は評価に影響します\n・安全靴／作業着推奨\n・詳細はチャットで確認してください';
+        : context.l10n.jobDetail_defaultNotes;
 
     final ownerId = data['ownerId']?.toString();
     final hasImage = imageUrl != null && imageUrl.isNotEmpty;
@@ -430,16 +430,16 @@ class JobDetailBody extends StatelessWidget {
                           child: AppCachedImage(
                             imageUrl: imageUrl,
                             fit: BoxFit.cover,
-                            errorWidget: _buildGradientPlaceholder(),
+                            errorWidget: _buildGradientPlaceholder(context),
                           ),
                         )
                       : AppCachedImage(
                           imageUrl: imageUrl,
                           fit: BoxFit.cover,
-                          errorWidget: _buildGradientPlaceholder(),
+                          errorWidget: _buildGradientPlaceholder(context),
                         )
                 else
-                  _buildGradientPlaceholder(),
+                  _buildGradientPlaceholder(context),
                 Positioned(
                   left: 0,
                   right: 0,
@@ -467,20 +467,20 @@ class JobDetailBody extends StatelessWidget {
                     children: [
                       if (category != null && category.isNotEmpty)
                         Semantics(
-                          label: 'カテゴリ: $category',
+                          label: '${context.l10n.jobDetail_category}: $category',
                           child: StatusBadge(
                             label: category,
-                            color: AppColors.ruri,
+                            color: context.appColors.primary,
                             icon: Icons.category,
                             filled: true,
                           ),
                         ),
                       if (ownerId == null || ownerId.isEmpty)
                         Semantics(
-                          label: 'ステータス: 旧データ',
-                          child: const StatusBadge(
-                            label: '旧データ',
-                            color: AppColors.warning,
+                          label: '${context.l10n.jobDetail_status}: ${context.l10n.jobDetail_legacyData}',
+                          child: StatusBadge(
+                            label: context.l10n.jobDetail_legacyData,
+                            color: context.appColors.warning,
                             icon: Icons.warning_amber_rounded,
                           ),
                         ),
@@ -505,7 +505,7 @@ class JobDetailBody extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  const Icon(Icons.place, size: 16, color: AppColors.textSecondary),
+                  Icon(Icons.place, size: 16, color: context.appColors.textSecondary),
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Text(location, style: AppTextStyles.bodySmall),
@@ -514,25 +514,25 @@ class JobDetailBody extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.base),
               Semantics(
-                label: '報酬: ¥$price',
+                label: '${context.l10n.jobDetail_paymentLabel}: ¥$price',
                 child: _ModernCard(
-                  color: AppColors.ruriPale,
+                  color: context.appColors.primaryPale,
                   child: Row(
                     children: [
                       Container(
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: AppColors.ruri.withValues(alpha: 0.1),
+                          color: context.appColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
-                        child: const Icon(Icons.currency_yen, color: AppColors.ruri, size: 22),
+                        child: Icon(Icons.currency_yen, color: context.appColors.primary, size: 22),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('報酬', style: AppTextStyles.labelMedium),
+                          Text(context.l10n.jobDetail_paymentLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: AppSpacing.xs),
                           Text('¥$price', style: AppTextStyles.salaryLarge),
                         ],
@@ -545,9 +545,9 @@ class JobDetailBody extends StatelessWidget {
               _ModernCard(
                 child: Column(
                   children: [
-                    _InfoRow(icon: Icons.event, label: '日程', value: date),
-                    const Divider(height: AppSpacing.lg, color: AppColors.divider),
-                    _InfoRow(icon: Icons.place, label: '場所', value: location),
+                    _InfoRow(icon: Icons.event, label: context.l10n.jobDetail_scheduleLabel, value: date),
+                    Divider(height: AppSpacing.lg, color: context.appColors.divider),
+                    _InfoRow(icon: Icons.place, label: context.l10n.jobDetail_locationLabel, value: location),
                   ],
                 ),
               ),
@@ -556,7 +556,7 @@ class JobDetailBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('仕事内容', style: AppTextStyles.headingSmall),
+                    Text(context.l10n.jobDetail_jobDescription, style: AppTextStyles.headingSmall),
                     const SizedBox(height: AppSpacing.sm),
                     Text(descriptionText, style: AppTextStyles.bodyMedium.copyWith(height: 1.6)),
                   ],
@@ -567,7 +567,7 @@ class JobDetailBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('注意事項', style: AppTextStyles.headingSmall),
+                    Text(context.l10n.jobDetail_notes, style: AppTextStyles.headingSmall),
                     const SizedBox(height: AppSpacing.sm),
                     Text(notesText, style: AppTextStyles.bodyMedium.copyWith(height: 1.6)),
                   ],
@@ -580,18 +580,18 @@ class JobDetailBody extends StatelessWidget {
     );
   }
 
-  Widget _buildGradientPlaceholder() {
+  Widget _buildGradientPlaceholder(BuildContext context) {
     return Semantics(
       excludeSemantics: true,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.ruriPale,
-              Color(0xFFD0DFFA),
-              Color(0xFFBDD0F5),
+              context.appColors.primaryPale,
+              const Color(0xFFD0DFFA),
+              const Color(0xFFBDD0F5),
             ],
           ),
         ),
@@ -599,7 +599,7 @@ class JobDetailBody extends StatelessWidget {
           child: Icon(
             Icons.construction,
             size: 64,
-            color: AppColors.ruri.withValues(alpha: 0.3),
+            color: context.appColors.primary.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -618,7 +618,7 @@ class _ModernCard extends StatelessWidget {
       width: double.infinity,
       padding: AppSpacing.cardInsets,
       decoration: BoxDecoration(
-        color: color ?? Colors.white,
+        color: color ?? context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
@@ -646,10 +646,10 @@ class _InfoRow extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.ruriPale,
+            color: context.appColors.primaryPale,
             borderRadius: BorderRadius.circular(AppSpacing.sm),
           ),
-          child: Icon(icon, size: 18, color: AppColors.ruri),
+          child: Icon(icon, size: 18, color: context.appColors.primary),
         ),
         const SizedBox(width: AppSpacing.md),
         SizedBox(

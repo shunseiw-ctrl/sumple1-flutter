@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/utils/prefecture_utils.dart';
 import 'package:sumple1/core/utils/job_date_utils.dart' as date_utils;
 import 'package:sumple1/presentation/widgets/section_title.dart';
@@ -90,9 +90,9 @@ class _JobEditPageState extends State<JobEditPage> {
       initialDate: initial,
       firstDate: DateTime(2020),
       lastDate: DateTime(2035),
-      helpText: '日程を選択',
-      cancelText: 'キャンセル',
-      confirmText: '決定',
+      helpText: context.l10n.jobEdit_datePickerHelp,
+      cancelText: context.l10n.jobEdit_datePickerCancel,
+      confirmText: context.l10n.jobEdit_datePickerConfirm,
     );
 
     if (picked == null) return;
@@ -113,7 +113,7 @@ class _JobEditPageState extends State<JobEditPage> {
 
     if (title.isEmpty || location.isEmpty || priceText.isEmpty || dateKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('未入力の項目があります')),
+        SnackBar(content: Text(context.l10n.jobEdit_snackEmptyFields)),
       );
       return;
     }
@@ -121,7 +121,7 @@ class _JobEditPageState extends State<JobEditPage> {
     final iso = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!iso.hasMatch(dateKey)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('日程はカレンダーから選択してください')),
+        SnackBar(content: Text(context.l10n.jobEdit_snackSelectDateFromCalendar)),
       );
       return;
     }
@@ -129,7 +129,7 @@ class _JobEditPageState extends State<JobEditPage> {
     final price = int.tryParse(priceText);
     if (price == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額は数字で入力してください')),
+        SnackBar(content: Text(context.l10n.jobEdit_snackPriceNumeric)),
       );
       return;
     }
@@ -168,7 +168,7 @@ class _JobEditPageState extends State<JobEditPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('更新に失敗しました: $e')),
+        SnackBar(content: Text(context.l10n.jobEdit_snackUpdateFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -178,17 +178,17 @@ class _JobEditPageState extends State<JobEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text(
-          '案件を編集',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+        title: Text(
+          context.l10n.jobEdit_title,
+          style: TextStyle(color: context.appColors.textPrimary, fontWeight: FontWeight.w800),
         ),
       ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Container(
-          color: Colors.white,
+          color: context.appColors.surface,
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           child: SizedBox(
             height: 50,
@@ -196,9 +196,9 @@ class _JobEditPageState extends State<JobEditPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _update,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.ruri,
+                backgroundColor: context.appColors.primary,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.ruri.withValues(alpha: 0.4),
+                disabledBackgroundColor: context.appColors.primary.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -212,9 +212,9 @@ class _JobEditPageState extends State<JobEditPage> {
                   color: Colors.white,
                 ),
               )
-                  : const Text(
-                '更新する',
-                style: TextStyle(fontWeight: FontWeight.w900),
+                  : Text(
+                context.l10n.jobEdit_updateButton,
+                style: const TextStyle(fontWeight: FontWeight.w900),
               ),
             ),
           ),
@@ -225,25 +225,25 @@ class _JobEditPageState extends State<JobEditPage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
           children: [
-            const SectionTitle(
-              title: '編集内容',
-              subtitle: '案件の情報を更新してください',
+            SectionTitle(
+              title: context.l10n.jobEdit_sectionTitle,
+              subtitle: context.l10n.jobEdit_sectionSubtitle,
             ),
             const SizedBox(height: 10),
             WhiteCard(
               child: Column(
                 children: [
                   LabeledField(
-                    label: 'タイトル',
-                    hint: '例）クロス張替え（1LDK）',
+                    label: context.l10n.jobEdit_titleLabel,
+                    hint: context.l10n.jobEdit_titleHint,
                     controller: _titleController,
                     textInputAction: TextInputAction.next,
                     maxLength: AppConstants.maxJobTitleLength,
                   ),
                   const FormDivider(),
                   LabeledField(
-                    label: '場所',
-                    hint: '例）千葉県千葉市花見川区',
+                    label: context.l10n.jobEdit_locationLabel,
+                    hint: context.l10n.jobEdit_locationHint,
                     controller: _locationController,
                     textInputAction: TextInputAction.next,
                     maxLength: AppConstants.maxJobLocationLength,
@@ -256,8 +256,8 @@ class _JobEditPageState extends State<JobEditPage> {
               child: Column(
                 children: [
                   LabeledField(
-                    label: '報酬（円）',
-                    hint: '例）30000',
+                    label: context.l10n.jobEdit_priceLabel,
+                    hint: context.l10n.jobEdit_priceHint,
                     controller: _priceController,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
@@ -265,8 +265,8 @@ class _JobEditPageState extends State<JobEditPage> {
                   ),
                   const FormDivider(),
                   LabeledField(
-                    label: '日程',
-                    hint: 'タップして日付を選択',
+                    label: context.l10n.jobEdit_dateLabel,
+                    hint: context.l10n.jobEdit_dateHint,
                     controller: _dateController,
                     textInputAction: TextInputAction.done,
                     prefixIcon: Icons.event,
@@ -281,8 +281,8 @@ class _JobEditPageState extends State<JobEditPage> {
               child: Column(
                 children: [
                   LabeledField(
-                    label: '仕事内容',
-                    hint: '例）現場作業の補助、清掃、資材運搬など',
+                    label: context.l10n.jobEdit_descriptionLabel,
+                    hint: context.l10n.jobEdit_descriptionHint,
                     controller: _descriptionController,
                     textInputAction: TextInputAction.next,
                     maxLines: 6,
@@ -290,8 +290,8 @@ class _JobEditPageState extends State<JobEditPage> {
                   ),
                   const FormDivider(),
                   LabeledField(
-                    label: '注意事項',
-                    hint: '例）遅刻厳禁、安全第一、詳細はチャットで確認など',
+                    label: context.l10n.jobEdit_notesLabel,
+                    hint: context.l10n.jobEdit_notesHint,
                     controller: _notesController,
                     textInputAction: TextInputAction.done,
                     maxLines: 6,
@@ -306,8 +306,8 @@ class _JobEditPageState extends State<JobEditPage> {
               child: Column(
                 children: [
                   LabeledField(
-                    label: '緯度（任意）',
-                    hint: '例）35.6812',
+                    label: context.l10n.jobEdit_latitudeLabel,
+                    hint: context.l10n.jobEdit_latitudeHint,
                     controller: _latitudeController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     textInputAction: TextInputAction.next,
@@ -315,8 +315,8 @@ class _JobEditPageState extends State<JobEditPage> {
                   ),
                   const FormDivider(),
                   LabeledField(
-                    label: '経度（任意）',
-                    hint: '例）139.7671',
+                    label: context.l10n.jobEdit_longitudeLabel,
+                    hint: context.l10n.jobEdit_longitudeHint,
                     controller: _longitudeController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     textInputAction: TextInputAction.done,
@@ -326,9 +326,9 @@ class _JobEditPageState extends State<JobEditPage> {
               ),
             ),
             const SizedBox(height: 10),
-            const HintCard(
-              title: 'ヒント',
-              body: '更新後は一覧に戻ります。日程はカレンダーから選択できます。緯度・経度を設定するとQR出退勤時のGPS検証が有効になります。',
+            HintCard(
+              title: context.l10n.jobEdit_hintTitle,
+              body: context.l10n.jobEdit_hintBody,
             ),
           ],
         ),
@@ -336,4 +336,3 @@ class _JobEditPageState extends State<JobEditPage> {
     );
   }
 }
-

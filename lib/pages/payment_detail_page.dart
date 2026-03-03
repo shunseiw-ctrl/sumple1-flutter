@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/data/models/payment_model.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -20,14 +20,15 @@ class PaymentDetailPage extends StatelessWidget {
     return '¥${buf.toString()}';
   }
 
-  Color _statusColor(String status) {
+  Color _statusColor(BuildContext context, String status) {
+    final colors = context.appColors;
     switch (status) {
       case 'succeeded':
-        return AppColors.success;
+        return colors.success;
       case 'failed':
-        return AppColors.error;
+        return colors.error;
       default:
-        return AppColors.warning;
+        return colors.warning;
     }
   }
 
@@ -36,9 +37,9 @@ class PaymentDetailPage extends StatelessWidget {
     AnalyticsService.logScreenView('payment_detail');
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '支払い詳細',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          context.l10n.paymentDetail_title,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -51,7 +52,7 @@ class PaymentDetailPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snap.hasData || !snap.data!.exists) {
-            return const Center(child: Text('支払い情報が見つかりません'));
+            return Center(child: Text(context.l10n.paymentDetail_notFound));
           }
 
           final payment = PaymentModel.fromFirestore(snap.data!);
@@ -63,9 +64,9 @@ class PaymentDetailPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: _statusColor(payment.status).withValues(alpha: 0.1),
+                  color: _statusColor(context, payment.status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _statusColor(payment.status).withValues(alpha: 0.3)),
+                  border: Border.all(color: _statusColor(context, payment.status).withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   children: [
@@ -76,7 +77,7 @@ class PaymentDetailPage extends StatelessWidget {
                               ? Icons.cancel
                               : Icons.pending,
                       size: 48,
-                      color: _statusColor(payment.status),
+                      color: _statusColor(context, payment.status),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -84,7 +85,7 @@ class PaymentDetailPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: _statusColor(payment.status),
+                        color: _statusColor(context, payment.status),
                       ),
                     ),
                   ],
@@ -95,18 +96,18 @@ class PaymentDetailPage extends StatelessWidget {
               // 金額詳細
               _DetailCard(
                 children: [
-                  _DetailRow(label: '案件名', value: payment.projectNameSnapshot ?? '-'),
+                  _DetailRow(label: context.l10n.paymentDetail_projectName, value: payment.projectNameSnapshot ?? '-'),
                   const Divider(height: 24),
-                  _DetailRow(label: '支払い金額', value: _formatYen(payment.amount), bold: true),
-                  _DetailRow(label: 'プラットフォーム手数料', value: _formatYen(payment.platformFee)),
-                  _DetailRow(label: '受取金額', value: _formatYen(payment.netAmount), bold: true),
+                  _DetailRow(label: context.l10n.paymentDetail_paymentAmount, value: _formatYen(payment.amount), bold: true),
+                  _DetailRow(label: context.l10n.paymentDetail_platformFee, value: _formatYen(payment.platformFee)),
+                  _DetailRow(label: context.l10n.paymentDetail_netAmount, value: _formatYen(payment.netAmount), bold: true),
                   const Divider(height: 24),
-                  _DetailRow(label: '決済ステータス', value: payment.statusLabel),
-                  _DetailRow(label: '振込ステータス', value: payment.payoutStatusLabel),
+                  _DetailRow(label: context.l10n.paymentDetail_paymentStatus, value: payment.statusLabel),
+                  _DetailRow(label: context.l10n.paymentDetail_payoutStatus, value: payment.payoutStatusLabel),
                   if (payment.createdAt != null) ...[
                     const Divider(height: 24),
                     _DetailRow(
-                      label: '作成日時',
+                      label: context.l10n.paymentDetail_createdAt,
                       value: '${payment.createdAt!.year}/${payment.createdAt!.month.toString().padLeft(2, '0')}/${payment.createdAt!.day.toString().padLeft(2, '0')} '
                           '${payment.createdAt!.hour.toString().padLeft(2, '0')}:${payment.createdAt!.minute.toString().padLeft(2, '0')}',
                     ),
@@ -130,9 +131,9 @@ class _DetailCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE6E8EB)),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Column(children: children),
     );
@@ -159,9 +160,9 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.appColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -171,7 +172,7 @@ class _DetailRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.appColors.textPrimary,
             ),
           ),
         ],

@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 
 void main() {
   group('RatingStarsDisplay', () {
     testWidgets('評価0件で「評価なし」テキストを表示', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: RatingStarsDisplay(average: 0, count: 0),
           ),
         ),
@@ -19,8 +31,17 @@ void main() {
 
     testWidgets('評価5.0で全て塗りつぶし星', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: RatingStarsDisplay(average: 5.0, count: 10),
           ),
         ),
@@ -33,8 +54,17 @@ void main() {
 
     testWidgets('評価3.5で半星が含まれる', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: RatingStarsDisplay(average: 3.5, count: 5),
           ),
         ),
@@ -47,8 +77,17 @@ void main() {
 
     testWidgets('スコアテキストが表示される', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: RatingStarsDisplay(average: 4.2, count: 15),
           ),
         ),
@@ -60,8 +99,17 @@ void main() {
 
     testWidgets('評価1.0で星1つ塗り、4つ空', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: RatingStarsDisplay(average: 1.0, count: 1),
           ),
         ),

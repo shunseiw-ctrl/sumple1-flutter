@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sumple1/core/services/auth_service.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -56,24 +56,24 @@ class _EmailAuthPageState extends State<EmailAuthPage>
   String _firebaseAuthErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
-        return 'このメールアドレスは既に登録されています';
+        return context.l10n.emailAuth_errorEmailInUse;
       case 'wrong-password':
       case 'invalid-credential':
-        return 'パスワードが正しくありません';
+        return context.l10n.emailAuth_errorWrongPassword;
       case 'user-not-found':
-        return 'アカウントが見つかりません';
+        return context.l10n.emailAuth_errorUserNotFound;
       case 'invalid-email':
-        return 'メールアドレスの形式が正しくありません';
+        return context.l10n.emailAuth_errorInvalidEmail;
       case 'user-disabled':
-        return 'このアカウントは無効化されています';
+        return context.l10n.emailAuth_errorUserDisabled;
       case 'too-many-requests':
-        return 'リクエストが多すぎます。しばらくしてからお試しください';
+        return context.l10n.emailAuth_errorTooManyRequests;
       case 'weak-password':
-        return 'パスワードが弱すぎます。6文字以上で設定してください';
+        return context.l10n.emailAuth_errorWeakPassword;
       case 'network-request-failed':
-        return 'ネットワーク接続を確認してください';
+        return context.l10n.emailAuth_errorNetwork;
       default:
-        return 'エラーが発生しました（${e.code}）';
+        return context.l10n.emailAuth_errorGeneric(e.code);
     }
   }
 
@@ -97,7 +97,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
       Logger.error('Email login failed', tag: 'EmailAuthPage', error: e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ログインに失敗しました')),
+        SnackBar(content: Text(context.l10n.emailAuth_snackLoginFailed)),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -124,7 +124,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
       Logger.error('Email registration failed', tag: 'EmailAuthPage', error: e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('登録に失敗しました')),
+        SnackBar(content: Text(context.l10n.emailAuth_snackRegisterFailed)),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -139,24 +139,24 @@ class _EmailAuthPageState extends State<EmailAuthPage>
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-            'パスワードリセット',
-            style: TextStyle(fontWeight: FontWeight.w700),
+          title: Text(
+            context.l10n.emailAuth_passwordResetTitle,
+            style: const TextStyle(fontWeight: FontWeight.w700),
           ),
           content: Form(
             key: formKey,
             child: TextFormField(
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'メールアドレス',
+              decoration: InputDecoration(
+                labelText: context.l10n.emailAuth_emailLabel,
                 hintText: 'example@email.com',
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'メールアドレスを入力してください';
+                if (v == null || v.trim().isEmpty) return context.l10n.emailAuth_emailRequired;
                 if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-                  return 'メールアドレスの形式が正しくありません';
+                  return context.l10n.emailAuth_emailInvalid;
                 }
                 return null;
               },
@@ -165,7 +165,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('キャンセル'),
+              child: Text(context.l10n.emailAuth_cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -178,8 +178,8 @@ class _EmailAuthPageState extends State<EmailAuthPage>
                   Navigator.pop(context);
                   if (!mounted) return;
                   ScaffoldMessenger.of(outerContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('リセットメールを送信しました'),
+                    SnackBar(
+                      content: Text(outerContext.l10n.emailAuth_snackResetSent),
                     ),
                   );
                 } on FirebaseAuthException catch (e) {
@@ -190,11 +190,11 @@ class _EmailAuthPageState extends State<EmailAuthPage>
                 } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('送信に失敗しました')),
+                    SnackBar(content: Text(context.l10n.emailAuth_snackSendFailed)),
                   );
                 }
               },
-              child: const Text('送信'),
+              child: Text(context.l10n.emailAuth_sendButton),
             ),
           ],
         );
@@ -204,16 +204,16 @@ class _EmailAuthPageState extends State<EmailAuthPage>
   }
 
   String? _emailValidator(String? v) {
-    if (v == null || v.trim().isEmpty) return 'メールアドレスを入力してください';
+    if (v == null || v.trim().isEmpty) return context.l10n.emailAuth_emailRequired;
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-      return 'メールアドレスの形式が正しくありません';
+      return context.l10n.emailAuth_emailInvalid;
     }
     return null;
   }
 
   String? _passwordValidator(String? v) {
-    if (v == null || v.isEmpty) return 'パスワードを入力してください';
-    if (v.length < 6) return 'パスワードは6文字以上で入力してください';
+    if (v == null || v.isEmpty) return context.l10n.emailAuth_passwordRequired;
+    if (v.length < 6) return context.l10n.emailAuth_passwordMinLength;
     return null;
   }
 
@@ -221,15 +221,15 @@ class _EmailAuthPageState extends State<EmailAuthPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'メールアドレスで続ける',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          context.l10n.emailAuth_title,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'ログイン'),
-            Tab(text: '新規登録'),
+          tabs: [
+            Tab(text: context.l10n.emailAuth_tabLogin),
+            Tab(text: context.l10n.emailAuth_tabRegister),
           ],
         ),
       ),
@@ -256,10 +256,10 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               controller: _loginEmailController,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'メールアドレス',
+              decoration: InputDecoration(
+                labelText: context.l10n.emailAuth_emailLabel,
                 hintText: 'example@email.com',
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
               validator: _emailValidator,
             ),
@@ -269,7 +269,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               obscureText: !_loginPasswordVisible,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
-                labelText: 'パスワード',
+                labelText: context.l10n.emailAuth_passwordLabel,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -291,10 +291,10 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _showPasswordResetDialog,
-                child: const Text(
-                  'パスワードを忘れた方',
+                child: Text(
+                  context.l10n.emailAuth_forgotPassword,
                   style: TextStyle(
-                    color: AppColors.textSecondary,
+                    color: context.appColors.textSecondary,
                     fontSize: 13,
                   ),
                 ),
@@ -314,7 +314,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text('ログイン'),
+                    : Text(context.l10n.emailAuth_loginButton),
               ),
             ),
           ],
@@ -336,10 +336,10 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               controller: _registerEmailController,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'メールアドレス',
+              decoration: InputDecoration(
+                labelText: context.l10n.emailAuth_emailLabel,
                 hintText: 'example@email.com',
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
               validator: _emailValidator,
             ),
@@ -349,7 +349,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               obscureText: !_registerPasswordVisible,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: 'パスワード（6文字以上）',
+                labelText: context.l10n.emailAuth_passwordWithMinLength,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -371,7 +371,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
               obscureText: !_registerConfirmVisible,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
-                labelText: 'パスワード（確認）',
+                labelText: context.l10n.emailAuth_passwordConfirmLabel,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -386,9 +386,9 @@ class _EmailAuthPageState extends State<EmailAuthPage>
                 ),
               ),
               validator: (v) {
-                if (v == null || v.isEmpty) return 'パスワードを再入力してください';
+                if (v == null || v.isEmpty) return context.l10n.emailAuth_passwordConfirmRequired;
                 if (v != _registerPasswordController.text) {
-                  return 'パスワードが一致しません';
+                  return context.l10n.emailAuth_passwordMismatch;
                 }
                 return null;
               },
@@ -408,7 +408,7 @@ class _EmailAuthPageState extends State<EmailAuthPage>
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text('新規登録'),
+                    : Text(context.l10n.emailAuth_registerButton),
               ),
             ),
           ],

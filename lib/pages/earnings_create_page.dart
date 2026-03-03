@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/services/auth_service.dart';
 import '../core/services/payment_service.dart';
 import '../core/enums/user_role.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
 
 class EarningsCreatePage extends StatefulWidget {
@@ -76,7 +76,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   Future<void> _createStripePayment() async {
     if (!_isAdmin || _selectedApp == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('案件を選択してください')),
+        SnackBar(content: Text(context.l10n.earningsCreate_selectJob)),
       );
       return;
     }
@@ -84,7 +84,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     final amount = _parseAmountYen(_amountCtrl.text);
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額を入力してください')),
+        SnackBar(content: Text(context.l10n.earningsCreate_enterAmount)),
       );
       return;
     }
@@ -98,7 +98,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Stripe決済を作成しました (ID: ${result['paymentId']})')),
+        SnackBar(content: Text(context.l10n.earningsCreate_stripeCreated(result['paymentId'].toString()))),
       );
 
       setState(() {
@@ -108,7 +108,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Stripe決済に失敗: $e')),
+        SnackBar(content: Text(context.l10n.earningsCreate_stripeFailed('$e'))),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -118,13 +118,13 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   Future<void> _createEarning() async {
     if (!_isAdmin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('管理者のみ操作できます')),
+        SnackBar(content: Text(context.l10n.earningsCreate_adminOnly)),
       );
       return;
     }
     if (_selectedApp == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('案件を選択してください')),
+        SnackBar(content: Text(context.l10n.earningsCreate_selectJob)),
       );
       return;
     }
@@ -132,7 +132,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     final amount = _parseAmountYen(_amountCtrl.text);
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('金額を入力してください（例: 12000）')),
+        SnackBar(content: Text(context.l10n.earningsCreate_enterAmountExample)),
       );
       return;
     }
@@ -140,7 +140,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     final date = _pickedDate;
     if (date == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('支払い確定日を選択してください')),
+        SnackBar(content: Text(context.l10n.earningsCreate_selectPaymentDate)),
       );
       return;
     }
@@ -149,12 +149,12 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     final appId = _selectedApp!.id;
 
     final targetUid = (app['applicantUid'] ?? '').toString();
-    final projectName = (app['projectNameSnapshot'] ?? app['jobTitleSnapshot'] ?? '案件').toString();
+    final projectName = (app['projectNameSnapshot'] ?? app['jobTitleSnapshot'] ?? context.l10n.common_job).toString();
     final jobId = (app['jobId'] ?? '').toString();
 
     if (targetUid.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('applications.applicantUid が空です')),
+        SnackBar(content: Text(context.l10n.earningsCreate_applicantUidEmpty)),
       );
       return;
     }
@@ -178,7 +178,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('支払い確定（売上）を登録しました')),
+        SnackBar(content: Text(context.l10n.earningsCreate_earningRegistered)),
       );
 
       setState(() {
@@ -189,7 +189,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('登録に失敗: $e')),
+        SnackBar(content: Text(context.l10n.earningsCreate_registerFailed('$e'))),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -199,11 +199,11 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
   @override
   Widget build(BuildContext context) {
     if (_myUid.isEmpty) {
-      return const Scaffold(body: Center(child: Text('ログインしてください')));
+      return Scaffold(body: Center(child: Text(context.l10n.common_pleaseLogin)));
     }
     if (!_isAdmin) {
-      return const Scaffold(
-        body: Center(child: Text('管理者のみ閲覧できます')),
+      return Scaffold(
+        body: Center(child: Text(context.l10n.common_adminOnlyView)),
       );
     }
 
@@ -215,7 +215,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('支払い確定（売上登録）'),
+        title: Text(context.l10n.earningsCreate_title),
       ),
       body: Column(
         children: [
@@ -223,7 +223,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: TextField(
               decoration: InputDecoration(
-                hintText: '物件名で検索（projectNameSnapshot）',
+                hintText: context.l10n.earningsCreate_searchHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 isDense: true,
@@ -240,11 +240,11 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snap.hasError) {
-                  return Center(child: Text('読み込みエラー: ${snap.error}'));
+                  return Center(child: Text(context.l10n.common_loadError('${snap.error}')));
                 }
                 final docs = snap.data?.docs ?? [];
                 if (docs.isEmpty) {
-                  return const Center(child: Text('担当案件がありません'));
+                  return Center(child: Text(context.l10n.earningsCreate_noAssignedJobs));
                 }
 
                 final filtered = docs.where((d) {
@@ -262,7 +262,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                     final m = d.data();
                     final appId = d.id;
 
-                    final name = (m['projectNameSnapshot'] ?? m['jobTitleSnapshot'] ?? '案件').toString();
+                    final name = (m['projectNameSnapshot'] ?? m['jobTitleSnapshot'] ?? context.l10n.common_job).toString();
                     final status = (m['status'] ?? '').toString();
                     final applicantUid = (m['applicantUid'] ?? '').toString();
 
@@ -271,10 +271,10 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                     return ListTile(
                       selected: selected,
                       leading: CircleAvatar(
-                        backgroundColor: selected ? AppColors.ruriPale : Colors.blueGrey.shade100,
+                        backgroundColor: selected ? context.appColors.primaryPale : Colors.blueGrey.shade100,
                         child: Icon(
                           Icons.work_outline,
-                          color: selected ? AppColors.ruri : AppColors.textSecondary,
+                          color: selected ? context.appColors.primary : context.appColors.textSecondary,
                         ),
                       ),
                       title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -282,7 +282,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                         'status: $status  uid:${applicantUid.isNotEmpty ? applicantUid.substring(0, applicantUid.length > 8 ? 8 : applicantUid.length) : "-"}…',
                       ),
                       trailing: selected
-                          ? const Icon(Icons.check_circle, color: AppColors.ruri)
+                          ? Icon(Icons.check_circle, color: context.appColors.primary)
                           : const Icon(Icons.chevron_right),
                       onTap: () {
                         setState(() {
@@ -299,14 +299,14 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.divider)),
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              border: Border(top: BorderSide(color: context.appColors.divider)),
             ),
             child: _selectedApp == null
-                ? const Text(
-              '上のリストから案件を選択してください',
-              style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700),
+                ? Text(
+              context.l10n.earningsCreate_selectFromList,
+              style: TextStyle(color: context.appColors.textSecondary, fontWeight: FontWeight.w700),
             )
                 : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,10 +319,10 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                       child: TextField(
                         controller: _amountCtrl,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: '金額（円）',
-                          hintText: '例: 12000',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.earningsCreate_amountLabel,
+                          hintText: context.l10n.earningsCreate_amountHint,
+                          border: const OutlineInputBorder(),
                           isDense: true,
                         ),
                       ),
@@ -332,15 +332,15 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                       child: InkWell(
                         onTap: _pickDate,
                         child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: '支払い確定日',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: context.l10n.earningsCreate_paymentDateLabel,
+                            border: const OutlineInputBorder(),
                             isDense: true,
                           ),
                           child: Text(
-                            _pickedDate == null ? '選択' : _ymd(_pickedDate!),
+                            _pickedDate == null ? context.l10n.common_select : _ymd(_pickedDate!),
                             style: TextStyle(
-                              color: _pickedDate == null ? AppColors.textHint : AppColors.textPrimary,
+                              color: _pickedDate == null ? context.appColors.textHint : context.appColors.textPrimary,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -355,7 +355,7 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _createEarning,
                     child: Text(
-                      _saving ? '登録中...' : '支払い確定を登録（earnings作成）',
+                      _saving ? context.l10n.common_registering : context.l10n.earningsCreate_registerButton,
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
@@ -366,9 +366,9 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   child: OutlinedButton.icon(
                     onPressed: _saving ? null : () => _createStripePayment(),
                     icon: const Icon(Icons.credit_card, size: 18),
-                    label: const Text(
-                      'Stripe決済で支払い',
-                      style: TextStyle(fontWeight: FontWeight.w800),
+                    label: Text(
+                      context.l10n.earningsCreate_stripePayButton,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF635BFF),
@@ -378,9 +378,9 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  '※売上は支払い確定日に反映されます（タイミー方式）',
-                  style: TextStyle(fontSize: 12, color: AppColors.textHint, fontWeight: FontWeight.w600),
+                Text(
+                  context.l10n.earningsCreate_earningsNote,
+                  style: TextStyle(fontSize: 12, color: context.appColors.textHint, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -398,7 +398,7 @@ class _SelectedSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final m = app.data() ?? {};
-    final name = (m['projectNameSnapshot'] ?? m['jobTitleSnapshot'] ?? '案件').toString();
+    final name = (m['projectNameSnapshot'] ?? m['jobTitleSnapshot'] ?? context.l10n.common_job).toString();
     final uid = (m['applicantUid'] ?? '').toString();
     final status = (m['status'] ?? '').toString();
 
@@ -407,9 +407,9 @@ class _SelectedSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.ruriPale,
+        color: context.appColors.primaryPale,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,11 +417,11 @@ class _SelectedSummary extends StatelessWidget {
           Text(name, style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
           Text('appId: ${short(app.id)}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: context.appColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('applicantUid: ${short(uid)}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: context.appColors.textSecondary, fontWeight: FontWeight.w700)),
           Text('status: $status',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontSize: 12, color: context.appColors.textSecondary, fontWeight: FontWeight.w700)),
         ],
       ),
     );

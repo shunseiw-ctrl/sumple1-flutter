@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -49,7 +50,7 @@ class AppCard extends StatelessWidget {
 
     Widget card = Container(
       decoration: BoxDecoration(
-        color: gradient == null ? Colors.white : null,
+        color: gradient == null ? context.appColors.surface : null,
         gradient: gradient,
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: shadows,

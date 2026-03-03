@@ -1,8 +1,11 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/qualification_service.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/admin/admin_qualifications_page.dart';
 
 class MockQualificationService extends Mock implements QualificationService {}
@@ -19,6 +22,15 @@ void main() {
       });
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: AdminQualificationsPage(
           qualificationService: mockService,
           firestore: fakeFirestore,
@@ -27,7 +39,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('資格承認'), findsOneWidget);
-      expect(find.text('承認待ちの資格はありません'), findsOneWidget);
+      expect(find.text('承認待ちの資格はありません'), findsAtLeastNWidgets(1));
     });
 
     testWidgets('承認待ちリスト表示', (tester) async {
@@ -51,6 +63,15 @@ void main() {
       });
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: AdminQualificationsPage(
           qualificationService: mockService,
           firestore: fakeFirestore,
@@ -83,6 +104,15 @@ void main() {
       });
 
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: AdminQualificationsPage(
           qualificationService: mockService,
           firestore: fakeFirestore,

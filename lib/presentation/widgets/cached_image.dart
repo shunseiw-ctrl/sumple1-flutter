@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import 'skeleton_loader.dart';
 
 /// キャッシュ付きネットワーク画像ウィジェット
@@ -58,10 +58,10 @@ class AppCachedImage extends StatelessWidget {
             Container(
               width: width,
               height: height,
-              color: AppColors.chipUnselected,
-              child: const Icon(
+              color: context.appColors.chipUnselected,
+              child: Icon(
                 Icons.broken_image,
-                color: AppColors.textHint,
+                color: context.appColors.textHint,
               ),
             ),
       ),

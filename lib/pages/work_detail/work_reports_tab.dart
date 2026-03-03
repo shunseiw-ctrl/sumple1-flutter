@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/router/route_paths.dart';
 import '../../core/services/work_report_service.dart';
 import '../../data/models/work_report_model.dart';
@@ -26,22 +26,22 @@ class WorkReportsTab extends StatelessWidget {
         stream: service.watchReports(applicationId),
         builder: (context, snap) {
           if (snap.hasError) {
-            return Center(child: Text('エラー: ${snap.error}'));
+            return Center(child: Text(context.l10n.workReports_error(snap.error.toString())));
           }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
           final reports = snap.data!;
           if (reports.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.description_outlined, size: 48, color: AppColors.textHint),
-                  SizedBox(height: 12),
-                  Text('日報はまだありません', style: TextStyle(color: AppColors.textSecondary)),
-                  SizedBox(height: 4),
-                  Text('右下のボタンから作成できます', style: TextStyle(color: AppColors.textHint, fontSize: 12)),
+                  Icon(Icons.description_outlined, size: 48, color: context.appColors.textHint),
+                  const SizedBox(height: 12),
+                  Text(context.l10n.workReports_empty, style: TextStyle(color: context.appColors.textSecondary)),
+                  const SizedBox(height: 4),
+                  Text(context.l10n.workReports_addHint, style: TextStyle(color: context.appColors.textHint, fontSize: 12)),
                 ],
               ),
             );
@@ -55,7 +55,7 @@ class WorkReportsTab extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
-                  leading: const Icon(Icons.description, color: AppColors.ruri),
+                  leading: Icon(Icons.description, color: context.appColors.primary),
                   title: Text(
                     report.reportDate,
                     style: const TextStyle(fontWeight: FontWeight.w700),
@@ -67,7 +67,7 @@ class WorkReportsTab extends StatelessWidget {
                   ),
                   trailing: Text(
                     '${report.hoursWorked}h',
-                    style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.ruri),
+                    style: TextStyle(fontWeight: FontWeight.w700, color: context.appColors.primary),
                   ),
                 ),
               );
@@ -79,7 +79,7 @@ class WorkReportsTab extends StatelessWidget {
         onPressed: () {
           context.push(RoutePaths.workReportCreatePath(applicationId));
         },
-        backgroundColor: AppColors.ruri,
+        backgroundColor: context.appColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

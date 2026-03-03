@@ -59,6 +59,7 @@ jobs:
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
           storeFile=keystore.jks
           EOF
+          sed -i 's/^[[:space:]]*//' android/key.properties
 
       - name: Decode Google Play JSON key
         run: echo "${{ secrets.GOOGLE_PLAY_JSON_KEY_BASE64 }}" | base64 --decode > android/google-play-key.json

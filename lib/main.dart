@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'core/config/app_environment.dart';
 import 'pages/home_page.dart';
 import 'pages/admin_home_page.dart';
@@ -27,6 +28,8 @@ import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'core/config/feature_flags.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/services/splash_remover.dart';
 import 'package:go_router/go_router.dart';
 import 'core/services/deep_link_service.dart';
@@ -220,6 +223,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         useMaterial3: true,
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppColors.background,
+        extensions: const [AppColorsExtension.light],
         textTheme: baseTextTheme,
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
@@ -381,6 +385,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         brightness: Brightness.dark,
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppDarkColors.background,
+        extensions: const [AppColorsExtension.dark],
         textTheme: baseTextTheme,
         appBarTheme: AppBarTheme(
           backgroundColor: AppDarkColors.surface,
@@ -545,7 +550,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('ja'),
+      locale: ref.watch(localeProvider),
     ));
   }
 }
@@ -649,7 +654,7 @@ class _AuthGateState extends State<AuthGate> {
                 _lastUid = null;
                 setState(() {});
               },
-              message: '認証処理中にエラーが発生しました\nもう一度お試しください',
+              message: context.l10n.authGate_authError,
             ),
           );
         }
@@ -688,7 +693,7 @@ class _AuthGateState extends State<AuthGate> {
                     _lastUid = null;
                     setState(() {});
                   },
-                  message: 'ユーザー情報の取得に失敗しました',
+                  message: context.l10n.authGate_roleError,
                 ),
               );
             }

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/payment_cycle_service.dart';
 import '../core/utils/haptic_utils.dart';
 import '../data/models/early_payment_request_model.dart';
@@ -16,7 +16,7 @@ class StatementDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('明細詳細')),
+      appBar: AppBar(title: Text(context.l10n.statementDetail_title)),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('monthly_statements')
@@ -24,7 +24,7 @@ class StatementDetailPage extends StatelessWidget {
             .snapshots(),
         builder: (context, snap) {
           if (snap.hasError) {
-            return Center(child: Text('エラー: ${snap.error}'));
+            return Center(child: Text(context.l10n.statementDetail_error(snap.error.toString())));
           }
           if (!snap.hasData || !snap.data!.exists) {
             return const Center(child: CircularProgressIndicator());
@@ -40,12 +40,12 @@ class StatementDetailPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.ruri,
+                  color: context.appColors.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   children: [
-                    Text('${stmt.month}月',
+                    Text(context.l10n.statementDetail_monthLabel(stmt.month.toString()),
                         style: const TextStyle(
                             color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 8),
@@ -68,18 +68,18 @@ class StatementDetailPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // 明細行
-              const Text('案件明細',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+              Text(context.l10n.statementDetail_jobDetails,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
               const SizedBox(height: 8),
               ...stmt.items.map((item) => Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
                       title: Text(item.jobTitle,
                           style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('完了日: ${item.completedDate}'),
+                      subtitle: Text(context.l10n.statementDetail_completedDate(item.completedDate)),
                       trailing: Text('¥${_formatAmount(item.amount)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w700, color: AppColors.ruri)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, color: context.appColors.primary)),
                     ),
                   )),
 
@@ -100,12 +100,12 @@ class StatementDetailPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.orange),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.schedule, color: Colors.orange),
-                      SizedBox(width: 8),
-                      Text('即金申請済み（審査中）',
-                          style: TextStyle(
+                      const Icon(Icons.schedule, color: Colors.orange),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.statementDetail_earlyPaymentPending,
+                          style: const TextStyle(
                               color: Colors.orange, fontWeight: FontWeight.w700)),
                     ],
                   ),
@@ -151,7 +151,8 @@ class _EarlyPaymentButton extends StatelessWidget {
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text('即金申請'),
+              title: Text(context.l10n.statementDetail_earlyPaymentTitle),
+              // TODO: i18n - statementDetail_earlyPaymentConfirm needs {amount}, {fee}, {payout} params
               content: Text(
                 '手数料10%が差し引かれます。\n\n'
                 '申請額: ¥$totalAmount\n'
@@ -162,11 +163,11 @@ class _EarlyPaymentButton extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('キャンセル'),
+                  child: Text(context.l10n.common_cancel),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(ctx, true),
-                  child: const Text('申請する'),
+                  child: Text(context.l10n.statementDetail_applyButton),
                 ),
               ],
             ),
@@ -181,19 +182,19 @@ class _EarlyPaymentButton extends StatelessWidget {
               AppHaptics.success();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('即金申請を送信しました')),
+                SnackBar(content: Text(context.l10n.statementDetail_earlyPaymentSuccess)),
               );
             } catch (e) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('申請に失敗: $e')),
+                SnackBar(content: Text('${context.l10n.statementDetail_earlyPaymentError}: $e')),
               );
             }
           }
         },
         icon: const Icon(Icons.flash_on),
-        label: const Text('即金申請（手数料10%）',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(context.l10n.statementDetail_earlyPaymentButton,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.orange,
           foregroundColor: Colors.white,

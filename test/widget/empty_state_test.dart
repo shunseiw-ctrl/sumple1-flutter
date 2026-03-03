@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 
 void main() {
   group('EmptyState', () {
     testWidgets('renders icon, title, and description', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: EmptyState(
               icon: Icons.work_off,
               title: '案件がありません',
@@ -26,6 +38,15 @@ void main() {
       bool tapped = false;
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
           home: Scaffold(
             body: EmptyState(
               icon: Icons.search,
@@ -48,8 +69,17 @@ void main() {
 
     testWidgets('does not render action button when actionText is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
               title: 'メッセージなし',
@@ -64,8 +94,17 @@ void main() {
 
     testWidgets('does not render action button when onAction is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
               title: 'メッセージなし',
@@ -81,8 +120,17 @@ void main() {
 
     testWidgets('renders without imagePath shows icon container', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: EmptyState(
               icon: Icons.notifications_off,
               title: '通知なし',
@@ -98,8 +146,17 @@ void main() {
 
     testWidgets('custom iconColor is applied', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
             body: EmptyState(
               icon: Icons.error,
               title: 'エラー',

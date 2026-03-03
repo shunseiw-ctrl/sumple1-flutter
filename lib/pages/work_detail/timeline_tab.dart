@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/services/activity_log_service.dart';
 import '../../data/models/activity_log_model.dart';
 
@@ -27,15 +27,16 @@ class TimelineTab extends StatelessWidget {
     };
   }
 
-  Color _colorForEvent(String eventType) {
+  Color _colorForEvent(BuildContext context, String eventType) {
+    final colors = context.appColors;
     return switch (eventType) {
-      'status_change' => AppColors.ruri,
+      'status_change' => colors.primary,
       'checkin' => Colors.green,
       'checkout' => Colors.orange,
       'report_submitted' => Colors.blue,
       'inspection_completed' => Colors.teal,
-      'note_added' => AppColors.textSecondary,
-      _ => AppColors.textHint,
+      'note_added' => colors.textSecondary,
+      _ => colors.textHint,
     };
   }
 
@@ -47,20 +48,20 @@ class TimelineTab extends StatelessWidget {
       stream: service.watchTimeline(applicationId),
       builder: (context, snap) {
         if (snap.hasError) {
-          return Center(child: Text('エラー: ${snap.error}'));
+          return Center(child: Text(context.l10n.timeline_error(snap.error.toString())));
         }
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
         final logs = snap.data!;
         if (logs.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.timeline, size: 48, color: AppColors.textHint),
-                SizedBox(height: 12),
-                Text('タイムラインはまだありません', style: TextStyle(color: AppColors.textSecondary)),
+                Icon(Icons.timeline, size: 48, color: context.appColors.textHint),
+                const SizedBox(height: 12),
+                Text(context.l10n.timeline_empty, style: TextStyle(color: context.appColors.textSecondary)),
               ],
             ),
           );
@@ -71,7 +72,7 @@ class TimelineTab extends StatelessWidget {
           itemCount: logs.length,
           itemBuilder: (context, index) {
             final log = logs[index];
-            final color = _colorForEvent(log.eventType);
+            final color = _colorForEvent(context, log.eventType);
             return Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Row(
@@ -93,7 +94,7 @@ class TimelineTab extends StatelessWidget {
                         Container(
                           width: 2,
                           height: 32,
-                          color: AppColors.divider,
+                          color: context.appColors.divider,
                         ),
                     ],
                   ),
@@ -109,8 +110,8 @@ class TimelineTab extends StatelessWidget {
                         if (log.createdAt != null)
                           Text(
                             _formatDateTime(log.createdAt!),
-                            style: const TextStyle(
-                                fontSize: 12, color: AppColors.textHint),
+                            style: TextStyle(
+                                fontSize: 12, color: context.appColors.textHint),
                           ),
                         const SizedBox(height: 8),
                       ],

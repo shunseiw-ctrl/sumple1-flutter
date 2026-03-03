@@ -12,6 +12,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/pages/legal_page.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
@@ -49,7 +50,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
       Logger.info('Guest sign in successful', tag: 'GuestHomePage');
 
       if (!mounted) return;
-      ErrorHandler.showSuccess(context, 'ゲストとしてログインしました');
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_guestLoginSuccess);
     } catch (e) {
       Logger.error('Guest sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
@@ -73,7 +74,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
       }
       Logger.info('Apple sign in successful', tag: 'GuestHomePage');
       if (!mounted) return;
-      ErrorHandler.showSuccess(context, 'Appleでログインしました');
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
     } catch (e) {
       Logger.error('Apple sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
@@ -163,7 +164,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '建設業界の仕事マッチングアプリ',
+                          context.l10n.guestHome_subtitle,
                           style: AppTextStyles.bodyLarge.copyWith(
                             color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 15,
@@ -184,17 +185,17 @@ class _GuestHomePageState extends State<GuestHomePage> {
                           children: [
                             _buildFeatureCard(
                               icon: Icons.search_rounded,
-                              label: '仕事を探す',
+                              label: context.l10n.guestHome_featureSearch,
                             ),
                             const SizedBox(width: 10),
                             _buildFeatureCard(
                               icon: Icons.flash_on_rounded,
-                              label: 'すぐに稼げる',
+                              label: context.l10n.guestHome_featureEarn,
                             ),
                             const SizedBox(width: 10),
                             _buildFeatureCard(
                               icon: Icons.verified_user_rounded,
-                              label: '安心の支払い',
+                              label: context.l10n.guestHome_featurePayment,
                             ),
                           ],
                         ),
@@ -205,7 +206,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.appColors.surface,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(28),
                       topRight: Radius.circular(28),
@@ -259,7 +260,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                         ),
                                       )
                                     : Text(
-                                        'ゲストとして始める',
+                                        context.l10n.guestHome_startAsGuest,
                                         style: AppTextStyles.button.copyWith(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -290,7 +291,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 },
                                 icon: const Icon(Icons.chat_bubble, size: 22),
                                 label: Text(
-                                  'LINEでログイン',
+                                  context.l10n.guestHome_lineLogin,
                                   style: AppTextStyles.button.copyWith(
                                     color: Colors.white,
                                     fontSize: 16,
@@ -355,7 +356,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                     },
                               icon: const Icon(Icons.phone, size: 22),
                               label: Text(
-                                '電話番号でログイン',
+                                context.l10n.guestHome_phoneLogin,
                                 style: AppTextStyles.button.copyWith(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -384,7 +385,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 color: AppColors.ruri,
                               ),
                               label: Text(
-                                'メールアドレスでログイン',
+                                context.l10n.guestHome_emailLogin,
                                 style: AppTextStyles.button.copyWith(
                                   color: AppColors.ruri,
                                   fontSize: 15,
@@ -392,8 +393,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppColors.ruri,
-                                side: const BorderSide(
-                                  color: AppColors.border,
+                                side: BorderSide(
+                                  color: context.appColors.border,
                                   width: 1.5,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -409,7 +410,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  context.push(RoutePaths.legal, extra: {'title': '利用規約', 'htmlContent': LegalPage.termsHtml});
+                                  context.push(RoutePaths.legal, extra: {'title': context.l10n.guestHome_termsOfService, 'htmlContent': LegalPage.termsHtml});
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -417,27 +418,27 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
-                                  '利用規約',
+                                  context.l10n.guestHome_termsOfService,
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: AppColors.textHint,
+                                    color: context.appColors.textHint,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: AppColors.textHint,
+                                    decorationColor: context.appColors.textHint,
                                   ),
                                 ),
                               ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
                                 child: Text(
                                   '・',
                                   style: TextStyle(
-                                    color: AppColors.textHint,
+                                    color: context.appColors.textHint,
                                     fontSize: 11,
                                   ),
                                 ),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  context.push(RoutePaths.legal, extra: {'title': 'プライバシーポリシー', 'htmlContent': LegalPage.privacyPolicyHtml});
+                                  context.push(RoutePaths.legal, extra: {'title': context.l10n.guestHome_privacyPolicy, 'htmlContent': LegalPage.privacyPolicyHtml});
                                 },
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -445,11 +446,11 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
-                                  'プライバシーポリシー',
+                                  context.l10n.guestHome_privacyPolicy,
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: AppColors.textHint,
+                                    color: context.appColors.textHint,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: AppColors.textHint,
+                                    decorationColor: context.appColors.textHint,
                                   ),
                                 ),
                               ),

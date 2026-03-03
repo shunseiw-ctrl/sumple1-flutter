@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 
 class AdminJobManagementTab extends StatefulWidget {
@@ -27,7 +27,7 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       body: Column(
         children: [
           // 検索バー
@@ -36,7 +36,7 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'タイトル・場所で検索',
+                hintText: context.l10n.adminJobManagement_searchHint,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -50,7 +50,7 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.divider),
+                  borderSide: BorderSide(color: context.appColors.divider),
                 ),
               ),
               onChanged: (v) => setState(() => _searchQuery = v.trim().toLowerCase()),
@@ -63,13 +63,13 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _FilterChip(label: 'すべて', value: 'all', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
+                  _FilterChip(label: context.l10n.adminJobManagement_filterAll, value: 'all', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
                   const SizedBox(width: 8),
-                  _FilterChip(label: '公開中', value: 'active', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
+                  _FilterChip(label: context.l10n.adminJobManagement_filterActive, value: 'active', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
                   const SizedBox(width: 8),
-                  _FilterChip(label: '完了', value: 'completed', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
+                  _FilterChip(label: context.l10n.adminJobManagement_filterCompleted, value: 'completed', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
                   const SizedBox(width: 8),
-                  _FilterChip(label: '下書き', value: 'draft', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
+                  _FilterChip(label: context.l10n.adminJobManagement_filterDraft, value: 'draft', selected: _statusFilter, onSelected: (v) => setState(() => _statusFilter = v)),
                 ],
               ),
             ),
@@ -91,18 +91,18 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: AppColors.textHint),
+                        Icon(Icons.error_outline, size: 48, color: context.appColors.textHint),
                         const SizedBox(height: 12),
-                        const Text(
-                          'データの読み込みに失敗しました',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                        Text(
+                          context.l10n.adminJobManagement_loadFailed,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.appColors.textSecondary),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${snap.error}'.contains('permission-denied')
-                              ? '権限がありません'
-                              : 'ネットワーク接続を確認してください',
-                          style: const TextStyle(fontSize: 13, color: AppColors.textHint),
+                              ? context.l10n.adminJobManagement_noPermission
+                              : context.l10n.adminJobManagement_checkNetwork,
+                          style: TextStyle(fontSize: 13, color: context.appColors.textHint),
                         ),
                       ],
                     ),
@@ -129,20 +129,20 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
                 }
 
                 if (docs.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.work_off_outlined, size: 48, color: AppColors.textHint),
-                        SizedBox(height: 12),
+                        Icon(Icons.work_off_outlined, size: 48, color: context.appColors.textHint),
+                        const SizedBox(height: 12),
                         Text(
-                          '案件がまだありません',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                          context.l10n.adminJobManagement_noJobs,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.appColors.textSecondary),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          '右下のボタンから案件を投稿できます',
-                          style: TextStyle(fontSize: 13, color: AppColors.textHint),
+                          context.l10n.adminJobManagement_postHint,
+                          style: TextStyle(fontSize: 13, color: context.appColors.textHint),
                         ),
                       ],
                     ),
@@ -161,7 +161,7 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
                           child: Center(
                             child: OutlinedButton(
                               onPressed: () => setState(() => _limit += 20),
-                              child: const Text('もっと見る'),
+                              child: Text(context.l10n.adminJobManagement_showMore),
                             ),
                           ),
                         );
@@ -171,7 +171,7 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
 
                     final doc = docs[index];
                     final data = doc.data();
-                    final title = (data['title'] ?? 'タイトルなし').toString();
+                    final title = (data['title'] ?? context.l10n.adminJobManagement_noTitle).toString();
                     final location = (data['location'] ?? '').toString();
                     final price = data['price'];
                     final date = (data['date'] ?? '').toString();
@@ -197,10 +197,10 @@ class _AdminJobManagementTabState extends State<AdminJobManagementTab> {
         onPressed: () {
           context.push(RoutePaths.postJob);
         },
-        backgroundColor: AppColors.ruri,
+        backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('案件を投稿', style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(context.l10n.adminJobManagement_postJob, style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -227,16 +227,16 @@ class _FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.ruriPale : AppColors.chipUnselected,
+          color: isSelected ? context.appColors.primaryPale : context.appColors.chipUnselected,
           borderRadius: BorderRadius.circular(20),
-          border: isSelected ? Border.all(color: AppColors.ruri, width: 1.5) : null,
+          border: isSelected ? Border.all(color: context.appColors.primary, width: 1.5) : null,
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.ruri : AppColors.textSecondary,
+            color: isSelected ? context.appColors.primary : context.appColors.textSecondary,
           ),
         ),
       ),
@@ -277,7 +277,7 @@ class _JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -286,7 +286,7 @@ class _JobCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: context.appColors.divider),
           ),
           child: Row(
             children: [
@@ -294,10 +294,10 @@ class _JobCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.ruriPale,
+                  color: context.appColors.primaryPale,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.work, color: AppColors.ruri, size: 24),
+                child: Icon(Icons.work, color: context.appColors.primary, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -306,29 +306,29 @@ class _JobCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: context.appColors.textPrimary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.place, size: 14, color: AppColors.textHint),
+                        Icon(Icons.place, size: 14, color: context.appColors.textHint),
                         const SizedBox(width: 2),
                         Flexible(
                           child: Text(
-                            location.isNotEmpty ? location : '場所未設定',
-                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            location.isNotEmpty ? location : context.l10n.adminJobManagement_locationNotSet,
+                            style: TextStyle(fontSize: 12, color: context.appColors.textSecondary),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.event, size: 14, color: AppColors.textHint),
+                        Icon(Icons.event, size: 14, color: context.appColors.textHint),
                         const SizedBox(width: 2),
                         Text(
-                          date.isNotEmpty ? date : '未定',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                          date.isNotEmpty ? date : context.l10n.adminJobManagement_dateTbd,
+                          style: TextStyle(fontSize: 12, color: context.appColors.textSecondary),
                         ),
                       ],
                     ),
@@ -341,10 +341,10 @@ class _JobCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 _formatPrice(price),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: context.appColors.textPrimary),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+              Icon(Icons.chevron_right, color: context.appColors.textHint, size: 20),
             ],
           ),
         ),
@@ -369,14 +369,14 @@ class _ApplicationCount extends StatelessWidget {
         if (count == 0) return const SizedBox.shrink();
         return Row(
           children: [
-            const Icon(Icons.people, size: 14, color: AppColors.ruri),
+            Icon(Icons.people, size: 14, color: context.appColors.primary),
             const SizedBox(width: 4),
             Text(
-              '応募者 $count人',
-              style: const TextStyle(
+              context.l10n.adminJobManagement_applicantCount(count.toString()),
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ruri,
+                color: context.appColors.primary,
               ),
             ),
           ],

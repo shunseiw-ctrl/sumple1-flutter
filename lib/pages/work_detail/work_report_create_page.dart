@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/services/work_report_service.dart';
 import '../../core/services/activity_log_service.dart';
 import '../../core/utils/haptic_utils.dart';
@@ -76,19 +76,19 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
       await ActivityLogService().logEvent(
         applicationId: widget.applicationId,
         eventType: 'report_submitted',
-        description: '$_reportDateの日報を提出しました',
+        description: context.l10n.workReportCreate_logSubmitted(_reportDate),
       );
 
       AppHaptics.success();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('日報を提出しました')),
+        SnackBar(content: Text(context.l10n.workReportCreate_submitted)),
       );
       context.pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存に失敗: $e')),
+        SnackBar(content: Text(context.l10n.workReportCreate_saveFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -99,7 +99,7 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('日報作成'),
+        title: Text(context.l10n.workReportCreate_title),
       ),
       body: Form(
         key: _formKey,
@@ -108,7 +108,7 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
           children: [
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('日付'),
+              title: Text(context.l10n.workReportCreate_date),
               subtitle: Text(_reportDate),
               trailing: const Icon(Icons.edit),
               onTap: _pickDate,
@@ -118,13 +118,13 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
               controller: _contentController,
               maxLines: 5,
               maxLength: AppConstants.maxWorkReportContentLength,
-              decoration: const InputDecoration(
-                labelText: '作業内容 *',
-                hintText: '本日の作業内容を記入してください',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.workReportCreate_contentLabel,
+                hintText: context.l10n.workReportCreate_contentHint,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return '作業内容を入力してください';
+                if (v == null || v.trim().isEmpty) return context.l10n.workReportCreate_contentRequired;
                 return null;
               },
             ),
@@ -132,15 +132,15 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
             TextFormField(
               controller: _hoursController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: '作業時間（時間）',
-                border: OutlineInputBorder(),
-                suffixText: '時間',
+              decoration: InputDecoration(
+                labelText: context.l10n.workReportCreate_hoursLabel,
+                border: const OutlineInputBorder(),
+                suffixText: context.l10n.workReportCreate_hoursSuffix,
               ),
               validator: (v) {
                 final hours = double.tryParse(v ?? '');
                 if (hours == null || hours <= 0 || hours > 24) {
-                  return '0〜24の数値を入力してください';
+                  return context.l10n.workReportCreate_hoursValidation;
                 }
                 return null;
               },
@@ -150,10 +150,10 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
               controller: _notesController,
               maxLines: 3,
               maxLength: AppConstants.maxWorkReportNotesLength,
-              decoration: const InputDecoration(
-                labelText: '備考',
-                hintText: '追加の連絡事項があれば記入',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.workReportCreate_notesLabel,
+                hintText: context.l10n.workReportCreate_notesHint,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 24),
@@ -163,7 +163,7 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ruri,
+                  backgroundColor: context.appColors.primary,
                   foregroundColor: Colors.white,
                 ),
                 child: _isSaving
@@ -173,7 +173,7 @@ class _WorkReportCreatePageState extends State<WorkReportCreatePage> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('提出する', style: TextStyle(fontWeight: FontWeight.w700)),
+                    : Text(context.l10n.workReportCreate_submit, style: const TextStyle(fontWeight: FontWeight.w700)),
               ),
             ),
           ],

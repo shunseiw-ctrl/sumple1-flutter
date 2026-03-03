@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -25,7 +25,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = iconColor ?? AppColors.ruri;
+    final color = iconColor ?? context.appColors.primary;
 
     return Center(
       child: Padding(
@@ -89,11 +89,11 @@ class EmptyState extends StatelessWidget {
                 height: 52,
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
+                    gradient: context.appColors.primaryGradient,
                     borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.ruri.withValues(alpha: 0.25),
+                        color: context.appColors.primary.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

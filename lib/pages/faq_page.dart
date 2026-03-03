@@ -1,61 +1,62 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class FaqPage extends StatelessWidget {
   const FaqPage({super.key});
 
-  static const _faqItems = <Map<String, String>>[
+  static List<Map<String, String>> _faqItems(BuildContext context) => [
     {
-      'q': 'ALBAWORKとは何ですか？',
-      'a': 'ALBAWORKは建設業界に特化した求人マッチングアプリです。管理者（事業者）が案件を掲載し、職人が応募・作業・報酬受取まで一貫して行えます。',
+      'q': context.l10n.faq_q1,
+      'a': context.l10n.faq_a1,
     },
     {
-      'q': '利用料金はかかりますか？',
-      'a': 'アプリの利用自体は無料です。決済時にプラットフォーム手数料が発生します。詳細は利用規約をご確認ください。',
+      'q': context.l10n.faq_q2,
+      'a': context.l10n.faq_a2,
     },
     {
-      'q': '応募するにはどうすればいいですか？',
-      'a': 'ホーム画面で案件を探し、「応募する」ボタンをタップしてください。応募にはログインが必要です。',
+      'q': context.l10n.faq_q3,
+      'a': context.l10n.faq_a3,
     },
     {
-      'q': '出退勤はどのように記録しますか？',
-      'a': '管理者が生成したQRコードをスキャンし、GPS位置情報で現場にいることを確認して出退勤を記録します。現場から100m以内にいる必要があります。',
+      'q': context.l10n.faq_q4,
+      'a': context.l10n.faq_a4,
     },
     {
-      'q': '報酬はどのように受け取れますか？',
-      'a': 'Stripe Connectを通じて報酬をお支払いします。マイページの「Stripe口座設定」から銀行口座を登録してください。',
+      'q': context.l10n.faq_q5,
+      'a': context.l10n.faq_a5,
     },
     {
-      'q': '本人確認は必要ですか？',
-      'a': '案件への応募や報酬受取には本人確認が推奨されます。マイページの「本人確認」から身分証明書を提出してください。',
+      'q': context.l10n.faq_q6,
+      'a': context.l10n.faq_a6,
     },
     {
-      'q': '退会するにはどうすればいいですか？',
-      'a': 'マイページの「アカウント設定」から退会手続きについてご確認いただけます。お問い合わせフォームからもご連絡いただけます。',
+      'q': context.l10n.faq_q7,
+      'a': context.l10n.faq_a7,
     },
     {
-      'q': 'パスワードを忘れました',
-      'a': 'ログイン画面から「パスワードを忘れた方」リンクをタップし、登録メールアドレスを入力してください。リセットメールが送信されます。',
+      'q': context.l10n.faq_q8,
+      'a': context.l10n.faq_a8,
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     AnalyticsService.logScreenView('faq');
+    final items = _faqItems(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('よくある質問', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(context.l10n.faq_title, style: const TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: _faqItems.length,
+        itemCount: items.length,
         itemBuilder: (context, i) {
-          final item = _faqItems[i];
+          final item = items[i];
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFE6E8EB)),
             ),
@@ -63,7 +64,7 @@ class FaqPage extends StatelessWidget {
               tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               shape: const Border(),
-              leading: const Icon(Icons.help_outline, color: AppColors.ruri, size: 20),
+              leading: Icon(Icons.help_outline, color: context.appColors.primary, size: 20),
               title: Text(
                 item['q']!,
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
@@ -71,7 +72,7 @@ class FaqPage extends StatelessWidget {
               children: [
                 Text(
                   item['a']!,
-                  style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6),
+                  style: TextStyle(fontSize: 14, color: context.appColors.textSecondary, height: 1.6),
                 ),
               ],
             ),

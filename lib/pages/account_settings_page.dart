@@ -3,21 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/account_service.dart';
-import 'package:sumple1/l10n/app_localizations.dart';
+import 'package:sumple1/core/providers/locale_provider.dart';
 
-class AccountSettingsPage extends StatefulWidget {
+class AccountSettingsPage extends ConsumerStatefulWidget {
   const AccountSettingsPage({super.key});
 
   @override
-  State<AccountSettingsPage> createState() => _AccountSettingsPageState();
+  ConsumerState<AccountSettingsPage> createState() => _AccountSettingsPageState();
 }
 
-class _AccountSettingsPageState extends State<AccountSettingsPage> {
+class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   final _nameController = TextEditingController();
   final _currentPassController = TextEditingController();
   final _newPassController = TextEditingController();
@@ -86,13 +87,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('表示名を更新しました')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackNameUpdated)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('更新に失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackUpdateFailed(e.toString()))),
         );
       }
     } finally {
@@ -106,13 +107,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
     if (currentPass.isEmpty || newPass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('現在のパスワードと新しいパスワードを入力してください')),
+        SnackBar(content: Text(context.l10n.accountSettings_snackEnterBothPasswords)),
       );
       return;
     }
     if (newPass.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('パスワードは6文字以上にしてください')),
+        SnackBar(content: Text(context.l10n.accountSettings_snackPasswordMinLength)),
       );
       return;
     }
@@ -121,7 +122,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       final email = user?.email;
-      if (user == null || email == null) throw Exception('ログインが必要です');
+      if (user == null || email == null) throw Exception(context.l10n.accountSettings_loginRequired);
 
       // 再認証
       final cred = EmailAuthProvider.credential(email: email, password: currentPass);
@@ -133,20 +134,20 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('パスワードを変更しました')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackPasswordChanged)),
         );
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         final msg = e.code == 'wrong-password'
-            ? '現在のパスワードが正しくありません'
-            : 'パスワード変更に失敗しました: ${e.code}';
+            ? context.l10n.accountSettings_snackWrongPassword
+            : context.l10n.accountSettings_snackPasswordChangeFailed(e.code);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('エラー: $e')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackError(e.toString()))),
         );
       }
     } finally {
@@ -165,13 +166,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('データをクリップボードにコピーしました')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackDataCopied)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('データエクスポートに失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackExportFailed(e.toString()))),
         );
       }
     } finally {
@@ -184,24 +185,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.deleteAccount),
-        content: const Text(
-          'アカウントを削除すると、全てのデータが完全に失われます。\n\n'
-          '・プロフィール情報\n'
-          '・応募履歴\n'
-          '・チャット履歴\n'
-          '・お気に入り\n'
-          '・通知\n\n'
-          'この操作は取り消せません。本当に削除しますか？',
+        title: Text(context.l10n.accountSettings_deleteAccount),
+        content: Text(
+          context.l10n.accountSettings_deleteConfirmMessage,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text(context.l10n.accountSettings_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: AppColors.error)),
+            child: Text(context.l10n.accountSettings_delete, style: TextStyle(color: context.appColors.error)),
           ),
         ],
       ),
@@ -215,20 +210,20 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       builder: (ctx) {
         final controller = TextEditingController();
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.confirm),
+          title: Text(context.l10n.accountSettings_confirm),
           content: TextField(
             controller: controller,
             obscureText: true,
-            decoration: const InputDecoration(hintText: '現在のパスワード'),
+            decoration: InputDecoration(hintText: context.l10n.accountSettings_currentPasswordHint),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(context.l10n.accountSettings_cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, controller.text),
-              child: Text(AppLocalizations.of(context)!.confirm, style: const TextStyle(color: AppColors.error)),
+              child: Text(context.l10n.accountSettings_confirm, style: TextStyle(color: context.appColors.error)),
             ),
           ],
         );
@@ -241,7 +236,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       final email = user?.email;
-      if (user == null || email == null) throw Exception('ログインが必要です');
+      if (user == null || email == null) throw Exception(context.l10n.accountSettings_loginRequired);
 
       // 再認証
       final cred = EmailAuthProvider.credential(email: email, password: password);
@@ -260,14 +255,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         final msg = e.code == 'wrong-password'
-            ? 'パスワードが正しくありません'
-            : 'アカウント削除に失敗しました: ${e.code}';
+            ? context.l10n.accountSettings_snackWrongPassword
+            : context.l10n.accountSettings_snackDeleteFailed(e.code);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('アカウント削除に失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.accountSettings_snackDeleteFailedGeneric(e.toString()))),
         );
       }
     } finally {
@@ -278,11 +273,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    final email = user?.email ?? '未設定';
+    final email = user?.email ?? context.l10n.accountSettings_notSet;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.accountSettings, style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(context.l10n.accountSettings_title, style: const TextStyle(fontWeight: FontWeight.w800)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -291,19 +286,19 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE6E8EB)),
+              border: Border.all(color: context.appColors.divider),
             ),
             child: Row(
               children: [
-                const Icon(Icons.email_outlined, color: AppColors.textSecondary, size: 20),
+                Icon(Icons.email_outlined, color: context.appColors.textSecondary, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppLocalizations.of(context)!.email, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      Text(context.l10n.accountSettings_emailLabel, style: TextStyle(fontSize: 12, color: context.appColors.textSecondary, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
                       Text(email, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     ],
@@ -316,15 +311,15 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 20),
 
           // 表示名変更
-          Text(AppLocalizations.of(context)!.displayName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.accountSettings_displayNameLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
             decoration: InputDecoration(
-              hintText: '名前を入力',
+              hintText: context.l10n.accountSettings_nameHint,
               suffixIcon: IconButton(
                 onPressed: _saving ? null : _updateDisplayName,
-                icon: const Icon(Icons.check, color: AppColors.ruri),
+                icon: Icon(Icons.check, color: context.appColors.primary),
               ),
             ),
           ),
@@ -332,18 +327,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 28),
 
           // パスワード変更
-          Text(AppLocalizations.of(context)!.changePassword, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.accountSettings_changePasswordLabel, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           TextField(
             controller: _currentPassController,
             obscureText: true,
-            decoration: const InputDecoration(hintText: '現在のパスワード'),
+            decoration: InputDecoration(hintText: context.l10n.accountSettings_currentPasswordHint),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _newPassController,
             obscureText: true,
-            decoration: const InputDecoration(hintText: '新しいパスワード（6文字以上）'),
+            decoration: InputDecoration(hintText: context.l10n.accountSettings_newPasswordHint),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -352,31 +347,75 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               onPressed: _saving ? null : _changePassword,
               child: _saving
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : Text(AppLocalizations.of(context)!.changePassword),
+                  : Text(context.l10n.accountSettings_changePasswordButton),
             ),
           ),
 
           const SizedBox(height: 28),
-          const Text('通知設定', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+          Text(context.l10n.accountSettings_notificationSettings, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary)),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE6E8EB)),
+              border: Border.all(color: context.appColors.divider),
             ),
             child: Row(
               children: [
-                const Icon(Icons.notifications_outlined, color: AppColors.textSecondary, size: 20),
+                Icon(Icons.notifications_outlined, color: context.appColors.textSecondary, size: 20),
                 const SizedBox(width: 12),
-                const Expanded(
-                  child: Text('お知らせ通知を受け取る', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                Expanded(
+                  child: Text(context.l10n.accountSettings_receiveNotifications, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                 ),
                 Switch(
                   value: _reengagementEnabled,
                   onChanged: _toggleReengagement,
-                  activeTrackColor: AppColors.ruri,
+                  activeTrackColor: context.appColors.primary,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          // 言語設定
+          Text(
+            context.l10n.accountSettings_languageLabel,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.appColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: context.appColors.divider),
+            ),
+            child: Column(
+              children: [
+                RadioListTile<Locale>(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('日本語', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  value: const Locale('ja'),
+                  groupValue: ref.watch(localeProvider),
+                  activeColor: context.appColors.primary,
+                  onChanged: (v) {
+                    if (v != null) ref.read(localeProvider.notifier).setLocale(v);
+                  },
+                ),
+                Divider(height: 1, color: context.appColors.divider),
+                RadioListTile<Locale>(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('English', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  value: const Locale('en'),
+                  groupValue: ref.watch(localeProvider),
+                  activeColor: context.appColors.primary,
+                  onChanged: (v) {
+                    if (v != null) ref.read(localeProvider.notifier).setLocale(v);
+                  },
                 ),
               ],
             ),
@@ -388,8 +427,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Center(
             child: TextButton.icon(
               onPressed: _saving ? null : _exportData,
-              icon: const Icon(Icons.download, color: AppColors.ruri, size: 18),
-              label: Text(AppLocalizations.of(context)!.downloadData, style: const TextStyle(color: AppColors.ruri, fontSize: 13)),
+              icon: Icon(Icons.download, color: context.appColors.primary, size: 18),
+              label: Text(context.l10n.accountSettings_downloadData, style: TextStyle(color: context.appColors.primary, fontSize: 13)),
             ),
           ),
 
@@ -399,7 +438,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Center(
             child: TextButton(
               onPressed: _saving ? null : _showDeleteConfirmation,
-              child: Text(AppLocalizations.of(context)!.deleteAccount, style: const TextStyle(color: AppColors.error, fontSize: 13)),
+              child: Text(context.l10n.accountSettings_deleteAccount, style: TextStyle(color: context.appColors.error, fontSize: 13)),
             ),
           ),
         ],

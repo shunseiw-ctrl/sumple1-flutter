@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/pages/onboarding_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 
 Widget _buildTestApp() {
   return MaterialApp(
+    theme: ThemeData(extensions: const [AppColorsExtension.light]),
     localizationsDelegates: const [
       AppLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,

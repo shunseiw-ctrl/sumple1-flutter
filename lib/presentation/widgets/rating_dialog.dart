@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 
 class RatingDialog extends StatefulWidget {
   final String applicationId;
@@ -52,7 +52,7 @@ class _RatingDialogState extends State<RatingDialog> {
   Future<void> _submit() async {
     if (_stars == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('星を選択してください')),
+        SnackBar(content: Text(context.l10n.ratingDialog_selectStars)),
       );
       return;
     }
@@ -71,12 +71,12 @@ class _RatingDialogState extends State<RatingDialog> {
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('評価を送信しました')),
+        SnackBar(content: Text(context.l10n.ratingDialog_submitSuccess)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('送信に失敗しました: $e')),
+        SnackBar(content: Text(context.l10n.ratingDialog_submitFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -94,14 +94,14 @@ class _RatingDialogState extends State<RatingDialog> {
           children: [
             const Icon(Icons.star_rounded, size: 48, color: Colors.amber),
             const SizedBox(height: 16),
-            const Text(
-              'お仕事の評価',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+            Text(
+              context.l10n.ratingDialog_title,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: context.appColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
               widget.jobTitle,
-              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 14, color: context.appColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -114,7 +114,7 @@ class _RatingDialogState extends State<RatingDialog> {
                   icon: Icon(
                     starNum <= _stars ? Icons.star_rounded : Icons.star_outline_rounded,
                     size: 40,
-                    color: starNum <= _stars ? Colors.amber : AppColors.textHint,
+                    color: starNum <= _stars ? Colors.amber : context.appColors.textHint,
                   ),
                 );
               }),
@@ -123,8 +123,15 @@ class _RatingDialogState extends State<RatingDialog> {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  ['', '不満', 'やや不満', '普通', '良い', '最高！'][_stars],
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                  [
+                    '',
+                    context.l10n.ratingDialog_dissatisfied,
+                    context.l10n.ratingDialog_somewhatDissatisfied,
+                    context.l10n.ratingDialog_average,
+                    context.l10n.ratingDialog_good,
+                    context.l10n.ratingDialog_excellent,
+                  ][_stars],
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.appColors.textSecondary),
                 ),
               ),
             const SizedBox(height: 16),
@@ -132,7 +139,7 @@ class _RatingDialogState extends State<RatingDialog> {
               controller: _commentController,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: 'コメント（任意）',
+                hintText: context.l10n.ratingDialog_commentHint,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
@@ -143,19 +150,19 @@ class _RatingDialogState extends State<RatingDialog> {
               child: ElevatedButton(
                 onPressed: _isSubmitting ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ruri,
+                  backgroundColor: context.appColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isSubmitting
                     ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('評価を送信', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    : Text(context.l10n.ratingDialog_submit, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               ),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('後で', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text(context.l10n.ratingDialog_later, style: TextStyle(color: context.appColors.textSecondary)),
             ),
           ],
         ),

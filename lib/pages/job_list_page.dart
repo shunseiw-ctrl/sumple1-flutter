@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
@@ -30,11 +30,11 @@ class JobListPage extends ConsumerStatefulWidget {
 }
 
 class _JobListPageState extends ConsumerState<JobListPage> {
-  String _selectedPref = '東京都';
+  String _selectedPref = 'tokyo';
 
   String? _selectedMonthKey;
 
-  String _sortLabel = '新着順';
+  String _sortKey = 'newest';
 
   final _favoritesService = FavoritesService();
   final _distanceSortService = DistanceSortService();
@@ -47,12 +47,31 @@ class _JobListPageState extends ConsumerState<JobListPage> {
   List<JobWithDistance>? _sortedByDistance;
   bool _loadingLocation = false;
 
-  final List<String> _prefs = const [
-    '千葉県',
-    '東京都',
-    '神奈川県',
-    'その他',
+  static const List<String> _prefKeys = [
+    'chiba',
+    'tokyo',
+    'kanagawa',
+    'other',
   ];
+
+  static const Map<String, String> _prefValues = {
+    'chiba': '千葉県',
+    'tokyo': '東京都',
+    'kanagawa': '神奈川県',
+    'other': 'その他',
+  };
+
+  static String _prefLabel(BuildContext context, String key) {
+    switch (key) {
+      case 'chiba': return context.l10n.jobList_prefChiba;
+      case 'tokyo': return context.l10n.jobList_prefTokyo;
+      case 'kanagawa': return context.l10n.jobList_prefKanagawa;
+      case 'other': return context.l10n.jobList_prefOther;
+      default: return key;
+    }
+  }
+
+  String get _selectedPrefValue => _prefValues[_selectedPref] ?? _selectedPref;
 
   late final List<_MonthChip> _monthChips = _buildMonthChips();
 
@@ -68,12 +87,12 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     DateTime addMonths(DateTime base, int m) => DateTime(base.year, base.month + m);
 
     final list = <_MonthChip>[];
-    list.add(_MonthChip(label: '今月', month: thisMonth));
-    list.add(_MonthChip(label: '来月', month: addMonths(thisMonth, 1)));
+    list.add(_MonthChip(labelKey: 'thisMonth', month: thisMonth));
+    list.add(_MonthChip(labelKey: 'nextMonth', month: addMonths(thisMonth, 1)));
 
     for (int i = 2; i <= 6; i++) {
       final m = addMonths(thisMonth, i);
-      list.add(_MonthChip(label: '${m.month}月', month: m));
+      list.add(_MonthChip(labelKey: 'month_${m.month}', month: m));
     }
     return list;
   }
@@ -84,12 +103,21 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     return '$y-$m';
   }
 
+  String _sortLabel(BuildContext context) {
+    switch (_sortKey) {
+      case 'newest': return context.l10n.jobList_sortNewest;
+      case 'distance': return context.l10n.jobList_sortDistance;
+      case 'highestPay': return context.l10n.jobList_sortHighestPay;
+      default: return context.l10n.jobList_sortNewest;
+    }
+  }
+
   void _onSortSelected(String value) {
-    if (value == '距離順') {
+    if (value == 'distance') {
       _loadDistanceSort();
     } else {
       setState(() {
-        _sortLabel = value;
+        _sortKey = value;
         _sortedByDistance = null;
       });
     }
@@ -99,7 +127,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     if (_loadingLocation) return;
     setState(() {
       _loadingLocation = true;
-      _sortLabel = '距離順';
+      _sortKey = 'distance';
     });
 
     try {
@@ -136,7 +164,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
         SnackBar(content: Text(e.message)),
       );
       setState(() {
-        _sortLabel = '新着順';
+        _sortKey = 'newest';
         _sortedByDistance = null;
         _loadingLocation = false;
       });
@@ -144,10 +172,10 @@ class _JobListPageState extends ConsumerState<JobListPage> {
       Logger.error('Failed to load distance sort', tag: 'JobListPage', error: e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('位置情報の取得に失敗しました')),
+        SnackBar(content: Text(context.l10n.jobList_locationError)),
       );
       setState(() {
-        _sortLabel = '新着順';
+        _sortKey = 'newest';
         _sortedByDistance = null;
         _loadingLocation = false;
       });
@@ -171,7 +199,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     }).catchError((e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('案件データの取得に失敗しました')),
+        SnackBar(content: Text(context.l10n.jobList_fetchJobsError)),
       );
     });
   }
@@ -193,30 +221,30 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
-            color: Colors.white,
+            color: context.appColors.surface,
             child: Semantics(
               button: true,
-              label: '検索フィルターを開く',
+              label: context.l10n.jobList_openSearchFilter,
               child: GestureDetector(
                 onTap: _showFilterSheet,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: context.appColors.background,
                     borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, color: AppColors.textHint, size: 20),
+                      Icon(Icons.search, color: context.appColors.textHint, size: 20),
                       const SizedBox(width: 12),
-                      Text('エリア・条件で検索', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
+                      Text(context.l10n.jobList_searchByAreaCondition, style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.textHint)),
                       const Spacer(),
-                      const Icon(Icons.tune_rounded, color: AppColors.textSecondary, size: 20),
+                      Icon(Icons.tune_rounded, color: context.appColors.textSecondary, size: 20),
                     ],
                   ),
                 ),
@@ -225,14 +253,15 @@ class _JobListPageState extends ConsumerState<JobListPage> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               boxShadow: AppShadows.subtle,
             ),
             padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.md, AppSpacing.base, AppSpacing.sm),
             child: Column(
               children: [
                 _PrefChips(
-                  prefs: _prefs,
+                  prefKeys: _prefKeys,
+                  labelBuilder: (key) => _prefLabel(context, key),
                   selected: _selectedPref,
                   onSelected: (p) {
                     AppHaptics.selection();
@@ -252,39 +281,39 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                 Row(
                   children: [
                     _SortDropDown(
-                      label: _sortLabel,
+                      label: _sortLabel(context),
                       onSelected: (value) => _onSortSelected(value),
                     ),
                     const Spacer(),
                     Semantics(
                       button: true,
-                      label: _filterState.hasActiveFilters ? '絞り込み、フィルター適用中' : '絞り込み',
+                      label: _filterState.hasActiveFilters ? context.l10n.jobList_filterActiveLabel : context.l10n.jobList_filter,
                       child: GestureDetector(
                         onTap: _showFilterSheet,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.sm + 2),
                           decoration: BoxDecoration(
-                            color: _filterState.hasActiveFilters ? AppColors.ruriPale : AppColors.chipUnselected,
+                            color: _filterState.hasActiveFilters ? context.appColors.primaryPale : context.appColors.chipUnselected,
                             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                            border: _filterState.hasActiveFilters ? Border.all(color: AppColors.ruri.withValues(alpha: 0.3), width: 1) : null,
+                            border: _filterState.hasActiveFilters ? Border.all(color: context.appColors.primary.withValues(alpha: 0.3), width: 1) : null,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.tune_rounded, size: 18, color: _filterState.hasActiveFilters ? AppColors.ruri : AppColors.textSecondary),
+                              Icon(Icons.tune_rounded, size: 18, color: _filterState.hasActiveFilters ? context.appColors.primary : context.appColors.textSecondary),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
-                                '絞り込み',
+                                context.l10n.jobList_filter,
                                 style: AppTextStyles.labelMedium.copyWith(
-                                  color: _filterState.hasActiveFilters ? AppColors.ruri : AppColors.textPrimary,
+                                  color: _filterState.hasActiveFilters ? context.appColors.primary : context.appColors.textPrimary,
                                 ),
                               ),
                               if (_filterState.hasActiveFilters) ...[
                                 const SizedBox(width: AppSpacing.xs),
                                 Container(
                                   width: 8, height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.ruri,
+                                  decoration: BoxDecoration(
+                                    color: context.appColors.primary,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -311,8 +340,8 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                   stream: (() {
                     Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection('jobs');
 
-                    if (_selectedPref != 'その他') {
-                      q = q.where('prefecture', isEqualTo: _selectedPref);
+                    if (_selectedPref != 'other') {
+                      q = q.where('prefecture', isEqualTo: _selectedPrefValue);
                     }
 
                     if (_selectedMonthKey != null) {
@@ -333,17 +362,17 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       }
                       return ErrorRetryWidget.general(
                         onRetry: () => setState(() {}),
-                        message: 'データの読み込みに失敗しました\nしばらく経ってからお試しください',
+                        message: context.l10n.jobList_dataLoadError,
                       );
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const SkeletonList();
                     }
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const EmptyState(
+                      return EmptyState(
                         icon: Icons.work_off_outlined,
-                        title: '案件がありません',
-                        description: '現在この条件に合う案件はありません。\n別の条件で検索してみてください。',
+                        title: context.l10n.jobList_noJobs,
+                        description: context.l10n.jobList_noJobsDescription,
                         imagePath: 'assets/images/empty_jobs.png',
                       );
                     }
@@ -352,7 +381,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
                     const excludePrefs = {'千葉県', '東京都', '神奈川県'};
 
-                    final docs = _selectedPref == 'その他'
+                    final docs = _selectedPref == 'other'
                         ? rawDocs.where((d) {
                       final data = d.data() as Map<String, dynamic>;
                       final pref = data['prefecture']?.toString();
@@ -387,7 +416,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       return true;
                     }).toList();
 
-                    if (_sortLabel == '金額が高い順') {
+                    if (_sortKey == 'highestPay') {
                       filteredDocs.sort((a, b) {
                         final aData = a.data() as Map<String, dynamic>;
                         final bData = b.data() as Map<String, dynamic>;
@@ -399,7 +428,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
                     // 距離ソート結果のマップ（docId → distanceLabel）
                     final distanceLabels = <String, String>{};
-                    if (_sortLabel == '距離順' && _sortedByDistance != null) {
+                    if (_sortKey == 'distance' && _sortedByDistance != null) {
                       for (final jwd in _sortedByDistance!) {
                         if (jwd.distanceLabel != null) {
                           distanceLabels[jwd.docId] = jwd.distanceLabel!;
@@ -418,10 +447,10 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                     }
 
                     if (filteredDocs.isEmpty) {
-                      return const EmptyState(
+                      return EmptyState(
                         icon: Icons.search_off_rounded,
-                        title: '条件に一致する案件がありません',
-                        description: 'フィルターを変更するか、\n別の条件で検索してみてください。',
+                        title: context.l10n.jobList_noMatchingJobs,
+                        description: context.l10n.jobList_noMatchingJobsDescription,
                       );
                     }
 
@@ -430,7 +459,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                         setState(() => _refreshKey = UniqueKey());
                         await Future.delayed(const Duration(milliseconds: 500));
                       },
-                      color: AppColors.ruri,
+                      color: context.appColors.primary,
                       child: ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
                         cacheExtent: AppConstants.listCacheExtent,
@@ -440,10 +469,10 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                           final doc = filteredDocs[index];
                           final data = doc.data() as Map<String, dynamic>;
 
-                          final title = data['title']?.toString() ?? 'タイトルなし';
-                          final location = data['location']?.toString() ?? '未設定';
+                          final title = data['title']?.toString() ?? context.l10n.common_noTitle;
+                          final location = data['location']?.toString() ?? context.l10n.common_notSet;
                           final price = data['price']?.toString() ?? '0';
-                          final date = data['date']?.toString() ?? '未設定';
+                          final date = data['date']?.toString() ?? context.l10n.common_notSet;
                           final imageUrl = data['imageUrl']?.toString();
                           final category = data['category']?.toString();
 
@@ -492,9 +521,9 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                                     }
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('登録するとお気に入りが保存されます'),
-                                      duration: Duration(seconds: 2),
+                                    SnackBar(
+                                      content: Text(context.l10n.common_registerToSaveFavorites),
+                                      duration: const Duration(seconds: 2),
                                     ),
                                   );
                                 }
@@ -524,10 +553,10 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
       floatingActionButton: Semantics(
         button: true,
-        label: '地図で現場を確認する',
+        label: context.l10n.jobList_viewOnMapAccessibility,
         child: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            gradient: context.appColors.primaryGradient,
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             boxShadow: AppShadows.button,
           ),
@@ -536,7 +565,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             icon: const Icon(Icons.map_outlined, color: Colors.white),
-            label: Text('地図で見る', style: AppTextStyles.buttonSmall.copyWith(color: Colors.white)),
+            label: Text(context.l10n.jobList_viewOnMap, style: AppTextStyles.buttonSmall.copyWith(color: Colors.white)),
           ),
         ),
       ),
@@ -550,16 +579,16 @@ Future<void> _showDeleteDialog(BuildContext context, String jobId) async {
     builder: (context) {
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.cardRadius)),
-        title: Text('削除確認', style: AppTextStyles.headingSmall),
-        content: Text('この案件を削除してもよろしいですか？', style: AppTextStyles.bodyMedium),
+        title: Text(context.l10n.jobList_deleteConfirmTitle, style: AppTextStyles.headingSmall),
+        content: Text(context.l10n.jobList_deleteConfirmMessage, style: AppTextStyles.bodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('キャンセル', style: AppTextStyles.labelMedium),
+            child: Text(context.l10n.common_cancel, style: AppTextStyles.labelMedium),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('削除', style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+            child: Text(context.l10n.common_delete, style: AppTextStyles.labelMedium.copyWith(color: context.appColors.error)),
           ),
         ],
       );
@@ -572,23 +601,25 @@ Future<void> _showDeleteDialog(BuildContext context, String jobId) async {
     await FirebaseFirestore.instance.collection('jobs').doc(jobId).delete();
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('削除しました')),
+      SnackBar(content: Text(context.l10n.common_deleted)),
     );
   } catch (e) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('削除できませんでした: $e')),
+      SnackBar(content: Text('${context.l10n.jobList_deleteError}: $e')),
     );
   }
 }
 
 class _PrefChips extends StatelessWidget {
-  final List<String> prefs;
+  final List<String> prefKeys;
+  final String Function(String key) labelBuilder;
   final String selected;
   final ValueChanged<String> onSelected;
 
   const _PrefChips({
-    required this.prefs,
+    required this.prefKeys,
+    required this.labelBuilder,
     required this.selected,
     required this.onSelected,
   });
@@ -599,29 +630,30 @@ class _PrefChips extends StatelessWidget {
       height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: prefs.length,
+        itemCount: prefKeys.length,
         separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (_, i) {
-          final p = prefs[i];
-          final isSelected = p == selected;
+          final key = prefKeys[i];
+          final label = labelBuilder(key);
+          final isSelected = key == selected;
           return Semantics(
             button: true,
-            label: '$p${isSelected ? "、選択中" : ""}',
+            label: '$label${isSelected ? context.l10n.common_selected : ""}',
             selected: isSelected,
             child: GestureDetector(
-              onTap: () => onSelected(p),
+              onTap: () => onSelected(key),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.ruri : AppColors.chipUnselected,
+                  color: isSelected ? context.appColors.primary : context.appColors.chipUnselected,
                   borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                 ),
                 child: Center(
                   child: Text(
-                    p,
+                    label,
                     style: AppTextStyles.chipText.copyWith(
-                      color: isSelected ? Colors.white : AppColors.chipTextUnselected,
+                      color: isSelected ? Colors.white : context.appColors.chipTextUnselected,
                     ),
                   ),
                 ),
@@ -635,9 +667,23 @@ class _PrefChips extends StatelessWidget {
 }
 
 class _MonthChip {
-  final String label;
+  final String labelKey;
   final DateTime month;
-  const _MonthChip({required this.label, required this.month});
+  const _MonthChip({required this.labelKey, required this.month});
+
+  String localizedLabel(BuildContext context) {
+    switch (labelKey) {
+      case 'thisMonth': return context.l10n.jobList_thisMonth;
+      case 'nextMonth': return context.l10n.jobList_nextMonth;
+      default:
+        if (labelKey.startsWith('month_')) {
+          final monthNum = labelKey.replaceFirst('month_', '');
+          // TODO: i18n - jobList_monthLabel should be "{month}月" pattern
+          return '$monthNum月';
+        }
+        return labelKey;
+    }
+  }
 }
 
 class _MonthChips extends StatelessWidget {
@@ -670,15 +716,15 @@ class _MonthChips extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.ruri : AppColors.chipUnselected,
+                  color: isSelected ? context.appColors.primary : context.appColors.chipUnselected,
                   borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                 ),
                 child: Center(
                   child: Text(
-                    'すべて',
+                    context.l10n.common_all,
                     style: AppTextStyles.labelSmall.copyWith(
                       fontSize: 12,
-                      color: isSelected ? Colors.white : AppColors.chipTextUnselected,
+                      color: isSelected ? Colors.white : context.appColors.chipTextUnselected,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -697,15 +743,15 @@ class _MonthChips extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: 6),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.ruri : AppColors.chipUnselected,
+                color: isSelected ? context.appColors.primary : context.appColors.chipUnselected,
                 borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
               ),
               child: Center(
                 child: Text(
-                  m.label,
+                  m.localizedLabel(context),
                   style: AppTextStyles.labelSmall.copyWith(
                     fontSize: 12,
-                    color: isSelected ? Colors.white : AppColors.chipTextUnselected,
+                    color: isSelected ? Colors.white : context.appColors.chipTextUnselected,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -727,28 +773,28 @@ class _SortDropDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      tooltip: '並び替え',
+      tooltip: context.l10n.jobList_sortTooltip,
       onSelected: onSelected,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
-      itemBuilder: (_) => [
-        PopupMenuItem(value: '新着順', child: Text('新着順', style: AppTextStyles.bodyMedium)),
-        PopupMenuItem(value: '距離順', child: Text('距離順', style: AppTextStyles.bodyMedium)),
-        PopupMenuItem(value: '金額が高い順', child: Text('金額が高い順', style: AppTextStyles.bodyMedium)),
+      itemBuilder: (ctx) => [
+        PopupMenuItem(value: 'newest', child: Text(ctx.l10n.jobList_sortNewest, style: AppTextStyles.bodyMedium)),
+        PopupMenuItem(value: 'distance', child: Text(ctx.l10n.jobList_sortDistance, style: AppTextStyles.bodyMedium)),
+        PopupMenuItem(value: 'highestPay', child: Text(ctx.l10n.jobList_sortHighestPay, style: AppTextStyles.bodyMedium)),
       ],
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 2),
         decoration: BoxDecoration(
-          color: AppColors.chipUnselected,
+          color: context.appColors.chipUnselected,
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.swap_vert_rounded, size: 18, color: AppColors.textSecondary),
+            Icon(Icons.swap_vert_rounded, size: 18, color: context.appColors.textSecondary),
             const SizedBox(width: AppSpacing.sm),
-            Text(label, style: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary)),
+            Text(label, style: AppTextStyles.labelMedium.copyWith(color: context.appColors.textPrimary)),
             const SizedBox(width: AppSpacing.xs),
-            const Icon(Icons.arrow_drop_down_rounded, size: 20, color: AppColors.textSecondary),
+            Icon(Icons.arrow_drop_down_rounded, size: 20, color: context.appColors.textSecondary),
           ],
         ),
       ),

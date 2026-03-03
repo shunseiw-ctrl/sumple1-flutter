@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class GradientHeader extends StatelessWidget {
   final String title;
@@ -28,7 +28,7 @@ class GradientHeader extends StatelessWidget {
         AppSpacing.xl,
       ),
       decoration: BoxDecoration(
-        gradient: gradient ?? AppColors.heroGradient,
+        gradient: gradient ?? context.appColors.heroGradient,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(AppSpacing.cardRadiusLg),
           bottomRight: Radius.circular(AppSpacing.cardRadiusLg),

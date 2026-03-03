@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/services/line_auth_service.dart';
 import '../../core/utils/logger.dart';
 
@@ -11,7 +12,7 @@ class RegistrationPromptModal {
   /// 登録を促すダイアログを表示
   static Future<void> show(
     BuildContext context, {
-    String featureName = 'この機能を使う',
+    String? featureName,
   }) async {
     return showDialog<void>(
       context: context,
@@ -31,13 +32,13 @@ class RegistrationPromptModal {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.ruriPale,
+                    color: context.appColors.primaryPale,
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.lock_outline,
                     size: 40,
-                    color: AppColors.ruri,
+                    color: context.appColors.primary,
                   ),
                 ),
 
@@ -45,24 +46,24 @@ class RegistrationPromptModal {
 
                 // タイトル
                 Text(
-                  '$featureName には登録が必要です',
+                  context.l10n.registrationPrompt_title(featureName ?? context.l10n.registrationPrompt_defaultFeature),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.appColors.textPrimary,
                   ),
                 ),
 
                 const SizedBox(height: 12),
 
                 // 説明文
-                const Text(
-                  'LINEまたはメールアドレスで登録して、\nすべての機能をご利用ください。',
+                Text(
+                  context.l10n.registrationPrompt_description,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.appColors.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -79,8 +80,8 @@ class RegistrationPromptModal {
                       _handleLineLogin(context);
                     },
                     icon: const Icon(Icons.chat_bubble, size: 20),
-                    label: const Text(
-                      'LINEで登録',
+                    label: Text(
+                      context.l10n.registrationPrompt_lineLogin,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -109,14 +110,14 @@ class RegistrationPromptModal {
                       _handleEmailLogin(context);
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.ruri,
-                      side: const BorderSide(color: AppColors.ruri, width: 2),
+                      foregroundColor: context.appColors.primary,
+                      side: BorderSide(color: context.appColors.primary, width: 2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'メールアドレスで登録',
+                    child: Text(
+                      context.l10n.registrationPrompt_emailLogin,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -133,12 +134,12 @@ class RegistrationPromptModal {
                   height: 48,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      '後で',
+                    child: Text(
+                      context.l10n.registrationPrompt_later,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: context.appColors.textSecondary,
                       ),
                     ),
                   ),
@@ -157,8 +158,8 @@ class RegistrationPromptModal {
     try {
       LineAuthService().startLineLogin();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('LINEログインページへ移動します'),
+        SnackBar(
+          content: Text(context.l10n.registrationPrompt_lineRedirect),
           duration: Duration(seconds: 2),
         ),
       );
@@ -166,8 +167,8 @@ class RegistrationPromptModal {
       Logger.error('LINE login failed', tag: 'RegistrationPromptModal', error: e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('エラーが発生しました: ${e.toString()}'),
-          backgroundColor: AppColors.error,
+          content: Text(context.l10n.registrationPrompt_error(e.toString())),
+          backgroundColor: context.appColors.error,
           duration: const Duration(seconds: 2),
         ),
       );

@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/referral_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/share_service.dart';
@@ -80,7 +80,7 @@ class _ReferralPageState extends State<ReferralPage> {
 
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      _showSnackBar('ログインが必要です');
+      _showSnackBar(context.l10n.referral_loginRequired);
       return;
     }
 
@@ -91,7 +91,7 @@ class _ReferralPageState extends State<ReferralPage> {
       await AnalyticsService.logReferralApply(code);
       if (mounted) {
         _codeController.clear();
-        _showSnackBar('紹介コードを適用しました');
+        _showSnackBar(context.l10n.referral_codeApplied);
         // 統計を更新
         final stats = await _referralService.getReferralStats(uid);
         setState(() {
@@ -110,7 +110,7 @@ class _ReferralPageState extends State<ReferralPage> {
   void _copyCode() {
     if (_myCode == null) return;
     Clipboard.setData(ClipboardData(text: _myCode!));
-    _showSnackBar('コードをコピーしました');
+    _showSnackBar(context.l10n.referral_codeCopied);
   }
 
   void _shareCode() {
@@ -129,12 +129,12 @@ class _ReferralPageState extends State<ReferralPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('友達を招待', style: AppTextStyles.appBarTitle),
-        backgroundColor: Colors.white,
+        title: Text(context.l10n.referral_title, style: AppTextStyles.appBarTitle),
+        backgroundColor: context.appColors.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppSpacing.maxContentWidth),
@@ -159,14 +159,14 @@ class _ReferralPageState extends State<ReferralPage> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
       child: Column(
         children: [
           Text(
-            'あなたの紹介コード',
+            context.l10n.referral_yourCode,
             style: AppTextStyles.labelMedium,
           ),
           const SizedBox(height: AppSpacing.md),
@@ -176,14 +176,14 @@ class _ReferralPageState extends State<ReferralPage> {
               vertical: AppSpacing.base,
             ),
             decoration: BoxDecoration(
-              color: AppColors.ruriPale,
+              color: context.appColors.primaryPale,
               borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-              border: Border.all(color: AppColors.ruri.withValues(alpha: 0.2)),
+              border: Border.all(color: context.appColors.primary.withValues(alpha: 0.2)),
             ),
             child: SelectableText(
               _myCode ?? '------',
               style: AppTextStyles.displayMedium.copyWith(
-                color: AppColors.ruri,
+                color: context.appColors.primary,
                 letterSpacing: 6,
                 fontWeight: FontWeight.w800,
               ),
@@ -197,10 +197,10 @@ class _ReferralPageState extends State<ReferralPage> {
                 child: OutlinedButton.icon(
                   onPressed: _myCode != null ? _copyCode : null,
                   icon: const Icon(Icons.copy, size: 18),
-                  label: Text('コピー', style: AppTextStyles.buttonSmall),
+                  label: Text(context.l10n.referral_copy, style: AppTextStyles.buttonSmall),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.ruri,
-                    side: const BorderSide(color: AppColors.ruri),
+                    foregroundColor: context.appColors.primary,
+                    side: BorderSide(color: context.appColors.primary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                     ),
@@ -214,11 +214,11 @@ class _ReferralPageState extends State<ReferralPage> {
                   onPressed: _myCode != null ? _shareCode : null,
                   icon: const Icon(Icons.share, size: 18),
                   label: Text(
-                    'シェア',
+                    context.l10n.referral_share,
                     style: AppTextStyles.buttonSmall.copyWith(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.ruri,
+                    backgroundColor: context.appColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -239,7 +239,7 @@ class _ReferralPageState extends State<ReferralPage> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
@@ -247,12 +247,12 @@ class _ReferralPageState extends State<ReferralPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '紹介コードを入力',
+            context.l10n.referral_enterCode,
             style: AppTextStyles.headingSmall,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            '友達から受け取った紹介コードを入力してください',
+            context.l10n.referral_enterCodeDescription,
             style: AppTextStyles.bodySmall,
           ),
           const SizedBox(height: AppSpacing.base),
@@ -261,20 +261,21 @@ class _ReferralPageState extends State<ReferralPage> {
             textCapitalization: TextCapitalization.characters,
             maxLength: 6,
             decoration: InputDecoration(
+              // TODO: i18n - referral_codeHint
               hintText: '例: ABC123',
-              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+              hintStyle: AppTextStyles.bodyMedium.copyWith(color: context.appColors.textHint),
               counterText: '',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: context.appColors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: context.appColors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: const BorderSide(color: AppColors.ruri, width: 2),
+                borderSide: BorderSide(color: context.appColors.primary, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.base,
@@ -292,7 +293,7 @@ class _ReferralPageState extends State<ReferralPage> {
             child: ElevatedButton(
               onPressed: _isApplying ? null : _applyCode,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.success,
+                backgroundColor: context.appColors.success,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -310,6 +311,7 @@ class _ReferralPageState extends State<ReferralPage> {
                       ),
                     )
                   : Text(
+                      // TODO: i18n - referral_applyButton
                       '適用する',
                       style: AppTextStyles.button.copyWith(color: Colors.white),
                     ),
@@ -324,32 +326,35 @@ class _ReferralPageState extends State<ReferralPage> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: AppShadows.card,
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.people_alt_outlined,
             size: 40,
-            color: AppColors.ruri,
+            color: context.appColors.primary,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
+            // TODO: i18n - referral_stats
             '紹介実績',
             style: AppTextStyles.labelMedium,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
+            // TODO: i18n - referral_statsCount
             '$_referralCount 人',
             style: AppTextStyles.displayMedium.copyWith(
-              color: AppColors.ruri,
+              color: context.appColors.primary,
               fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
+            // TODO: i18n - referral_inviteDescription
             '友達を招待して特典を受け取ろう',
             style: AppTextStyles.bodySmall,
           ),

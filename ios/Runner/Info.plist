@@ -46,11 +46,15 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>QRコードをスキャンして出退勤を記録するためにカメラを使用します</string>
+		<string>出退勤のQRコードスキャン、プロフィール写真の撮影、作業写真の記録にカメラを使用します。Camera is used for QR code scanning at check-in/check-out, profile photos, and work documentation.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>プロフィール写真を設定するために写真ライブラリを使用します</string>
+		<string>プロフィール写真の設定、日報への作業写真添付、チャットでの画像送信に写真ライブラリを使用します。Photo library is used for setting profile photos, attaching work photos to reports, and sending images in chat.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>出退勤時に現場との距離を確認するために位置情報を使用します</string>
+		<string>出退勤時の現場位置確認（GPS打刻）および近くの求人検索に位置情報を使用します。Location is used for worksite verification during check-in/check-out and nearby job search.</string>
+		<key>NSUserTrackingUsageDescription</key>
+		<string>広告の最適化のためにトラッキング情報を使用します。This app uses tracking data to optimize advertisements.</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 		<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/constants/app_colors.dart';
 import '../core/constants/app_constants.dart';
+import '../core/extensions/build_context_extensions.dart';
 import '../core/services/qualification_service.dart';
 import '../core/utils/haptic_utils.dart';
 
@@ -55,13 +55,13 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
       AppHaptics.success();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('資格を登録しました（審査待ち）')),
+        SnackBar(content: Text(context.l10n.qualificationAdd_registered)),
       );
       context.pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('登録に失敗: $e')),
+        SnackBar(content: Text(context.l10n.qualificationAdd_registerFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -71,7 +71,7 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('資格を追加')),
+      appBar: AppBar(title: Text(context.l10n.qualificationAdd_title)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -79,9 +79,9 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
           children: [
             DropdownButtonFormField<String>(
               initialValue: _selectedCategory,
-              decoration: const InputDecoration(
-                labelText: 'カテゴリ *',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.qualificationAdd_categoryLabel,
+                border: const OutlineInputBorder(),
               ),
               items: AppConstants.qualificationCategories.entries
                   .map((e) => DropdownMenuItem(
@@ -97,21 +97,21 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
             TextFormField(
               controller: _nameController,
               maxLength: AppConstants.maxQualificationNameLength,
-              decoration: const InputDecoration(
-                labelText: '資格名 *',
-                hintText: '例: 2級建築施工管理技士',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.qualificationAdd_nameLabel,
+                hintText: context.l10n.qualificationAdd_nameHint,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return '資格名を入力してください';
+                if (v == null || v.trim().isEmpty) return context.l10n.qualificationAdd_nameRequired;
                 return null;
               },
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('有効期限'),
-              subtitle: Text(_expiryDate ?? '無期限'),
+              title: Text(context.l10n.qualificationAdd_expiryDate),
+              subtitle: Text(_expiryDate ?? context.l10n.qualificationAdd_noExpiry),
               trailing: const Icon(Icons.edit),
               onTap: _pickExpiryDate,
             ),
@@ -122,7 +122,7 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
               child: ElevatedButton(
                 onPressed: _isSaving ? null : _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ruri,
+                  backgroundColor: context.appColors.primary,
                   foregroundColor: Colors.white,
                 ),
                 child: _isSaving
@@ -131,7 +131,7 @@ class _QualificationAddPageState extends State<QualificationAddPage> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white))
-                    : const Text('登録する', style: TextStyle(fontWeight: FontWeight.w700)),
+                    : Text(context.l10n.qualificationAdd_register, style: const TextStyle(fontWeight: FontWeight.w700)),
               ),
             ),
           ],

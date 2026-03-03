@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 /// 汎用フィルタチップ行
 class AdminFilterChips extends StatelessWidget {
@@ -17,7 +17,7 @@ class AdminFilterChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: context.appColors.surface,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -30,13 +30,13 @@ class AdminFilterChips extends StatelessWidget {
                 label: Text(entry.value),
                 selected: isSelected,
                 onSelected: (_) => onSelected(entry.key),
-                selectedColor: AppColors.ruri,
+                selectedColor: context.appColors.primary,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppColors.textPrimary,
+                  color: isSelected ? Colors.white : context.appColors.textPrimary,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   fontSize: 13,
                 ),
-                backgroundColor: AppColors.chipUnselected,
+                backgroundColor: context.appColors.chipUnselected,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 side: BorderSide.none,

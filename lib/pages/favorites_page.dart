@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
@@ -89,19 +89,19 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final uid = _auth.currentUser?.uid ?? '';
     if (uid.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         appBar: AppBar(
-          title: const Text('お気に入り案件'),
+          title: Text(context.l10n.favorites_title),
           centerTitle: true,
         ),
-        body: const Center(child: Text('ログインが必要です')),
+        body: Center(child: Text(context.l10n.favorites_loginRequired)),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text('お気に入り案件'),
+        title: Text(context.l10n.favorites_title),
         centerTitle: true,
       ),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -115,10 +115,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
           final jobIds = List<String>.from(favData?['jobIds'] ?? []);
 
           if (jobIds.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.favorite_border,
-              title: 'お気に入りはまだありません',
-              description: '案件の♡をタップして追加できます',
+              title: context.l10n.favorites_empty,
+              description: context.l10n.favorites_emptyDescription,
             );
           }
 
@@ -138,7 +138,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
               _lastJobIds = [];
               await _fetchJobs(jobIds);
             },
-            color: AppColors.ruri,
+            color: context.appColors.primary,
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               cacheExtent: AppConstants.listCacheExtent,
@@ -149,7 +149,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 final job = _jobsCache[jobId];
                 if (job == null) return const SizedBox.shrink();
 
-                final title = (job['title'] ?? 'タイトルなし').toString();
+                final title = (job['title'] ?? context.l10n.favorites_noTitle).toString();
                 final location = (job['location'] ?? '').toString();
                 final price = (job['price'] ?? '').toString();
                 final date = (job['date'] ?? '').toString();
@@ -159,7 +159,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.appColors.surface,
                       borderRadius:
                           BorderRadius.circular(AppSpacing.cardRadius),
                       boxShadow: AppShadows.card,
@@ -195,9 +195,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                         fit: BoxFit.cover,
                                       )
                                     : Container(
-                                        color: AppColors.chipUnselected,
-                                        child: const Icon(Icons.work,
-                                            color: AppColors.textHint),
+                                        color: context.appColors.chipUnselected,
+                                        child: Icon(Icons.work,
+                                            color: context.appColors.textHint),
                                       ),
                               ),
                             ),
@@ -220,10 +220,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                     if (location.isNotEmpty)
                                       Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                               Icons.location_on_outlined,
                                               size: 14,
-                                              color: AppColors.textHint),
+                                              color: context.appColors.textHint),
                                           const SizedBox(
                                               width: AppSpacing.xs),
                                           Expanded(
@@ -231,7 +231,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                                   style: AppTextStyles
                                                       .labelSmall
                                                       .copyWith(
-                                                          color: AppColors
+                                                          color: context.appColors
                                                               .textSecondary),
                                                   maxLines: 1,
                                                   overflow: TextOverflow

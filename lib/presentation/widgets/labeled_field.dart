@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class LabeledField extends StatelessWidget {
   final String label;
@@ -49,7 +49,7 @@ class LabeledField extends StatelessWidget {
             hintText: hint,
             prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 18),
             filled: true,
-            fillColor: AppColors.chipUnselected,
+            fillColor: context.appColors.chipUnselected,
             counterText: '',
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(

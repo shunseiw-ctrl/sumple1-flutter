@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/core/config/feature_flags.dart';
 import 'package:sumple1/core/providers/admin_pending_counts_provider.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 
@@ -22,8 +23,8 @@ class AdminDashboardTab extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.ruri, AppColors.ruriLight],
+            gradient: LinearGradient(
+              colors: [context.appColors.primary, context.appColors.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -32,9 +33,9 @@ class AdminDashboardTab extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '管理者ダッシュボード',
-                style: TextStyle(
+              Text(
+                context.l10n.adminDashboard_title,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
@@ -68,9 +69,9 @@ class AdminDashboardTab extends ConsumerWidget {
                     Expanded(
                       child: _SummaryCard(
                         icon: Icons.work,
-                        iconColor: AppColors.ruri,
-                        iconBgColor: AppColors.ruriPale,
-                        label: '掲載中の案件',
+                        iconColor: context.appColors.primary,
+                        iconBgColor: context.appColors.primaryPale,
+                        label: context.l10n.adminDashboard_activeJobs,
                         count: totalJobs,
                       ),
                     ),
@@ -78,9 +79,9 @@ class AdminDashboardTab extends ConsumerWidget {
                     Expanded(
                       child: _SummaryCard(
                         icon: Icons.people,
-                        iconColor: AppColors.success,
+                        iconColor: context.appColors.success,
                         iconBgColor: const Color(0xFFD1FAE5),
-                        label: '応募数',
+                        label: context.l10n.adminDashboard_applicationCount,
                         count: totalApplications,
                       ),
                     ),
@@ -92,9 +93,9 @@ class AdminDashboardTab extends ConsumerWidget {
                     Expanded(
                       child: _SummaryCard(
                         icon: Icons.person,
-                        iconColor: AppColors.warning,
+                        iconColor: context.appColors.warning,
                         iconBgColor: const Color(0xFFFEF3C7),
-                        label: '登録ユーザー',
+                        label: context.l10n.adminDashboard_registeredUsers,
                         count: totalUsers,
                       ),
                     ),
@@ -102,9 +103,9 @@ class AdminDashboardTab extends ConsumerWidget {
                     Expanded(
                       child: _SummaryCard(
                         icon: Icons.pending_actions,
-                        iconColor: AppColors.error,
+                        iconColor: context.appColors.error,
                         iconBgColor: const Color(0xFFFEE2E2),
-                        label: '未対応の応募',
+                        label: context.l10n.adminDashboard_pendingApplications,
                         count: pendingApplications,
                       ),
                     ),
@@ -125,44 +126,44 @@ class AdminDashboardTab extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '未処理アラート',
+                Text(
+                  context.l10n.adminDashboard_pendingAlerts,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.appColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 10),
                 if (counts.pendingApplications > 0)
                   _AlertCard(
                     icon: Icons.people,
-                    color: AppColors.ruri,
-                    label: '承認待ちの応募',
+                    color: context.appColors.primary,
+                    label: context.l10n.adminDashboard_pendingApproval,
                     count: counts.pendingApplications,
                     onTap: () => onNavigateToTab(2),
                   ),
                 if (counts.pendingQualifications > 0)
                   _AlertCard(
                     icon: Icons.workspace_premium,
-                    color: AppColors.warning,
-                    label: '資格承認待ち',
+                    color: context.appColors.warning,
+                    label: context.l10n.adminDashboard_pendingQualifications,
                     count: counts.pendingQualifications,
                     onTap: () => context.push(RoutePaths.adminQualifications),
                   ),
-                if (counts.pendingEarlyPayments > 0)
+                if (FeatureFlags.enableEarlyPayment && counts.pendingEarlyPayments > 0)
                   _AlertCard(
                     icon: Icons.flash_on,
                     color: Colors.orange,
-                    label: '即金申請待ち',
+                    label: context.l10n.adminDashboard_pendingEarlyPayments,
                     count: counts.pendingEarlyPayments,
                     onTap: () => context.push(RoutePaths.adminEarlyPayments),
                   ),
                 if (counts.pendingVerifications > 0)
                   _AlertCard(
                     icon: Icons.verified_user,
-                    color: AppColors.info,
-                    label: '本人確認待ち',
+                    color: context.appColors.info,
+                    label: context.l10n.adminDashboard_pendingVerifications,
                     count: counts.pendingVerifications,
                     onTap: () => context.push(RoutePaths.adminIdentityVerification),
                   ),
@@ -172,12 +173,12 @@ class AdminDashboardTab extends ConsumerWidget {
           },
         ),
 
-        const Text(
-          'クイックアクション',
+        Text(
+          context.l10n.adminDashboard_quickActions,
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+            color: context.appColors.textPrimary,
           ),
         ),
         const SizedBox(height: 10),
@@ -186,7 +187,7 @@ class AdminDashboardTab extends ConsumerWidget {
             Expanded(
               child: _ActionButton(
                 icon: Icons.add_circle_outline,
-                label: '案件を投稿',
+                label: context.l10n.adminDashboard_postJob,
                 onTap: () {
                   context.push(RoutePaths.postJob);
                 },
@@ -196,7 +197,7 @@ class AdminDashboardTab extends ConsumerWidget {
             Expanded(
               child: _ActionButton(
                 icon: Icons.bar_chart,
-                label: '売上を確認',
+                label: context.l10n.adminDashboard_checkSales,
                 onTap: () => onNavigateToTab(3),
               ),
             ),
@@ -204,7 +205,7 @@ class AdminDashboardTab extends ConsumerWidget {
             Expanded(
               child: _ActionButton(
                 icon: Icons.workspace_premium,
-                label: '資格承認',
+                label: context.l10n.adminDashboard_qualificationApproval,
                 onTap: () {
                   context.push(RoutePaths.adminQualifications);
                 },
@@ -218,33 +219,35 @@ class AdminDashboardTab extends ConsumerWidget {
             Expanded(
               child: _ActionButton(
                 icon: Icons.verified_user,
-                label: '本人確認',
+                label: context.l10n.adminDashboard_identityVerification,
                 onTap: () {
                   context.push(RoutePaths.adminIdentityVerification);
                 },
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _ActionButton(
-                icon: Icons.flash_on,
-                label: '即金承認',
-                onTap: () {
-                  context.push(RoutePaths.adminEarlyPayments);
-                },
+            if (FeatureFlags.enableEarlyPayment) ...[
+              const SizedBox(width: 12),
+              Expanded(
+                child: _ActionButton(
+                  icon: Icons.flash_on,
+                  label: context.l10n.adminDashboard_earlyPaymentApproval,
+                  onTap: () {
+                    context.push(RoutePaths.adminEarlyPayments);
+                  },
+                ),
               ),
-            ),
+            ],
             const SizedBox(width: 12),
             const Expanded(child: SizedBox()),
           ],
         ),
         const SizedBox(height: 20),
-        const Text(
-          '最近の応募',
+        Text(
+          context.l10n.adminDashboard_recentApplications,
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+            color: context.appColors.textPrimary,
           ),
         ),
         const SizedBox(height: 10),
@@ -263,12 +266,12 @@ class AdminDashboardTab extends ConsumerWidget {
             }
             final docs = snap.data?.docs ?? [];
             if (docs.isEmpty) {
-              return const _EmptyCard(message: 'まだ応募はありません');
+              return _EmptyCard(message: context.l10n.adminDashboard_noApplications);
             }
             return Column(
               children: docs.map((doc) {
                 final data = doc.data();
-                final jobTitle = (data['jobTitleSnapshot'] ?? '案件名なし').toString();
+                final jobTitle = (data['jobTitleSnapshot'] ?? context.l10n.adminDashboard_noJobTitle).toString();
                 final status = (data['status'] ?? 'applied').toString();
                 final createdAt = data['createdAt'];
                 String dateStr = '';
@@ -330,7 +333,7 @@ class _AlertCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '$label $count件',
+                  context.l10n.adminDashboard_alertCount(label, count.toString()),
                   style: TextStyle(
                     color: color,
                     fontWeight: FontWeight.w700,
@@ -367,16 +370,16 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: AppColors.cardShadow,
+            color: context.appColors.cardShadow,
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,19 +396,19 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             count.toString(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
+              color: context.appColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.appColors.textSecondary,
             ),
           ),
         ],
@@ -428,7 +431,7 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -437,18 +440,18 @@ class _ActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: context.appColors.divider),
           ),
           child: Column(
             children: [
-              Icon(icon, color: AppColors.ruri, size: 28),
+              Icon(icon, color: context.appColors.primary, size: 28),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.appColors.textPrimary,
                 ),
               ),
             ],
@@ -475,7 +478,7 @@ class _RecentApplicationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -484,7 +487,7 @@ class _RecentApplicationCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: context.appColors.divider),
           ),
           child: Row(
             children: [
@@ -494,10 +497,10 @@ class _RecentApplicationCard extends StatelessWidget {
                   children: [
                     Text(
                       jobTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -505,9 +508,9 @@ class _RecentApplicationCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       dateStr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.appColors.textSecondary,
                       ),
                     ),
                   ],
@@ -516,20 +519,20 @@ class _RecentApplicationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: StatusBadge.colorFor(status).withValues(alpha: 0.1),
+                  color: StatusBadge.colorFor(context, status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  StatusBadge.labelFor(status),
+                  StatusBadge.labelFor(status, context),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: StatusBadge.colorFor(status),
+                    color: StatusBadge.colorFor(context, status),
                   ),
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+              Icon(Icons.chevron_right, color: context.appColors.textHint, size: 20),
             ],
           ),
         ),
@@ -547,15 +550,15 @@ class _EmptyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Center(
         child: Text(
           message,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: context.appColors.textSecondary,
             fontWeight: FontWeight.w600,
           ),
         ),

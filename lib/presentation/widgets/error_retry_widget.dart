@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 
 class ErrorRetryWidget extends StatelessWidget {
@@ -24,9 +24,8 @@ class ErrorRetryWidget extends StatelessWidget {
     required VoidCallback onRetry,
     bool isCompact = false,
   }) {
+    // i18n: errorRetry_networkErrorTitle, errorRetry_networkErrorMessage
     return ErrorRetryWidget(
-      title: 'ネットワークエラー',
-      message: 'インターネット接続を確認して\nもう一度お試しください',
       onRetry: onRetry,
       icon: Icons.wifi_off_rounded,
       isCompact: isCompact,
@@ -37,9 +36,8 @@ class ErrorRetryWidget extends StatelessWidget {
     required VoidCallback onRetry,
     bool isCompact = false,
   }) {
+    // i18n: errorRetry_timeoutTitle, errorRetry_timeoutMessage
     return ErrorRetryWidget(
-      title: 'タイムアウト',
-      message: 'サーバーへの接続に時間がかかっています\nもう一度お試しください',
       onRetry: onRetry,
       icon: Icons.timer_off_rounded,
       isCompact: isCompact,
@@ -51,9 +49,9 @@ class ErrorRetryWidget extends StatelessWidget {
     String? message,
     bool isCompact = false,
   }) {
+    // i18n: errorRetry_generalTitle, errorRetry_generalMessage
     return ErrorRetryWidget(
-      title: 'エラーが発生しました',
-      message: message ?? 'しばらく経ってからもう一度お試しください',
+      message: message,
       onRetry: onRetry,
       icon: Icons.error_outline_rounded,
       isCompact: isCompact,
@@ -65,36 +63,53 @@ class ErrorRetryWidget extends StatelessWidget {
     String? title,
     String? message,
   }) {
+    // i18n: errorRetry_emptyTitle, errorRetry_emptyMessage
     return ErrorRetryWidget(
-      title: title ?? 'データが見つかりません',
-      message: message ?? '条件を変更して再検索してください',
+      title: title,
+      message: message,
       onRetry: onRetry,
       icon: Icons.search_off_rounded,
     );
+  }
+
+  String _resolveTitle(BuildContext context) {
+    if (title != null) return title!;
+    if (icon == Icons.wifi_off_rounded) return context.l10n.errorRetry_networkErrorTitle;
+    if (icon == Icons.timer_off_rounded) return context.l10n.errorRetry_timeoutTitle;
+    if (icon == Icons.search_off_rounded) return context.l10n.errorRetry_emptyTitle;
+    return context.l10n.errorRetry_generalTitle;
+  }
+
+  String? _resolveMessage(BuildContext context) {
+    if (message != null) return message;
+    if (icon == Icons.wifi_off_rounded) return context.l10n.errorRetry_networkErrorMessage;
+    if (icon == Icons.timer_off_rounded) return context.l10n.errorRetry_timeoutMessage;
+    if (icon == Icons.search_off_rounded) return context.l10n.errorRetry_emptyMessage;
+    return context.l10n.errorRetry_generalMessage;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     if (isCompact) {
-      return _buildCompact(l10n);
+      return _buildCompact(context, l10n);
     }
-    return _buildFull(l10n);
+    return _buildFull(context, l10n);
   }
 
-  Widget _buildCompact(AppLocalizations l10n) {
+  Widget _buildCompact(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 32, color: AppColors.textHint),
+            Icon(icon, size: 32, color: context.appColors.textHint),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              title ?? l10n.errorLabel,
+              _resolveTitle(context),
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.textSecondary,
+                color: context.appColors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.base),
@@ -105,7 +120,8 @@ class ErrorRetryWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFull(AppLocalizations l10n) {
+  Widget _buildFull(BuildContext context, AppLocalizations l10n) {
+    final resolvedMessage = _resolveMessage(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -130,17 +146,17 @@ class ErrorRetryWidget extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              title ?? l10n.errorGeneric,
+              _resolveTitle(context),
               textAlign: TextAlign.center,
               style: AppTextStyles.headingSmall,
             ),
-            if (message != null) ...[
+            if (resolvedMessage != null) ...[
               const SizedBox(height: AppSpacing.sm),
               Text(
-                message!,
+                resolvedMessage,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                   height: 1.6,
                 ),
               ),
@@ -153,29 +169,33 @@ class ErrorRetryWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRetryButton({required bool compact, required AppLocalizations l10n}) {
-    return SizedBox(
-      width: compact ? null : double.infinity,
-      height: compact ? 36 : 48,
-      child: ElevatedButton.icon(
-        onPressed: onRetry,
-        icon: const Icon(Icons.refresh_rounded, size: 18),
-        label: Text(
-          l10n.retry,
-          style: AppTextStyles.labelMedium.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
+  Widget _buildRetryButton({required bool compact, required AppLocalizations l10n, BuildContext? ctx}) {
+    return Builder(
+      builder: (context) {
+        return SizedBox(
+          width: compact ? null : double.infinity,
+          height: compact ? 36 : 48,
+          child: ElevatedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: Text(
+              l10n.retry,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.appColors.primary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(compact ? 18 : AppSpacing.buttonRadius),
+              ),
+            ),
           ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.ruri,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(compact ? 18 : AppSpacing.buttonRadius),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

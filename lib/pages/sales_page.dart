@@ -5,13 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import '../core/services/analytics_service.dart';
+import 'package:sumple1/core/config/feature_flags.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 class SalesPage extends StatefulWidget {
@@ -54,14 +55,14 @@ class _SalesPageState extends State<SalesPage>
     final isAnonymous = FirebaseAuth.instance.currentUser?.isAnonymous ?? true;
     if (uid.isEmpty || isAnonymous) {
       return Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('売上'), centerTitle: true),
+        backgroundColor: context.appColors.background,
+        appBar: AppBar(title: Text(context.l10n.sales_salesTitle), centerTitle: true),
         body: EmptyState(
           icon: Icons.payments_outlined,
-          title: '売上を確認するには\n登録が必要です',
-          description: 'お仕事の報酬や支払い履歴を\nこのページで確認できます',
-          actionText: '登録して始める',
-          onAction: () => RegistrationPromptModal.show(context, featureName: '売上を確認する'),
+          title: context.l10n.sales_registrationRequired,
+          description: context.l10n.sales_registrationDescription,
+          actionText: context.l10n.sales_registerToStart,
+          onAction: () => RegistrationPromptModal.show(context, featureName: context.l10n.sales_checkSales),
         ),
       );
     }
@@ -69,14 +70,14 @@ class _SalesPageState extends State<SalesPage>
     final isAdmin = _isAdmin;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text('収入・明細'),
+        title: Text(context.l10n.sales_incomeAndStatements),
         centerTitle: true,
         actions: [
-          if (isAdmin)
+          if (isAdmin && FeatureFlags.enableStripePayments)
             IconButton(
-              tooltip: '支払い確定を登録',
+              tooltip: context.l10n.sales_registerPayment,
               icon: const Icon(Icons.add),
               onPressed: () {
                 context.push(RoutePaths.earningsCreate);
@@ -85,14 +86,14 @@ class _SalesPageState extends State<SalesPage>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.ruri,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.ruri,
-          labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: AppColors.ruri),
+          labelColor: context.appColors.primary,
+          unselectedLabelColor: context.appColors.textSecondary,
+          indicatorColor: context.appColors.primary,
+          labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700, color: context.appColors.primary),
           unselectedLabelStyle: AppTextStyles.labelMedium,
-          tabs: const [
-            Tab(text: '収入'),
-            Tab(text: '明細'),
+          tabs: [
+            Tab(text: context.l10n.sales_tabIncome),
+            Tab(text: context.l10n.sales_tabStatements),
           ],
         ),
       ),
@@ -149,7 +150,8 @@ class _SalesContentState extends State<_SalesContent> {
     return list;
   }
 
-  String _monthLabel(DateTime m) => '${m.month}月';
+  String _monthLabel(BuildContext context, DateTime m) =>
+      context.l10n.sales_monthLabel(m.month.toString());
 
   int _nextPaymentMonth() {
     final now = DateTime.now();
@@ -173,7 +175,7 @@ class _SalesContentState extends State<_SalesContent> {
           return SkeletonList(itemBuilder: (_) => const SkeletonSalesCard());
         }
         if (snap.hasError) {
-          return Center(child: Text('読み込みエラー: ${snap.error}'));
+          return Center(child: Text('${context.l10n.common_loadError}: ${snap.error}'));
         }
 
         final docs = snap.data?.docs ?? [];
@@ -230,7 +232,7 @@ class _SalesContentState extends State<_SalesContent> {
             setState(() => _refreshKey = UniqueKey());
             await Future.delayed(const Duration(milliseconds: 500));
           },
-          color: AppColors.ruri,
+          color: context.appColors.primary,
           child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.base, AppSpacing.pagePadding, AppSpacing.xl),
@@ -238,7 +240,7 @@ class _SalesContentState extends State<_SalesContent> {
             // --- Gradient Header Card ---
             Container(
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: context.appColors.primaryGradient,
                 borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
                 boxShadow: AppShadows.card,
               ),
@@ -248,7 +250,7 @@ class _SalesContentState extends State<_SalesContent> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      '今月の収入',
+                      context.l10n.sales_thisMonthIncome,
                       style: AppTextStyles.sectionTitle.copyWith(color: Colors.white.withValues(alpha: 0.85)),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -268,7 +270,7 @@ class _SalesContentState extends State<_SalesContent> {
                         borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                       ),
                       child: Text(
-                        '次回支払日: ${_nextPaymentMonth()}月10日',
+                        context.l10n.sales_nextPaymentDate(_nextPaymentMonth().toString()),
                         style: AppTextStyles.labelMedium.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w700,
@@ -280,7 +282,7 @@ class _SalesContentState extends State<_SalesContent> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '累計収入',
+                          context.l10n.sales_totalIncome,
                           style: AppTextStyles.labelSmall.copyWith(color: Colors.white.withValues(alpha: 0.7)),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -313,14 +315,14 @@ class _SalesContentState extends State<_SalesContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '月別推移',
+                      context.l10n.sales_monthlyTrend,
                       style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: AppSpacing.sm),
 
                     _SelectedMonthCard(
                       monthText:
-                      '${_ym(selectedKey)}（${_monthLabel(selectedKey)}）',
+                      '${_ym(selectedKey)}（${_monthLabel(context, selectedKey)}）',
                       amountText: _yen(selectedValue),
                       onResetToThisMonth: () {
                         setState(() {
@@ -349,12 +351,12 @@ class _SalesContentState extends State<_SalesContent> {
                                     _selectedMonth?.month == m.month);
 
                                 final barColor = isSelected
-                                    ? AppColors.ruri
-                                    : AppColors.textHint;
+                                    ? context.appColors.primary
+                                    : context.appColors.textHint;
 
                                 final labelColor = isSelected
-                                    ? AppColors.ruri
-                                    : AppColors.textPrimary;
+                                    ? context.appColors.primary
+                                    : context.appColors.textPrimary;
 
                                 return Expanded(
                                   child: GestureDetector(
@@ -376,7 +378,7 @@ class _SalesContentState extends State<_SalesContent> {
                                         const SizedBox(height: 10),
 
                                         _MonthLabel(
-                                          text: _monthLabel(m),
+                                          text: _monthLabel(context, m),
                                           selected: isSelected,
                                           color: labelColor,
                                         ),
@@ -393,12 +395,12 @@ class _SalesContentState extends State<_SalesContent> {
 
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '※収入は支払い確定日に反映されます',
+                      context.l10n.sales_incomeNote,
                       style: AppTextStyles.labelSmall,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'データ件数: ${docs.length}件',
+                      context.l10n.sales_dataCount(docs.length.toString()),
                       style: AppTextStyles.labelSmall,
                     ),
                   ],
@@ -415,7 +417,7 @@ class _SalesContentState extends State<_SalesContent> {
               const SizedBox(height: AppSpacing.sectionGap),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Text('支払い管理', style: AppTextStyles.headingSmall),
+                child: Text(context.l10n.sales_paymentManagement, style: AppTextStyles.headingSmall),
               ),
               const SizedBox(height: AppSpacing.md),
               const _PaymentSummarySection(),
@@ -480,23 +482,23 @@ class _UnconfirmedEarningsSection extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.pending_actions, size: 20, color: AppColors.warning),
+                        Icon(Icons.pending_actions, size: 20, color: context.appColors.warning),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          '未確定の報酬',
+                          context.l10n.sales_unconfirmedEarnings,
                           style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
                         ),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.warning.withValues(alpha: 0.1),
+                            color: context.appColors.warning.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                           ),
                           child: Text(
-                            '${unconfirmed.length}件',
+                            '${unconfirmed.length}${context.l10n.common_itemsCount}',
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.warning,
+                              color: context.appColors.warning,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -506,9 +508,9 @@ class _UnconfirmedEarningsSection extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     ...unconfirmed.map((doc) {
                       final data = doc.data();
-                      final jobTitle = (data['jobTitleSnapshot'] ?? '案件').toString();
+                      final jobTitle = (data['jobTitleSnapshot'] ?? context.l10n.common_job).toString();
                       final status = (data['status'] ?? '').toString();
-                      final statusLabel = status == 'done' ? '完了' : '施工完了';
+                      final statusLabel = status == 'done' ? context.l10n.common_completed : context.l10n.sales_constructionCompleted;
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -526,7 +528,7 @@ class _UnconfirmedEarningsSection extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: AppColors.chipUnselected,
+                                color: context.appColors.chipUnselected,
                                 borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                               ),
                               child: Text(
@@ -540,8 +542,8 @@ class _UnconfirmedEarningsSection extends StatelessWidget {
                     }),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      '※報酬は管理者が確定後に反映されます',
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint),
+                      context.l10n.sales_earningsNote,
+                      style: AppTextStyles.labelSmall.copyWith(color: context.appColors.textHint),
                     ),
                   ],
                 ),
@@ -582,10 +584,10 @@ class _PaymentHistorySection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.receipt_long, size: 20, color: AppColors.ruri),
+                Icon(Icons.receipt_long, size: 20, color: context.appColors.primary),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  '支払い履歴',
+                  context.l10n.sales_paymentHistory,
                   style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w900),
                 ),
               ],
@@ -606,11 +608,13 @@ class _PaymentHistorySection extends StatelessWidget {
                   ? '${confirmedAt.year}/${confirmedAt.month.toString().padLeft(2, '0')}/${confirmedAt.day.toString().padLeft(2, '0')}'
                   : '';
 
+              final canNavigate = paymentId.isNotEmpty && FeatureFlags.enableStripePayments;
+
               return Material(
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                  onTap: paymentId.isNotEmpty
+                  onTap: canNavigate
                       ? () {
                           context.push(RoutePaths.paymentDetailPath(paymentId));
                         }
@@ -630,7 +634,7 @@ class _PaymentHistorySection extends StatelessWidget {
                               if (dateText.isNotEmpty)
                                 Text(
                                   dateText,
-                                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary),
+                                  style: AppTextStyles.labelSmall.copyWith(color: context.appColors.textSecondary),
                                 ),
                             ],
                           ),
@@ -639,22 +643,22 @@ class _PaymentHistorySection extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: isPaid
-                                ? AppColors.success.withValues(alpha: 0.1)
-                                : AppColors.ruri.withValues(alpha: 0.1),
+                                ? context.appColors.success.withValues(alpha: 0.1)
+                                : context.appColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                           ),
                           child: Text(
-                            isPaid ? '振込済み ✓' : '確定済み',
+                            isPaid ? '${context.l10n.common_transferred} ✓' : context.l10n.common_confirmed,
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: isPaid ? AppColors.success : AppColors.ruri,
+                              color: isPaid ? context.appColors.success : context.appColors.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        if (paymentId.isNotEmpty)
-                          const Padding(
-                            padding: EdgeInsets.only(left: 4),
-                            child: Icon(Icons.chevron_right, size: 18, color: AppColors.textHint),
+                        if (canNavigate)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Icon(Icons.chevron_right, size: 18, color: context.appColors.textHint),
                           ),
                       ],
                     ),
@@ -685,9 +689,9 @@ class _SelectedMonthCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.ruriPale,
+        color: context.appColors.primaryPale,
         borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Row(
         children: [
@@ -696,13 +700,13 @@ class _SelectedMonthCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '選択月の収入',
+                  context.l10n.sales_selectedMonthIncome,
                   style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   monthText,
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w700),
+                  style: AppTextStyles.labelSmall.copyWith(color: context.appColors.textSecondary, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -713,7 +717,7 @@ class _SelectedMonthCard extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           IconButton(
-            tooltip: '今月に戻す',
+            tooltip: context.l10n.sales_resetToThisMonth,
             onPressed: onResetToThisMonth,
             icon: const Icon(Icons.refresh, size: 18),
           ),
@@ -753,7 +757,7 @@ class _MonthLabel extends StatelessWidget {
             width: 18,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.ruri,
+              color: context.appColors.primary,
               borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
             ),
           ),
@@ -771,7 +775,7 @@ class _ShadowCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
         boxShadow: AppShadows.card,
       ),
@@ -871,11 +875,11 @@ class _PaymentSummarySection extends StatelessWidget {
           return Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
               boxShadow: AppShadows.subtle,
             ),
-            child: Center(child: Text('支払いデータはまだありません', style: AppTextStyles.bodySmall)),
+            child: Center(child: Text(context.l10n.sales_noPaymentData, style: AppTextStyles.bodySmall)),
           );
         }
 
@@ -883,7 +887,7 @@ class _PaymentSummarySection extends StatelessWidget {
         for (final doc in docs) {
           final data = doc.data();
           final createdAt = data['createdAt'];
-          String monthKey = '不明';
+          String monthKey = context.l10n.common_unknown;
           if (createdAt is Timestamp) {
             final d = createdAt.toDate();
             monthKey = '${d.year}/${d.month.toString().padLeft(2, '0')}';
@@ -919,7 +923,7 @@ class _PaymentSummarySection extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
               padding: const EdgeInsets.all(AppSpacing.base),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.appColors.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                 boxShadow: AppShadows.card,
               ),
@@ -928,24 +932,24 @@ class _PaymentSummarySection extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.calendar_month, size: 18, color: AppColors.ruri),
+                      Icon(Icons.calendar_month, size: 18, color: context.appColors.primary),
                       const SizedBox(width: AppSpacing.sm),
                       Text(month, style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
                       const Spacer(),
-                      Text('$count件', style: AppTextStyles.labelMedium),
+                      Text('$count${context.l10n.common_itemsCount}', style: AppTextStyles.labelMedium),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
-                        child: _MiniStat(label: '合計', value: '¥${_formatPrice(total)}', color: AppColors.textPrimary),
+                        child: _MiniStat(label: context.l10n.sales_total, value: '¥${_formatPrice(total)}', color: context.appColors.textPrimary),
                       ),
                       Expanded(
-                        child: _MiniStat(label: '支払済', value: '¥${_formatPrice(paid)}', color: AppColors.success),
+                        child: _MiniStat(label: context.l10n.sales_paid, value: '¥${_formatPrice(paid)}', color: context.appColors.success),
                       ),
                       Expanded(
-                        child: _MiniStat(label: '未払い', value: '¥${_formatPrice(unpaid)}', color: AppColors.warning),
+                        child: _MiniStat(label: context.l10n.sales_unpaid, value: '¥${_formatPrice(unpaid)}', color: context.appColors.warning),
                       ),
                     ],
                   ),
@@ -1008,10 +1012,10 @@ class _StatementsContent extends StatelessWidget {
         }
         final docs = snap.data?.docs ?? [];
         if (docs.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.receipt_long_outlined,
-            title: '月次明細はまだありません',
-            description: '完了した案件があると\n自動的に明細が作成されます',
+            title: context.l10n.sales_noStatements,
+            description: context.l10n.sales_noStatementsDescription,
           );
         }
 
@@ -1024,24 +1028,24 @@ class _StatementsContent extends StatelessWidget {
             final total = int.tryParse((data['totalAmount'] ?? '0').toString()) ?? 0;
             final status = (data['status'] ?? 'draft').toString();
             final statusLabel = switch (status) {
-              'draft' => '集計中',
-              'confirmed' => '確定済み',
-              'paid' => '支払済み',
+              'draft' => context.l10n.sales_statusDraft,
+              'confirmed' => context.l10n.common_confirmed,
+              'paid' => context.l10n.sales_statusPaid,
               _ => status,
             };
             final statusColor = switch (status) {
-              'paid' => AppColors.success,
-              'confirmed' => AppColors.ruri,
-              _ => AppColors.textSecondary,
+              'paid' => context.appColors.success,
+              'confirmed' => context.appColors.primary,
+              _ => context.appColors.textSecondary,
             };
 
             return Card(
               margin: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: ListTile(
-                leading: const Icon(Icons.receipt_long, color: AppColors.ruri),
-                title: Text('$month月 明細',
+                leading: Icon(Icons.receipt_long, color: context.appColors.primary),
+                title: Text(context.l10n.sales_monthStatement(month),
                     style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700)),
-                subtitle: Text('合計: ¥${_formatAmount(total)}'),
+                subtitle: Text('${context.l10n.sales_total}: ¥${_formatAmount(total)}'),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 
 class RatingStarsDisplay extends StatelessWidget {
   final double average;
@@ -19,10 +19,10 @@ class RatingStarsDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     if (count == 0) {
       return Text(
-        '評価なし',
+        context.l10n.ratingStars_noRating,
         style: TextStyle(
           fontSize: fontSize,
-          color: AppColors.textHint,
+          color: context.appColors.textHint,
           fontWeight: FontWeight.w600,
         ),
       );
@@ -38,7 +38,7 @@ class RatingStarsDisplay extends StatelessWidget {
           } else if (average >= starNum - 0.5) {
             return Icon(Icons.star_half_rounded, size: starSize, color: Colors.amber);
           } else {
-            return Icon(Icons.star_outline_rounded, size: starSize, color: AppColors.textHint);
+            return Icon(Icons.star_outline_rounded, size: starSize, color: context.appColors.textHint);
           }
         }),
         const SizedBox(width: 6),
@@ -47,15 +47,15 @@ class RatingStarsDisplay extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+            color: context.appColors.textPrimary,
           ),
         ),
         const SizedBox(width: 4),
         Text(
-          '($count件)',
+          context.l10n.ratingStars_count(count.toString()),
           style: TextStyle(
             fontSize: fontSize - 1,
-            color: AppColors.textSecondary,
+            color: context.appColors.textSecondary,
             fontWeight: FontWeight.w600,
           ),
         ),

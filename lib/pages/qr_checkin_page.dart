@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/checkin_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -70,12 +70,12 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.error_outline, color: AppColors.error),
+                Icon(Icons.error_outline, color: context.appColors.error),
                 SizedBox(width: 8),
                 Expanded(
-                  child: Text('エラー', style: TextStyle(fontSize: 18)),
+                  child: Text(context.l10n.qrCheckin_error, style: const TextStyle(fontSize: 18)),
                 ),
               ],
             ),
@@ -96,7 +96,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('エラーが発生しました: $e')),
+        SnackBar(content: Text(context.l10n.qrCheckin_errorOccurred(e.toString()))),
       );
       setState(() {
         _processing = false;
@@ -107,7 +107,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
 
   @override
   Widget build(BuildContext context) {
-    final action = widget.isCheckOut ? '退勤' : '出勤';
+    final action = widget.isCheckOut ? context.l10n.qrCheckin_clockOut : context.l10n.qrCheckin_clockIn;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -115,7 +115,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         title: Text(
-          'QRスキャン（$action）',
+          context.l10n.qrCheckin_title(action),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
@@ -147,7 +147,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
                   const CircularProgressIndicator(color: Colors.white)
                 else
                   Text(
-                    '管理者のQRコードをスキャンしてください',
+                    context.l10n.qrCheckin_scanAdminQr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
@@ -157,7 +157,7 @@ class _QrCheckinPageState extends State<QrCheckinPage> {
                   ),
                 const SizedBox(height: 8),
                 Text(
-                  'GPS検証: 現場から100m以内で$actionできます',
+                  context.l10n.qrCheckin_gpsVerification(action),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),

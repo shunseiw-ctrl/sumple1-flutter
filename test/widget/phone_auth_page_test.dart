@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/phone_auth_page.dart';
 import 'package:sumple1/core/services/phone_auth_service.dart';
@@ -10,6 +11,7 @@ class MockPhoneAuthService extends Mock implements PhoneAuthService {}
 
 Widget _buildTestApp({PhoneAuthService? phoneAuthService}) {
   return MaterialApp(
+    theme: ThemeData(extensions: const [AppColorsExtension.light]),
     localizationsDelegates: const [
       AppLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,

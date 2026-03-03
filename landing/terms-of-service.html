@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>利用規約 / Terms of Service - ALBAWORK</title>
+  <meta name="description" content="ALBAWORKの利用規約。サービスのご利用条件について説明します。">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+      color: #fff;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .header a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .lang-nav {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 16px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .lang-nav a {
+      display: inline-block;
+      padding: 8px 24px;
+      margin: 0 8px;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #1a237e;
+      font-weight: 500;
+      border: 1px solid #1a237e;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .lang-nav a:hover {
+      background-color: #1a237e;
+      color: #fff;
+    }
+
+    .terms-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .terms-section h1 {
+      font-size: 28px;
+      color: #1a237e;
+      margin-bottom: 8px;
+    }
+
+    .last-updated {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .terms-section h2 {
+      font-size: 20px;
+      color: #1a237e;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e8eaf6;
+    }
+
+    .terms-section h3 {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    .terms-section p {
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    .terms-section ul, .terms-section ol {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+
+    .terms-section li {
+      margin-bottom: 6px;
+    }
+
+    .contact-box {
+      background: #e8eaf6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .contact-box p {
+      margin-bottom: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #1a237e;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      border: none;
+      border-top: 3px solid #1a237e;
+      margin: 48px 0;
+    }
+
+    @media (max-width: 600px) {
+      .terms-section {
+        padding: 24px 16px;
+      }
+
+      .terms-section h1 {
+        font-size: 22px;
+      }
+
+      .terms-section h2 {
+        font-size: 18px;
+      }
+
+      .container {
+        padding: 24px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="/">ALBAWORK</a>
+  </div>
+
+  <div class="container">
+    <nav class="lang-nav">
+      <a href="#ja">日本語</a>
+      <a href="#en">English</a>
+    </nav>
+
+    <!-- Japanese Section -->
+    <div class="terms-section" id="ja">
+      <h1>利用規約</h1>
+      <p class="last-updated">最終更新日: 2026年3月3日</p>
+
+      <p>本利用規約（以下「本規約」）は、ALBAWORK（以下「当社」）が提供する建設業界向け求人マッチングアプリ「ALBAWORK」（以下「本サービス」）の利用条件を定めるものです。ユーザーの皆様（以下「ユーザー」）は、本サービスをご利用いただく前に、本規約をよくお読みください。本サービスを利用することにより、本規約に同意したものとみなされます。</p>
+
+      <h2>第1条（サービスの概要）</h2>
+      <p>本サービスは、建設業界における求人掲載者（企業・事業者）と求職者（職人・作業員）をマッチングするプラットフォームです。主な機能は以下の通りです。</p>
+      <ul>
+        <li>求人の掲載および検索</li>
+        <li>求人への応募およびマッチング</li>
+        <li>QRコード + GPS による出退勤管理</li>
+        <li>ユーザー間のチャット機能</li>
+        <li>日報・検査チェックリストの管理</li>
+        <li>報酬の計算・支払い処理（Stripe Connect経由）</li>
+        <li>品質スコアによる評価システム</li>
+        <li>地図による現場検索</li>
+      </ul>
+
+      <h2>第2条（アカウント登録）</h2>
+      <ol>
+        <li>ユーザーは、本サービスを利用するにあたり、正確かつ最新の情報を提供してアカウント登録を行うものとします。</li>
+        <li>ユーザーは、メールアドレス、LINEアカウント、またはApple IDを使用してアカウントを作成できます。</li>
+        <li>ユーザーは、18歳以上であることを確認の上、登録するものとします。</li>
+        <li>ユーザーは、自身のアカウント情報を適切に管理し、第三者に譲渡、貸与、または共有してはなりません。</li>
+        <li>アカウント情報の管理不備により生じた損害について、当社は一切の責任を負いません。</li>
+      </ol>
+
+      <h2>第3条（ユーザーの責任）</h2>
+      <ol>
+        <li>ユーザーは、本サービスの利用にあたり、すべての適用される法令、規則、およびガイドラインを遵守するものとします。</li>
+        <li>求人掲載者は、掲載する求人情報が正確であり、労働関連法規に準拠していることを保証するものとします。</li>
+        <li>求職者は、提供するプロフィール情報、資格情報が正確であることを保証するものとします。</li>
+        <li>出退勤記録の正確性について、ユーザーは自ら確認する責任を負うものとします。</li>
+        <li>現場での安全管理は、求人掲載者および作業に従事するユーザー双方の責任とします。</li>
+      </ol>
+
+      <h2>第4条（禁止事項）</h2>
+      <p>ユーザーは、本サービスの利用にあたり、以下の行為を行ってはなりません。</p>
+      <ol>
+        <li>虚偽の情報を登録または提供する行為</li>
+        <li>他のユーザーになりすます行為</li>
+        <li>本サービスを通じて知り得た個人情報を、本サービスの目的以外に利用する行為</li>
+        <li>GPSの位置情報を偽装して出退勤記録を不正に操作する行為</li>
+        <li>本サービスの運営を妨害する行為（不正アクセス、過度な負荷等）</li>
+        <li>法令または公序良俗に反する行為</li>
+        <li>反社会的勢力との関係を有する行為</li>
+        <li>本サービスのソフトウェアのリバースエンジニアリング、逆コンパイル、逆アセンブル</li>
+        <li>当社または第三者の知的財産権、プライバシー権、名誉権その他の権利を侵害する行為</li>
+        <li>本サービスを利用した違法な労働契約や、労働基準法に違反する求人の掲載</li>
+        <li>差別的、ハラスメント的、脅迫的な内容のメッセージの送信</li>
+        <li>スパム、広告、勧誘目的でのチャット機能の利用</li>
+        <li>その他、当社が不適切と判断する行為</li>
+      </ol>
+
+      <h2>第5条（知的財産権）</h2>
+      <ol>
+        <li>本サービスに関する著作権、商標権その他一切の知的財産権は、当社または正当な権利者に帰属します。</li>
+        <li>ユーザーが本サービスに投稿したコンテンツ（写真、テキスト等）の著作権は、当該ユーザーに帰属します。ただし、ユーザーは、当社に対し、本サービスの提供・改善に必要な範囲で、当該コンテンツを使用する非独占的な権利を許諾するものとします。</li>
+        <li>ユーザーは、本サービスの全部または一部を、当社の事前の書面による承諾なく、複製、改変、頒布、公開してはなりません。</li>
+      </ol>
+
+      <h2>第6条（報酬と決済）</h2>
+      <ol>
+        <li>報酬の支払いは、Stripe Connectを通じて処理されます。</li>
+        <li>求人掲載者は、マッチングが成立した場合、掲載した報酬額を求職者に支払う義務を負います。</li>
+        <li>即日払い（早期支払い）を利用する場合、所定の手数料が発生します。</li>
+        <li>当社は、プラットフォーム利用料として、取引額の一部をサービス手数料として徴収する場合があります。</li>
+        <li>報酬に関する税務上の責任は、各ユーザーが負うものとします。</li>
+      </ol>
+
+      <h2>第7条（免責事項）</h2>
+      <ol>
+        <li>当社は、本サービスの内容、正確性、信頼性、利用可能性、適時性について、明示または黙示を問わず、いかなる保証も行いません。</li>
+        <li>当社は、ユーザー間の取引、紛争、トラブルについて、一切の責任を負いません。ただし、当社は紛争解決の支援に努めます。</li>
+        <li>当社は、求人情報の正確性や、求職者の資格・能力について保証しません。</li>
+        <li>当社は、天災地変、通信障害、システム障害その他の不可抗力による本サービスの中断・停止について、一切の責任を負いません。</li>
+        <li>当社は、本サービスの利用に起因するユーザーの間接的、偶発的、特別な損害について、一切の責任を負いません。</li>
+        <li>当社の損害賠償責任は、ユーザーが過去12ヶ月間に当社に支払った金額を上限とします。</li>
+      </ol>
+
+      <h2>第8条（サービスの変更・中断・終了）</h2>
+      <ol>
+        <li>当社は、ユーザーへの事前通知なく、本サービスの内容を変更、追加、または廃止することがあります。</li>
+        <li>当社は、以下の場合、本サービスの全部または一部を一時的に中断することがあります。
+          <ul>
+            <li>システムの保守・点検を行う場合</li>
+            <li>天災地変、停電、通信障害等の不可抗力が生じた場合</li>
+            <li>その他、当社が中断を必要と判断した場合</li>
+          </ul>
+        </li>
+        <li>当社は、本サービスの変更、中断、終了によりユーザーに生じた損害について、一切の責任を負いません。</li>
+      </ol>
+
+      <h2>第9条（アカウントの停止・削除）</h2>
+      <ol>
+        <li>当社は、ユーザーが本規約に違反した場合、または不正な利用が認められた場合、事前通知なくアカウントを停止または削除することがあります。</li>
+        <li>ユーザーは、アプリ内の設定画面からいつでもアカウントを削除できます。</li>
+        <li>アカウント削除後、当社は個人情報を本プライバシーポリシーに従い適切に処理します。</li>
+      </ol>
+
+      <h2>第10条（準拠法と裁判管轄）</h2>
+      <ol>
+        <li>本規約は、日本法に準拠し、日本法に基づいて解釈されるものとします。</li>
+        <li>本規約に関連する紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。</li>
+      </ol>
+
+      <h2>第11条（規約の変更）</h2>
+      <ol>
+        <li>当社は、必要と判断した場合、本規約を変更することがあります。</li>
+        <li>本規約の変更後、本サービスを継続して利用する場合、変更後の規約に同意したものとみなされます。</li>
+        <li>重要な変更がある場合は、アプリ内通知またはメールにて事前にお知らせします。</li>
+      </ol>
+
+      <h2>第12条（分離可能性）</h2>
+      <p>本規約のいずれかの条項が無効または執行不能と判断された場合でも、残りの条項は引き続き有効に存続するものとします。</p>
+
+      <h2>第13条（お問い合わせ）</h2>
+      <div class="contact-box">
+        <p><strong>ALBAWORK サポート</strong></p>
+        <p>メール: <a href="mailto:support@albawork.app">support@albawork.app</a></p>
+        <p>住所: 日本国内</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- English Section -->
+    <div class="terms-section" id="en">
+      <h1>Terms of Service</h1>
+      <p class="last-updated">Last Updated: March 3, 2026</p>
+
+      <p>These Terms of Service ("Terms") govern your use of the ALBAWORK construction industry job matching application ("the Service") provided by ALBAWORK ("we", "us", or "our"). Please read these Terms carefully before using the Service. By using the Service, you agree to be bound by these Terms.</p>
+
+      <h2>Article 1: Service Overview</h2>
+      <p>The Service is a platform that matches job posters (companies and businesses) with job seekers (skilled workers and laborers) in the construction industry. Key features include:</p>
+      <ul>
+        <li>Job posting and search</li>
+        <li>Job application and matching</li>
+        <li>QR code + GPS attendance management</li>
+        <li>In-app chat between users</li>
+        <li>Daily report and inspection checklist management</li>
+        <li>Payment calculation and processing (via Stripe Connect)</li>
+        <li>Quality score evaluation system</li>
+        <li>Map-based worksite search</li>
+      </ul>
+
+      <h2>Article 2: Account Registration</h2>
+      <ol>
+        <li>Users must provide accurate and up-to-date information when registering an account.</li>
+        <li>Users may create an account using an email address, LINE account, or Apple ID.</li>
+        <li>Users must confirm that they are 18 years of age or older before registering.</li>
+        <li>Users must properly manage their account credentials and must not transfer, lend, or share them with third parties.</li>
+        <li>We are not responsible for any damages resulting from inadequate management of account information.</li>
+      </ol>
+
+      <h2>Article 3: User Responsibilities</h2>
+      <ol>
+        <li>Users must comply with all applicable laws, regulations, and guidelines when using the Service.</li>
+        <li>Job posters warrant that posted job information is accurate and complies with labor-related regulations.</li>
+        <li>Job seekers warrant that their profile information and qualification details are accurate.</li>
+        <li>Users are responsible for verifying the accuracy of their attendance records.</li>
+        <li>Worksite safety management is the shared responsibility of both job posters and workers.</li>
+      </ol>
+
+      <h2>Article 4: Prohibited Activities</h2>
+      <p>Users must not engage in the following activities when using the Service:</p>
+      <ol>
+        <li>Registering or providing false information</li>
+        <li>Impersonating other users</li>
+        <li>Using personal information obtained through the Service for purposes other than those intended</li>
+        <li>Falsifying GPS location data to manipulate attendance records</li>
+        <li>Interfering with the operation of the Service (unauthorized access, excessive load, etc.)</li>
+        <li>Activities that violate laws or public order and morals</li>
+        <li>Activities involving relationships with antisocial forces</li>
+        <li>Reverse engineering, decompiling, or disassembling the Service's software</li>
+        <li>Infringing on the intellectual property rights, privacy rights, reputation, or other rights of us or third parties</li>
+        <li>Posting job listings that involve illegal labor contracts or violate labor standards laws</li>
+        <li>Sending discriminatory, harassing, or threatening messages</li>
+        <li>Using the chat function for spam, advertising, or solicitation purposes</li>
+        <li>Any other activities deemed inappropriate by us</li>
+      </ol>
+
+      <h2>Article 5: Intellectual Property</h2>
+      <ol>
+        <li>All intellectual property rights related to the Service, including copyrights and trademarks, belong to us or their rightful owners.</li>
+        <li>Copyright of content posted by users (photos, text, etc.) belongs to the respective users. However, users grant us a non-exclusive right to use such content to the extent necessary for providing and improving the Service.</li>
+        <li>Users may not reproduce, modify, distribute, or publish all or part of the Service without our prior written consent.</li>
+      </ol>
+
+      <h2>Article 6: Payments and Compensation</h2>
+      <ol>
+        <li>Payments are processed through Stripe Connect.</li>
+        <li>When a match is established, job posters are obligated to pay the posted compensation amount to the worker.</li>
+        <li>A processing fee applies when using the early payment (same-day payment) feature.</li>
+        <li>We may collect a service fee as a percentage of the transaction amount as a platform usage fee.</li>
+        <li>Each user is responsible for their own tax obligations related to compensation.</li>
+      </ol>
+
+      <h2>Article 7: Limitation of Liability</h2>
+      <ol>
+        <li>We make no warranties, express or implied, regarding the content, accuracy, reliability, availability, or timeliness of the Service.</li>
+        <li>We are not responsible for transactions, disputes, or troubles between users. However, we will endeavor to assist in dispute resolution.</li>
+        <li>We do not guarantee the accuracy of job information or the qualifications and abilities of job seekers.</li>
+        <li>We are not responsible for any interruption or suspension of the Service due to natural disasters, communication failures, system failures, or other force majeure events.</li>
+        <li>We are not responsible for any indirect, incidental, or special damages arising from the use of the Service.</li>
+        <li>Our total liability for damages is limited to the amount paid by the user to us in the preceding 12 months.</li>
+      </ol>
+
+      <h2>Article 8: Service Changes, Interruptions, and Termination</h2>
+      <ol>
+        <li>We may change, add to, or discontinue the content of the Service without prior notice to users.</li>
+        <li>We may temporarily interrupt all or part of the Service in the following cases:
+          <ul>
+            <li>System maintenance or inspection</li>
+            <li>Force majeure events such as natural disasters, power outages, or communication failures</li>
+            <li>Other cases where we deem interruption necessary</li>
+          </ul>
+        </li>
+        <li>We are not responsible for any damages incurred by users due to changes, interruptions, or termination of the Service.</li>
+      </ol>
+
+      <h2>Article 9: Account Suspension and Deletion</h2>
+      <ol>
+        <li>We may suspend or delete a user's account without prior notice if the user violates these Terms or if unauthorized use is detected.</li>
+        <li>Users may delete their account at any time from the settings screen within the App.</li>
+        <li>After account deletion, we will process personal information in accordance with our Privacy Policy.</li>
+      </ol>
+
+      <h2>Article 10: Governing Law and Jurisdiction</h2>
+      <ol>
+        <li>These Terms are governed by and construed in accordance with the laws of Japan.</li>
+        <li>Any disputes arising in connection with these Terms shall be subject to the exclusive jurisdiction of the Tokyo District Court as the court of first instance.</li>
+      </ol>
+
+      <h2>Article 11: Changes to These Terms</h2>
+      <ol>
+        <li>We may modify these Terms when we deem it necessary.</li>
+        <li>By continuing to use the Service after any changes to these Terms, you are deemed to have agreed to the modified Terms.</li>
+        <li>For significant changes, we will provide advance notice via in-app notification or email.</li>
+      </ol>
+
+      <h2>Article 12: Severability</h2>
+      <p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+      <h2>Article 13: Contact Us</h2>
+      <div class="contact-box">
+        <p><strong>ALBAWORK Support</strong></p>
+        <p>Email: <a href="mailto:support@albawork.app">support@albawork.app</a></p>
+        <p>Location: Japan</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p><a href="/">ALBAWORK</a> | <a href="privacy-policy.html">プライバシーポリシー / Privacy Policy</a></p>
+    <p>&copy; 2026 ALBAWORK. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/extensions/build_context_extensions.dart';
 import '../core/services/auth_service.dart';
 import '../core/utils/error_handler.dart';
 import '../core/utils/logger.dart';
@@ -35,17 +36,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     AnalyticsService.logScreenView('admin_login');
   }
 
-  String get _lockoutMessage {
+  String _lockoutMessage(BuildContext context) {
     if (_lockoutUntil == null) return '';
     final remaining = _lockoutUntil!.difference(DateTime.now());
     final minutes = remaining.inMinutes;
     final seconds = remaining.inSeconds % 60;
-    return 'ログイン試行回数の上限に達しました。$minutes分$seconds秒後にお試しください';
+    return context.l10n.adminLogin_lockoutMessage(minutes.toString(), seconds.toString());
   }
 
   Future<void> _signIn() async {
     if (_isLockedOut) {
-      ErrorHandler.showError(context, _lockoutMessage);
+      ErrorHandler.showError(context, _lockoutMessage(context));
       setState(() {});
       return;
     }
@@ -67,7 +68,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       Logger.info('Admin sign in successful', tag: 'AdminLoginPage');
 
       if (!mounted) return;
-      ErrorHandler.showSuccess(context, 'ログインしました');
+      ErrorHandler.showSuccess(context, context.l10n.adminLogin_loginSuccess);
     } catch (e) {
       _failedAttempts++;
       if (_failedAttempts >= _maxAttempts) {
@@ -77,7 +78,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       Logger.error('Admin sign in failed', tag: 'AdminLoginPage', error: e);
       if (!mounted) return;
       if (_isLockedOut) {
-        ErrorHandler.showError(context, _lockoutMessage);
+        ErrorHandler.showError(context, _lockoutMessage(context));
       } else {
         ErrorHandler.showError(context, e);
       }
@@ -96,7 +97,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('管理者ログイン')),
+      appBar: AppBar(title: Text(context.l10n.adminLogin_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -110,17 +111,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 autocorrect: false,
                 enableSuggestions: false,
-                decoration: const InputDecoration(
-                  labelText: 'メールアドレス',
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.adminLogin_email,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'メールアドレスを入力してください';
+                    return context.l10n.adminLogin_emailRequired;
                   }
                   if (!value.contains('@') || !value.contains('.')) {
-                    return '有効なメールアドレスを入力してください';
+                    return context.l10n.adminLogin_emailInvalid;
                   }
                   return null;
                 },
@@ -132,7 +133,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 enableSuggestions: false,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  labelText: 'パスワード',
+                  labelText: context.l10n.adminLogin_password,
                   prefixIcon: const Icon(Icons.lock_outlined),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -142,10 +143,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'パスワードを入力してください';
+                    return context.l10n.adminLogin_passwordRequired;
                   }
                   if (value.length < 6) {
-                    return 'パスワードは6文字以上で入力してください';
+                    return context.l10n.adminLogin_passwordMinLength;
                   }
                   return null;
                 },
@@ -165,7 +166,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _lockoutMessage,
+                          _lockoutMessage(context),
                           style: TextStyle(color: Colors.red.shade700, fontSize: 13),
                         ),
                       ),
@@ -187,8 +188,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'ログイン',
+                      : Text(
+                          context.l10n.adminLogin_login,
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                         ),
                 ),

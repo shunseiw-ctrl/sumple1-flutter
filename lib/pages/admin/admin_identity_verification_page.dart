@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/ekyc_manual_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/data/models/identity_verification_model.dart';
@@ -34,16 +34,16 @@ class _AdminIdentityVerificationPageState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('本人確認承認'),
-        content: const Text('この本人確認を承認しますか？'),
+        title: Text(context.l10n.adminIdentityVerification_approveTitle),
+        content: Text(context.l10n.adminIdentityVerification_approveConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('キャンセル'),
+            child: Text(context.l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('承認する'),
+            child: Text(context.l10n.adminIdentityVerification_approveButton),
           ),
         ],
       ),
@@ -55,13 +55,13 @@ class _AdminIdentityVerificationPageState
       await _ekycService.approveVerification(uid, _myUid);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('本人確認を承認しました')),
+          SnackBar(content: Text(context.l10n.adminIdentityVerification_approved)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('承認に失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.adminIdentityVerification_approveFailed('$e'))),
         );
       }
     }
@@ -72,18 +72,18 @@ class _AdminIdentityVerificationPageState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('本人確認却下'),
+        title: Text(context.l10n.adminIdentityVerification_rejectTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('却下理由を入力してください'),
+            Text(context.l10n.adminIdentityVerification_enterRejectReason),
             const SizedBox(height: 12),
             TextField(
               controller: reasonController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: '却下理由（必須）',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.adminIdentityVerification_rejectReasonHint,
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -91,20 +91,20 @@ class _AdminIdentityVerificationPageState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('キャンセル'),
+            child: Text(context.l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () {
               if (reasonController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('却下理由を入力してください')),
+                  SnackBar(content: Text(context.l10n.adminIdentityVerification_enterRejectReason)),
                 );
                 return;
               }
               Navigator.pop(ctx, true);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('却下する'),
+            style: ElevatedButton.styleFrom(backgroundColor: context.appColors.error),
+            child: Text(context.l10n.adminIdentityVerification_rejectButton),
           ),
         ],
       ),
@@ -120,13 +120,13 @@ class _AdminIdentityVerificationPageState
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('本人確認を却下しました')),
+          SnackBar(content: Text(context.l10n.adminIdentityVerification_rejected)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('却下に失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.adminIdentityVerification_rejectFailed('$e'))),
         );
       }
     } finally {
@@ -166,7 +166,7 @@ class _AdminIdentityVerificationPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('本人確認レビュー')),
+      appBar: AppBar(title: Text(context.l10n.adminIdentityVerification_title)),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() => _refreshKey = UniqueKey());
@@ -184,26 +184,26 @@ class _AdminIdentityVerificationPageState
             }
             if (snap.hasError) {
               return Center(
-                child: Text('読み込みエラー: ${snap.error}'),
+                child: Text(context.l10n.common_loadError('${snap.error}')),
               );
             }
 
             final docs = snap.data?.docs ?? [];
             if (docs.isEmpty) {
               return ListView(
-                children: const [
-                  SizedBox(height: 120),
+                children: [
+                  const SizedBox(height: 120),
                   Center(
                     child: Column(
                       children: [
-                        Icon(Icons.verified_user_outlined, size: 48, color: AppColors.textHint),
-                        SizedBox(height: 12),
+                        Icon(Icons.verified_user_outlined, size: 48, color: context.appColors.textHint),
+                        const SizedBox(height: 12),
                         Text(
-                          '未処理の本人確認申請はありません',
+                          context.l10n.adminIdentityVerification_noPendingRequests,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textSecondary,
+                            color: context.appColors.textSecondary,
                           ),
                         ),
                       ],
@@ -226,8 +226,8 @@ class _AdminIdentityVerificationPageState
                   model: model,
                   onApprove: () => _approve(model.uid),
                   onReject: () => _reject(model.uid),
-                  onTapIdPhoto: () => _showPhotoDialog(model.idPhotoUrl, '身分証明書'),
-                  onTapSelfie: () => _showPhotoDialog(model.selfieUrl, '顔写真'),
+                  onTapIdPhoto: () => _showPhotoDialog(model.idPhotoUrl, context.l10n.adminIdentityVerification_idDocumentPhoto),
+                  onTapSelfie: () => _showPhotoDialog(model.selfieUrl, context.l10n.adminIdentityVerification_selfiePhoto),
                 );
               },
             );
@@ -265,38 +265,36 @@ class _VerificationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
-        boxShadow: const [
-          BoxShadow(color: AppColors.cardShadow, blurRadius: 8, offset: Offset(0, 2)),
+        border: Border.all(color: context.appColors.divider),
+        boxShadow: [
+          BoxShadow(color: context.appColors.cardShadow, blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ワーカー情報
           _WorkerInfo(uid: model.uid),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.badge, size: 16, color: AppColors.textHint),
+              Icon(Icons.badge, size: 16, color: context.appColors.textHint),
               const SizedBox(width: 4),
               Text(
                 model.documentTypeLabel,
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: context.appColors.textSecondary),
               ),
               const SizedBox(width: 12),
-              const Icon(Icons.schedule, size: 16, color: AppColors.textHint),
+              Icon(Icons.schedule, size: 16, color: context.appColors.textHint),
               const SizedBox(width: 4),
               Text(
                 dateStr,
-                style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+                style: TextStyle(fontSize: 12, color: context.appColors.textHint),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // 写真表示
           Row(
             children: [
               Expanded(
@@ -314,7 +312,7 @@ class _VerificationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text('身分証明書', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      Text(context.l10n.adminIdentityVerification_idDocumentPhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
                     ],
                   ),
                 ),
@@ -335,7 +333,7 @@ class _VerificationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text('顔写真', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      Text(context.l10n.adminIdentityVerification_selfiePhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
                     ],
                   ),
                 ),
@@ -343,17 +341,16 @@ class _VerificationCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // アクションボタン
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onReject,
                   icon: const Icon(Icons.close, size: 18),
-                  label: const Text('却下'),
+                  label: Text(context.l10n.common_reject),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: context.appColors.error,
+                    side: BorderSide(color: context.appColors.error),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -364,9 +361,9 @@ class _VerificationCard extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onApprove,
                   icon: const Icon(Icons.check, size: 18),
-                  label: const Text('承認'),
+                  label: Text(context.l10n.common_approve),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.success,
+                    backgroundColor: context.appColors.success,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -403,19 +400,19 @@ class _WorkerInfo extends StatelessWidget {
 
         return Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 18,
-              backgroundColor: AppColors.ruriPale,
-              child: Icon(Icons.person, color: AppColors.ruri, size: 18),
+              backgroundColor: context.appColors.primaryPale,
+              child: Icon(Icons.person, color: context.appColors.primary, size: 18),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.appColors.textPrimary,
                 ),
               ),
             ),

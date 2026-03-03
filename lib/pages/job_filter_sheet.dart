@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 /// Immutable data class representing the state of the job filter sheet.
 class JobFilterState {
@@ -74,6 +74,7 @@ class JobFilterState {
 }
 
 /// Available qualification filter options.
+/// Qualification option keys (used as Firestore values).
 const List<String> qualificationOptions = [
   '足場組立',
   '玉掛け',
@@ -84,6 +85,21 @@ const List<String> qualificationOptions = [
   '土木施工管理',
   '建築施工管理',
 ];
+
+/// Returns a localized label for a qualification option key.
+String qualificationLabel(BuildContext context, String key) {
+  switch (key) {
+    case '足場組立': return context.l10n.jobFilter_qualScaffolding;
+    case '玉掛け': return context.l10n.jobFilter_qualSlinging;
+    case 'フォークリフト': return context.l10n.jobFilter_qualForklift;
+    case '電気工事士': return context.l10n.jobFilter_qualElectrician;
+    case '溶接': return context.l10n.jobFilter_qualWelding;
+    case '危険物取扱者': return context.l10n.jobFilter_qualHazmat;
+    case '土木施工管理': return context.l10n.jobFilter_qualCivilEngineering;
+    case '建築施工管理': return context.l10n.jobFilter_qualBuildingManagement;
+    default: return key;
+  }
+}
 
 /// Shows the job filter bottom sheet.
 ///
@@ -109,9 +125,9 @@ Future<JobFilterState?> showJobFilterSheet(
       return StatefulBuilder(
         builder: (ctx, setLocal) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadiusLg)),
+            decoration: BoxDecoration(
+              color: ctx.appColors.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadiusLg)),
             ),
             child: DraggableScrollableSheet(
               initialChildSize: 0.75,
@@ -128,7 +144,7 @@ Future<JobFilterState?> showJobFilterSheet(
                         child: Container(
                           width: 40, height: 4,
                           decoration: BoxDecoration(
-                            color: AppColors.border,
+                            color: ctx.appColors.border,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -136,7 +152,7 @@ Future<JobFilterState?> showJobFilterSheet(
                       const SizedBox(height: AppSpacing.base),
                       Row(
                         children: [
-                          Text('絞り込み', style: AppTextStyles.headingMedium),
+                          Text(ctx.l10n.jobFilter_title, style: AppTextStyles.headingMedium),
                           const Spacer(),
                           TextButton(
                             onPressed: () {
@@ -149,25 +165,25 @@ Future<JobFilterState?> showJobFilterSheet(
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.ruri,
+                              foregroundColor: ctx.appColors.primary,
                             ),
-                            child: Text('リセット', style: AppTextStyles.labelMedium.copyWith(color: AppColors.ruri)),
+                            child: Text(ctx.l10n.jobFilter_reset, style: AppTextStyles.labelMedium.copyWith(color: ctx.appColors.primary)),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      Text('エリア（市区町村）', style: AppTextStyles.labelLarge),
+                      Text(ctx.l10n.jobFilter_areaLabel, style: AppTextStyles.labelLarge),
                       const SizedBox(height: AppSpacing.sm),
                       TextField(
                         controller: TextEditingController(text: tempArea),
                         decoration: InputDecoration(
-                          hintText: '例）渋谷区、横浜市',
-                          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
-                          prefixIcon: const Icon(Icons.location_on_outlined, size: 20, color: AppColors.ruri),
+                          hintText: ctx.l10n.jobFilter_areaHint,
+                          hintStyle: AppTextStyles.bodyMedium.copyWith(color: ctx.appColors.textHint),
+                          prefixIcon: Icon(Icons.location_on_outlined, size: 20, color: ctx.appColors.primary),
                           isDense: true,
                           filled: true,
-                          fillColor: AppColors.background,
+                          fillColor: ctx.appColors.background,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                             borderSide: BorderSide.none,
@@ -178,22 +194,24 @@ Future<JobFilterState?> showJobFilterSheet(
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                            borderSide: const BorderSide(color: AppColors.ruri, width: 1.5),
+                            borderSide: BorderSide(color: ctx.appColors.primary, width: 1.5),
                           ),
                         ),
                         onChanged: (v) => tempArea = v.trim(),
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      Text('金額範囲: ¥${tempPrice.start.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')} ~ ¥${tempPrice.end.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')}${tempPrice.end >= 100000 ? '+' : ''}',
+                      Text('${ctx.l10n.jobFilter_priceRange}: '
+                        '¥${tempPrice.start.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')} - '
+                        '¥${tempPrice.end.toInt().toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+\$)'), (m) => '${m[1]},')}${tempPrice.end >= 100000 ? '+' : ''}',
                         style: AppTextStyles.labelLarge),
                       RangeSlider(
                         values: tempPrice,
                         min: 0,
                         max: 100000,
                         divisions: 20,
-                        activeColor: AppColors.ruri,
-                        inactiveColor: AppColors.ruriPale,
+                        activeColor: ctx.appColors.primary,
+                        inactiveColor: ctx.appColors.primaryPale,
                         labels: RangeLabels(
                           '¥${tempPrice.start.toInt()}',
                           tempPrice.end >= 100000 ? '¥100,000+' : '¥${tempPrice.end.toInt()}',
@@ -202,39 +220,39 @@ Future<JobFilterState?> showJobFilterSheet(
                       ),
                       const SizedBox(height: AppSpacing.base),
 
-                      Text('必要資格', style: AppTextStyles.labelLarge),
+                      Text(ctx.l10n.jobFilter_requiredQualifications, style: AppTextStyles.labelLarge),
                       const SizedBox(height: AppSpacing.sm),
                       Wrap(
                         spacing: AppSpacing.sm, runSpacing: AppSpacing.sm,
                         children: qualificationOptions.map((q) {
                           final selected = tempQuals.contains(q);
                           return FilterChip(
-                            label: Text(q),
+                            label: Text(qualificationLabel(ctx, q)),
                             selected: selected,
                             onSelected: (v) {
                               setLocal(() {
                                 if (v) { tempQuals.add(q); } else { tempQuals.remove(q); }
                               });
                             },
-                            selectedColor: AppColors.ruriPale,
-                            checkmarkColor: AppColors.ruri,
-                            backgroundColor: AppColors.background,
+                            selectedColor: ctx.appColors.primaryPale,
+                            checkmarkColor: ctx.appColors.primary,
+                            backgroundColor: ctx.appColors.background,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                               side: BorderSide(
-                                color: selected ? AppColors.ruri : Colors.transparent,
+                                color: selected ? ctx.appColors.primary : Colors.transparent,
                                 width: 1,
                               ),
                             ),
                             labelStyle: AppTextStyles.chipText.copyWith(
-                              color: selected ? AppColors.ruri : AppColors.textPrimary,
+                              color: selected ? ctx.appColors.primary : ctx.appColors.textPrimary,
                             ),
                           );
                         }).toList(),
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      Text('日付範囲', style: AppTextStyles.labelLarge),
+                      Text(ctx.l10n.jobFilter_dateRange, style: AppTextStyles.labelLarge),
                       const SizedBox(height: AppSpacing.sm),
                       Row(
                         children: [
@@ -255,14 +273,14 @@ Future<JobFilterState?> showJobFilterSheet(
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
                                 decoration: BoxDecoration(
-                                  color: AppColors.background,
+                                  color: ctx.appColors.background,
                                   borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
+                                    Icon(Icons.calendar_today, size: 16, color: ctx.appColors.primary),
                                     const SizedBox(width: AppSpacing.sm),
-                                    Text(tempDateFrom ?? '開始日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateFrom != null ? AppColors.textPrimary : AppColors.textHint)),
+                                    Text(tempDateFrom ?? ctx.l10n.jobFilter_startDate, style: AppTextStyles.bodyMedium.copyWith(color: tempDateFrom != null ? ctx.appColors.textPrimary : ctx.appColors.textHint)),
                                   ],
                                 ),
                               ),
@@ -270,6 +288,7 @@ Future<JobFilterState?> showJobFilterSheet(
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                            // TODO: i18n - jobFilter_dateSeparator
                             child: Text('〜', style: AppTextStyles.bodyMedium),
                           ),
                           Expanded(
@@ -289,14 +308,14 @@ Future<JobFilterState?> showJobFilterSheet(
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
                                 decoration: BoxDecoration(
-                                  color: AppColors.background,
+                                  color: ctx.appColors.background,
                                   borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.calendar_today, size: 16, color: AppColors.ruri),
+                                    Icon(Icons.calendar_today, size: 16, color: ctx.appColors.primary),
                                     const SizedBox(width: AppSpacing.sm),
-                                    Text(tempDateTo ?? '終了日', style: AppTextStyles.bodyMedium.copyWith(color: tempDateTo != null ? AppColors.textPrimary : AppColors.textHint)),
+                                    Text(tempDateTo ?? ctx.l10n.jobFilter_endDate, style: AppTextStyles.bodyMedium.copyWith(color: tempDateTo != null ? ctx.appColors.textPrimary : ctx.appColors.textHint)),
                                   ],
                                 ),
                               ),
@@ -310,7 +329,7 @@ Future<JobFilterState?> showJobFilterSheet(
                         width: double.infinity,
                         height: 52,
                         decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                          gradient: ctx.appColors.primaryGradient,
                           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                           boxShadow: AppShadows.button,
                         ),
@@ -331,7 +350,7 @@ Future<JobFilterState?> showJobFilterSheet(
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.buttonRadius)),
                           ),
-                          child: Text('この条件で検索', style: AppTextStyles.button.copyWith(color: Colors.white)),
+                          child: Text(ctx.l10n.jobFilter_searchButton, style: AppTextStyles.button.copyWith(color: Colors.white)),
                         ),
                       ),
                     ],

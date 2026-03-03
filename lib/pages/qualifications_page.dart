@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/constants/app_colors.dart';
 import '../core/constants/app_constants.dart';
+import '../core/extensions/build_context_extensions.dart';
 import '../core/router/route_paths.dart';
 import '../core/services/qualification_service.dart';
 import '../data/models/qualification_model.dart';
@@ -18,35 +18,35 @@ class QualificationsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      return const Scaffold(
-        body: Center(child: Text('ログインが必要です')),
+      return Scaffold(
+        body: Center(child: Text(context.l10n.qualifications_loginRequired)),
       );
     }
 
     final service = qualificationService ?? QualificationService();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('資格管理')),
+      appBar: AppBar(title: Text(context.l10n.qualifications_title)),
       body: StreamBuilder<List<QualificationModel>>(
         stream: service.watchQualifications(uid),
         builder: (context, snap) {
           if (snap.hasError) {
-            return Center(child: Text('エラー: ${snap.error}'));
+            return Center(child: Text(context.l10n.qualifications_error(snap.error.toString())));
           }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
           final quals = snap.data!;
           if (quals.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.workspace_premium, size: 48, color: AppColors.textHint),
-                  SizedBox(height: 12),
-                  Text('登録された資格はありません', style: TextStyle(color: AppColors.textSecondary)),
-                  SizedBox(height: 4),
-                  Text('右下のボタンから追加できます', style: TextStyle(color: AppColors.textHint, fontSize: 12)),
+                  Icon(Icons.workspace_premium, size: 48, color: context.appColors.textHint),
+                  const SizedBox(height: 12),
+                  Text(context.l10n.qualifications_empty, style: TextStyle(color: context.appColors.textSecondary)),
+                  const SizedBox(height: 4),
+                  Text(context.l10n.qualifications_addHint, style: TextStyle(color: context.appColors.textHint, fontSize: 12)),
                 ],
               ),
             );
@@ -66,7 +66,7 @@ class QualificationsPage extends StatelessWidget {
         onPressed: () {
           context.push(RoutePaths.qualificationAdd);
         },
-        backgroundColor: AppColors.ruri,
+        backgroundColor: context.appColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -86,13 +86,13 @@ class _QualificationCard extends StatelessWidget {
     String statusText;
     if (qual.isVerified) {
       statusColor = Colors.green;
-      statusText = '承認済み';
+      statusText = context.l10n.qualifications_approved;
     } else if (qual.isPending) {
       statusColor = Colors.orange;
-      statusText = '審査中';
+      statusText = context.l10n.qualifications_pending;
     } else {
       statusColor = Colors.red;
-      statusText = '却下';
+      statusText = context.l10n.qualifications_rejected;
     }
 
     return Card(
@@ -100,7 +100,7 @@ class _QualificationCard extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           Icons.workspace_premium,
-          color: qual.isVerified ? Colors.green : AppColors.textHint,
+          color: qual.isVerified ? Colors.green : context.appColors.textHint,
         ),
         title: Text(qual.name, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: Column(
@@ -109,10 +109,10 @@ class _QualificationCard extends StatelessWidget {
             Text(categoryLabel, style: const TextStyle(fontSize: 12)),
             if (qual.expiryDate != null)
               Text(
-                '有効期限: ${qual.expiryDate}${qual.isExpired ? ' (期限切れ)' : ''}',
+                context.l10n.qualifications_expiryDate(qual.expiryDate!, qual.isExpired ? context.l10n.qualifications_expired : ''),
                 style: TextStyle(
                   fontSize: 12,
-                  color: qual.isExpired ? Colors.red : AppColors.textSecondary,
+                  color: qual.isExpired ? Colors.red : context.appColors.textSecondary,
                 ),
               ),
           ],

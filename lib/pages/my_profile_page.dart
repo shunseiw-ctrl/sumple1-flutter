@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/quality_score_service.dart';
@@ -111,7 +111,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ErrorHandler.showError(context, e, customMessage: 'プロフィールの読み込みに失敗しました');
+      ErrorHandler.showError(context, e, customMessage: context.l10n.myProfile_loadError);
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -130,17 +130,17 @@ class _MyProfilePageState extends State<MyProfilePage> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('ギャラリーから選択'),
+              title: Text(context.l10n.myProfile_pickFromGallery),
               onTap: () => Navigator.pop(ctx, 'gallery'),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('カメラで撮影'),
+              title: Text(context.l10n.myProfile_takePhoto),
               onTap: () => Navigator.pop(ctx, 'camera'),
             ),
             ListTile(
               leading: const Icon(Icons.close),
-              title: const Text('キャンセル'),
+              title: Text(context.l10n.common_cancel),
               onTap: () => Navigator.pop(ctx),
             ),
           ],
@@ -161,9 +161,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     if (result.isCancelled) return;
     if (result.isSuccess) {
-      ErrorHandler.showSuccess(context, 'プロフィール画像を更新しました');
+      ErrorHandler.showSuccess(context, context.l10n.myProfile_avatarUpdated);
     } else {
-      ErrorHandler.showError(context, null, customMessage: result.errorMessage ?? '画像のアップロードに失敗しました');
+      ErrorHandler.showError(context, null, customMessage: result.errorMessage ?? context.l10n.myProfile_avatarUploadError);
     }
   }
 
@@ -184,9 +184,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
       initialDate: initial,
       firstDate: DateTime(1900, 1, 1),
       lastDate: DateTime.now(),
-      helpText: '生年月日を選択',
-      cancelText: 'キャンセル',
-      confirmText: 'OK',
+      helpText: context.l10n.myProfile_selectBirthDate,
+      cancelText: context.l10n.common_cancel,
+      confirmText: context.l10n.common_ok,
     );
 
     if (picked == null) return;
@@ -199,7 +199,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   String? _requiredValidator(String? v, String label) {
-    if (v == null || v.trim().isEmpty) return '$labelは必須です';
+    if (v == null || v.trim().isEmpty) return context.l10n.myProfile_requiredField(label);
     return null;
   }
 
@@ -208,7 +208,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.isAnonymous) {
-      ErrorHandler.showError(context, null, customMessage: 'プロフィールの保存にはログインが必要です');
+      ErrorHandler.showError(context, null, customMessage: context.l10n.myProfile_loginRequired);
       return;
     }
 
@@ -216,7 +216,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     if (!ok) return;
 
     if (_gender == null || _gender!.trim().isEmpty) {
-      ErrorHandler.showError(context, null, customMessage: '性別を選択してください');
+      ErrorHandler.showError(context, null, customMessage: context.l10n.myProfile_selectGender);
       return;
     }
 
@@ -249,13 +249,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
       await ref.set(data, SetOptions(merge: true));
 
       if (!mounted) return;
-      ErrorHandler.showSuccess(context, 'プロフィールを保存しました');
+      ErrorHandler.showSuccess(context, context.l10n.myProfile_saveSuccess);
 
       Navigator.pop(context);
       return;
     } catch (e) {
       if (!mounted) return;
-      ErrorHandler.showError(context, e, customMessage: '保存に失敗しました');
+      ErrorHandler.showError(context, e, customMessage: context.l10n.myProfile_saveError);
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -297,7 +297,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('あなたのプロフィール'),
+        title: Text(context.l10n.myProfile_title),
         actions: [
           TextButton(
             onPressed: (_isLoading || isAnon) ? null : _save,
@@ -307,7 +307,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               height: 18,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-                : const Text('保存'),
+                : Text(context.l10n.common_save),
           ),
         ],
       ),
@@ -322,14 +322,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
               if (isAnon) ...[
-                const _Banner(
-                  title: 'ログインが必要です',
-                  message: 'プロフィールの入力・保存にはログインが必要です（Google/メール/SMS いずれでもOK）。',
+                _Banner(
+                  title: context.l10n.myProfile_loginRequiredTitle,
+                  message: context.l10n.myProfile_loginRequiredMessage,
                 ),
                 const SizedBox(height: 12),
               ],
 
-              const _SectionTitle('プロフィール写真'),
+              _SectionTitle(context.l10n.myProfile_profilePhoto),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance.collection('profiles').doc(FirebaseAuth.instance.currentUser?.uid ?? '').snapshots(),
                 builder: (context, snap) {
@@ -347,12 +347,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             children: [
                               CircleAvatar(
                                 radius: 50,
-                                backgroundColor: AppColors.chipUnselected,
+                                backgroundColor: context.appColors.chipUnselected,
                                 backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                                 child: _isUploadingAvatar
                                     ? const CircularProgressIndicator(strokeWidth: 2)
                                     : photoUrl.isEmpty
-                                        ? const Icon(Icons.person, size: 50, color: AppColors.textHint)
+                                        ? Icon(Icons.person, size: 50, color: context.appColors.textHint)
                                         : null,
                               ),
                               if (canUpload)
@@ -363,7 +363,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     width: 30,
                                     height: 30,
                                     decoration: BoxDecoration(
-                                      color: AppColors.ruri,
+                                      color: context.appColors.primary,
                                       shape: BoxShape.circle,
                                       border: Border.all(color: Colors.white, width: 2),
                                     ),
@@ -375,18 +375,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ),
                         const SizedBox(height: 8),
                         if (locked)
-                          const Row(
+                          Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.lock, size: 14, color: AppColors.success),
-                              SizedBox(width: 4),
-                              Text('本人確認済み', style: TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w600)),
+                              Icon(Icons.lock, size: 14, color: context.appColors.success),
+                              const SizedBox(width: 4),
+                              Text(context.l10n.myProfile_identityVerified, style: TextStyle(fontSize: 12, color: context.appColors.success, fontWeight: FontWeight.w600)),
                             ],
                           )
                         else if (!isAnon)
-                          const Text('タップして写真を変更', style: TextStyle(fontSize: 12, color: AppColors.textHint))
+                          Text(context.l10n.myProfile_tapToChangePhoto, style: TextStyle(fontSize: 12, color: context.appColors.textHint))
                         else
-                          const Text('本人確認で写真が設定されます', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                          Text(context.l10n.myProfile_photoSetByVerification, style: TextStyle(fontSize: 12, color: context.appColors.textHint)),
                       ],
                     ),
                   );
@@ -394,7 +394,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 16),
 
-              const _SectionTitle('あなたの評価'),
+              _SectionTitle(context.l10n.myProfile_yourRating),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
                     .collection('profiles')
@@ -422,11 +422,11 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ),
                         if (count > 0) ...[
                           const SizedBox(height: 8),
-                          const Text(
-                            '管理者からの評価',
+                          Text(
+                            context.l10n.myProfile_adminRating,
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.appColors.textSecondary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -442,7 +442,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 16),
 
-              const _SectionTitle('Stripe連携'),
+              _SectionTitle(context.l10n.myProfile_stripeIntegration),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
                     .collection('profiles')
@@ -459,16 +459,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
                   if (!hasAccount) {
                     icon = Icons.account_balance_outlined;
-                    color = AppColors.textHint;
-                    label = '未設定 — 設定ページからStripe口座を登録してください';
+                    color = context.appColors.textHint;
+                    label = context.l10n.myProfile_stripeNotConfigured;
                   } else if (stripeStatus == 'active') {
                     icon = Icons.check_circle;
-                    color = AppColors.success;
-                    label = '連携済み — 報酬を受け取れます';
+                    color = context.appColors.success;
+                    label = context.l10n.myProfile_stripeActive;
                   } else {
                     icon = Icons.pending;
-                    color = AppColors.warning;
-                    label = '設定中 — Stripeでの確認をお待ちください';
+                    color = context.appColors.warning;
+                    label = context.l10n.myProfile_stripePending;
                   }
 
                   return Container(
@@ -486,10 +486,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         Expanded(
                           child: Text(
                             label,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: context.appColors.textPrimary,
                             ),
                           ),
                         ),
@@ -500,21 +500,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 20),
 
-              const _SectionTitle('基本情報'),
+              _SectionTitle(context.l10n.myProfile_basicInfo),
 
               _twoColumnFields(
                 left: TextFormField(
                   controller: _familyNameCtrl,
-                  decoration: const InputDecoration(labelText: '姓（必須）'),
+                  decoration: InputDecoration(labelText: context.l10n.myProfile_familyNameLabel),
                   maxLength: AppConstants.maxDisplayNameLength,
-                  validator: (v) => _requiredValidator(v, '姓'),
+                  validator: (v) => _requiredValidator(v, context.l10n.myProfile_familyName),
                   textInputAction: TextInputAction.next,
                 ),
                 right: TextFormField(
                   controller: _givenNameCtrl,
-                  decoration: const InputDecoration(labelText: '名（必須）'),
+                  decoration: InputDecoration(labelText: context.l10n.myProfile_givenNameLabel),
                   maxLength: AppConstants.maxDisplayNameLength,
-                  validator: (v) => _requiredValidator(v, '名'),
+                  validator: (v) => _requiredValidator(v, context.l10n.myProfile_givenName),
                   textInputAction: TextInputAction.next,
                 ),
               ),
@@ -523,16 +523,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
               _twoColumnFields(
                 left: TextFormField(
                   controller: _familyNameKanaCtrl,
-                  decoration: const InputDecoration(labelText: 'セイ（必須）'),
+                  decoration: InputDecoration(labelText: context.l10n.myProfile_familyNameKanaLabel),
                   maxLength: AppConstants.maxDisplayNameLength,
-                  validator: (v) => _requiredValidator(v, 'セイ'),
+                  validator: (v) => _requiredValidator(v, context.l10n.myProfile_familyNameKana),
                   textInputAction: TextInputAction.next,
                 ),
                 right: TextFormField(
                   controller: _givenNameKanaCtrl,
-                  decoration: const InputDecoration(labelText: 'メイ（必須）'),
+                  decoration: InputDecoration(labelText: context.l10n.myProfile_givenNameKanaLabel),
                   maxLength: AppConstants.maxDisplayNameLength,
-                  validator: (v) => _requiredValidator(v, 'メイ'),
+                  validator: (v) => _requiredValidator(v, context.l10n.myProfile_givenNameKana),
                   textInputAction: TextInputAction.next,
                 ),
               ),
@@ -543,49 +543,49 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 readOnly: true,
                 onTap: isAnon ? null : _pickBirthDate,
                 decoration: InputDecoration(
-                  labelText: '生年月日（必須）',
+                  labelText: context.l10n.myProfile_birthDateLabel,
                   hintText: 'YYYY-MM-DD',
                   suffixIcon: IconButton(
                     onPressed: isAnon ? null : _pickBirthDate,
                     icon: const Icon(Icons.calendar_month_outlined),
                   ),
                 ),
-                validator: (v) => _requiredValidator(v, '生年月日'),
+                validator: (v) => _requiredValidator(v, context.l10n.myProfile_birthDate),
               ),
               const SizedBox(height: 12),
 
               DropdownButtonFormField<String>(
                 initialValue: _gender,
-                decoration: const InputDecoration(labelText: '性別（必須）'),
-                items: const [
-                  DropdownMenuItem(value: '未回答', child: Text('未回答')),
-                  DropdownMenuItem(value: '男性', child: Text('男性')),
-                  DropdownMenuItem(value: '女性', child: Text('女性')),
-                  DropdownMenuItem(value: 'その他', child: Text('その他')),
+                decoration: InputDecoration(labelText: context.l10n.myProfile_genderLabel),
+                items: [
+                  DropdownMenuItem(value: '未回答', child: Text(context.l10n.myProfile_genderNotAnswered)),
+                  DropdownMenuItem(value: '男性', child: Text(context.l10n.myProfile_genderMale)),
+                  DropdownMenuItem(value: '女性', child: Text(context.l10n.myProfile_genderFemale)),
+                  DropdownMenuItem(value: 'その他', child: Text(context.l10n.myProfile_genderOther)),
                 ],
                 onChanged: isAnon ? null : (v) => setState(() => _gender = v),
                 validator: (v) {
                   if (isAnon) return null;
-                  if (v == null || v.trim().isEmpty) return '性別は必須です';
+                  if (v == null || v.trim().isEmpty) return context.l10n.myProfile_genderRequired;
                   return null;
                 },
               ),
 
               const SizedBox(height: 20),
-              const _SectionTitle('住所'),
+              _SectionTitle(context.l10n.myProfile_addressSection),
 
               TextFormField(
                 controller: _postalCodeCtrl,
-                decoration: const InputDecoration(
-                  labelText: '郵便番号',
-                  hintText: '例）123-4567',
+                decoration: InputDecoration(
+                  labelText: context.l10n.myProfile_postalCodeLabel,
+                  hintText: context.l10n.myProfile_postalCodeHint,
                 ),
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   final regex = RegExp(AppConstants.postalCodePattern);
-                  if (!regex.hasMatch(v.trim())) return '正しい郵便番号を入力してください（例: 123-4567）';
+                  if (!regex.hasMatch(v.trim())) return context.l10n.myProfile_postalCodeInvalid;
                   return null;
                 },
               ),
@@ -593,9 +593,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
               TextFormField(
                 controller: _addressCtrl,
-                decoration: const InputDecoration(
-                  labelText: '住所',
-                  hintText: '例）千葉県…',
+                decoration: InputDecoration(
+                  labelText: context.l10n.myProfile_addressLabel,
+                  hintText: context.l10n.myProfile_addressHint,
                 ),
                 keyboardType: TextInputType.text,
                 maxLines: 2,
@@ -603,14 +603,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
 
               const SizedBox(height: 20),
-              const _SectionTitle('経験・スキル'),
+              _SectionTitle(context.l10n.myProfile_experienceSkills),
 
               TextFormField(
                 controller: _experienceYearsCtrl,
-                decoration: const InputDecoration(
-                  labelText: '経験年数',
-                  hintText: '例）5年',
-                  suffixText: '年',
+                decoration: InputDecoration(
+                  labelText: context.l10n.myProfile_experienceYearsLabel,
+                  hintText: context.l10n.myProfile_experienceYearsHint,
+                  suffixText: context.l10n.myProfile_yearsSuffix,
                 ),
                 keyboardType: TextInputType.number,
                 maxLength: AppConstants.maxExperienceYearsLength,
@@ -619,9 +619,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
               TextFormField(
                 controller: _introCtrl,
-                decoration: const InputDecoration(
-                  labelText: '自己紹介',
-                  hintText: '得意な作業や経験をアピールしましょう',
+                decoration: InputDecoration(
+                  labelText: context.l10n.myProfile_introLabel,
+                  hintText: context.l10n.myProfile_introHint,
                   alignLabelWithHint: true,
                 ),
                 maxLines: 4,
@@ -629,7 +629,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 16),
 
-              const _SectionTitle('保有資格'),
+              _SectionTitle(context.l10n.myProfile_qualifications),
 
               Wrap(
                 spacing: 8,
@@ -642,8 +642,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       onDeleted: isAnon ? null : () {
                         setState(() => _qualifications.removeAt(i));
                       },
-                      backgroundColor: AppColors.ruriPale,
-                      labelStyle: const TextStyle(color: AppColors.ruri, fontWeight: FontWeight.w600),
+                      backgroundColor: context.appColors.primaryPale,
+                      labelStyle: TextStyle(color: context.appColors.primary, fontWeight: FontWeight.w600),
                     ),
                 ],
               ),
@@ -656,7 +656,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       controller: _qualificationInputCtrl,
                       maxLength: AppConstants.maxQualificationLength,
                       decoration: InputDecoration(
-                        hintText: '資格名を入力',
+                        hintText: context.l10n.myProfile_qualificationHint,
                         isDense: true,
                         counterText: '',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -673,8 +673,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         _qualificationInputCtrl.clear();
                       });
                     },
-                    icon: const Icon(Icons.add_circle, color: AppColors.ruri, size: 32),
-                    tooltip: '資格を追加',
+                    icon: Icon(Icons.add_circle, color: context.appColors.primary, size: 32),
+                    tooltip: context.l10n.myProfile_addQualification,
                   ),
                 ],
               ),
@@ -700,7 +700,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: isAnon ? null : _save,
-                  child: const Text('保存する'),
+                  child: Text(context.l10n.myProfile_saveButton),
                 ),
               ),
             ],
@@ -725,10 +725,10 @@ class _SectionTitle extends StatelessWidget {
         padding: const EdgeInsets.only(left: 2, bottom: 10),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
-            color: AppColors.textSecondary,
+            color: context.appColors.textSecondary,
           ),
         ),
       ),
@@ -752,9 +752,9 @@ class _QualityScoreCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.ruriPale.withValues(alpha: 0.5),
+              color: context.appColors.primaryPale.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.ruriPale),
+              border: Border.all(color: context.appColors.primaryPale),
             ),
             child: const Center(
               child: SizedBox(
@@ -778,21 +778,21 @@ class _QualityScoreCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.ruriPale.withValues(alpha: 0.5),
+            color: context.appColors.primaryPale.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.ruriPale),
+            border: Border.all(color: context.appColors.primaryPale),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Text(
-                    '品質スコア',
+                  Text(
+                    context.l10n.myProfile_qualityScore,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.appColors.textPrimary,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -803,34 +803,34 @@ class _QualityScoreCard extends StatelessWidget {
                     } else if (overallScore >= starNum - 0.5) {
                       return const Icon(Icons.star_half_rounded, size: 20, color: Colors.amber);
                     } else {
-                      return const Icon(Icons.star_outline_rounded, size: 20, color: AppColors.textHint);
+                      return Icon(Icons.star_outline_rounded, size: 20, color: context.appColors.textHint);
                     }
                   }),
                   const SizedBox(width: 6),
                   Text(
                     overallScore.toStringAsFixed(1),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: context.appColors.textPrimary,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
               _ScoreRow(
-                label: '評価平均',
-                value: '${score.ratingsAverage.toStringAsFixed(1)} (${score.ratingsCount}件)',
+                label: context.l10n.myProfile_ratingAverage,
+                value: '${score.ratingsAverage.toStringAsFixed(1)} (${score.ratingsCount}${context.l10n.common_itemsCount})',
               ),
               const SizedBox(height: 4),
               _ScoreRow(
-                label: '完了率',
+                label: context.l10n.myProfile_completionRate,
                 value: '$completionPercent% (${score.totalCompleted}/${score.totalAssigned})',
               ),
               const SizedBox(height: 4),
               _ScoreRow(
-                label: '認定資格',
-                value: '${score.verifiedQualificationCount}件',
+                label: context.l10n.myProfile_verifiedQualifications,
+                value: '${score.verifiedQualificationCount}${context.l10n.common_itemsCount}',
               ),
             ],
           ),
@@ -850,21 +850,21 @@ class _ScoreRow extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 8),
-        const Text('├ ', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+        Text('├ ', style: TextStyle(fontSize: 12, color: context.appColors.textHint)),
         Text(
           '$label: ',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
+            color: context.appColors.textSecondary,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.appColors.textPrimary,
           ),
         ),
       ],
@@ -886,16 +886,16 @@ class _Banner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.chipUnselected,
+        color: context.appColors.chipUnselected,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: context.appColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
-          Text(message, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(message, style: TextStyle(color: context.appColors.textSecondary)),
         ],
       ),
     );

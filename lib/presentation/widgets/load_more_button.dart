@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 /// ページネーション用「もっと読み込む」ボタン
 class LoadMoreButton extends StatelessWidget {
@@ -30,10 +30,10 @@ class LoadMoreButton extends StatelessWidget {
             : OutlinedButton.icon(
                 onPressed: onPressed,
                 icon: const Icon(Icons.expand_more, size: 20),
-                label: const Text('もっと表示'),
+                label: Text(context.l10n.loadMore_showMore),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.ruri,
-                  side: const BorderSide(color: AppColors.ruri),
+                  foregroundColor: context.appColors.primary,
+                  side: BorderSide(color: context.appColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

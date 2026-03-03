@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../services/analytics_service.dart';
+import '../config/feature_flags.dart';
 import 'page_transitions.dart';
 import 'route_paths.dart';
 
@@ -51,6 +53,20 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: navigatorKey,
     initialLocation: RoutePaths.home,
     observers: [AnalyticsService.observer],
+    redirect: (context, state) {
+      final path = state.uri.path;
+      if (!FeatureFlags.enableStripePayments) {
+        if (path == RoutePaths.stripeOnboarding || path.startsWith('/payments/')) {
+          return RoutePaths.home;
+        }
+      }
+      if (!FeatureFlags.enableEarlyPayment) {
+        if (path == RoutePaths.adminEarlyPayments || path == RoutePaths.earningsCreate) {
+          return RoutePaths.home;
+        }
+      }
+      return null;
+    },
     routes: [
       // --- メインページ（AuthGateで認証状態に応じてルーティング） ---
       GoRoute(
@@ -287,7 +303,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return slideUpTransition(
             key: state.pageKey,
             child: Scaffold(
-              appBar: AppBar(title: const Text('工程タイムライン')),
+              appBar: AppBar(title: Text(context.l10n.router_workTimelineTitle)),
               body: TimelineTab(applicationId: applicationId),
             ),
           );
@@ -315,7 +331,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.statements,
         pageBuilder: (context, state) => slideRightTransition(
           key: state.pageKey,
-          child: const Scaffold(body: Center(child: Text('明細一覧'))),
+          child: Scaffold(body: Center(child: Text(context.l10n.router_statementsTitle))),
         ),
       ),
       GoRoute(
@@ -405,18 +421,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('ページが見つかりません')),
+      appBar: AppBar(title: Text(context.l10n.router_pageNotFound)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.grey),
             const SizedBox(height: 16),
-            Text('${state.uri} は存在しません'),
+            Text(context.l10n.router_pageDoesNotExist(state.uri.toString())),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.go(RoutePaths.home),
-              child: const Text('ホームに戻る'),
+              child: Text(context.l10n.router_goHome),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/connectivity_service.dart';
 
 class OfflineBanner extends StatefulWidget {
@@ -30,8 +31,8 @@ class _OfflineBannerState extends State<OfflineBanner> {
         if (wasOffline && online) {
           _showRecoverySnackBar = true;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('接続が復旧しました'),
+            SnackBar(
+              content: Text(context.l10n.offlineBanner_connectionRestored),
               duration: Duration(seconds: 2),
             ),
           );
@@ -63,7 +64,7 @@ class _OfflineBannerState extends State<OfflineBanner> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'オフラインモード — キャッシュデータを表示中',
+                  context.l10n.offlineBanner_offlineMode,
                   style: AppTextStyles.caption.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -80,7 +81,7 @@ class _OfflineBannerState extends State<OfflineBanner> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '再試行',
+                      context.l10n.offlineBanner_retry,
                       style: AppTextStyles.caption.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

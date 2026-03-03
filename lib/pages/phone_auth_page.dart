@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/phone_auth_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
@@ -87,7 +87,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
   Future<void> _sendCode() async {
     final raw = _phoneController.text.trim();
     if (!_isValidPhone(raw)) {
-      ErrorHandler.showError(context, null, customMessage: '有効な電話番号を入力してください（10〜11桁）');
+      ErrorHandler.showError(context, null, customMessage: context.l10n.phoneAuth_invalidPhoneNumber);
       return;
     }
 
@@ -102,7 +102,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
         try {
           await _phoneAuthService.signInWithCredential(credential);
           if (!mounted) return;
-          ErrorHandler.showSuccess(context, 'ログインしました');
+          ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
           context.go(RoutePaths.home);
         } catch (e) {
           if (!mounted) return;
@@ -130,11 +130,11 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
   Future<void> _verifyCode() async {
     final code = _otpController.text.trim();
     if (code.length != 6) {
-      ErrorHandler.showError(context, null, customMessage: '6桁のコードを入力してください');
+      ErrorHandler.showError(context, null, customMessage: context.l10n.phoneAuth_enterSixDigitCode);
       return;
     }
     if (_verificationId == null) {
-      ErrorHandler.showError(context, null, customMessage: '認証コードの送信からやり直してください');
+      ErrorHandler.showError(context, null, customMessage: context.l10n.phoneAuth_restartVerification);
       return;
     }
 
@@ -146,7 +146,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
       );
       await _phoneAuthService.signInWithCredential(credential);
       if (!mounted) return;
-      ErrorHandler.showSuccess(context, 'ログインしました');
+      ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
       context.go(RoutePaths.home);
     } catch (e) {
       if (!mounted) return;
@@ -158,9 +158,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text('電話番号でログイン'),
+        title: Text(context.l10n.phoneAuth_title),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -182,16 +182,16 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.ruriPale,
+              color: context.appColors.primaryPale,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(Icons.phone_android, size: 36, color: AppColors.ruri),
+            child: Icon(Icons.phone_android, size: 36, color: context.appColors.primary),
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
         Center(
           child: Text(
-            'SMSで認証コードを送信します',
+            context.l10n.phoneAuth_smsDescription,
             style: AppTextStyles.headingSmall,
             textAlign: TextAlign.center,
           ),
@@ -199,22 +199,22 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
         const SizedBox(height: AppSpacing.sm),
         Center(
           child: Text(
-            '日本の電話番号を入力してください',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            context.l10n.phoneAuth_enterJapaneseNumber,
+            style: AppTextStyles.bodySmall.copyWith(color: context.appColors.textSecondary),
             textAlign: TextAlign.center,
           ),
         ),
         const SizedBox(height: AppSpacing.xxl),
-        Text('電話番号', style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700)),
+        Text(context.l10n.phoneAuth_phoneNumberLabel, style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
               decoration: BoxDecoration(
-                color: AppColors.chipUnselected,
+                color: context.appColors.chipUnselected,
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appColors.border),
               ),
               child: Text(
                 '+81',
@@ -228,18 +228,18 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   hintText: '090-1234-5678',
-                  hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(color: context.appColors.textHint),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: context.appColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: context.appColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                    borderSide: const BorderSide(color: AppColors.ruri, width: 2),
+                    borderSide: BorderSide(color: context.appColors.primary, width: 2),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                 ),
@@ -254,7 +254,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _sendCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.ruri,
+              backgroundColor: context.appColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -267,7 +267,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                   )
                 : Text(
-                    '認証コードを送信',
+                    context.l10n.phoneAuth_sendCode,
                     style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16),
                   ),
           ),
@@ -286,16 +286,16 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.ruriPale,
+              color: context.appColors.primaryPale,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(Icons.sms_outlined, size: 36, color: AppColors.ruri),
+            child: Icon(Icons.sms_outlined, size: 36, color: context.appColors.primary),
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
         Center(
           child: Text(
-            '認証コードを入力',
+            context.l10n.phoneAuth_enterCode,
             style: AppTextStyles.headingSmall,
             textAlign: TextAlign.center,
           ),
@@ -303,13 +303,13 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
         const SizedBox(height: AppSpacing.sm),
         Center(
           child: Text(
-            '${_phoneController.text.trim()} に送信された\n6桁のコードを入力してください',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            context.l10n.phoneAuth_codeSentTo(_phoneController.text.trim()),
+            style: AppTextStyles.bodySmall.copyWith(color: context.appColors.textSecondary),
             textAlign: TextAlign.center,
           ),
         ),
         const SizedBox(height: AppSpacing.xxl),
-        Text('認証コード', style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700)),
+        Text(context.l10n.phoneAuth_verificationCodeLabel, style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         TextField(
           controller: _otpController,
@@ -325,20 +325,20 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
             hintStyle: AppTextStyles.displayLarge.copyWith(
               fontSize: 28,
               letterSpacing: 8,
-              color: AppColors.textHint,
+              color: context.appColors.textHint,
             ),
             counterText: '',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.appColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.appColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              borderSide: const BorderSide(color: AppColors.ruri, width: 2),
+              borderSide: BorderSide(color: context.appColors.primary, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
           ),
@@ -350,7 +350,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _verifyCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.ruri,
+              backgroundColor: context.appColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
@@ -363,7 +363,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                   )
                 : Text(
-                    'ログイン',
+                    context.l10n.phoneAuth_login,
                     style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16),
                   ),
           ),
@@ -372,15 +372,15 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
         Center(
           child: _countdown > 0
               ? Text(
-                  '再送信まで ${_countdown}秒',
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  context.l10n.phoneAuth_resendCountdown(_countdown.toString()),
+                  style: AppTextStyles.bodySmall.copyWith(color: context.appColors.textSecondary),
                 )
               : TextButton(
                   onPressed: _isLoading ? null : _sendCode,
                   child: Text(
-                    'コードを再送信',
+                    context.l10n.phoneAuth_resendCode,
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.ruri,
+                      color: context.appColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -398,9 +398,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
               });
             },
             child: Text(
-              '電話番号を変更する',
+              context.l10n.phoneAuth_changePhoneNumber,
               style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: context.appColors.textSecondary,
               ),
             ),
           ),

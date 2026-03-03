@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class HintCard extends StatelessWidget {
   final String title;
@@ -20,7 +20,7 @@ class HintCard extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
           const SizedBox(height: 6),
-          Text(body, style: const TextStyle(color: AppColors.textPrimary, height: 1.35)),
+          Text(body, style: TextStyle(color: context.appColors.textPrimary, height: 1.35)),
         ],
       ),
     );

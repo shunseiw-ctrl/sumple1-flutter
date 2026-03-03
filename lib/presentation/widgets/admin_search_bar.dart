@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/utils/debouncer.dart';
 
 /// 管理者検索バー（Debounce付き）
@@ -11,7 +11,7 @@ class AdminSearchBar extends StatefulWidget {
   const AdminSearchBar({
     super.key,
     required this.onChanged,
-    this.hintText = '検索...',
+    this.hintText = '',
   });
 
   @override
@@ -51,20 +51,20 @@ class _AdminSearchBarState extends State<AdminSearchBar> {
         controller: _controller,
         onChanged: _onChanged,
         decoration: InputDecoration(
-          hintText: widget.hintText,
-          hintStyle: const TextStyle(
-            color: AppColors.textHint,
+          hintText: widget.hintText.isEmpty ? context.l10n.adminSearch_hint : widget.hintText,
+          hintStyle: TextStyle(
+            color: context.appColors.textHint,
             fontSize: 14,
           ),
-          prefixIcon: const Icon(Icons.search, color: AppColors.textHint),
+          prefixIcon: Icon(Icons.search, color: context.appColors.textHint),
           suffixIcon: _controller.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear, color: AppColors.textHint),
+                  icon: Icon(Icons.clear, color: context.appColors.textHint),
                   onPressed: _clear,
                 )
               : null,
           filled: true,
-          fillColor: AppColors.chipUnselected,
+          fillColor: context.appColors.chipUnselected,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
             borderSide: BorderSide.none,

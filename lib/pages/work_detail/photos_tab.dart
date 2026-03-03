@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
@@ -54,13 +54,13 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
       final successCount = results.where((r) => r.isSuccess).length;
       if (mounted && successCount > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$successCount枚の写真をアップロードしました')),
+          SnackBar(content: Text(context.l10n.workPhotos_uploadSuccess(successCount.toString()))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('アップロードに失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.workPhotos_uploadFailed(e.toString()))),
         );
       }
     } finally {
@@ -72,14 +72,14 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('写真を削除'),
-        content: const Text('この写真を削除しますか？'),
+        title: Text(context.l10n.workPhotos_deleteTitle),
+        content: Text(context.l10n.workPhotos_deleteConfirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('キャンセル')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.l10n.workPhotos_cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('削除'),
+            style: ElevatedButton.styleFrom(backgroundColor: context.appColors.error),
+            child: Text(context.l10n.workPhotos_delete),
           ),
         ],
       ),
@@ -90,7 +90,7 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
       await _photosRef.doc(docId).delete();
       await _imageService.deleteImage(url);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('写真を削除しました')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.workPhotos_deleteSuccess)));
       }
     } catch (e) {
       Logger.warning('写真の削除に失敗', tag: 'WorkDetail', data: {'docId': docId, 'error': '$e'});
@@ -105,16 +105,16 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
           child: Row(
             children: [
-              const Icon(Icons.photo_library, size: 20, color: AppColors.ruri),
+              Icon(Icons.photo_library, size: 20, color: context.appColors.primary),
               const SizedBox(width: 8),
-              const Expanded(child: Text('現場写真', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
+              Expanded(child: Text(context.l10n.workPhotos_title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
               if (_uploading)
                 const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
               else
                 ElevatedButton.icon(
                   onPressed: _uploadPhotos,
                   icon: const Icon(Icons.add_a_photo, size: 18),
-                  label: const Text('追加'),
+                  label: Text(context.l10n.workPhotos_add),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     textStyle: const TextStyle(fontSize: 13),
@@ -133,15 +133,15 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
               }
               final docs = snap.data?.docs ?? [];
               if (docs.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.photo_outlined, size: 56, color: AppColors.textHint),
-                      SizedBox(height: 12),
-                      Text('写真はまだありません', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                      SizedBox(height: 6),
-                      Text('「追加」ボタンから写真をアップロード', style: TextStyle(fontSize: 13, color: AppColors.textHint)),
+                      Icon(Icons.photo_outlined, size: 56, color: context.appColors.textHint),
+                      const SizedBox(height: 12),
+                      Text(context.l10n.workPhotos_noPhotos, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: context.appColors.textSecondary)),
+                      const SizedBox(height: 6),
+                      Text(context.l10n.workPhotos_uploadHint, style: TextStyle(fontSize: 13, color: context.appColors.textHint)),
                     ],
                   ),
                 );
@@ -195,8 +195,8 @@ class _WorkPhotosTabState extends State<WorkPhotosTab> {
                                     Navigator.pop(ctx);
                                     _deletePhoto(docs[i].id, url);
                                   },
-                                  icon: const Icon(Icons.delete, color: AppColors.error, size: 18),
-                                  label: const Text('削除', style: TextStyle(color: AppColors.error)),
+                                  icon: Icon(Icons.delete, color: context.appColors.error, size: 18),
+                                  label: Text(context.l10n.workPhotos_delete, style: TextStyle(color: context.appColors.error)),
                                 ),
                               ),
                             ],

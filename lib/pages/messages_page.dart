@@ -8,8 +8,8 @@ import 'package:sumple1/core/router/route_paths.dart';
 import '../core/services/auth_service.dart';
 import '../core/enums/user_role.dart';
 import '../core/utils/logger.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -112,7 +112,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.error,
+        color: context.appColors.error,
         borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
       ),
       child: Text(
@@ -144,7 +144,6 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
       setState(() {
         _chatsCache = result;
         _lastAppIds = List.of(appIds);
-        // _lastAtCacheも更新
         for (final entry in result.entries) {
           final lastAt = _lastMessageAtFromChat(entry.value);
           if (lastAt != null) {
@@ -242,14 +241,14 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
   Widget build(BuildContext context) {
     if (_myUid.isEmpty || FirebaseAuth.instance.currentUser?.isAnonymous == true) {
       return Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('メッセージ')),
+        backgroundColor: context.appColors.background,
+        appBar: AppBar(title: Text(context.l10n.messages_title)),
         body: EmptyState(
           icon: Icons.chat_bubble_outline,
-          title: 'メッセージを見るには\n登録が必要です',
-          description: '案件の担当者とチャットで\nやりとりできます',
-          actionText: '登録して始める',
-          onAction: () => RegistrationPromptModal.show(context, featureName: 'メッセージを見る'),
+          title: context.l10n.messages_registrationRequiredTitle,
+          description: context.l10n.messages_registrationRequiredDescription,
+          actionText: context.l10n.common_registerToStart,
+          onAction: () => RegistrationPromptModal.show(context, featureName: context.l10n.messages_featureName),
         ),
       );
     }
@@ -261,7 +260,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isAdmin ? 'メッセージ（管理者）' : 'メッセージ'),
+        title: Text(_isAdmin ? context.l10n.messages_titleAdmin : context.l10n.messages_title),
         bottom: kDebugMode
             ? PreferredSize(
           preferredSize: const Size.fromHeight(40),
@@ -287,8 +286,8 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
             padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
             child: TextField(
               decoration: InputDecoration(
-                hintText: '案件名で検索',
-                prefixIcon: const Icon(Icons.search, color: AppColors.textHint),
+                hintText: context.l10n.messages_searchHint,
+                prefixIcon: Icon(Icons.search, color: context.appColors.textHint),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                 ),
@@ -310,15 +309,15 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                   return SkeletonList(itemBuilder: (_) => const SkeletonMessageCard());
                 }
                 if (snap.hasError) {
-                  return Center(child: Text('読み込みエラー: ${snap.error}'));
+                  return Center(child: Text(context.l10n.common_loadError('${snap.error}')));
                 }
 
                 final docs = snap.data?.docs.toList() ?? [];
                 if (docs.isEmpty) {
                   return EmptyState(
                     icon: Icons.chat_bubble_outline,
-                    title: _isAdmin ? '担当案件のメッセージはまだありません' : 'メッセージはまだありません',
-                    description: '案件に応募するとメッセージが届きます',
+                    title: _isAdmin ? context.l10n.messages_emptyAdmin : context.l10n.messages_emptyUser,
+                    description: context.l10n.messages_emptyDescription,
                     imagePath: 'assets/images/empty_messages.png',
                   );
                 }
@@ -343,10 +342,10 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.search_off,
-                    title: '検索結果がありません',
-                    description: '別のキーワードで検索してみてください',
+                    title: context.l10n.messages_noSearchResults,
+                    description: context.l10n.messages_tryDifferentKeyword,
                   );
                 }
 
@@ -354,11 +353,11 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
-                    _lastAppIds = []; // 強制再取得
+                    _lastAppIds = [];
                     await _fetchChats(appIds);
                     setState(() => _refreshKey = UniqueKey());
                   },
-                  color: AppColors.ruri,
+                  color: context.appColors.primary,
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
                     cacheExtent: AppConstants.listCacheExtent,
@@ -373,7 +372,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                       final title = (app['projectNameSnapshot'] ??
                           app['jobTitleSnapshot'] ??
                           app['titleSnapshot'] ??
-                          '案件')
+                          context.l10n.common_job)
                           .toString();
 
                       final status = (app['status'] ?? '').toString();
@@ -386,12 +385,12 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                       final sub1 = lastText.isNotEmpty
                           ? lastText
-                          : (status.isEmpty ? ' ' : 'ステータス: $status');
-                      final sub2 = lastText.isNotEmpty && status.isNotEmpty ? 'ステータス: $status' : '';
+                          : (status.isEmpty ? ' ' : context.l10n.messages_statusLabel(status));
+                      final sub2 = lastText.isNotEmpty && status.isNotEmpty ? context.l10n.messages_statusLabel(status) : '';
 
                       return Container(
                         decoration: BoxDecoration(
-                          color: unread > 0 ? AppColors.ruriPale : Colors.white,
+                          color: unread > 0 ? context.appColors.primaryPale : context.appColors.surface,
                           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                           boxShadow: AppShadows.subtle,
                         ),
@@ -416,10 +415,10 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: AppColors.ruriPale,
+                                      color: context.appColors.primaryPale,
                                       borderRadius: BorderRadius.circular(14),
                                     ),
-                                    child: const Icon(Icons.work_outline, color: AppColors.ruri, size: 22),
+                                    child: Icon(Icons.work_outline, color: context.appColors.primary, size: 22),
                                   ),
                                   const SizedBox(width: AppSpacing.md),
                                   Expanded(
@@ -470,7 +469,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                                     children: [
                                       _unreadBadge(unread),
                                       const SizedBox(height: AppSpacing.xs),
-                                      const Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),
+                                      Icon(Icons.chevron_right, size: 20, color: context.appColors.textHint),
                                     ],
                                   ),
                                 ],

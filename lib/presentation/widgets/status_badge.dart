@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class StatusBadge extends StatelessWidget {
   final String label;
@@ -16,52 +16,68 @@ class StatusBadge extends StatelessWidget {
     this.filled = false,
   });
 
-  /// ステータスキーから日本語ラベルを取得
-  static String labelFor(String statusKey) {
+  /// ステータスキーからラベルを取得（i18n対応）
+  static String labelFor(String statusKey, [BuildContext? context]) {
+    if (context != null) {
+      switch (statusKey) {
+        case 'applied': return context.l10n.statusBadge_applied;
+        case 'assigned': return context.l10n.statusBadge_assigned;
+        case 'in_progress': return context.l10n.statusBadge_inProgress;
+        case 'completed': return context.l10n.statusBadge_completed;
+        case 'inspection': return context.l10n.statusBadge_inspection;
+        case 'fixing': return context.l10n.statusBadge_fixing;
+        case 'done': return context.l10n.statusBadge_done;
+        default: return statusKey;
+      }
+    }
+    // Fallback for cases without context (English)
     switch (statusKey) {
-      case 'applied': return '応募中';
-      case 'assigned': return '着工前';
-      case 'in_progress': return '着工中';
-      case 'completed': return '施工完了';
-      case 'inspection': return '検収中';
-      case 'fixing': return '是正中';
-      case 'done': return '完了';
+      case 'applied': return 'Applied';
+      case 'assigned': return 'Assigned';
+      case 'in_progress': return 'In Progress';
+      case 'completed': return 'Completed';
+      case 'inspection': return 'Inspection';
+      case 'fixing': return 'Fixing';
+      case 'done': return 'Done';
       default: return statusKey;
     }
   }
 
   /// ステータスキーからカラーを取得
-  static Color colorFor(String statusKey) {
+  static Color colorFor(BuildContext context, String statusKey) {
+    final colors = context.appColors;
     switch (statusKey) {
-      case 'applied': return AppColors.warning;
-      case 'assigned': return AppColors.info;
-      case 'in_progress': return AppColors.ruri;
-      case 'completed': return AppColors.success;
+      case 'applied': return colors.warning;
+      case 'assigned': return colors.info;
+      case 'in_progress': return colors.primary;
+      case 'completed': return colors.success;
       case 'inspection': return const Color(0xFF8B5CF6);
-      case 'fixing': return AppColors.error;
-      case 'done': return AppColors.success;
-      default: return AppColors.textSecondary;
+      case 'fixing': return colors.error;
+      case 'done': return colors.success;
+      default: return colors.textSecondary;
     }
   }
 
-  factory StatusBadge.fromStatus(String statusKey) {
+  factory StatusBadge.fromStatus(BuildContext context, String statusKey) {
+    final colors = context.appColors;
+    final label = labelFor(statusKey, context);
     switch (statusKey) {
       case 'applied':
-        return const StatusBadge(label: '応募中', color: AppColors.warning, icon: Icons.schedule);
+        return StatusBadge(label: label, color: colors.warning, icon: Icons.schedule);
       case 'assigned':
-        return const StatusBadge(label: '着工前', color: AppColors.info, icon: Icons.assignment_turned_in);
+        return StatusBadge(label: label, color: colors.info, icon: Icons.assignment_turned_in);
       case 'in_progress':
-        return const StatusBadge(label: '着工中', color: AppColors.ruri, icon: Icons.engineering, filled: true);
+        return StatusBadge(label: label, color: colors.primary, icon: Icons.engineering, filled: true);
       case 'completed':
-        return const StatusBadge(label: '施工完了', color: AppColors.success, icon: Icons.check_circle_outline);
+        return StatusBadge(label: label, color: colors.success, icon: Icons.check_circle_outline);
       case 'inspection':
-        return const StatusBadge(label: '検収中', color: Color(0xFF8B5CF6), icon: Icons.visibility);
+        return StatusBadge(label: label, color: const Color(0xFF8B5CF6), icon: Icons.visibility);
       case 'fixing':
-        return const StatusBadge(label: '是正中', color: AppColors.error, icon: Icons.build);
+        return StatusBadge(label: label, color: colors.error, icon: Icons.build);
       case 'done':
-        return const StatusBadge(label: '完了', color: AppColors.success, icon: Icons.done_all, filled: true);
+        return StatusBadge(label: label, color: colors.success, icon: Icons.done_all, filled: true);
       default:
-        return StatusBadge(label: statusKey, color: AppColors.textSecondary);
+        return StatusBadge(label: label, color: colors.textSecondary);
     }
   }
 

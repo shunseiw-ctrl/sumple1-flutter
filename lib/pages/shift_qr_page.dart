@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class ShiftQrPage extends StatefulWidget {
   final String jobId;
@@ -65,13 +65,13 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('QRコードを生成しました')),
+          SnackBar(content: Text(context.l10n.shiftQr_generated)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('生成に失敗: $e')),
+          SnackBar(content: Text(context.l10n.shiftQr_generateFailed(e.toString()))),
         );
       }
     } finally {
@@ -82,18 +82,18 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: const Text(
-          'QR出退勤管理',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+        title: Text(
+          context.l10n.shiftQr_title,
+          style: TextStyle(color: context.appColors.textPrimary, fontWeight: FontWeight.w800),
         ),
       ),
       body: Column(
         children: [
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: context.appColors.surface,
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,9 +114,9 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
                         : const Icon(Icons.qr_code, size: 20),
-                    label: Text(_generating ? '生成中...' : '新しいQRコードを生成'),
+                    label: Text(_generating ? context.l10n.shiftQr_generating : context.l10n.shiftQr_generateNew),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ruri,
+                      backgroundColor: context.appColors.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -142,18 +142,18 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                 }
                 final docs = snap.data?.docs ?? [];
                 if (docs.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.qr_code_2, size: 56, color: AppColors.textHint),
-                        SizedBox(height: 12),
+                        Icon(Icons.qr_code_2, size: 56, color: context.appColors.textHint),
+                        const SizedBox(height: 12),
                         Text(
-                          'QRコードはまだ生成されていません',
+                          context.l10n.shiftQr_noQrCodes,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: context.appColors.textSecondary,
                           ),
                         ),
                       ],
@@ -174,7 +174,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.appColors.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: const Color(0xFFE6E8EB)),
                       ),
@@ -182,22 +182,22 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondary),
+                              Icon(Icons.calendar_today, size: 16, color: context.appColors.textSecondary),
                               const SizedBox(width: 6),
                               Text(date, style: const TextStyle(fontWeight: FontWeight.w700)),
                               const Spacer(),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: AppColors.ruriPale,
+                                  color: context.appColors.primaryPale,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   qrCode,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.ruri,
+                                    color: context.appColors.primary,
                                     fontFamily: 'monospace',
                                   ),
                                 ),
@@ -208,7 +208,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.appColors.surface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: const Color(0xFFE6E8EB)),
                             ),
@@ -219,11 +219,11 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            '職人にこのQRコードをスキャンしてもらってください',
+                          Text(
+                            context.l10n.shiftQr_scanInstruction,
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textHint,
+                              color: context.appColors.textHint,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

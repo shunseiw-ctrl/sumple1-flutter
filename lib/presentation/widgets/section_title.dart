@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class SectionTitle extends StatelessWidget {
   final String title;
@@ -13,7 +13,7 @@ class SectionTitle extends StatelessWidget {
       children: [
         Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 4),
-        Text(subtitle, style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+        Text(subtitle, style: TextStyle(color: context.appColors.textSecondary, fontWeight: FontWeight.w600)),
       ],
     );
   }

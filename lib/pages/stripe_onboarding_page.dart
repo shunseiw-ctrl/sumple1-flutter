@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/payment_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -64,11 +64,11 @@ class _StripeOnboardingPageState extends State<StripeOnboardingPage> {
       if (url != null && url.isNotEmpty) {
         _controller.loadRequest(Uri.parse(url));
       } else {
-        setState(() => _error = 'URLの取得に失敗しました');
+        setState(() => _error = context.l10n.stripeOnboarding_urlFetchFailed);
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'Stripeの初期化に失敗しました: $e');
+        setState(() => _error = '${context.l10n.stripeOnboarding_initFailed}: ${e.toString()}');
       }
     }
   }
@@ -77,9 +77,9 @@ class _StripeOnboardingPageState extends State<StripeOnboardingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Stripe口座設定',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          context.l10n.stripeOnboarding_title,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: _error != null
@@ -89,17 +89,17 @@ class _StripeOnboardingPageState extends State<StripeOnboardingPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                    Icon(Icons.error_outline, size: 48, color: context.appColors.error),
                     const SizedBox(height: 16),
                     Text(
                       _error!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: context.appColors.textSecondary),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _loadOnboardingUrl,
-                      child: const Text('リトライ'),
+                      child: Text(context.l10n.stripeOnboarding_retry),
                     ),
                   ],
                 ),

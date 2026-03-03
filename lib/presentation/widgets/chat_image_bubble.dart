@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import 'cached_image.dart';
 
 /// 画像メッセージバブル
@@ -27,7 +27,7 @@ class ChatImageBubble extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
         decoration: BoxDecoration(
-          color: isMine ? const Color(0xFF7BC67E) : Colors.white,
+          color: isMine ? const Color(0xFF7BC67E) : context.appColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),
@@ -60,7 +60,7 @@ class ChatImageBubble extends StatelessWidget {
                   caption!,
                   style: TextStyle(
                     fontSize: 14,
-                    color: isMine ? Colors.white : AppColors.textPrimary,
+                    color: isMine ? Colors.white : context.appColors.textPrimary,
                     height: 1.4,
                   ),
                 ),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
@@ -52,14 +52,14 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$_selectedFolderにアップロードしました')),
+            SnackBar(content: Text(context.l10n.workDocs_uploadSuccess(_selectedFolder))),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('アップロードに失敗しました: $e')),
+          SnackBar(content: Text(context.l10n.workDocs_uploadFailed(e.toString()))),
         );
       }
     } finally {
@@ -75,16 +75,16 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
           child: Row(
             children: [
-              const Icon(Icons.folder_outlined, size: 20, color: AppColors.ruri),
+              Icon(Icons.folder_outlined, size: 20, color: context.appColors.primary),
               const SizedBox(width: 8),
-              const Expanded(child: Text('資料管理', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
+              Expanded(child: Text(context.l10n.workDocs_title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15))),
               if (_uploading)
                 const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
               else
                 ElevatedButton.icon(
                   onPressed: _uploadDoc,
                   icon: const Icon(Icons.upload_file, size: 18),
-                  label: const Text('追加'),
+                  label: Text(context.l10n.workDocs_add),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     textStyle: const TextStyle(fontSize: 13),
@@ -106,12 +106,12 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
                   label: Text(f, style: const TextStyle(fontSize: 12)),
                   selected: selected,
                   onSelected: (_) => setState(() => _selectedFolder = f),
-                  selectedColor: AppColors.ruri,
+                  selectedColor: context.appColors.primary,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.appColors.textPrimary,
                     fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   ),
-                  backgroundColor: AppColors.chipUnselected,
+                  backgroundColor: context.appColors.chipUnselected,
                   side: BorderSide.none,
                   visualDensity: VisualDensity.compact,
                 ),
@@ -136,9 +136,9 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.folder_off_outlined, size: 48, color: AppColors.textHint),
+                      Icon(Icons.folder_off_outlined, size: 48, color: context.appColors.textHint),
                       const SizedBox(height: 12),
-                      Text('「$_selectedFolder」の資料はまだありません', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      Text(context.l10n.workDocs_noDocuments(_selectedFolder), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: context.appColors.textSecondary)),
                     ],
                   ),
                 );
@@ -170,8 +170,8 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
                           errorWidget: Container(
                             width: 60,
                             height: 60,
-                            color: AppColors.chipUnselected,
-                            child: const Icon(Icons.description, color: AppColors.textHint),
+                            color: context.appColors.chipUnselected,
+                            child: Icon(Icons.description, color: context.appColors.textHint),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -181,12 +181,12 @@ class _WorkDocsTabState extends State<WorkDocsTab> {
                             children: [
                               Text(_selectedFolder, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                               if (dateStr.isNotEmpty)
-                                Text(dateStr, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
+                                Text(dateStr, style: TextStyle(fontSize: 12, color: context.appColors.textHint)),
                             ],
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                          icon: Icon(Icons.delete_outline, color: context.appColors.error, size: 20),
                           onPressed: () async {
                             try {
                               await _docsRef.doc(docs[i].id).delete();
@@ -216,7 +216,7 @@ class _DocCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),

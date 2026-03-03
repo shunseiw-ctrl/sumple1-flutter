@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../core/config/maps_config.dart';
-import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/constants/app_spacing.dart';
 import '../core/router/route_paths.dart';
+import '../core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
 import '../core/services/location_service.dart';
 import '../core/utils/logger.dart';
@@ -103,19 +103,19 @@ class _MapSearchPageState extends State<MapSearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.ruri,
+        backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('地図で探す', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(context.l10n.mapSearch_title, style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: !hasJobs
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.map_outlined, size: 64, color: AppColors.textHint),
-                  SizedBox(height: 16),
-                  Text('地図に表示できる案件がありません', style: TextStyle(color: AppColors.textSecondary)),
+                  Icon(Icons.map_outlined, size: 64, color: context.appColors.textHint),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.mapSearch_noJobs, style: TextStyle(color: context.appColors.textSecondary)),
                 ],
               ),
             )
@@ -144,9 +144,9 @@ class _MapSearchPageState extends State<MapSearchPage> {
                   right: 16,
                   child: FloatingActionButton.small(
                     heroTag: 'map_location_btn',
-                    backgroundColor: Colors.white,
+                    backgroundColor: context.appColors.surface,
                     onPressed: _moveToCurrentLocation,
-                    child: const Icon(Icons.my_location, color: AppColors.ruri),
+                    child: Icon(Icons.my_location, color: context.appColors.primary),
                   ),
                 ),
 
@@ -160,8 +160,8 @@ class _MapSearchPageState extends State<MapSearchPage> {
   Widget _buildBottomCard() {
     final data = _selectedJob!['data'] as Map<String, dynamic>;
     final docId = _selectedJob!['docId'] as String;
-    final title = data['title']?.toString() ?? 'タイトルなし';
-    final location = data['location']?.toString() ?? '未設定';
+    final title = data['title']?.toString() ?? context.l10n.mapSearch_noTitle;
+    final location = data['location']?.toString() ?? context.l10n.mapSearch_notSet;
     final price = data['price']?.toString() ?? '0';
     final imageUrl = data['imageUrl']?.toString();
 
@@ -172,7 +172,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.cardPadding),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.appColors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: const [
             BoxShadow(
@@ -203,10 +203,10 @@ class _MapSearchPageState extends State<MapSearchPage> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: AppColors.ruriPale,
+                  color: context.appColors.primaryPale,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.construction, color: AppColors.ruri, size: 32),
+                child: Icon(Icons.construction, color: context.appColors.primary, size: 32),
               ),
             const SizedBox(width: 12),
             Expanded(
@@ -223,7 +223,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 14, color: AppColors.textHint),
+                      Icon(Icons.place_outlined, size: 14, color: context.appColors.textHint),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -237,7 +237,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '¥$price /日',
+                    context.l10n.mapSearch_pricePerDay(price),
                     style: AppTextStyles.salary.copyWith(fontSize: 16),
                   ),
                 ],
@@ -249,14 +249,14 @@ class _MapSearchPageState extends State<MapSearchPage> {
                 context.push(RoutePaths.jobDetailPath(docId), extra: data);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.ruri,
+                backgroundColor: context.appColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('詳細'),
+              child: Text(context.l10n.mapSearch_details),
             ),
           ],
         ),

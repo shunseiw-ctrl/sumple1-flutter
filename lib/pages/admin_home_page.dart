@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sales_page.dart';
 import 'profile_page.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +35,7 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
     final pendingApplicants = pendingCounts.valueOrNull?.pendingApplications ?? 0;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
         titleSpacing: 12,
         title: Row(
@@ -50,14 +50,14 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'ALBAWORKS',
               style: TextStyle(
                 fontFamily: 'serif',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.5,
-                color: AppColors.textPrimary,
+                color: context.appColors.textPrimary,
               ),
             ),
             Padding(
@@ -65,15 +65,15 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.ruriPale,
+                  color: context.appColors.primaryPale,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  '管理者',
+                child: Text(
+                  context.l10n.adminHome_admin,
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.ruri,
+                    color: context.appColors.primary,
                   ),
                 ),
               ),
@@ -91,7 +91,7 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.notifications_outlined),
-                    tooltip: 'お知らせ',
+                    tooltip: context.l10n.adminHome_notifications,
                     onPressed: () {
                       context.push(RoutePaths.notifications);
                     },
@@ -135,12 +135,12 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.ruri,
-        unselectedItemColor: AppColors.textSecondary,
+        selectedItemColor: context.appColors.primary,
+        unselectedItemColor: context.appColors.textSecondary,
         onTap: (i) => setState(() => _currentIndex = i),
         items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'ダッシュボード'),
-          const BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: '案件管理'),
+          BottomNavigationBarItem(icon: const Icon(Icons.dashboard_outlined), activeIcon: const Icon(Icons.dashboard), label: context.l10n.adminHome_dashboard),
+          BottomNavigationBarItem(icon: const Icon(Icons.work_outline), activeIcon: const Icon(Icons.work), label: context.l10n.adminHome_jobManagement),
           BottomNavigationBarItem(
             icon: Badge(
               isLabelVisible: pendingApplicants > 0,
@@ -158,10 +158,10 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
               ),
               child: const Icon(Icons.people),
             ),
-            label: '応募者',
+            label: context.l10n.adminHome_applicants,
           ),
-          const BottomNavigationBarItem(icon: Icon(Icons.payments_outlined), activeIcon: Icon(Icons.payments), label: '売上管理'),
-          const BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), activeIcon: Icon(Icons.settings), label: '設定'),
+          BottomNavigationBarItem(icon: const Icon(Icons.payments_outlined), activeIcon: const Icon(Icons.payments), label: context.l10n.adminHome_salesManagement),
+          BottomNavigationBarItem(icon: const Icon(Icons.settings_outlined), activeIcon: const Icon(Icons.settings), label: context.l10n.adminHome_settings),
         ],
       ),
     );

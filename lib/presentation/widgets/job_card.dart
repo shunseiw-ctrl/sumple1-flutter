@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/scale_tap.dart';
 
@@ -114,12 +114,12 @@ class JobCard extends StatelessWidget {
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
     return Semantics(
-      label: '$title、場所: $location、日程: $dateText、報酬: $priceText',
+      label: context.l10n.jobCard_semanticsLabel(title, location, dateText, priceText),
       child: ScaleTap(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.appColors.surface,
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           boxShadow: AppShadows.card,
         ),
@@ -140,16 +140,16 @@ class JobCard extends StatelessWidget {
                             child: AppCachedImage(
                               imageUrl: imageUrl!,
                               fit: BoxFit.cover,
-                              errorWidget: _placeholderImage(),
+                              errorWidget: _placeholderImage(context),
                             ),
                           )
                         : AppCachedImage(
                             imageUrl: imageUrl!,
                             fit: BoxFit.cover,
-                            errorWidget: _placeholderImage(),
+                            errorWidget: _placeholderImage(context),
                           )
                   else
-                    _placeholderImage(),
+                    _placeholderImage(context),
 
                   Positioned(
                     bottom: 0,
@@ -183,11 +183,11 @@ class JobCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(categoryIcon(category), size: 14, color: AppColors.ruri),
+                            Icon(categoryIcon(category), size: 14, color: context.appColors.primary),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
                               category!,
-                              style: AppTextStyles.badgeText.copyWith(color: AppColors.ruri),
+                              style: AppTextStyles.badgeText.copyWith(color: context.appColors.primary),
                             ),
                           ],
                         ),
@@ -199,7 +199,7 @@ class JobCard extends StatelessWidget {
                     right: AppSpacing.md,
                     child: Semantics(
                       button: true,
-                      label: isFavorite ? 'お気に入りから削除' : 'お気に入りに追加',
+                      label: isFavorite ? context.l10n.jobCard_removeFavorite : context.l10n.jobCard_addFavorite,
                       child: GestureDetector(
                         onTap: onToggleFavorite,
                         child: Container(
@@ -212,7 +212,7 @@ class JobCard extends StatelessWidget {
                           ),
                           child: Icon(
                             isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                            color: isFavorite ? AppColors.error : AppColors.textHint,
+                            color: isFavorite ? context.appColors.error : context.appColors.textHint,
                             size: 20,
                           ),
                         ),
@@ -233,19 +233,19 @@ class JobCard extends StatelessWidget {
                           boxShadow: AppShadows.subtle,
                         ),
                         child: PopupMenuButton<String>(
-                          tooltip: '操作',
+                          tooltip: context.l10n.jobCard_actions,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
                           iconSize: 20,
-                          icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary, size: 20),
+                          icon: Icon(Icons.more_horiz_rounded, color: context.appColors.textSecondary, size: 20),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
                           onSelected: (v) {
                             if (v == 'edit') onEdit?.call();
                             if (v == 'delete') onDelete?.call();
                           },
                           itemBuilder: (_) => [
-                            PopupMenuItem(value: 'edit', child: Text('編集', style: AppTextStyles.bodyMedium)),
-                            PopupMenuItem(value: 'delete', child: Text('削除', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error))),
+                            PopupMenuItem(value: 'edit', child: Text(context.l10n.jobCard_edit, style: AppTextStyles.bodyMedium)),
+                            PopupMenuItem(value: 'delete', child: Text(context.l10n.jobCard_delete, style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.error))),
                           ],
                         ),
                       ),
@@ -268,7 +268,7 @@ class JobCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                             decoration: BoxDecoration(
-                              color: AppColors.error,
+                              color: context.appColors.error,
                               borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                             ),
                             child: Text(
@@ -292,11 +292,11 @@ class JobCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                             decoration: BoxDecoration(
-                              color: AppColors.warningLight,
+                              color: context.appColors.warningLight,
                               borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
                             ),
                             child: Text(
-                              'ownerIdなし',
+                              context.l10n.jobCard_noOwnerId,
                               style: AppTextStyles.badgeText.copyWith(color: const Color(0xFFE65100)),
                             ),
                           ),
@@ -313,7 +313,7 @@ class JobCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.sm),
 
-                  _buildMetricsRow(JobCardMetrics.fromData(data)),
+                  _buildMetricsRow(context, JobCardMetrics.fromData(data)),
                   const SizedBox(height: AppSpacing.md),
 
                   Container(
@@ -332,7 +332,7 @@ class JobCard extends StatelessWidget {
                           priceText,
                           style: AppTextStyles.salary,
                         ),
-                        Text(' /日', style: AppTextStyles.bodySmall),
+                        Text(context.l10n.jobCard_perDay, style: AppTextStyles.bodySmall),
                       ],
                     ),
                   ),
@@ -340,7 +340,7 @@ class JobCard extends StatelessWidget {
 
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 16, color: AppColors.ruri),
+                      Icon(Icons.place_outlined, size: 16, color: context.appColors.primary),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
@@ -354,20 +354,20 @@ class JobCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.ruriPale,
+                            color: context.appColors.primaryPale,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             distanceLabel!,
                             style: AppTextStyles.badgeText.copyWith(
-                              color: AppColors.ruri,
+                              color: context.appColors.primary,
                               fontSize: 11,
                             ),
                           ),
                         ),
                       ],
                       const SizedBox(width: AppSpacing.md),
-                      const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
+                      Icon(Icons.calendar_today_outlined, size: 14, color: context.appColors.textHint),
                       const SizedBox(width: AppSpacing.xs),
                       Text(
                         dateText,
@@ -398,13 +398,14 @@ class JobCard extends StatelessWidget {
     return DateTime.now().difference(created).inHours < 24;
   }
 
-  Widget _buildMetricsRow(JobCardMetrics metrics) {
+  Widget _buildMetricsRow(BuildContext context, JobCardMetrics metrics) {
+    final colors = context.appColors;
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: metrics.isUrgent ? AppColors.errorLight : AppColors.warningLight,
+            color: metrics.isUrgent ? colors.errorLight : colors.warningLight,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -413,13 +414,13 @@ class JobCard extends StatelessWidget {
               Icon(
                 metrics.isUrgent ? Icons.local_fire_department : Icons.people_outline,
                 size: 12,
-                color: metrics.isUrgent ? AppColors.error : AppColors.warning,
+                color: metrics.isUrgent ? colors.error : colors.warning,
               ),
               const SizedBox(width: 4),
               Text(
-                '残り${metrics.remainingSlots}枠',
+                context.l10n.jobCard_remainingSlots(metrics.remainingSlots.toString()),
                 style: AppTextStyles.badgeText.copyWith(
-                  color: metrics.isUrgent ? AppColors.error : AppColors.warning,
+                  color: metrics.isUrgent ? colors.error : colors.warning,
                 ),
               ),
             ],
@@ -430,25 +431,26 @@ class JobCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.successLight,
+              color: colors.successLight,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              '即日勤務OK',
-              style: AppTextStyles.badgeText.copyWith(color: AppColors.success),
+              context.l10n.jobCard_quickStart,
+              style: AppTextStyles.badgeText.copyWith(color: colors.success),
             ),
           ),
       ],
     );
   }
 
-  Widget _placeholderImage() {
+  Widget _placeholderImage(BuildContext context) {
+    final colors = context.appColors;
     return Semantics(
       excludeSemantics: true,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.ruriPale, Color(0xFFE0E7F2)],
+            colors: [colors.primaryPale, const Color(0xFFE0E7F2)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -457,7 +459,7 @@ class JobCard extends StatelessWidget {
           child: Icon(
             categoryIcon(category),
             size: 48,
-            color: AppColors.ruri.withValues(alpha: 0.3),
+            color: colors.primary.withValues(alpha: 0.3),
           ),
         ),
       ),

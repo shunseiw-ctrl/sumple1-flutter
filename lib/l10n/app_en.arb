@@ -1,0 +1,1882 @@
+{
+  "@@locale": "en",
+  "@accountSettings_snackDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackDeleteFailedGeneric": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackPasswordChangeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproveConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproveCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproved": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_changeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_changeStatusConfirm": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_noApplicantsForStatus": {
+    "placeholders": {
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_qualityScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_statusChanged": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_statusUpdateNotifBody": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminDashboard_alertCount": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_loadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_notifyRejectedBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_requestDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_yenFormat": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminIdentityVerification_approveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminIdentityVerification_rejectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminJobManagement_applicantCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminLogin_lockoutMessage": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminQualifications_approveSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminQualifications_category": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminQualifications_rejectSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@common_loadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreate_registerFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreate_stripeCreated": {
+    "placeholders": {
+      "paymentId": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreate_stripeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@emailAuthDialog_authError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "@emailAuth_errorGeneric": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "@home_navTabLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
+    }
+  },
+  "@home_notifications": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@home_notificationsUnread": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@identityVerification_rejectionReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "@identityVerification_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@imagePicker_uploadPartial": {
+    "placeholders": {
+      "successCount": {
+        "type": "String"
+      },
+      "failedCount": {
+        "type": "String"
+      }
+    }
+  },
+  "@imagePicker_uploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@inspection_completedLog": {
+    "placeholders": {
+      "result": {
+        "type": "String"
+      }
+    }
+  },
+  "@inspection_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobCard_remainingSlots": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobCard_semanticsLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobDetail_applicationReceived": {
+    "placeholders": {
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobEdit_snackUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@mapSearch_pricePerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@messages_statusLabel": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "@myProfile_requiredField": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@notifications_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@onboarding_pageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@phoneAuth_codeSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@phoneAuth_resendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "@post_snackPostFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qrCheckin_errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qrCheckin_gpsVerification": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "@qrCheckin_title": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualificationAdd_registerFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualifications_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualifications_expiryDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "@ratingDialog_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@ratingStars_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@referral_statsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@registrationPrompt_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@registrationPrompt_title": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "@router_pageDoesNotExist": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_dataCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_monthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_monthStatement": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_nextPaymentDate": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@shiftQr_generateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_completedDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_earlyPaymentConfirm": {
+    "placeholders": {
+      "totalAmount": {
+        "type": "String"
+      },
+      "fee": {
+        "type": "String"
+      },
+      "payout": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_monthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@timeline_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@unreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDetail_statusCompleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDetail_statusInProgress": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_noDocuments": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_uploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_uploadSuccess": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "@workPhotos_uploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workPhotos_uploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReportCreate_logSubmitted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReportCreate_saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReports_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettings": "Account Settings",
+  "accountSettings_cancel": "Cancel",
+  "accountSettings_changePasswordButton": "Change password",
+  "accountSettings_changePasswordLabel": "Change password",
+  "accountSettings_confirm": "Confirm",
+  "accountSettings_currentPasswordHint": "Current password",
+  "accountSettings_delete": "Delete",
+  "accountSettings_deleteAccount": "Delete account",
+  "accountSettings_deleteConfirmMessage": "Deleting your account will permanently erase all your data.\n\n- Profile information\n- Application history\n- Chat history\n- Favorites\n- Notifications\n\nThis action cannot be undone. Are you sure you want to delete?",
+  "accountSettings_displayNameLabel": "Display name",
+  "accountSettings_downloadData": "Download data",
+  "accountSettings_emailLabel": "Email",
+  "accountSettings_languageLabel": "Language settings",
+  "accountSettings_loginRequired": "Login required",
+  "accountSettings_nameHint": "Enter your name",
+  "accountSettings_newPasswordHint": "New password (6+ characters)",
+  "accountSettings_notSet": "Not set",
+  "accountSettings_notificationSettings": "Notification settings",
+  "accountSettings_receiveNotifications": "Receive notifications",
+  "accountSettings_snackDataCopied": "Data copied to clipboard",
+  "accountSettings_snackDeleteFailed": "Failed to delete account: {error}",
+  "accountSettings_snackDeleteFailedGeneric": "Failed to delete account: {error}",
+  "accountSettings_snackEnterBothPasswords": "Please enter both current and new passwords",
+  "accountSettings_snackError": "Error: {error}",
+  "accountSettings_snackExportFailed": "Failed to export data: {error}",
+  "accountSettings_snackNameUpdated": "Display name updated",
+  "accountSettings_snackPasswordChangeFailed": "Failed to change password: {error}",
+  "accountSettings_snackPasswordChanged": "Password changed",
+  "accountSettings_snackPasswordMinLength": "Password must be at least 6 characters",
+  "accountSettings_snackUpdateFailed": "Failed to update: {error}",
+  "accountSettings_snackWrongPassword": "Current password is incorrect",
+  "accountSettings_title": "Account Settings",
+  "address": "Address",
+  "adminApplicants_bulkApproveButton": "Bulk approve",
+  "adminApplicants_bulkApproveConfirm": "Assign all {count} pending applications?",
+  "adminApplicants_bulkApproveCount": "Bulk approve ({count})",
+  "adminApplicants_bulkApproveFailed": "Bulk approval failed: {error}",
+  "adminApplicants_bulkApproveTitle": "Bulk Approve",
+  "adminApplicants_bulkApproved": "{count} applications approved",
+  "adminApplicants_changeButton": "Change",
+  "adminApplicants_changeFailed": "Failed to change status: {error}",
+  "adminApplicants_changeStatusConfirm": "Change the status of \"{jobTitle}\" to \"{statusLabel}\"?",
+  "adminApplicants_changeStatusTitle": "Change Status",
+  "adminApplicants_filterAll": "All",
+  "adminApplicants_filterApplied": "Applied",
+  "adminApplicants_filterAssigned": "Assigned",
+  "adminApplicants_filterDone": "Done",
+  "adminApplicants_filterInProgress": "In Progress",
+  "adminApplicants_noApplicantsForStatus": "No applicants with status \"{statusLabel}\"",
+  "adminApplicants_noApplicantsYet": "No applicants yet",
+  "adminApplicants_qualityScore": "Quality: {score}",
+  "adminApplicants_searchHint": "Search by name...",
+  "adminApplicants_startWork": "Start work",
+  "adminApplicants_statusChanged": "\"{jobTitle}\" changed to \"{statusLabel}\"",
+  "adminApplicants_statusUpdateNotifBody": "The status of \"{jobTitle}\" has been changed to \"{statusLabel}\"",
+  "adminApplicants_statusUpdateNotifTitle": "Status updated",
+  "adminApplicants_workCompleted": "Work completed",
+  "adminApplications": "Application Management",
+  "adminBadge": "Admin",
+  "adminDashboard_activeJobs": "Active jobs",
+  "adminDashboard_alertCount": "{label} {count}",
+  "adminDashboard_applicationCount": "Applications",
+  "adminDashboard_checkSales": "Check earnings",
+  "adminDashboard_earlyPaymentApproval": "Early payment approval",
+  "adminDashboard_identityVerification": "Identity verification",
+  "adminDashboard_noApplications": "No applications yet",
+  "adminDashboard_noJobTitle": "No job title",
+  "adminDashboard_pendingAlerts": "Pending alerts",
+  "adminDashboard_pendingApplications": "Pending applications",
+  "adminDashboard_pendingApproval": "Pending approval",
+  "adminDashboard_pendingEarlyPayments": "Pending early payments",
+  "adminDashboard_pendingQualifications": "Pending qualifications",
+  "adminDashboard_pendingVerifications": "Pending verifications",
+  "adminDashboard_postJob": "Post a job",
+  "adminDashboard_qualificationApproval": "Qualification approval",
+  "adminDashboard_quickActions": "Quick actions",
+  "adminDashboard_recentApplications": "Recent applications",
+  "adminDashboard_registeredUsers": "Registered users",
+  "adminDashboard_title": "Admin Dashboard",
+  "adminEarlyPayments_approveLabel": "Approve",
+  "adminEarlyPayments_cancel": "Cancel",
+  "adminEarlyPayments_emptyDescription": "When workers submit early payment requests, they will appear here.",
+  "adminEarlyPayments_emptyTitle": "No pending early payment requests",
+  "adminEarlyPayments_fee": "Fee (10%)",
+  "adminEarlyPayments_loadError": "Load error: {error}",
+  "adminEarlyPayments_loading": "Loading...",
+  "adminEarlyPayments_nameNotSet": "Name not set",
+  "adminEarlyPayments_notifyApprovedBody": "Your early payment request has been approved. Funds will be transferred soon.",
+  "adminEarlyPayments_notifyApprovedTitle": "Early payment approved",
+  "adminEarlyPayments_notifyRejectedBody": "Early payment request was rejected. Reason: {reason}",
+  "adminEarlyPayments_notifyRejectedTitle": "Early payment rejected",
+  "adminEarlyPayments_payoutAmount": "Payout amount",
+  "adminEarlyPayments_rejectButton": "Reject",
+  "adminEarlyPayments_rejectLabel": "Reject",
+  "adminEarlyPayments_rejectReasonHint": "Enter the reason for rejection",
+  "adminEarlyPayments_rejectReasonRequired": "Please enter a reason for rejection",
+  "adminEarlyPayments_rejectReasonTitle": "Rejection reason",
+  "adminEarlyPayments_requestDate": "Request date: {date}",
+  "adminEarlyPayments_requestedAmount": "Requested amount",
+  "adminEarlyPayments_snackApproveFailed": "Failed to approve",
+  "adminEarlyPayments_snackApproved": "Early payment approved",
+  "adminEarlyPayments_snackRejectFailed": "Failed to reject",
+  "adminEarlyPayments_snackRejected": "Early payment rejected",
+  "adminEarlyPayments_statusRequested": "Requested",
+  "adminEarlyPayments_targetMonth": "Target month",
+  "adminEarlyPayments_title": "Early Payment Requests",
+  "adminEarlyPayments_yenFormat": "¥{amount}",
+  "adminHome": "Admin Dashboard",
+  "adminHome_admin": "Admin",
+  "adminHome_applicants": "Applicants",
+  "adminHome_dashboard": "Dashboard",
+  "adminHome_jobManagement": "Job Management",
+  "adminHome_notifications": "Notifications",
+  "adminHome_salesManagement": "Sales Management",
+  "adminHome_settings": "Settings",
+  "adminIdentityVerification_approveButton": "Approve",
+  "adminIdentityVerification_approveConfirm": "Approve this identity verification?",
+  "adminIdentityVerification_approveFailed": "Approval failed: {error}",
+  "adminIdentityVerification_approveTitle": "Confirm Approval",
+  "adminIdentityVerification_approved": "Approved",
+  "adminIdentityVerification_enterRejectReason": "Please enter a reason for rejection",
+  "adminIdentityVerification_idDocumentPhoto": "ID Document",
+  "adminIdentityVerification_noPendingRequests": "No pending verification requests",
+  "adminIdentityVerification_rejectButton": "Reject",
+  "adminIdentityVerification_rejectFailed": "Rejection failed: {error}",
+  "adminIdentityVerification_rejectReasonHint": "e.g. Photo is unclear",
+  "adminIdentityVerification_rejectTitle": "Confirm Rejection",
+  "adminIdentityVerification_rejected": "Rejected",
+  "adminIdentityVerification_selfiePhoto": "Selfie",
+  "adminIdentityVerification_title": "Identity Verification Management",
+  "adminJobManagement": "Job Management",
+  "adminJobManagement_applicantCount": "{count} applications",
+  "adminJobManagement_checkNetwork": "Please check your network connection",
+  "adminJobManagement_dateTbd": "Date TBD",
+  "adminJobManagement_filterActive": "Active",
+  "adminJobManagement_filterAll": "All",
+  "adminJobManagement_filterCompleted": "Completed",
+  "adminJobManagement_filterDraft": "Draft",
+  "adminJobManagement_loadFailed": "Failed to load",
+  "adminJobManagement_locationNotSet": "Location not set",
+  "adminJobManagement_noJobs": "No jobs",
+  "adminJobManagement_noPermission": "No permission",
+  "adminJobManagement_noTitle": "No title",
+  "adminJobManagement_postHint": "Add jobs using the Post button",
+  "adminJobManagement_postJob": "Post job",
+  "adminJobManagement_searchHint": "Search jobs...",
+  "adminJobManagement_showMore": "Show more",
+  "adminLogin": "Admin Login",
+  "adminLoginDescription": "Enter admin password",
+  "adminLogin_email": "Email",
+  "adminLogin_emailInvalid": "Invalid email format",
+  "adminLogin_emailRequired": "Email is required",
+  "adminLogin_lockoutMessage": "Too many login attempts. Please try again in {minutes}m {seconds}s",
+  "adminLogin_login": "Log in",
+  "adminLogin_loginSuccess": "Login successful",
+  "adminLogin_password": "Password",
+  "adminLogin_passwordMinLength": "Password must be at least 6 characters",
+  "adminLogin_passwordRequired": "Password is required",
+  "adminLogin_title": "Admin Login",
+  "adminPassword": "Admin Password",
+  "adminPayments": "Payment Management",
+  "adminQualifications_approve": "Approve",
+  "adminQualifications_approveError": "Failed to approve",
+  "adminQualifications_approveSuccess": "{name} approved",
+  "adminQualifications_category": "Category: {category}",
+  "adminQualifications_emptyDescription": "When workers register qualifications, they will appear here for review.",
+  "adminQualifications_emptyTitle": "No qualifications pending review",
+  "adminQualifications_imageLoadError": "Failed to load image",
+  "adminQualifications_loadError": "Failed to load qualifications",
+  "adminQualifications_noName": "No name",
+  "adminQualifications_pendingApproval": "Pending approval",
+  "adminQualifications_reject": "Reject",
+  "adminQualifications_rejectButton": "Reject",
+  "adminQualifications_rejectError": "Failed to reject",
+  "adminQualifications_rejectReasonHint": "Enter the reason for rejection",
+  "adminQualifications_rejectReasonRequired": "Please enter a reason for rejection",
+  "adminQualifications_rejectReasonTitle": "Rejection reason",
+  "adminQualifications_rejectSuccess": "{name} rejected",
+  "adminQualifications_title": "Qualification Management",
+  "adminSearch_hint": "Search...",
+  "adminUsers": "User Management",
+  "agreeToPrivacy": "I agree to the Privacy Policy",
+  "agreeToTerms": "I agree to the Terms of Service",
+  "allPrefectures": "All areas",
+  "alreadyApplied": "Already applied",
+  "amount": "Amount",
+  "appName": "ALBAWORK",
+  "appTagline": "Construction Job Matching App",
+  "appleLoginSuccess": "Signed in with Apple",
+  "applicant": "Applicant",
+  "applicationConfirm": "Apply for this job?",
+  "applicationDate": "Application Date",
+  "applicationSuccess": "Application submitted",
+  "apply": "Apply",
+  "applyForJob": "Apply for this job",
+  "asyncValue_errorOccurred": "An error occurred",
+  "asyncValue_loadFailed": "Failed to load",
+  "asyncValue_networkError": "Network error",
+  "asyncValue_permissionDenied": "Permission denied",
+  "authError": "Authentication error occurred",
+  "authGate_authError": "An error occurred during authentication.\nPlease try again.",
+  "authGate_roleError": "Failed to retrieve user information",
+  "back": "Back",
+  "birthDate": "Date of Birth",
+  "cameraPermissionRequired": "Camera permission is required",
+  "cancel": "Cancel",
+  "changeName": "Change Name",
+  "changePassword": "Change Password",
+  "chatRoom_attachImage": "Attach image",
+  "chatRoom_imageSendFailed": "Failed to send image",
+  "chatRoom_inputHint": "Type a message...",
+  "chatRoom_loadError": "Failed to load chat",
+  "chatRoom_loginRequired": "Login required to chat",
+  "chatRoom_notReady": "Chat is not ready yet",
+  "chatRoom_pickFromGallery": "Choose from gallery",
+  "chatRoom_read": "Read",
+  "chatRoom_retry": "Retry",
+  "chatRoom_sendFailed": "Failed to send message",
+  "chatRoom_startConversation": "Start a conversation",
+  "chatRoom_takePhoto": "Take photo",
+  "chatRoom_title": "Chat",
+  "chatRoom_today": "Today",
+  "chatRoom_uploadFailed": "Upload failed",
+  "chatRoom_yesterday": "Yesterday",
+  "chatWith": "Chat",
+  "checkIn": "Check In",
+  "checkInSuccess": "Checked in successfully",
+  "checkOut": "Check Out",
+  "checkOutSuccess": "Checked out successfully",
+  "checkedIn": "Checked In",
+  "checkedOut": "Checked Out",
+  "close": "Close",
+  "common_adminOnlyView": "Visible to administrators only",
+  "common_all": "All",
+  "common_approve": "Approve",
+  "common_cancel": "Cancel",
+  "common_completed": "Completed",
+  "common_confirmed": "Confirmed",
+  "common_dataLoadError": "Failed to load data",
+  "common_delete": "Delete",
+  "common_deleted": "Deleted",
+  "common_edit": "Edit",
+  "common_itemsCount": " items",
+  "common_job": "Job",
+  "common_loadError": "Load error: {error}",
+  "common_noTitle": "No Title",
+  "common_notSet": "Not Set",
+  "common_ok": "OK",
+  "common_pleaseLogin": "Please log in",
+  "common_registerToSaveFavorites": "Registration is required to save favorites",
+  "common_registerToStart": "Register to start",
+  "common_registering": "Registering...",
+  "common_reject": "Reject",
+  "common_save": "Save",
+  "common_select": "Select",
+  "common_selected": " (Selected)",
+  "common_transferred": "Transferred",
+  "common_undecided": "TBD",
+  "common_unknown": "Unknown",
+  "confirm": "Confirm",
+  "confirmPassword": "Confirm Password",
+  "contactBody": "Message",
+  "contactCategory": "Category",
+  "contactCategoryBug": "Bug Report",
+  "contactCategoryFeature": "Feature Request",
+  "contactCategoryGeneral": "General",
+  "contactCategoryOther": "Other",
+  "contactCategoryPayment": "Payment",
+  "contactSent": "Message sent successfully",
+  "contactSubject": "Subject",
+  "contactTitle": "Contact Us",
+  "contact_bodyHint": "Enter your message",
+  "contact_bodyLabel": "Message",
+  "contact_categoryAccount": "Account",
+  "contact_categoryBug": "Bug report",
+  "contact_categoryGeneral": "General inquiry",
+  "contact_categoryJobs": "Jobs",
+  "contact_categoryLabel": "Category",
+  "contact_categoryOther": "Other",
+  "contact_categoryPayment": "Payment",
+  "contact_sendError": "Failed to send",
+  "contact_sendSuccess": "Inquiry sent",
+  "contact_subjectHint": "Enter the subject",
+  "contact_subjectLabel": "Subject",
+  "contact_submitButton": "Send",
+  "contact_title": "Contact Us",
+  "contact_validationError": "Please fill in all required fields",
+  "createEarnings": "Record Earnings",
+  "currentPassword": "Current Password",
+  "dataExportSuccess": "Data exported",
+  "dateSelect": "Select date",
+  "delete": "Delete",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirm": "Delete your account? This action cannot be undone.",
+  "deleteAccountSuccess": "Account deleted",
+  "deleteAccountTitle": "Delete Account",
+  "deleteJobConfirm": "Delete this job?",
+  "dispatchLaw": "Worker Dispatch Act",
+  "displayName": "Display Name",
+  "downloadData": "Download Data",
+  "earningsCreate_adminOnly": "Stripe payments are available to administrators only",
+  "earningsCreate_amountHint": "e.g. 15000",
+  "earningsCreate_amountLabel": "Amount (tax included)",
+  "earningsCreate_applicantUidEmpty": "Applicant UID is empty",
+  "earningsCreate_earningRegistered": "Earnings registered",
+  "earningsCreate_earningsNote": "* Earnings will be reflected after administrator review",
+  "earningsCreate_enterAmount": "Please enter an amount",
+  "earningsCreate_enterAmountExample": "Please enter an amount (e.g. 15000)",
+  "earningsCreate_noAssignedJobs": "No assigned jobs",
+  "earningsCreate_paymentDateLabel": "Payment date",
+  "earningsCreate_registerButton": "Register earnings",
+  "earningsCreate_registerFailed": "Registration failed: {error}",
+  "earningsCreate_searchHint": "Search jobs...",
+  "earningsCreate_selectFromList": "Please select a job from the list above",
+  "earningsCreate_selectJob": "Please select a job first",
+  "earningsCreate_selectPaymentDate": "Please select a payment date",
+  "earningsCreate_stripeCreated": "Stripe payment created (ID: {paymentId})",
+  "earningsCreate_stripeFailed": "Stripe payment failed: {error}",
+  "earningsCreate_stripePayButton": "Create Stripe payment",
+  "earningsCreate_title": "Register Earnings",
+  "earningsCreated": "Earnings recorded",
+  "earningsDetail": "Earnings Details",
+  "edit": "Edit",
+  "editProfile": "Edit Profile",
+  "ekycApproveConfirm": "Approve this identity verification?",
+  "ekycApproved": "Identity verified",
+  "ekycDocumentType": "Document Type",
+  "ekycDriversLicense": "Driver's License",
+  "ekycMyNumber": "My Number Card",
+  "ekycPassport": "Passport",
+  "ekycPendingReview": "Identity Verification Request",
+  "ekycRejectConfirm": "Reject this identity verification?",
+  "ekycRejected": "Identity verification rejected",
+  "ekycRejectionReason": "Reason for Rejection",
+  "ekycResidenceCard": "Residence Card",
+  "ekycResubmit": "Resubmit",
+  "ekycTitle": "Identity Verification",
+  "email": "Email",
+  "emailAlreadyInUse": "This email is already registered",
+  "emailAuthDialog_authError": "Authentication error: {code}",
+  "emailAuthDialog_emailAlreadyInUse": "This email is already in use",
+  "emailAuthDialog_emailLabel": "Email address",
+  "emailAuthDialog_enterEmailAndPassword": "Please enter your email and password",
+  "emailAuthDialog_hidePassword": "Hide password",
+  "emailAuthDialog_invalidEmail": "Invalid email format",
+  "emailAuthDialog_loginButton": "Log In",
+  "emailAuthDialog_loginFailed": "Login failed",
+  "emailAuthDialog_loginLocked": "Too many login attempts. Please wait a moment",
+  "emailAuthDialog_loginSuccess": "Logged in successfully",
+  "emailAuthDialog_operationNotAllowed": "This authentication method is currently unavailable",
+  "emailAuthDialog_passwordLabel": "Password",
+  "emailAuthDialog_passwordMinLength": "Password must be at least 6 characters",
+  "emailAuthDialog_showPassword": "Show password",
+  "emailAuthDialog_signUpButton": "Sign Up",
+  "emailAuthDialog_signUpFailed": "Account creation failed",
+  "emailAuthDialog_signUpHint": "If you don't have an account, tap \"Sign Up\"",
+  "emailAuthDialog_signUpSuccess": "Account created successfully",
+  "emailAuthDialog_title": "Sign in with email",
+  "emailAuthDialog_weakPassword": "Password is too weak. Use at least 6 characters",
+  "emailAuthDialog_wrongCredentials": "Incorrect email or password",
+  "emailAuth_cancel": "Cancel",
+  "emailAuth_emailInvalid": "Invalid email format",
+  "emailAuth_emailLabel": "Email address",
+  "emailAuth_emailRequired": "Please enter your email address",
+  "emailAuth_errorEmailInUse": "This email is already registered",
+  "emailAuth_errorGeneric": "An error occurred ({code})",
+  "emailAuth_errorInvalidEmail": "Invalid email format",
+  "emailAuth_errorNetwork": "Please check your network connection",
+  "emailAuth_errorTooManyRequests": "Too many requests. Please try again later",
+  "emailAuth_errorUserDisabled": "This account has been disabled",
+  "emailAuth_errorUserNotFound": "Account not found",
+  "emailAuth_errorWeakPassword": "Password is too weak. Use at least 6 characters",
+  "emailAuth_errorWrongPassword": "Incorrect password",
+  "emailAuth_forgotPassword": "Forgot password?",
+  "emailAuth_loginButton": "Log in",
+  "emailAuth_passwordConfirmLabel": "Confirm password",
+  "emailAuth_passwordConfirmRequired": "Please re-enter your password",
+  "emailAuth_passwordLabel": "Password",
+  "emailAuth_passwordMinLength": "Password must be at least 6 characters",
+  "emailAuth_passwordMismatch": "Passwords do not match",
+  "emailAuth_passwordRequired": "Please enter your password",
+  "emailAuth_passwordResetTitle": "Password Reset",
+  "emailAuth_passwordWithMinLength": "Password (6+ characters)",
+  "emailAuth_registerButton": "Sign up",
+  "emailAuth_sendButton": "Send",
+  "emailAuth_snackLoginFailed": "Login failed",
+  "emailAuth_snackRegisterFailed": "Registration failed",
+  "emailAuth_snackResetSent": "Password reset email sent",
+  "emailAuth_snackSendFailed": "Failed to send",
+  "emailAuth_tabLogin": "Log in",
+  "emailAuth_tabRegister": "Sign up",
+  "emailAuth_title": "Continue with email",
+  "employer": "Employer",
+  "employmentSecurityLaw": "Employment Security Act",
+  "errorDataNotFound": "Data not found",
+  "errorDefaultMessage": "Please try again later",
+  "errorGeneric": "An error occurred",
+  "errorLabel": "Error",
+  "errorNetwork": "A network error occurred",
+  "errorNetworkMessage": "Please check your internet connection\nand try again",
+  "errorNetworkTitle": "Network Error",
+  "errorRetry_emptyMessage": "Try changing your search criteria",
+  "errorRetry_emptyTitle": "No Data Found",
+  "errorRetry_generalMessage": "An unexpected error occurred",
+  "errorRetry_generalTitle": "Error occurred",
+  "errorRetry_networkErrorMessage": "Please check your internet connection",
+  "errorRetry_networkErrorTitle": "Network Error",
+  "errorRetry_timeoutMessage": "Connection timed out. Please try again",
+  "errorRetry_timeoutTitle": "Timeout",
+  "errorSearchRetry": "Please change your search criteria and try again",
+  "errorTimeout": "Timeout",
+  "errorTimeoutMessage": "The connection is taking too long\nPlease try again",
+  "experienceYears": "Years of Experience",
+  "familyName": "Last Name",
+  "familyNameKana": "Last Name (Kana)",
+  "faqTitle": "FAQ",
+  "faq_a1": "Download the app and create an account with your email, LINE, or phone number.",
+  "faq_a2": "Browse available jobs on the search page and tap \"Apply\" on the job you want.",
+  "faq_a3": "Payments are processed on the 10th of each month for work completed the previous month.",
+  "faq_a4": "Use the QR code attendance feature on-site. Scan the QR code provided by the site supervisor.",
+  "faq_a5": "Requirements vary by job. Some jobs require specific construction qualifications. Check the job details.",
+  "faq_a6": "Use the chat feature to contact the job supervisor directly, or submit a daily report through the app.",
+  "faq_a7": "You can cancel applications before they are approved. Contact the supervisor for cancellations after approval.",
+  "faq_a8": "Go to Profile > Identity Verification and upload your ID document and a selfie.",
+  "faq_q1": "How do I register?",
+  "faq_q2": "How do I apply for a job?",
+  "faq_q3": "When do I get paid?",
+  "faq_q4": "How do I check in/out?",
+  "faq_q5": "What qualifications do I need?",
+  "faq_q6": "How do I report issues on-site?",
+  "faq_q7": "Can I cancel an application?",
+  "faq_q8": "How do I verify my identity?",
+  "faq_title": "FAQ",
+  "favorites_empty": "No favorites yet",
+  "favorites_emptyDescription": "Add jobs you like to your favorites",
+  "favorites_loginRequired": "Login required",
+  "favorites_noTitle": "No title",
+  "favorites_title": "Favorites",
+  "featureQuickEarn": "Quick Earnings",
+  "featureSearch": "Find Jobs",
+  "featureSecurePayment": "Secure Payments",
+  "filterByPrefecture": "Filter by prefecture",
+  "forceUpdate_available": "Update Available",
+  "forceUpdate_availableMessage": "A new version is available. Would you like to update?",
+  "forceUpdate_later": "Later",
+  "forceUpdate_required": "Update Required",
+  "forceUpdate_requiredMessage": "Please update to the latest version to continue using the app.",
+  "forceUpdate_update": "Update",
+  "forgotPassword": "Forgot password?",
+  "gender": "Gender",
+  "genderFemale": "Female",
+  "genderMale": "Male",
+  "genderOther": "Other",
+  "getStarted": "Get Started",
+  "givenName": "First Name",
+  "givenNameKana": "First Name (Kana)",
+  "guestCannotApply": "Guests cannot apply. Please log in",
+  "guestHome_appleLoginSuccess": "Apple login successful",
+  "guestHome_emailLogin": "Log in with email",
+  "guestHome_featureEarn": "Earn money",
+  "guestHome_featurePayment": "Easy payment",
+  "guestHome_featureSearch": "Find jobs",
+  "guestHome_guestLoginSuccess": "Continuing as guest",
+  "guestHome_lineLogin": "Log in with LINE",
+  "guestHome_phoneLogin": "Log in with phone",
+  "guestHome_privacyPolicy": "Privacy Policy",
+  "guestHome_startAsGuest": "Continue as guest",
+  "guestHome_subtitle": "Find construction jobs near you",
+  "guestHome_termsOfService": "Terms of Service",
+  "guestLoginSuccess": "Logged in as guest",
+  "guestModeWarning": "Some features are limited in guest mode",
+  "hidePassword": "Hide password",
+  "home_admin": "Admin",
+  "home_greetingAfternoon": "Good afternoon",
+  "home_greetingEvening": "Good evening",
+  "home_greetingMorning": "Good morning",
+  "home_navMessages": "Messages",
+  "home_navProfile": "Profile",
+  "home_navSales": "Earnings",
+  "home_navSearch": "Search",
+  "home_navSelected": ", selected",
+  "home_navTabLabel": "{label} tab{suffix}",
+  "home_navWork": "Work",
+  "home_notifications": "Notifications, {count} unread",
+  "home_notificationsUnread": "Notifications, {count} unread",
+  "home_postJob": "Post job",
+  "home_statusAdmin": "Admin mode",
+  "identityVerification": "Identity Verification",
+  "identityVerification_documentTypeLabel": "Document type",
+  "identityVerification_ekycBanner": "Submitted documents will be reviewed by an administrator based on eKYC (online identity verification).",
+  "identityVerification_idDocumentSubtitle": "Driver's license, My Number card, etc.",
+  "identityVerification_idDocumentTitle": "ID Document",
+  "identityVerification_instructions": "Please upload a photo of your ID document and a selfie for identity verification.",
+  "identityVerification_loadStatusFailed": "Failed to load verification status",
+  "identityVerification_rejectionReason": "Reason: {reason}",
+  "identityVerification_resubmitButton": "Resubmit",
+  "identityVerification_selfieSubtitle": "Make sure your full face is visible",
+  "identityVerification_selfieTitle": "Selfie",
+  "identityVerification_statusApproved": "Identity verified",
+  "identityVerification_statusPending": "Under review. Please wait",
+  "identityVerification_statusRejected": "Identity verification rejected",
+  "identityVerification_stepSelfie": "Selfie",
+  "identityVerification_stepSubmit": "Submit",
+  "identityVerification_stepUploadId": "ID",
+  "identityVerification_submitButton": "Submit verification",
+  "identityVerification_submitFailed": "Submission failed: {error}",
+  "identityVerification_submitted": "Verification submitted. Please wait for review",
+  "identityVerification_tapToSelect": "Tap to select",
+  "identityVerification_title": "Identity Verification",
+  "identityVerification_uploadBoth": "Please upload both an ID document and a selfie",
+  "imagePicker_camera": "Camera",
+  "imagePicker_cancel": "Cancel",
+  "imagePicker_error": "Failed to select image",
+  "imagePicker_gallery": "Gallery",
+  "imagePicker_galleryMultiple": "Gallery (multiple)",
+  "imagePicker_noImageSelected": "No image selected",
+  "imagePicker_selectImage": "Select image",
+  "imagePicker_uploadPartial": "{successCount} succeeded, {failedCount} failed",
+  "imagePicker_uploadSuccess": "Uploaded {count} images",
+  "imagePicker_uploaded": "Uploaded",
+  "inspection_checklist": "Inspection checklist",
+  "inspection_completedLog": "Inspection complete: {result}",
+  "inspection_fail": "Fail",
+  "inspection_failedFixRequest": "Inspection failed. Fix request sent",
+  "inspection_needsFix": "Needs fix",
+  "inspection_overallComment": "Overall comment",
+  "inspection_pass": "Pass",
+  "inspection_passed": "Passed",
+  "inspection_passedComplete": "Inspection passed. Job completed",
+  "inspection_submitFailed": "Failed to submit inspection: {error}",
+  "inspection_submitResult": "Submit results",
+  "inspection_title": "Inspection",
+  "introduction": "Introduction",
+  "invalidEmail": "Invalid email format",
+  "inviteFriends": "Invite Friends",
+  "inviteFriendsSubtitle": "Invite friends with your referral code",
+  "itemCount": "{count} items",
+  "jobCard_actions": "Actions",
+  "jobCard_addFavorite": "Add to favorites",
+  "jobCard_delete": "Delete",
+  "jobCard_edit": "Edit",
+  "jobCard_noOwnerId": "No owner ID",
+  "jobCard_perDay": "per day",
+  "jobCard_quickStart": "Quick start",
+  "jobCard_remainingSlots": "{count} slots left",
+  "jobCard_removeFavorite": "Remove from favorites",
+  "jobCard_semanticsLabel": "{title}, Location: {location}, Date: {date}, Pay: {price}",
+  "jobCreateTitle": "Create Job",
+  "jobDate": "Work Date",
+  "jobDeleted": "Job deleted",
+  "jobDescription": "Job Description",
+  "jobDetail": "Job Details",
+  "jobDetail_addToFavorites": "Add to favorites",
+  "jobDetail_applicationReceived": "New application received for {projectName}",
+  "jobDetail_applied": "Applied",
+  "jobDetail_applyButton": "Apply",
+  "jobDetail_applyError": "Failed to apply",
+  "jobDetail_applyToJob": "Apply to Job",
+  "jobDetail_applyToThisJob": "Apply to this job",
+  "jobDetail_category": "Category",
+  "jobDetail_checking": "Checking...",
+  "jobDetail_checkingStatus": "Checking...",
+  "jobDetail_defaultDescription": "No details have been registered yet.",
+  "jobDetail_defaultNotes": "No special notes.",
+  "jobDetail_deleteConfirmMessage": "Are you sure you want to delete this job? This action cannot be undone.",
+  "jobDetail_deleteConfirmTitle": "Delete Job",
+  "jobDetail_deleteError": "Failed to delete",
+  "jobDetail_deleteThisJob": "Delete this job",
+  "jobDetail_favorite": "Favorite",
+  "jobDetail_jobDescription": "Job Description",
+  "jobDetail_legacyData": "Legacy Data",
+  "jobDetail_locationLabel": "Location",
+  "jobDetail_mayBeDeleted": "This job may have been deleted",
+  "jobDetail_newApplication": "New Application",
+  "jobDetail_notes": "Notes & Precautions",
+  "jobDetail_paymentLabel": "Payment",
+  "jobDetail_removeFromFavorites": "Remove from favorites",
+  "jobDetail_scheduleLabel": "Schedule",
+  "jobDetail_share": "Share",
+  "jobDetail_snackApplied": "Application submitted",
+  "jobDetail_status": "Status",
+  "jobDetail_title": "Job Details",
+  "jobEditTitle": "Edit Job",
+  "jobEdit_dateHint": "Tap to select date",
+  "jobEdit_dateLabel": "Schedule",
+  "jobEdit_datePickerCancel": "Cancel",
+  "jobEdit_datePickerConfirm": "Confirm",
+  "jobEdit_datePickerHelp": "Select a date",
+  "jobEdit_descriptionHint": "e.g. On-site assistance, cleaning, material transport",
+  "jobEdit_descriptionLabel": "Job description",
+  "jobEdit_hintBody": "After updating, you will return to the list. Select dates from the calendar. Setting latitude/longitude enables GPS verification for QR attendance.",
+  "jobEdit_hintTitle": "Hint",
+  "jobEdit_latitudeHint": "e.g. 35.6812",
+  "jobEdit_latitudeLabel": "Latitude (optional)",
+  "jobEdit_locationHint": "e.g. Hanamigawa-ku, Chiba City, Chiba",
+  "jobEdit_locationLabel": "Location",
+  "jobEdit_longitudeHint": "e.g. 139.7671",
+  "jobEdit_longitudeLabel": "Longitude (optional)",
+  "jobEdit_notesHint": "e.g. No tardiness, safety first, confirm details via chat",
+  "jobEdit_notesLabel": "Notes",
+  "jobEdit_priceHint": "e.g. 30000",
+  "jobEdit_priceLabel": "Payment (JPY)",
+  "jobEdit_sectionSubtitle": "Please update the job information",
+  "jobEdit_sectionTitle": "Edit details",
+  "jobEdit_snackEmptyFields": "Some fields are empty",
+  "jobEdit_snackPriceNumeric": "Please enter a numeric amount",
+  "jobEdit_snackSelectDateFromCalendar": "Please select a date from the calendar",
+  "jobEdit_snackUpdateFailed": "Update failed: {error}",
+  "jobEdit_title": "Edit Job",
+  "jobEdit_titleHint": "e.g. Wallpaper replacement (1LDK)",
+  "jobEdit_titleLabel": "Title",
+  "jobEdit_updateButton": "Update",
+  "jobFilter_areaHint": "Select area",
+  "jobFilter_areaLabel": "Area",
+  "jobFilter_dateRange": "Date range",
+  "jobFilter_dateSeparator": "~",
+  "jobFilter_endDate": "End date",
+  "jobFilter_priceRange": "Pay range",
+  "jobFilter_qualBuildingManagement": "Building Construction Supervisor",
+  "jobFilter_qualCivilEngineering": "Civil Engineering Supervisor",
+  "jobFilter_qualElectrician": "Electrician",
+  "jobFilter_qualForklift": "Forklift Operator",
+  "jobFilter_qualHazmat": "Hazardous Materials Handler",
+  "jobFilter_qualScaffolding": "Scaffolding Worker",
+  "jobFilter_qualSlinging": "Slinger",
+  "jobFilter_qualWelding": "Welder",
+  "jobFilter_requiredQualifications": "Required qualifications",
+  "jobFilter_reset": "Reset",
+  "jobFilter_searchButton": "Search",
+  "jobFilter_startDate": "Start date",
+  "jobFilter_title": "Search Filter",
+  "jobListTitle": "Job Listings",
+  "jobList_dataLoadError": "Failed to load data",
+  "jobList_deleteConfirmMessage": "Are you sure you want to delete this job? This action cannot be undone.",
+  "jobList_deleteConfirmTitle": "Delete Job",
+  "jobList_deleteError": "Failed to delete",
+  "jobList_fetchJobsError": "Failed to fetch job information",
+  "jobList_filter": "Filter",
+  "jobList_filterActiveLabel": "Filters active",
+  "jobList_locationError": "Failed to get location",
+  "jobList_monthLabel": "Month",
+  "jobList_nextMonth": "Next month",
+  "jobList_noJobs": "No jobs available",
+  "jobList_noJobsDescription": "There are currently no jobs matching this criteria.",
+  "jobList_noMatchingJobs": "No matching jobs",
+  "jobList_noMatchingJobsDescription": "Please change conditions and search again.",
+  "jobList_openSearchFilter": "Open search filter",
+  "jobList_prefChiba": "Chiba",
+  "jobList_prefKanagawa": "Kanagawa",
+  "jobList_prefOther": "Other",
+  "jobList_prefTokyo": "Tokyo",
+  "jobList_searchByAreaCondition": "Search by area & conditions",
+  "jobList_sortDistance": "By Distance",
+  "jobList_sortHighestPay": "Highest Pay",
+  "jobList_sortNewest": "Newest First",
+  "jobList_sortTooltip": "Sort",
+  "jobList_thisMonth": "This month",
+  "jobList_viewOnMap": "Map View",
+  "jobList_viewOnMapAccessibility": "View jobs on map",
+  "jobLocation": "Location",
+  "jobNotes": "Notes",
+  "jobOverview": "Overview",
+  "jobPrice": "Pay",
+  "jobSaved": "Job saved",
+  "jobTitle": "Job Title",
+  "laborInsurance": "Workers' Compensation Insurance",
+  "legalCompliance": "Legal Compliance",
+  "legalDocuments": "Legal Documents",
+  "legalIndex": "Legal Information",
+  "legalIndex_compliance": "Labor Law Compliance",
+  "legalIndex_dispatchLaw": "Worker Dispatch Act",
+  "legalIndex_employmentSecurityLaw": "Employment Security Act",
+  "legalIndex_laborInsurance": "Labor Insurance",
+  "legalIndex_legalDocuments": "Legal Documents",
+  "legalIndex_privacyPolicy": "Privacy Policy",
+  "legalIndex_termsOfService": "Terms of Service",
+  "legalIndex_title": "Legal Information",
+  "legalInfo": "Legal Information",
+  "legalInfoSubtitle": "Privacy Policy, Terms of Service, Legal Info",
+  "loadMore": "Load More",
+  "loadMore_showMore": "Show more",
+  "loading": "Loading...",
+  "locationPermissionRequired": "Location permission is required",
+  "login": "Log In",
+  "loginSuccess": "Logged in successfully",
+  "logout": "Log Out",
+  "logoutConfirm": "Log out?",
+  "logoutSuccess": "Logged out",
+  "mapSearch_details": "Details",
+  "mapSearch_noJobs": "No jobs in this area",
+  "mapSearch_noTitle": "No title",
+  "mapSearch_notSet": "Not set",
+  "mapSearch_pricePerDay": "¥{price} /day",
+  "mapSearch_title": "Map Search",
+  "markAsRead": "Mark as read",
+  "messagesTitle": "Messages",
+  "messages_emptyAdmin": "No chat rooms yet",
+  "messages_emptyDescription": "Chat will begin when you apply for a job",
+  "messages_emptyUser": "No messages yet",
+  "messages_featureName": "Messages",
+  "messages_noSearchResults": "No search results",
+  "messages_registrationRequiredDescription": "Register to use the messaging feature.",
+  "messages_registrationRequiredTitle": "Registration required to use messages",
+  "messages_searchHint": "Search messages...",
+  "messages_statusLabel": "Status: {status}",
+  "messages_title": "Messages",
+  "messages_titleAdmin": "Messages (Admin)",
+  "messages_tryDifferentKeyword": "Try a different keyword",
+  "myProfile": "Profile",
+  "myProfile_addQualification": "Add Qualification",
+  "myProfile_addressHint": "e.g. Shibuya, Tokyo...",
+  "myProfile_addressLabel": "Address",
+  "myProfile_addressSection": "Address",
+  "myProfile_adminRating": "Rating from administrators",
+  "myProfile_avatarUpdated": "Profile photo updated",
+  "myProfile_avatarUploadError": "Failed to upload photo",
+  "myProfile_basicInfo": "Basic Information",
+  "myProfile_birthDate": "Date of Birth",
+  "myProfile_birthDateLabel": "Date of Birth",
+  "myProfile_completionRate": "Completion Rate",
+  "myProfile_experienceSkills": "Experience & Skills",
+  "myProfile_experienceYearsHint": "e.g. 5",
+  "myProfile_experienceYearsLabel": "Years of Experience",
+  "myProfile_familyName": "Family Name",
+  "myProfile_familyNameKana": "Family Name (Kana)",
+  "myProfile_familyNameKanaLabel": "Family Name (Kana)",
+  "myProfile_familyNameLabel": "Family Name",
+  "myProfile_genderFemale": "Female",
+  "myProfile_genderLabel": "Gender",
+  "myProfile_genderMale": "Male",
+  "myProfile_genderNotAnswered": "Prefer not to say",
+  "myProfile_genderOther": "Other",
+  "myProfile_genderRequired": "Please select a gender",
+  "myProfile_givenName": "Given Name",
+  "myProfile_givenNameKana": "Given Name (Kana)",
+  "myProfile_givenNameKanaLabel": "Given Name (Kana)",
+  "myProfile_givenNameLabel": "Given Name",
+  "myProfile_identityVerified": "Identity Verified",
+  "myProfile_introHint": "Showcase your expertise and experience",
+  "myProfile_introLabel": "Self Introduction",
+  "myProfile_loadError": "Failed to load profile",
+  "myProfile_loginRequired": "Login is required",
+  "myProfile_loginRequiredMessage": "Login is required to edit your profile. Please log in from the Settings page.",
+  "myProfile_loginRequiredTitle": "Login Required",
+  "myProfile_photoSetByVerification": "Photo will be set after identity verification",
+  "myProfile_pickFromGallery": "Choose from Gallery",
+  "myProfile_postalCodeHint": "e.g. 123-4567",
+  "myProfile_postalCodeInvalid": "Invalid postal code format",
+  "myProfile_postalCodeLabel": "Postal Code",
+  "myProfile_profilePhoto": "Profile Photo",
+  "myProfile_qualificationHint": "Enter qualification name",
+  "myProfile_qualifications": "Qualifications",
+  "myProfile_qualityScore": "Quality Score",
+  "myProfile_ratingAverage": "Rating Average",
+  "myProfile_requiredField": "{label} is required",
+  "myProfile_saveButton": "Save",
+  "myProfile_saveError": "Failed to save",
+  "myProfile_saveSuccess": "Profile saved",
+  "myProfile_selectBirthDate": "Select Date of Birth",
+  "myProfile_selectGender": "Please select a gender",
+  "myProfile_stripeActive": "Stripe connected — You can receive payments",
+  "myProfile_stripeIntegration": "Stripe Integration",
+  "myProfile_stripeNotConfigured": "Stripe not configured — Stripe integration is required to receive payments",
+  "myProfile_stripePending": "Stripe under review — Please wait for verification to complete",
+  "myProfile_takePhoto": "Take a Photo",
+  "myProfile_tapToChangePhoto": "Tap to change photo",
+  "myProfile_title": "Edit Profile",
+  "myProfile_verifiedQualifications": "Verified Qualifications",
+  "myProfile_yearsSuffix": "years",
+  "myProfile_yourRating": "Your Rating",
+  "name": "Full Name",
+  "nameChanged": "Name changed",
+  "navHome": "Home",
+  "navMessages": "Messages",
+  "navMyPage": "My Page",
+  "navProfile": "Profile",
+  "navSales": "Earnings",
+  "navSearch": "Search",
+  "navWork": "Work",
+  "netAmount": "Net Amount",
+  "networkCheckConnection": "Please check your network connection",
+  "newPassword": "New Password",
+  "next": "Next",
+  "noData": "No data available",
+  "noEarnings": "No earnings data",
+  "noJobsFound": "No jobs matching your criteria",
+  "noMessages": "No messages",
+  "noMoreData": "No more data",
+  "noNotifications": "No notifications",
+  "noWork": "No current work assignments",
+  "notificationSettings": "Notification Settings",
+  "notifications": "Notifications",
+  "notifications_allRead": "All notifications read",
+  "notifications_empty": "No notifications",
+  "notifications_emptyDescription": "You will receive notifications about job updates here",
+  "notifications_error": "Error: {error}",
+  "notifications_loginDescription": "Login to receive notifications",
+  "notifications_loginRequired": "Login required",
+  "notifications_markAllRead": "Mark all as read",
+  "notifications_title": "Notifications",
+  "offlineBanner_connectionRestored": "Connection restored",
+  "offlineBanner_offlineMode": "Offline mode",
+  "offlineBanner_retry": "Retry",
+  "onboardingDesc1": "Easily search and apply for construction jobs",
+  "onboardingDesc2": "Simple attendance management with QR code scanning",
+  "onboardingDesc3": "Receive your earnings safely and reliably",
+  "onboardingTitle1": "Find Work",
+  "onboardingTitle2": "QR Check-in/out",
+  "onboardingTitle3": "Secure Payments",
+  "onboarding_agreed": ", agreed",
+  "onboarding_getStarted": "Get Started",
+  "onboarding_nextPage": "Next",
+  "onboarding_pageIndicator": "Page {current} / {total}",
+  "onboarding_privacyPolicy": "Privacy Policy",
+  "onboarding_skip": "Skip",
+  "onboarding_termsOfService": "Terms of Service",
+  "openSettings": "Open Settings",
+  "optional": "Optional",
+  "password": "Password",
+  "passwordChanged": "Password changed",
+  "passwordResetDescription": "We will send a reset link to your registered email",
+  "passwordResetSent": "Password reset email sent",
+  "passwordResetTitle": "Reset Password",
+  "paymentDetail": "Payment Details",
+  "paymentDetail_createdAt": "Created",
+  "paymentDetail_netAmount": "Net amount",
+  "paymentDetail_notFound": "Payment details not found",
+  "paymentDetail_paymentAmount": "Payment amount",
+  "paymentDetail_paymentStatus": "Payment status",
+  "paymentDetail_payoutStatus": "Payout status",
+  "paymentDetail_platformFee": "Platform fee",
+  "paymentDetail_projectName": "Job name",
+  "paymentDetail_title": "Payment Details",
+  "paymentFailed": "Payment Failed",
+  "paymentPending": "Payment Pending",
+  "paymentStatus": "Payment Status",
+  "paymentSucceeded": "Payment Complete",
+  "payoutDate": "Payout Date",
+  "phone": "Phone Number",
+  "phoneAuth_changePhoneNumber": "Change phone number",
+  "phoneAuth_codeSentTo": "Enter the 6-digit code sent to {phone}",
+  "phoneAuth_enterCode": "Enter verification code",
+  "phoneAuth_enterJapaneseNumber": "Please enter a Japanese phone number",
+  "phoneAuth_enterSixDigitCode": "Enter the 6-digit code",
+  "phoneAuth_invalidPhoneNumber": "Please enter a valid phone number (10-11 digits)",
+  "phoneAuth_login": "Log in",
+  "phoneAuth_loginSuccess": "Logged in successfully",
+  "phoneAuth_phoneNumberLabel": "Phone number",
+  "phoneAuth_resendCode": "Resend code",
+  "phoneAuth_resendCountdown": "Resend in {seconds}s",
+  "phoneAuth_restartVerification": "Please restart the verification process",
+  "phoneAuth_sendCode": "Send verification code",
+  "phoneAuth_smsDescription": "A verification code will be sent via SMS",
+  "phoneAuth_title": "Log in with phone number",
+  "phoneAuth_verificationCodeLabel": "Verification code",
+  "platformFee": "Platform Fee",
+  "postJob": "Post Job",
+  "postJobSuccess": "Job posted",
+  "postJobTitle": "Post a Job",
+  "post_dateHint": "Tap to select date",
+  "post_dateLabel": "Schedule",
+  "post_datePickerCancel": "Cancel",
+  "post_datePickerConfirm": "Confirm",
+  "post_datePickerHelp": "Select a date",
+  "post_hintBody": "Select dates from the calendar. Setting latitude/longitude enables GPS verification for QR attendance.",
+  "post_hintTitle": "Hint",
+  "post_latitudeHint": "e.g. 35.6812",
+  "post_latitudeLabel": "Latitude (optional)",
+  "post_locationHint": "e.g. Hanamigawa-ku, Chiba City, Chiba",
+  "post_locationLabel": "Location",
+  "post_longitudeHint": "e.g. 139.7671",
+  "post_longitudeLabel": "Longitude (optional)",
+  "post_noPermissionMessage": "This screen is for administrators only.",
+  "post_noPermissionTitle": "No permission",
+  "post_priceHint": "e.g. 30000",
+  "post_priceLabel": "Payment (JPY)",
+  "post_sectionBasicInfo": "Basic Information",
+  "post_sectionBasicInfoSubtitle": "Please enter the job details",
+  "post_snackAdminOnly": "Only administrators can post jobs",
+  "post_snackCheckingPermission": "Checking permissions. Please wait.",
+  "post_snackEmptyFields": "Some fields are empty",
+  "post_snackLoginRequired": "Login required",
+  "post_snackPostFailed": "Post failed: {error}",
+  "post_snackPriceNumeric": "Please enter a numeric amount",
+  "post_snackSelectDateFromCalendar": "Please select a date from the calendar",
+  "post_submitButton": "Post job",
+  "post_title": "Post a Job",
+  "post_titleHint": "e.g. Wallpaper replacement (1LDK)",
+  "post_titleLabel": "Title",
+  "postalCode": "Postal Code",
+  "prefecture": "Prefecture",
+  "privacyPolicy": "Privacy Policy",
+  "profilePhotoChange": "Change Photo",
+  "profileSaved": "Profile saved",
+  "profileTitle": "My Page",
+  "profileWidgets_guest": "Guest",
+  "profileWidgets_loggedIn": "Logged in",
+  "profileWidgets_status": "Status",
+  "profile_accountSettings": "Account settings",
+  "profile_adminLogin": "Admin login",
+  "profile_adminLoginSubtitle": "Post and edit jobs",
+  "profile_adminLogout": "Admin logout",
+  "profile_adminLogoutSubtitle": "Not currently logged in",
+  "profile_contact": "Contact us",
+  "profile_darkMode": "Dark mode",
+  "profile_darkModeDescription": "Dark mode follows your device's system settings.\n\nYou can change this in your device's Settings > Display > Dark Mode.",
+  "profile_darkModeSubtitle": "Follows system settings",
+  "profile_faq": "FAQ",
+  "profile_favoriteJobs": "Favorite jobs",
+  "profile_favoriteJobsSubtitle": "View saved jobs",
+  "profile_guest": "Guest",
+  "profile_identityVerification": "Identity verification",
+  "profile_identityVerificationSubtitle": "Submit ID and selfie",
+  "profile_inviteFriends": "Invite friends",
+  "profile_inviteFriendsSubtitle": "Invite friends with referral code",
+  "profile_legalInfo": "Legal information",
+  "profile_legalInfoSubtitle": "Privacy policy, terms of service",
+  "profile_lineLoginButton": "Log in with LINE",
+  "profile_lineLoginSemanticsLabel": "Log in with LINE account",
+  "profile_loggedIn": "Log in to apply and chat",
+  "profile_loggedInUser": "Logged in user",
+  "profile_loginButton": "Log in",
+  "profile_loginPromptSubtitle": "Log in to apply and chat",
+  "profile_loginRequired": "Login required",
+  "profile_loginRequiredMessage": "Login is required for some features like applying and chatting.",
+  "profile_notLoggedIn": "Not currently logged in",
+  "profile_qualifications": "Qualifications",
+  "profile_qualificationsSubtitle": "Register and manage qualifications",
+  "profile_sectionAccount": "Account",
+  "profile_sectionAdmin": "Admin",
+  "profile_sectionOther": "Other",
+  "profile_sectionSupport": "Support",
+  "profile_snackLoggedOut": "Logged out (returned to guest mode)",
+  "profile_stripeAccount": "Stripe account settings",
+  "profile_stripeAccountSubtitle": "Set up payment account",
+  "profile_yourProfile": "Your profile",
+  "projectName": "Project Name",
+  "qrCheckIn": "QR Check-in",
+  "qrCheckin_clockIn": "Clock in",
+  "qrCheckin_clockOut": "Clock out",
+  "qrCheckin_error": "Error",
+  "qrCheckin_errorOccurred": "An error occurred: {error}",
+  "qrCheckin_gpsVerification": "GPS verification: {action} available within 100m of the site",
+  "qrCheckin_scanAdminQr": "Scan admin QR code",
+  "qrCheckin_title": "QR Scan ({action})",
+  "qualificationAdd_categoryLabel": "Category",
+  "qualificationAdd_expiryDate": "Expiry date",
+  "qualificationAdd_nameHint": "Enter qualification name",
+  "qualificationAdd_nameLabel": "Qualification name",
+  "qualificationAdd_nameRequired": "Qualification name is required",
+  "qualificationAdd_noExpiry": "No expiry",
+  "qualificationAdd_register": "Register",
+  "qualificationAdd_registerFailed": "Registration failed: {error}",
+  "qualificationAdd_registered": "Qualification registered",
+  "qualificationAdd_title": "Add Qualification",
+  "qualifications": "Qualifications",
+  "qualifications_addHint": "Add your qualifications",
+  "qualifications_approved": "Approved",
+  "qualifications_empty": "No qualifications registered",
+  "qualifications_error": "Error: {error}",
+  "qualifications_expired": "(expired)",
+  "qualifications_expiryDate": "Expiry: {date}{status}",
+  "qualifications_loginRequired": "Login required to manage qualifications",
+  "qualifications_pending": "Pending",
+  "qualifications_rejected": "Rejected",
+  "qualifications_title": "Qualifications",
+  "ratingDialog_average": "Average",
+  "ratingDialog_commentHint": "Enter your comment (optional)",
+  "ratingDialog_dissatisfied": "Dissatisfied",
+  "ratingDialog_excellent": "Excellent",
+  "ratingDialog_good": "Good",
+  "ratingDialog_later": "Later",
+  "ratingDialog_selectStars": "Please select a rating",
+  "ratingDialog_somewhatDissatisfied": "Somewhat dissatisfied",
+  "ratingDialog_submit": "Submit",
+  "ratingDialog_submitFailed": "Failed to submit: {error}",
+  "ratingDialog_submitSuccess": "Rating submitted",
+  "ratingDialog_title": "Rate this job",
+  "ratingLabel": "Rating",
+  "ratingStars_count": "({count} reviews)",
+  "ratingStars_noRating": "No rating",
+  "receiveNotifications": "Receive notifications",
+  "referral_applyButton": "Apply",
+  "referral_codeApplied": "Referral code applied",
+  "referral_codeCopied": "Code copied",
+  "referral_codeHint": "e.g. ABC123",
+  "referral_copy": "Copy",
+  "referral_enterCode": "Enter referral code",
+  "referral_enterCodeDescription": "Enter the referral code from your friend",
+  "referral_inviteDescription": "Invite friends and earn rewards",
+  "referral_loginRequired": "Login required",
+  "referral_share": "Share with friends",
+  "referral_stats": "Referral Stats",
+  "referral_statsCount": "{count} people",
+  "referral_title": "Invite Friends",
+  "referral_yourCode": "Your referral code",
+  "refreshing": "Refreshing...",
+  "register": "Sign Up",
+  "registerSuccess": "Account created successfully",
+  "registrationPrompt_defaultFeature": "this feature",
+  "registrationPrompt_description": "Register to use all features",
+  "registrationPrompt_emailLogin": "Log in with email",
+  "registrationPrompt_error": "An error occurred: {error}",
+  "registrationPrompt_later": "Later",
+  "registrationPrompt_lineLogin": "Log in with LINE",
+  "registrationPrompt_lineRedirect": "Redirecting to LINE login...",
+  "registrationPrompt_title": "{feature} requires registration",
+  "required": "Required",
+  "retry": "Retry",
+  "router_goHome": "Go to Home",
+  "router_pageDoesNotExist": "{uri} does not exist",
+  "router_pageNotFound": "Page Not Found",
+  "router_statementsTitle": "Statements",
+  "router_workTimelineTitle": "Work Timeline",
+  "salesTitle": "Earnings",
+  "sales_checkSales": "Check Sales",
+  "sales_constructionCompleted": "Construction Completed",
+  "sales_dataCount": "Data count: {count} items",
+  "sales_earningsNote": "* Earnings will be reflected when confirmed by an administrator",
+  "sales_incomeAndStatements": "Income & Statements",
+  "sales_incomeNote": "* Only confirmed earnings are shown",
+  "sales_monthLabel": "Month {month}",
+  "sales_monthStatement": "{month} Statement",
+  "sales_monthlyTrend": "Monthly Trend",
+  "sales_nextPaymentDate": "Next Payment: {month}/10",
+  "sales_noPaymentData": "No payment data",
+  "sales_noStatements": "No statements",
+  "sales_noStatementsDescription": "Monthly statements will appear here when generated.",
+  "sales_paid": "Paid",
+  "sales_paymentHistory": "Payment History",
+  "sales_paymentManagement": "Payment Management",
+  "sales_registerPayment": "Register Payment",
+  "sales_registerToStart": "Register to Start",
+  "sales_registrationDescription": "Registration is required to view sales information.",
+  "sales_registrationRequired": "Registration Required",
+  "sales_resetToThisMonth": "Reset to this month",
+  "sales_salesTitle": "Sales",
+  "sales_selectedMonthIncome": "Selected Month Income",
+  "sales_statusDraft": "In Progress",
+  "sales_statusPaid": "Paid",
+  "sales_tabIncome": "Income",
+  "sales_tabStatements": "Statements",
+  "sales_thisMonthIncome": "This Month's Income",
+  "sales_total": "Total",
+  "sales_totalIncome": "Total Income",
+  "sales_unconfirmedEarnings": "Unconfirmed Earnings",
+  "sales_unpaid": "Unpaid",
+  "save": "Save",
+  "scanQrCode": "Scan QR Code",
+  "search": "Search",
+  "searchJobs": "Search jobs",
+  "send": "Send",
+  "sendMessage": "Send Message",
+  "sendResetLink": "Send Reset Link",
+  "shareJob": "Share Job",
+  "shiftQr": "Shift QR",
+  "shiftQr_generateFailed": "Failed to generate: {error}",
+  "shiftQr_generateNew": "Generate new QR",
+  "shiftQr_generated": "QR code generated",
+  "shiftQr_generating": "Generating...",
+  "shiftQr_noQrCodes": "No QR codes",
+  "shiftQr_scanInstruction": "Have workers scan this code",
+  "shiftQr_title": "Shift QR Code",
+  "showPassword": "Show password",
+  "signInWithApple": "Sign in with Apple",
+  "signInWithEmail": "Sign in with Email",
+  "signInWithLine": "Sign in with LINE",
+  "skip": "Skip",
+  "sortByNewest": "Newest first",
+  "sortByPriceHigh": "Highest pay first",
+  "startAsGuest": "Continue as Guest",
+  "startOnboarding": "Start Setup",
+  "statementDetail_applyButton": "Apply for early payment",
+  "statementDetail_completedDate": "Completed: {date}",
+  "statementDetail_earlyPaymentButton": "Early payment",
+  "statementDetail_earlyPaymentConfirm": "Apply for early payment? A 10% fee will be deducted. (Amount: ¥{totalAmount}, Fee: ¥{fee}, Payout: ¥{payout})",
+  "statementDetail_earlyPaymentError": "Early payment request failed",
+  "statementDetail_earlyPaymentPending": "Early payment pending",
+  "statementDetail_earlyPaymentSuccess": "Early payment request submitted",
+  "statementDetail_earlyPaymentTitle": "Early Payment",
+  "statementDetail_error": "Error: {error}",
+  "statementDetail_jobDetails": "Job Details",
+  "statementDetail_monthLabel": "{month}",
+  "statementDetail_title": "Statement Details",
+  "statusApplied": "Applied",
+  "statusAssigned": "Assigned",
+  "statusBadge_applied": "Applied",
+  "statusBadge_assigned": "Assigned",
+  "statusBadge_completed": "Completed",
+  "statusBadge_done": "Done",
+  "statusBadge_fixing": "Fixing",
+  "statusBadge_inProgress": "In Progress",
+  "statusBadge_inspection": "Inspection",
+  "statusCancelled": "Cancelled",
+  "statusCompleted": "Completed",
+  "statusPending": "Under Review",
+  "statusRejected": "Rejected",
+  "stripeOnboarding": "Bank Account Setup",
+  "stripeOnboardingDescription": "Set up your bank account to receive payments",
+  "stripeOnboarding_initFailed": "Failed to initialize Stripe",
+  "stripeOnboarding_retry": "Retry",
+  "stripeOnboarding_title": "Stripe Setup",
+  "stripeOnboarding_urlFetchFailed": "Failed to get setup URL",
+  "tabSelected": "Selected",
+  "termsOfService": "Terms of Service",
+  "timeline_empty": "No activity yet",
+  "timeline_error": "Error: {error}",
+  "today": "Today",
+  "tooManyRequests": "Too many requests. Please try again later",
+  "totalEarnings": "Total Earnings",
+  "typeMessage": "Type a message",
+  "unreadCount": "{count} unread",
+  "update": "Update",
+  "userDisabled": "This account has been disabled",
+  "userNotFound": "Account not found",
+  "weakPassword": "Password is too weak. Please use at least 6 characters",
+  "workDetail": "Work Details",
+  "workDetail_chat": "Chat",
+  "workDetail_checkedIn": "Clocked In",
+  "workDetail_checkedOut": "Clocked Out",
+  "workDetail_completeButton": "Complete",
+  "workDetail_jobName": "Job Name",
+  "workDetail_jobNotFound": "Job not found",
+  "workDetail_location": "Location",
+  "workDetail_loginRequired": "Login is required",
+  "workDetail_noJobIdWarning": "* Cannot display original job information because jobId is not set.",
+  "workDetail_noPermission": "You do not have permission to view this job",
+  "workDetail_notCheckedIn": "Not Clocked In",
+  "workDetail_payment": "Payment",
+  "workDetail_paymentUnconfirmed": "Unconfirmed",
+  "workDetail_qrAttendance": "QR Attendance",
+  "workDetail_qrClockIn": "QR Clock In",
+  "workDetail_qrClockOut": "QR Clock Out",
+  "workDetail_rateButton": "Rate",
+  "workDetail_rated": "Rated",
+  "workDetail_reinspect": "Re-inspect",
+  "workDetail_reportRequired": "Please submit at least one daily report to complete",
+  "workDetail_schedule": "Schedule",
+  "workDetail_snackCompleteError": "Failed to complete",
+  "workDetail_snackCompleted": "Work completed",
+  "workDetail_snackStartError": "Failed to start work",
+  "workDetail_snackStarted": "Work started",
+  "workDetail_startButton": "Start Work",
+  "workDetail_startInspection": "Inspect",
+  "workDetail_statusCompleted": "{title} is now \"Completed\"",
+  "workDetail_statusInProgress": "{title} is now \"In Progress\"",
+  "workDetail_statusUpdate": "Status Update",
+  "workDetail_tabDailyReport": "Daily Report",
+  "workDetail_tabDocuments": "Documents",
+  "workDetail_tabOverview": "Overview",
+  "workDetail_tabPhotos": "Photos",
+  "workDetail_timeline": "Timeline",
+  "workDocs_add": "Add",
+  "workDocs_noDocuments": "No documents in \"{folder}\" yet",
+  "workDocs_title": "Documents",
+  "workDocs_uploadFailed": "Upload failed: {error}",
+  "workDocs_uploadSuccess": "Uploaded to {folder}",
+  "workPhotos_add": "Add",
+  "workPhotos_cancel": "Cancel",
+  "workPhotos_delete": "Delete",
+  "workPhotos_deleteConfirm": "Delete this photo?",
+  "workPhotos_deleteSuccess": "Photo deleted",
+  "workPhotos_deleteTitle": "Delete photo",
+  "workPhotos_noPhotos": "No photos yet",
+  "workPhotos_title": "Site Photos",
+  "workPhotos_uploadFailed": "Upload failed: {error}",
+  "workPhotos_uploadHint": "Upload photos using the Add button",
+  "workPhotos_uploadSuccess": "Uploaded {count} photos",
+  "workReportCreate_contentHint": "Describe the work done in detail",
+  "workReportCreate_contentLabel": "Work description",
+  "workReportCreate_contentRequired": "Please enter work description",
+  "workReportCreate_date": "Date",
+  "workReportCreate_hoursLabel": "Hours worked",
+  "workReportCreate_hoursSuffix": "hours",
+  "workReportCreate_hoursValidation": "Please enter hours worked",
+  "workReportCreate_logSubmitted": "Daily report: {title} submitted",
+  "workReportCreate_notesHint": "Enter any special notes",
+  "workReportCreate_notesLabel": "Notes",
+  "workReportCreate_saveFailed": "Failed to save report: {error}",
+  "workReportCreate_submit": "Submit",
+  "workReportCreate_submitted": "Report submitted",
+  "workReportCreate_title": "Create Daily Report",
+  "workReports_addHint": "Create reports using the Add button",
+  "workReports_empty": "No reports yet",
+  "workReports_error": "Error: {error}",
+  "workStatus": "Work Status",
+  "workTitle": "My Work",
+  "work_chatTooltip": "Chat",
+  "work_emptyApplications": "No applications",
+  "work_emptyAssigned": "No assigned jobs",
+  "work_emptyCompleted": "No completed jobs",
+  "work_emptyDefault": "No matching jobs",
+  "work_emptyDone": "No finished jobs",
+  "work_emptyFixing": "No jobs under correction",
+  "work_emptyInProgress": "No jobs in progress",
+  "work_emptyInspection": "No jobs under inspection",
+  "work_featureName": "Work Management",
+  "work_groupApplied": "Applied",
+  "work_groupApproved": "Approved / In Progress",
+  "work_groupCompleted": "Completed / Inspection",
+  "work_noJobs": "None",
+  "work_registrationRequiredDescription": "Register to apply for and manage your jobs.",
+  "work_registrationRequiredTitle": "Registration required to use work management",
+  "work_tabApplications": "Applications",
+  "work_tabAssigned": "Assigned",
+  "work_tabCompleted": "Work Completed",
+  "work_tabDone": "Done",
+  "work_tabFixing": "Under Correction",
+  "work_tabInProgress": "In Progress",
+  "work_tabInspection": "Under Inspection",
+  "workerLabel": "Worker",
+  "wrongPassword": "Incorrect password",
+  "yen": "JPY",
+  "yesterday": "Yesterday"
+}

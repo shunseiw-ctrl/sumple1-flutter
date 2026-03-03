@@ -1,5 +1,272 @@
 import 'package:flutter/material.dart';
 
+/// テーマ対応のカラー拡張
+/// `context.appColors.xxx` でアクセスする
+@immutable
+class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
+  const AppColorsExtension({
+    required this.primary,
+    required this.primaryLight,
+    required this.primaryDark,
+    required this.primaryPale,
+    required this.primarySurface,
+    required this.background,
+    required this.surface,
+    required this.surfaceElevated,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textHint,
+    required this.textOnPrimary,
+    required this.divider,
+    required this.border,
+    required this.borderLight,
+    required this.success,
+    required this.successLight,
+    required this.warning,
+    required this.warningLight,
+    required this.error,
+    required this.errorLight,
+    required this.info,
+    required this.infoLight,
+    required this.chipSelected,
+    required this.chipUnselected,
+    required this.chipTextSelected,
+    required this.chipTextUnselected,
+    required this.cardShadow,
+    required this.elevatedShadow,
+    required this.salaryHighlight,
+    required this.salaryBg,
+    required this.cardGradient,
+    required this.primaryGradient,
+    required this.heroGradient,
+  });
+
+  final Color primary;
+  final Color primaryLight;
+  final Color primaryDark;
+  final Color primaryPale;
+  final Color primarySurface;
+  final Color background;
+  final Color surface;
+  final Color surfaceElevated;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textHint;
+  final Color textOnPrimary;
+  final Color divider;
+  final Color border;
+  final Color borderLight;
+  final Color success;
+  final Color successLight;
+  final Color warning;
+  final Color warningLight;
+  final Color error;
+  final Color errorLight;
+  final Color info;
+  final Color infoLight;
+  final Color chipSelected;
+  final Color chipUnselected;
+  final Color chipTextSelected;
+  final Color chipTextUnselected;
+  final Color cardShadow;
+  final Color elevatedShadow;
+  final Color salaryHighlight;
+  final Color salaryBg;
+  final LinearGradient cardGradient;
+  final LinearGradient primaryGradient;
+  final LinearGradient heroGradient;
+
+  static const light = AppColorsExtension(
+    primary: AppColors.ruri,
+    primaryLight: AppColors.ruriLight,
+    primaryDark: AppColors.ruriDark,
+    primaryPale: AppColors.ruriPale,
+    primarySurface: AppColors.ruriSurface,
+    background: AppColors.background,
+    surface: AppColors.surface,
+    surfaceElevated: AppColors.surfaceElevated,
+    textPrimary: AppColors.textPrimary,
+    textSecondary: AppColors.textSecondary,
+    textHint: AppColors.textHint,
+    textOnPrimary: AppColors.textOnPrimary,
+    divider: AppColors.divider,
+    border: AppColors.border,
+    borderLight: AppColors.borderLight,
+    success: AppColors.success,
+    successLight: AppColors.successLight,
+    warning: AppColors.warning,
+    warningLight: AppColors.warningLight,
+    error: AppColors.error,
+    errorLight: AppColors.errorLight,
+    info: AppColors.info,
+    infoLight: AppColors.infoLight,
+    chipSelected: AppColors.chipSelected,
+    chipUnselected: AppColors.chipUnselected,
+    chipTextSelected: AppColors.chipTextSelected,
+    chipTextUnselected: AppColors.chipTextUnselected,
+    cardShadow: AppColors.cardShadow,
+    elevatedShadow: AppColors.elevatedShadow,
+    salaryHighlight: AppColors.salaryHighlight,
+    salaryBg: AppColors.salaryBg,
+    cardGradient: AppColors.cardGradient,
+    primaryGradient: AppColors.primaryGradient,
+    heroGradient: AppColors.heroGradient,
+  );
+
+  static const dark = AppColorsExtension(
+    primary: AppColors.ruri,
+    primaryLight: AppColors.ruriLight,
+    primaryDark: AppColors.ruriDark,
+    primaryPale: AppDarkColors.ruriPale,
+    primarySurface: AppDarkColors.ruriSurface,
+    background: AppDarkColors.background,
+    surface: AppDarkColors.surface,
+    surfaceElevated: AppDarkColors.surfaceElevated,
+    textPrimary: AppDarkColors.textPrimary,
+    textSecondary: AppDarkColors.textSecondary,
+    textHint: AppDarkColors.textHint,
+    textOnPrimary: AppDarkColors.textOnPrimary,
+    divider: AppDarkColors.divider,
+    border: AppDarkColors.border,
+    borderLight: AppDarkColors.borderLight,
+    success: AppColors.success,
+    successLight: AppColors.successLight,
+    warning: AppColors.warning,
+    warningLight: AppColors.warningLight,
+    error: AppColors.error,
+    errorLight: AppColors.errorLight,
+    info: AppColors.info,
+    infoLight: AppColors.infoLight,
+    chipSelected: AppColors.ruri,
+    chipUnselected: AppDarkColors.chipUnselected,
+    chipTextSelected: Colors.white,
+    chipTextUnselected: AppDarkColors.chipTextUnselected,
+    cardShadow: AppDarkColors.cardShadow,
+    elevatedShadow: AppDarkColors.elevatedShadow,
+    salaryHighlight: AppColors.salaryHighlight,
+    salaryBg: AppDarkColors.salaryBg,
+    cardGradient: AppDarkColors.cardGradient,
+    primaryGradient: AppColors.primaryGradient,
+    heroGradient: AppColors.heroGradient,
+  );
+
+  @override
+  AppColorsExtension copyWith({
+    Color? primary,
+    Color? primaryLight,
+    Color? primaryDark,
+    Color? primaryPale,
+    Color? primarySurface,
+    Color? background,
+    Color? surface,
+    Color? surfaceElevated,
+    Color? textPrimary,
+    Color? textSecondary,
+    Color? textHint,
+    Color? textOnPrimary,
+    Color? divider,
+    Color? border,
+    Color? borderLight,
+    Color? success,
+    Color? successLight,
+    Color? warning,
+    Color? warningLight,
+    Color? error,
+    Color? errorLight,
+    Color? info,
+    Color? infoLight,
+    Color? chipSelected,
+    Color? chipUnselected,
+    Color? chipTextSelected,
+    Color? chipTextUnselected,
+    Color? cardShadow,
+    Color? elevatedShadow,
+    Color? salaryHighlight,
+    Color? salaryBg,
+    LinearGradient? cardGradient,
+    LinearGradient? primaryGradient,
+    LinearGradient? heroGradient,
+  }) {
+    return AppColorsExtension(
+      primary: primary ?? this.primary,
+      primaryLight: primaryLight ?? this.primaryLight,
+      primaryDark: primaryDark ?? this.primaryDark,
+      primaryPale: primaryPale ?? this.primaryPale,
+      primarySurface: primarySurface ?? this.primarySurface,
+      background: background ?? this.background,
+      surface: surface ?? this.surface,
+      surfaceElevated: surfaceElevated ?? this.surfaceElevated,
+      textPrimary: textPrimary ?? this.textPrimary,
+      textSecondary: textSecondary ?? this.textSecondary,
+      textHint: textHint ?? this.textHint,
+      textOnPrimary: textOnPrimary ?? this.textOnPrimary,
+      divider: divider ?? this.divider,
+      border: border ?? this.border,
+      borderLight: borderLight ?? this.borderLight,
+      success: success ?? this.success,
+      successLight: successLight ?? this.successLight,
+      warning: warning ?? this.warning,
+      warningLight: warningLight ?? this.warningLight,
+      error: error ?? this.error,
+      errorLight: errorLight ?? this.errorLight,
+      info: info ?? this.info,
+      infoLight: infoLight ?? this.infoLight,
+      chipSelected: chipSelected ?? this.chipSelected,
+      chipUnselected: chipUnselected ?? this.chipUnselected,
+      chipTextSelected: chipTextSelected ?? this.chipTextSelected,
+      chipTextUnselected: chipTextUnselected ?? this.chipTextUnselected,
+      cardShadow: cardShadow ?? this.cardShadow,
+      elevatedShadow: elevatedShadow ?? this.elevatedShadow,
+      salaryHighlight: salaryHighlight ?? this.salaryHighlight,
+      salaryBg: salaryBg ?? this.salaryBg,
+      cardGradient: cardGradient ?? this.cardGradient,
+      primaryGradient: primaryGradient ?? this.primaryGradient,
+      heroGradient: heroGradient ?? this.heroGradient,
+    );
+  }
+
+  @override
+  AppColorsExtension lerp(AppColorsExtension? other, double t) {
+    if (other is! AppColorsExtension) return this;
+    return AppColorsExtension(
+      primary: Color.lerp(primary, other.primary, t)!,
+      primaryLight: Color.lerp(primaryLight, other.primaryLight, t)!,
+      primaryDark: Color.lerp(primaryDark, other.primaryDark, t)!,
+      primaryPale: Color.lerp(primaryPale, other.primaryPale, t)!,
+      primarySurface: Color.lerp(primarySurface, other.primarySurface, t)!,
+      background: Color.lerp(background, other.background, t)!,
+      surface: Color.lerp(surface, other.surface, t)!,
+      surfaceElevated: Color.lerp(surfaceElevated, other.surfaceElevated, t)!,
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
+      textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textHint: Color.lerp(textHint, other.textHint, t)!,
+      textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t)!,
+      divider: Color.lerp(divider, other.divider, t)!,
+      border: Color.lerp(border, other.border, t)!,
+      borderLight: Color.lerp(borderLight, other.borderLight, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      successLight: Color.lerp(successLight, other.successLight, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      warningLight: Color.lerp(warningLight, other.warningLight, t)!,
+      error: Color.lerp(error, other.error, t)!,
+      errorLight: Color.lerp(errorLight, other.errorLight, t)!,
+      info: Color.lerp(info, other.info, t)!,
+      infoLight: Color.lerp(infoLight, other.infoLight, t)!,
+      chipSelected: Color.lerp(chipSelected, other.chipSelected, t)!,
+      chipUnselected: Color.lerp(chipUnselected, other.chipUnselected, t)!,
+      chipTextSelected: Color.lerp(chipTextSelected, other.chipTextSelected, t)!,
+      chipTextUnselected: Color.lerp(chipTextUnselected, other.chipTextUnselected, t)!,
+      cardShadow: Color.lerp(cardShadow, other.cardShadow, t)!,
+      elevatedShadow: Color.lerp(elevatedShadow, other.elevatedShadow, t)!,
+      salaryHighlight: Color.lerp(salaryHighlight, other.salaryHighlight, t)!,
+      salaryBg: Color.lerp(salaryBg, other.salaryBg, t)!,
+      cardGradient: LinearGradient.lerp(cardGradient, other.cardGradient, t)!,
+      primaryGradient: LinearGradient.lerp(primaryGradient, other.primaryGradient, t)!,
+      heroGradient: LinearGradient.lerp(heroGradient, other.heroGradient, t)!,
+    );
+  }
+}
+
 class AppColors {
   AppColors._();
 

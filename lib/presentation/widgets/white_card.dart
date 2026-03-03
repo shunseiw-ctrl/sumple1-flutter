@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class WhiteCard extends StatelessWidget {
   final Widget child;
@@ -7,7 +8,7 @@ class WhiteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),

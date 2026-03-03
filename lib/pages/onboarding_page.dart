@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/pages/legal_page.dart';
@@ -91,13 +91,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }) {
     return Semantics(
       toggled: value,
-      label: '$label${value ? "、同意済み" : ""}',
+      label: '$label${value ? context.l10n.onboarding_agreed : ""}',
       child: Row(
         children: [
           Checkbox(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.ruri,
+            activeColor: context.appColors.primary,
           ),
           Expanded(
             child: GestureDetector(
@@ -105,7 +105,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Text(
                 label,
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.ruri,
+                  color: context.appColors.primary,
                   decoration: TextDecoration.underline,
                 ),
               ),
@@ -128,7 +128,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final pages = _buildPages(l10n);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.appColors.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -138,7 +138,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 padding: const EdgeInsets.only(right: AppSpacing.base, top: AppSpacing.sm),
                 child: Semantics(
                   button: true,
-                  label: 'オンボーディングをスキップ',
+                  label: context.l10n.onboarding_skip,
                   enabled: !(_currentPage == pages.length - 1 && !_canComplete),
                   child: TextButton(
                     onPressed: (_currentPage == pages.length - 1 && !_canComplete)
@@ -148,8 +148,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       l10n.skip,
                       style: AppTextStyles.labelMedium.copyWith(
                         color: (_currentPage == pages.length - 1 && !_canComplete)
-                            ? AppColors.divider
-                            : AppColors.textSecondary,
+                            ? context.appColors.divider
+                            : context.appColors.textSecondary,
                       ),
                     ),
                   ),
@@ -165,7 +165,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     height: 40,
                     errorBuilder: (_, __, ___) => Text(
                       'ALBAWORK',
-                      style: AppTextStyles.headingLarge.copyWith(color: AppColors.ruri),
+                      style: AppTextStyles.headingLarge.copyWith(color: context.appColors.primary),
                     ),
                   ),
                 ),
@@ -201,7 +201,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Column(
                 children: [
                   Semantics(
-                    label: 'ページ${_currentPage + 1} / ${pages.length}',
+                    label: context.l10n.onboarding_pageIndicator((_currentPage + 1).toString(), pages.length.toString()),
                     child: AnimatedPageIndicator(
                       pageCount: pages.length,
                       currentPage: _currentPage,
@@ -216,9 +216,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: context.appColors.surface.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                            border: Border.all(color: context.appColors.surface.withValues(alpha: 0.2)),
                           ),
                           child: Column(
                             children: [
@@ -227,7 +227,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 label: l10n.agreeToTerms,
                                 onChanged: (v) => setState(() => _termsAccepted = v ?? false),
                                 onTap: () => context.push(RoutePaths.legal, extra: {
-                                  'title': '利用規約',
+                                  'title': context.l10n.onboarding_termsOfService,
                                   'htmlContent': LegalPage.termsHtml,
                                 }),
                               ),
@@ -236,7 +236,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 label: l10n.agreeToPrivacy,
                                 onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
                                 onTap: () => context.push(RoutePaths.legal, extra: {
-                                  'title': 'プライバシーポリシー',
+                                  'title': context.l10n.onboarding_privacyPolicy,
                                   'htmlContent': LegalPage.privacyPolicyHtml,
                                 }),
                               ),
@@ -249,7 +249,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   const SizedBox(height: AppSpacing.xl),
                   Semantics(
                     button: true,
-                    label: _currentPage == pages.length - 1 ? 'アプリを始める' : '次のページへ進む',
+                    label: _currentPage == pages.length - 1 ? context.l10n.onboarding_getStarted : context.l10n.onboarding_nextPage,
                     enabled: !(_currentPage == pages.length - 1 && !_canComplete),
                     child: SizedBox(
                       width: double.infinity,
@@ -258,11 +258,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         decoration: BoxDecoration(
                           gradient: (_currentPage == pages.length - 1 && !_canComplete)
                               ? const LinearGradient(colors: [Colors.grey, Colors.grey])
-                              : AppColors.primaryGradient,
+                              : context.appColors.primaryGradient,
                           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.ruri.withValues(alpha: 0.3),
+                              color: context.appColors.primary.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -316,7 +316,7 @@ class _OnboardingPageContent extends StatelessWidget {
               height: screenHeight * 0.45,
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: AppColors.heroGradient,
+                  gradient: context.appColors.heroGradient,
                   borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
                 ),
                 child: Center(
@@ -344,7 +344,7 @@ class _OnboardingPageContent extends StatelessWidget {
           Text(
             data.description,
             style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+              color: context.appColors.textSecondary,
               height: 1.6,
             ),
             textAlign: TextAlign.center,

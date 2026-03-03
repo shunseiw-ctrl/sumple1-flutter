@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../core/services/line_auth_service.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
@@ -44,10 +45,10 @@ class _ProfilePageState extends State<ProfilePage> {
     final isAnon = _isAnonymous(user);
 
     final displayName = isAnon
-        ? 'ゲスト'
+        ? context.l10n.profile_guest
         : (user?.displayName?.trim().isNotEmpty == true
         ? user!.displayName!.trim()
-        : (user?.email?.trim().isNotEmpty == true ? user!.email!.trim() : 'ログインユーザー'));
+        : (user?.email?.trim().isNotEmpty == true ? user!.email!.trim() : context.l10n.profile_loggedInUser));
 
     return Scaffold(
       body: Center(
@@ -60,14 +61,14 @@ class _ProfilePageState extends State<ProfilePage> {
             index: 0,
             child: Container(
               decoration: BoxDecoration(
-                gradient: AppColors.heroGradient,
+                gradient: context.appColors.heroGradient,
                 borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(3),
                 child: ProfileHeaderCard(
                   displayName: displayName,
-                  subtitle: isAnon ? 'ログインすると応募・チャットが使えます' : 'ログイン済み',
+                  subtitle: isAnon ? context.l10n.profile_loginPromptSubtitle : context.l10n.profile_loggedIn,
                   isLoggedIn: !isAnon,
                 ),
               ),
@@ -79,9 +80,9 @@ class _ProfilePageState extends State<ProfilePage> {
             StaggeredFadeSlide(
               index: 1,
               child: InfoBanner(
-                title: 'ログインが必要です',
-                message: '応募・チャットなど一部機能を利用するにはログインが必要です。',
-                buttonText: 'ログインする',
+                title: context.l10n.profile_loginRequired,
+                message: context.l10n.profile_loginRequiredMessage,
+                buttonText: context.l10n.profile_loginButton,
                 onPressed: _openEmailAuthDialog,
               ),
             ),
@@ -99,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: Semantics(
                 button: true,
-                label: 'LINEアカウントでログインする',
+                label: context.l10n.profile_lineLoginSemanticsLabel,
                 child: SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -109,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                     icon: const Icon(Icons.chat_bubble, size: 20),
                     label: Text(
-                      'LINEでログイン',
+                      context.l10n.profile_lineLoginButton,
                       style: AppTextStyles.button.copyWith(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -132,30 +133,30 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ProfileSectionHeader(title: 'アカウント'),
+                ProfileSectionHeader(title: context.l10n.profile_sectionAccount),
                 ProfileMenuGroup(
                   children: [
                     ProfileMenuTile(
                       icon: Icons.settings_outlined,
-                      iconColor: AppColors.ruri,
-                      title: 'アカウント設定',
+                      iconColor: context.appColors.primary,
+                      title: context.l10n.profile_accountSettings,
                       onTap: () {
                         context.push(RoutePaths.accountSettings);
                       },
                     ),
                     ProfileMenuTile(
                       icon: Icons.badge_outlined,
-                      iconColor: AppColors.info,
-                      title: 'あなたのプロフィール',
+                      iconColor: context.appColors.info,
+                      title: context.l10n.profile_yourProfile,
                       onTap: () {
                         context.push(RoutePaths.myProfile);
                       },
                     ),
                     ProfileMenuTile(
                       icon: Icons.verified_user_outlined,
-                      iconColor: AppColors.success,
-                      title: '本人確認',
-                      subtitle: '身分証明書と顔写真を提出',
+                      iconColor: context.appColors.success,
+                      title: context.l10n.profile_identityVerification,
+                      subtitle: context.l10n.profile_identityVerificationSubtitle,
                       onTap: () {
                         context.push(RoutePaths.identityVerification);
                       },
@@ -163,8 +164,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ProfileMenuTile(
                       icon: Icons.workspace_premium,
                       iconColor: Colors.teal,
-                      title: '資格管理',
-                      subtitle: '保有資格の登録・確認',
+                      title: context.l10n.profile_qualifications,
+                      subtitle: context.l10n.profile_qualificationsSubtitle,
                       onTap: () {
                         context.push(RoutePaths.qualifications);
                       },
@@ -172,8 +173,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ProfileMenuTile(
                       icon: Icons.account_balance_outlined,
                       iconColor: const Color(0xFF635BFF),
-                      title: 'Stripe口座設定',
-                      subtitle: '報酬の受取口座を設定',
+                      title: context.l10n.profile_stripeAccount,
+                      subtitle: context.l10n.profile_stripeAccountSubtitle,
                       onTap: () {
                         context.push(RoutePaths.stripeOnboarding, extra: {
                           'email': user?.email,
@@ -182,9 +183,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     ProfileMenuTile(
                       icon: Icons.card_giftcard_outlined,
-                      iconColor: AppColors.warning,
-                      title: '友達を招待',
-                      subtitle: '紹介コードで友達を招待',
+                      iconColor: context.appColors.warning,
+                      title: context.l10n.profile_inviteFriends,
+                      subtitle: context.l10n.profile_inviteFriendsSubtitle,
                       onTap: () {
                         context.push(RoutePaths.referral);
                       },
@@ -192,8 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ProfileMenuTile(
                       icon: Icons.favorite_outlined,
                       iconColor: Colors.red,
-                      title: 'お気に入り案件',
-                      subtitle: '保存した案件を確認',
+                      title: context.l10n.profile_favoriteJobs,
+                      subtitle: context.l10n.profile_favoriteJobsSubtitle,
                       isLast: true,
                       onTap: () {
                         context.push(RoutePaths.favorites);
@@ -211,21 +212,21 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ProfileSectionHeader(title: 'サポート'),
+                ProfileSectionHeader(title: context.l10n.profile_sectionSupport),
                 ProfileMenuGroup(
                   children: [
                     ProfileMenuTile(
                       icon: Icons.help_outline,
-                      iconColor: AppColors.warning,
-                      title: 'よくある質問',
+                      iconColor: context.appColors.warning,
+                      title: context.l10n.profile_faq,
                       onTap: () {
                         context.push(RoutePaths.faq);
                       },
                     ),
                     ProfileMenuTile(
                       icon: Icons.mail_outline,
-                      iconColor: AppColors.ruri,
-                      title: 'お問い合わせ',
+                      iconColor: context.appColors.primary,
+                      title: context.l10n.profile_contact,
                       isLast: true,
                       onTap: () {
                         context.push(RoutePaths.contact);
@@ -243,23 +244,21 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ProfileSectionHeader(title: 'その他'),
+                ProfileSectionHeader(title: context.l10n.profile_sectionOther),
                 ProfileMenuGroup(
                   children: [
                     ProfileMenuTile(
                       icon: Icons.dark_mode_outlined,
-                      iconColor: AppColors.ruri,
-                      title: 'ダークモード',
-                      subtitle: 'システム設定に従う',
+                      iconColor: context.appColors.primary,
+                      title: context.l10n.profile_darkMode,
+                      subtitle: context.l10n.profile_darkModeSubtitle,
                       onTap: () {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('ダークモード'),
-                            content: const Text(
-                              'ダークモードはお使いの端末のシステム設定に連動しています。\n\n'
-                              'iOS: 設定 → 画面表示と明るさ\n'
-                              'Android: 設定 → ディスプレイ → ダークテーマ',
+                            title: Text(context.l10n.profile_darkMode),
+                            content: Text(
+                              context.l10n.profile_darkModeDescription,
                             ),
                             actions: [
                               TextButton(
@@ -273,9 +272,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     ProfileMenuTile(
                       icon: Icons.gavel_outlined,
-                      iconColor: AppColors.textSecondary,
-                      title: '法的情報',
-                      subtitle: 'プライバシーポリシー・利用規約・法令情報',
+                      iconColor: context.appColors.textSecondary,
+                      title: context.l10n.profile_legalInfo,
+                      subtitle: context.l10n.profile_legalInfoSubtitle,
                       isLast: true,
                       onTap: () {
                         context.push(RoutePaths.legalIndex);
@@ -293,23 +292,23 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ProfileSectionHeader(title: '管理者'),
+                ProfileSectionHeader(title: context.l10n.profile_sectionAdmin),
                 ProfileMenuGroup(
                   children: [
                     ProfileMenuTile(
                       icon: Icons.admin_panel_settings_outlined,
-                      iconColor: AppColors.ruriDark,
-                      title: '管理者ログイン',
-                      subtitle: '案件の投稿・編集ができます',
+                      iconColor: context.appColors.primaryDark,
+                      title: context.l10n.profile_adminLogin,
+                      subtitle: context.l10n.profile_adminLoginSubtitle,
                       onTap: () {
                         context.push(RoutePaths.adminLogin);
                       },
                     ),
                     ProfileMenuTile(
                       icon: Icons.logout,
-                      iconColor: AppColors.error,
-                      title: '管理者ログアウト',
-                      subtitle: isAnon ? '現在ログインしていません' : 'ログアウトして一般ユーザー表示に戻す',
+                      iconColor: context.appColors.error,
+                      title: context.l10n.profile_adminLogout,
+                      subtitle: isAnon ? context.l10n.profile_notLoggedIn : context.l10n.profile_adminLogoutSubtitle,
                       isLast: true,
                       onTap: () async {
                         final auth = FirebaseAuth.instance;
@@ -319,7 +318,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         if (!context.mounted) return;
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('ログアウトしました（ゲストに戻りました）')),
+                          SnackBar(content: Text(context.l10n.profile_snackLoggedOut)),
                         );
                       },
                     ),

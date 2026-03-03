@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class AnimatedPageIndicator extends StatelessWidget {
   final int pageCount;
@@ -29,8 +29,8 @@ class AnimatedPageIndicator extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             color: isActive
-                ? (activeColor ?? AppColors.ruri)
-                : (inactiveColor ?? AppColors.divider),
+                ? (activeColor ?? context.appColors.primary)
+                : (inactiveColor ?? context.appColors.divider),
           ),
         );
       }),

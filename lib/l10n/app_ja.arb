@@ -1,778 +1,2653 @@
 {
   "@@locale": "ja",
-
-  "appName": "ALBAWORK",
-  "@appName": { "description": "アプリ名" },
-
-  "navHome": "ホーム",
-  "@navHome": { "description": "BottomNavigation: ホーム" },
-
-  "navWork": "仕事",
-  "@navWork": { "description": "BottomNavigation: 仕事" },
-
-  "navMessages": "メッセージ",
-  "@navMessages": { "description": "BottomNavigation: メッセージ" },
-
-  "navSales": "売上",
-  "@navSales": { "description": "BottomNavigation: 売上" },
-
-  "navProfile": "プロフィール",
-  "@navProfile": { "description": "BottomNavigation: プロフィール" },
-
-  "navSearch": "検索",
-  "@navSearch": { "description": "BottomNavigation: 検索" },
-
-  "navMyPage": "マイページ",
-  "@navMyPage": { "description": "BottomNavigation: マイページ" },
-
-  "cancel": "キャンセル",
-  "@cancel": { "description": "汎用キャンセルボタン" },
-
-  "save": "保存",
-  "@save": { "description": "汎用保存ボタン" },
-
-  "delete": "削除",
-  "@delete": { "description": "汎用削除ボタン" },
-
-  "confirm": "確認",
-  "@confirm": { "description": "汎用確認ボタン" },
-
-  "close": "閉じる",
-  "@close": { "description": "汎用閉じるボタン" },
-
-  "send": "送信",
-  "@send": { "description": "汎用送信ボタン" },
-
-  "edit": "編集",
-  "@edit": { "description": "汎用編集ボタン" },
-
-  "update": "更新",
-  "@update": { "description": "汎用更新ボタン" },
-
-  "back": "戻る",
-  "@back": { "description": "汎用戻るボタン" },
-
-  "search": "検索",
-  "@search": { "description": "汎用検索" },
-
-  "apply": "応募する",
-  "@apply": { "description": "応募ボタン" },
-
-  "skip": "スキップ",
-  "@skip": { "description": "オンボーディング: スキップ" },
-
-  "next": "次へ",
-  "@next": { "description": "オンボーディング: 次へ" },
-
-  "getStarted": "始める",
-  "@getStarted": { "description": "オンボーディング: 始める" },
-
-  "retry": "再試行",
-  "@retry": { "description": "エラー時のリトライボタン" },
-
-  "loading": "読み込み中...",
-  "@loading": { "description": "ローディング表示" },
-
-  "noData": "データがありません",
-  "@noData": { "description": "データなし表示" },
-
-  "login": "ログイン",
-  "@login": { "description": "ログインボタン" },
-
-  "logout": "ログアウト",
-  "@logout": { "description": "ログアウトボタン" },
-
-  "register": "新規登録",
-  "@register": { "description": "新規登録ボタン" },
-
-  "email": "メールアドレス",
-  "@email": { "description": "メールアドレスラベル" },
-
-  "password": "パスワード",
-  "@password": { "description": "パスワードラベル" },
-
-  "displayName": "表示名",
-  "@displayName": { "description": "表示名ラベル" },
-
-  "signInWithApple": "Appleでサインイン",
-  "@signInWithApple": { "description": "Apple Sign In ボタン" },
-
-  "signInWithLine": "LINEでログイン",
-  "@signInWithLine": { "description": "LINE ログインボタン" },
-
-  "signInWithEmail": "メールアドレスでログイン",
-  "@signInWithEmail": { "description": "メールログインボタン" },
-
-  "startAsGuest": "ゲストとして始める",
-  "@startAsGuest": { "description": "ゲストログインボタン" },
-
-  "guestLoginSuccess": "ゲストとしてログインしました",
-  "@guestLoginSuccess": { "description": "ゲストログイン成功メッセージ" },
-
-  "appleLoginSuccess": "Appleでログインしました",
-  "@appleLoginSuccess": { "description": "Appleログイン成功メッセージ" },
-
-  "appTagline": "建設業界の仕事マッチングアプリ",
-  "@appTagline": { "description": "アプリのキャッチコピー" },
-
-  "featureSearch": "仕事を探す",
-  "@featureSearch": { "description": "特徴カード: 検索" },
-
-  "featureQuickEarn": "すぐに稼げる",
-  "@featureQuickEarn": { "description": "特徴カード: 即収入" },
-
-  "featureSecurePayment": "安心の支払い",
-  "@featureSecurePayment": { "description": "特徴カード: 安全決済" },
-
-  "termsOfService": "利用規約",
-  "@termsOfService": { "description": "利用規約リンク" },
-
-  "privacyPolicy": "プライバシーポリシー",
-  "@privacyPolicy": { "description": "プライバシーポリシーリンク" },
-
-  "statusApplied": "応募中",
-  "@statusApplied": { "description": "ステータス: 応募済み" },
-
-  "statusAssigned": "確定",
-  "@statusAssigned": { "description": "ステータス: 確定" },
-
-  "statusCompleted": "完了",
-  "@statusCompleted": { "description": "ステータス: 完了" },
-
-  "statusCancelled": "キャンセル",
-  "@statusCancelled": { "description": "ステータス: キャンセル" },
-
-  "statusPending": "審査中",
-  "@statusPending": { "description": "ステータス: 審査中" },
-
-  "statusRejected": "不採用",
-  "@statusRejected": { "description": "ステータス: 不採用" },
-
-  "accountSettings": "アカウント設定",
-  "@accountSettings": { "description": "アカウント設定ページタイトル" },
-
-  "deleteAccount": "アカウントを削除",
-  "@deleteAccount": { "description": "アカウント削除ボタン" },
-
-  "downloadData": "データをダウンロード",
-  "@downloadData": { "description": "データダウンロードボタン" },
-
-  "agreeToTerms": "利用規約に同意する",
-  "@agreeToTerms": { "description": "利用規約同意チェック" },
-
-  "agreeToPrivacy": "プライバシーポリシーに同意する",
-  "@agreeToPrivacy": { "description": "プライバシーポリシー同意チェック" },
-
-  "changePassword": "パスワードを変更",
-  "@changePassword": { "description": "パスワード変更ボタン" },
-
-  "errorGeneric": "エラーが発生しました",
-  "@errorGeneric": { "description": "汎用エラーメッセージ" },
-
-  "errorNetwork": "ネットワークエラーが発生しました",
-  "@errorNetwork": { "description": "ネットワークエラーメッセージ" },
-
-  "errorNetworkTitle": "ネットワークエラー",
-  "@errorNetworkTitle": { "description": "ネットワークエラータイトル" },
-
-  "errorNetworkMessage": "インターネット接続を確認して\nもう一度お試しください",
-  "@errorNetworkMessage": { "description": "ネットワークエラー詳細メッセージ" },
-
-  "errorTimeout": "タイムアウト",
-  "@errorTimeout": { "description": "タイムアウトエラータイトル" },
-
-  "errorTimeoutMessage": "サーバーへの接続に時間がかかっています\nもう一度お試しください",
-  "@errorTimeoutMessage": { "description": "タイムアウトエラー詳細メッセージ" },
-
-  "errorDefaultMessage": "しばらく経ってからもう一度お試しください",
-  "@errorDefaultMessage": { "description": "汎用エラー詳細メッセージ" },
-
-  "errorDataNotFound": "データが見つかりません",
-  "@errorDataNotFound": { "description": "データ未検出タイトル" },
-
-  "errorSearchRetry": "条件を変更して再検索してください",
-  "@errorSearchRetry": { "description": "検索リトライメッセージ" },
-
-  "errorLabel": "エラー",
-  "@errorLabel": { "description": "コンパクトエラーラベル" },
-
-  "adminBadge": "管理者",
-  "@adminBadge": { "description": "管理者バッジ" },
-
-  "notifications": "お知らせ",
-  "@notifications": { "description": "お知らせタイトル" },
-
-  "postJob": "案件を投稿",
-  "@postJob": { "description": "案件投稿ボタン" },
-
-  "emailAlreadyInUse": "このメールアドレスは既に登録されています",
-  "@emailAlreadyInUse": { "description": "メール重複エラー" },
-
-  "wrongPassword": "パスワードが正しくありません",
-  "@wrongPassword": { "description": "パスワード不正エラー" },
-
-  "userNotFound": "アカウントが見つかりません",
-  "@userNotFound": { "description": "アカウント未検出エラー" },
-
-  "invalidEmail": "メールアドレスの形式が正しくありません",
-  "@invalidEmail": { "description": "メール形式エラー" },
-
-  "userDisabled": "このアカウントは無効化されています",
-  "@userDisabled": { "description": "アカウント無効エラー" },
-
-  "tooManyRequests": "リクエストが多すぎます。しばらくしてからお試しください",
-  "@tooManyRequests": { "description": "リクエスト過多エラー" },
-
-  "weakPassword": "パスワードが弱すぎます。6文字以上で設定してください",
-  "@weakPassword": { "description": "弱パスワードエラー" },
-
-  "networkCheckConnection": "ネットワーク接続を確認してください",
-  "@networkCheckConnection": { "description": "ネットワーク確認メッセージ" },
-
-  "authError": "認証エラーが発生しました",
-  "@authError": { "description": "認証エラー" },
-
-  "loginSuccess": "ログインしました",
-  "@loginSuccess": { "description": "ログイン成功メッセージ" },
-
-  "registerSuccess": "アカウントを作成しました",
-  "@registerSuccess": { "description": "登録成功メッセージ" },
-
-  "passwordResetSent": "パスワードリセットメールを送信しました",
-  "@passwordResetSent": { "description": "パスワードリセットメール送信" },
-
-  "forgotPassword": "パスワードを忘れた方",
-  "@forgotPassword": { "description": "パスワード忘れリンク" },
-
-  "passwordResetTitle": "パスワードリセット",
-  "@passwordResetTitle": { "description": "パスワードリセットタイトル" },
-
-  "passwordResetDescription": "登録されたメールアドレスにリセットリンクを送信します",
-  "@passwordResetDescription": { "description": "パスワードリセット説明" },
-
-  "sendResetLink": "リセットリンクを送信",
-  "@sendResetLink": { "description": "リセットリンク送信ボタン" },
-
-  "showPassword": "パスワードを表示",
-  "@showPassword": { "description": "パスワード表示切替" },
-
-  "hidePassword": "パスワードを非表示",
-  "@hidePassword": { "description": "パスワード非表示切替" },
-
-  "jobListTitle": "仕事一覧",
-  "@jobListTitle": { "description": "仕事一覧ページタイトル" },
-
-  "jobDetail": "案件詳細",
-  "@jobDetail": { "description": "案件詳細タイトル" },
-
-  "jobTitle": "案件名",
-  "@jobTitle": { "description": "案件名ラベル" },
-
-  "jobLocation": "勤務地",
-  "@jobLocation": { "description": "勤務地ラベル" },
-
-  "jobDate": "勤務日",
-  "@jobDate": { "description": "勤務日ラベル" },
-
-  "jobPrice": "報酬",
-  "@jobPrice": { "description": "報酬ラベル" },
-
-  "jobDescription": "仕事内容",
-  "@jobDescription": { "description": "仕事内容ラベル" },
-
-  "jobNotes": "備考",
-  "@jobNotes": { "description": "備考ラベル" },
-
-  "jobOverview": "概要",
-  "@jobOverview": { "description": "概要ラベル" },
-
-  "noJobsFound": "条件に合う仕事が見つかりません",
-  "@noJobsFound": { "description": "仕事なしメッセージ" },
-
-  "searchJobs": "仕事を検索",
-  "@searchJobs": { "description": "仕事検索ヒント" },
-
-  "filterByPrefecture": "都道府県で絞り込み",
-  "@filterByPrefecture": { "description": "都道府県フィルター" },
-
-  "allPrefectures": "全国",
-  "@allPrefectures": { "description": "全都道府県" },
-
-  "sortByNewest": "新着順",
-  "@sortByNewest": { "description": "新着順ソート" },
-
-  "sortByPriceHigh": "報酬が高い順",
-  "@sortByPriceHigh": { "description": "報酬高い順ソート" },
-
-  "applyForJob": "この案件に応募する",
-  "@applyForJob": { "description": "案件応募ボタン" },
-
-  "alreadyApplied": "応募済み",
-  "@alreadyApplied": { "description": "応募済み表示" },
-
-  "applicationSuccess": "応募が完了しました",
-  "@applicationSuccess": { "description": "応募成功メッセージ" },
-
-  "applicationConfirm": "この案件に応募しますか？",
-  "@applicationConfirm": { "description": "応募確認メッセージ" },
-
-  "guestCannotApply": "ゲストは応募できません。ログインしてください",
-  "@guestCannotApply": { "description": "ゲスト応募不可メッセージ" },
-
-  "workTitle": "はたらく",
-  "@workTitle": { "description": "はたらくページタイトル" },
-
-  "workDetail": "仕事詳細",
-  "@workDetail": { "description": "仕事詳細タイトル" },
-
-  "checkIn": "出勤",
-  "@checkIn": { "description": "出勤ボタン" },
-
-  "checkOut": "退勤",
-  "@checkOut": { "description": "退勤ボタン" },
-
-  "checkedIn": "出勤済み",
-  "@checkedIn": { "description": "出勤済み表示" },
-
-  "checkedOut": "退勤済み",
-  "@checkedOut": { "description": "退勤済み表示" },
-
-  "checkInSuccess": "出勤しました",
-  "@checkInSuccess": { "description": "出勤成功メッセージ" },
-
-  "checkOutSuccess": "退勤しました",
-  "@checkOutSuccess": { "description": "退勤成功メッセージ" },
-
-  "noWork": "現在の仕事はありません",
-  "@noWork": { "description": "仕事なしメッセージ" },
-
-  "workStatus": "勤務状況",
-  "@workStatus": { "description": "勤務状況ラベル" },
-
-  "projectName": "案件名",
-  "@projectName": { "description": "プロジェクト名" },
-
-  "profileTitle": "マイページ",
-  "@profileTitle": { "description": "マイページタイトル" },
-
-  "editProfile": "プロフィール編集",
-  "@editProfile": { "description": "プロフィール編集" },
-
-  "myProfile": "プロフィール",
-  "@myProfile": { "description": "マイプロフィール" },
-
-  "name": "氏名",
-  "@name": { "description": "氏名ラベル" },
-
-  "familyName": "姓",
-  "@familyName": { "description": "姓ラベル" },
-
-  "givenName": "名",
-  "@givenName": { "description": "名ラベル" },
-
-  "familyNameKana": "姓（カナ）",
-  "@familyNameKana": { "description": "姓カナラベル" },
-
-  "givenNameKana": "名（カナ）",
-  "@givenNameKana": { "description": "名カナラベル" },
-
-  "phone": "電話番号",
-  "@phone": { "description": "電話番号ラベル" },
-
-  "birthDate": "生年月日",
-  "@birthDate": { "description": "生年月日ラベル" },
-
-  "gender": "性別",
-  "@gender": { "description": "性別ラベル" },
-
-  "genderMale": "男性",
-  "@genderMale": { "description": "男性" },
-
-  "genderFemale": "女性",
-  "@genderFemale": { "description": "女性" },
-
-  "genderOther": "その他",
-  "@genderOther": { "description": "その他" },
-
-  "postalCode": "郵便番号",
-  "@postalCode": { "description": "郵便番号ラベル" },
-
-  "address": "住所",
-  "@address": { "description": "住所ラベル" },
-
-  "introduction": "自己紹介",
-  "@introduction": { "description": "自己紹介ラベル" },
-
-  "experienceYears": "経験年数",
-  "@experienceYears": { "description": "経験年数ラベル" },
-
-  "qualifications": "資格",
-  "@qualifications": { "description": "資格ラベル" },
-
-  "profileSaved": "プロフィールを保存しました",
-  "@profileSaved": { "description": "プロフィール保存成功" },
-
-  "profilePhotoChange": "写真を変更",
-  "@profilePhotoChange": { "description": "プロフィール写真変更" },
-
-  "adminLogin": "管理者ログイン",
-  "@adminLogin": { "description": "管理者ログインタイトル" },
-
-  "adminLoginDescription": "管理者パスワードを入力してください",
-  "@adminLoginDescription": { "description": "管理者ログイン説明" },
-
-  "adminPassword": "管理者パスワード",
-  "@adminPassword": { "description": "管理者パスワードラベル" },
-
-  "adminHome": "管理者ダッシュボード",
-  "@adminHome": { "description": "管理者ホームタイトル" },
-
-  "adminJobManagement": "案件管理",
-  "@adminJobManagement": { "description": "案件管理メニュー" },
-
-  "adminApplications": "応募管理",
-  "@adminApplications": { "description": "応募管理メニュー" },
-
-  "adminPayments": "決済管理",
-  "@adminPayments": { "description": "決済管理メニュー" },
-
-  "adminUsers": "ユーザー管理",
-  "@adminUsers": { "description": "ユーザー管理メニュー" },
-
-  "messagesTitle": "メッセージ",
-  "@messagesTitle": { "description": "メッセージページタイトル" },
-
-  "noMessages": "メッセージはありません",
-  "@noMessages": { "description": "メッセージなし" },
-
-  "typeMessage": "メッセージを入力",
-  "@typeMessage": { "description": "メッセージ入力ヒント" },
-
-  "salesTitle": "売上",
-  "@salesTitle": { "description": "売上ページタイトル" },
-
-  "totalEarnings": "合計報酬",
-  "@totalEarnings": { "description": "合計報酬ラベル" },
-
-  "earningsDetail": "売上詳細",
-  "@earningsDetail": { "description": "売上詳細タイトル" },
-
-  "createEarnings": "売上を登録",
-  "@createEarnings": { "description": "売上登録ボタン" },
-
-  "amount": "金額",
-  "@amount": { "description": "金額ラベル" },
-
-  "payoutDate": "支払い日",
-  "@payoutDate": { "description": "支払い日ラベル" },
-
-  "noEarnings": "売上データがありません",
-  "@noEarnings": { "description": "売上なしメッセージ" },
-
-  "earningsCreated": "売上を登録しました",
-  "@earningsCreated": { "description": "売上登録成功" },
-
-  "noNotifications": "お知らせはありません",
-  "@noNotifications": { "description": "通知なしメッセージ" },
-
-  "markAsRead": "既読にする",
-  "@markAsRead": { "description": "既読マークボタン" },
-
-  "contactTitle": "お問い合わせ",
-  "@contactTitle": { "description": "お問い合わせタイトル" },
-
-  "contactSubject": "件名",
-  "@contactSubject": { "description": "件名ラベル" },
-
-  "contactBody": "お問い合わせ内容",
-  "@contactBody": { "description": "問い合わせ内容ラベル" },
-
-  "contactCategory": "カテゴリ",
-  "@contactCategory": { "description": "カテゴリラベル" },
-
-  "contactSent": "お問い合わせを送信しました",
-  "@contactSent": { "description": "問い合わせ送信成功" },
-
-  "contactCategoryGeneral": "一般",
-  "@contactCategoryGeneral": { "description": "カテゴリ: 一般" },
-
-  "contactCategoryBug": "不具合報告",
-  "@contactCategoryBug": { "description": "カテゴリ: 不具合" },
-
-  "contactCategoryFeature": "機能要望",
-  "@contactCategoryFeature": { "description": "カテゴリ: 機能要望" },
-
-  "contactCategoryPayment": "お支払い",
-  "@contactCategoryPayment": { "description": "カテゴリ: 支払い" },
-
-  "contactCategoryOther": "その他",
-  "@contactCategoryOther": { "description": "カテゴリ: その他" },
-
-  "faqTitle": "よくある質問",
-  "@faqTitle": { "description": "FAQタイトル" },
-
-  "paymentDetail": "決済詳細",
-  "@paymentDetail": { "description": "決済詳細タイトル" },
-
-  "paymentStatus": "決済状況",
-  "@paymentStatus": { "description": "決済状況ラベル" },
-
-  "paymentSucceeded": "決済完了",
-  "@paymentSucceeded": { "description": "決済成功" },
-
-  "paymentFailed": "決済失敗",
-  "@paymentFailed": { "description": "決済失敗" },
-
-  "paymentPending": "決済待ち",
-  "@paymentPending": { "description": "決済待ち" },
-
-  "platformFee": "プラットフォーム手数料",
-  "@platformFee": { "description": "手数料ラベル" },
-
-  "netAmount": "振込金額",
-  "@netAmount": { "description": "振込金額ラベル" },
-
-  "stripeOnboarding": "口座設定",
-  "@stripeOnboarding": { "description": "Stripe口座設定タイトル" },
-
-  "stripeOnboardingDescription": "報酬を受け取るために口座情報を設定してください",
-  "@stripeOnboardingDescription": { "description": "Stripe設定説明" },
-
-  "startOnboarding": "口座設定を開始",
-  "@startOnboarding": { "description": "口座設定開始ボタン" },
-
-  "qrCheckIn": "QR出勤",
-  "@qrCheckIn": { "description": "QR出勤タイトル" },
-
-  "scanQrCode": "QRコードをスキャン",
-  "@scanQrCode": { "description": "QRスキャン説明" },
-
-  "shiftQr": "シフトQR",
-  "@shiftQr": { "description": "シフトQRタイトル" },
-
-  "identityVerification": "本人確認",
-  "@identityVerification": { "description": "本人確認タイトル" },
-
-  "jobEditTitle": "案件編集",
-  "@jobEditTitle": { "description": "案件編集タイトル" },
-
-  "jobCreateTitle": "案件作成",
-  "@jobCreateTitle": { "description": "案件作成タイトル" },
-
-  "jobSaved": "案件を保存しました",
-  "@jobSaved": { "description": "案件保存成功" },
-
-  "jobDeleted": "案件を削除しました",
-  "@jobDeleted": { "description": "案件削除成功" },
-
-  "deleteJobConfirm": "この案件を削除しますか？",
-  "@deleteJobConfirm": { "description": "案件削除確認" },
-
-  "deleteAccountConfirm": "アカウントを削除しますか？この操作は取り消せません。",
-  "@deleteAccountConfirm": { "description": "アカウント削除確認" },
-
-  "deleteAccountTitle": "アカウント削除",
-  "@deleteAccountTitle": { "description": "アカウント削除タイトル" },
-
-  "deleteAccountSuccess": "アカウントを削除しました",
-  "@deleteAccountSuccess": { "description": "アカウント削除成功" },
-
-  "dataExportSuccess": "データをエクスポートしました",
-  "@dataExportSuccess": { "description": "データエクスポート成功" },
-
-  "logoutConfirm": "ログアウトしますか？",
-  "@logoutConfirm": { "description": "ログアウト確認" },
-
-  "logoutSuccess": "ログアウトしました",
-  "@logoutSuccess": { "description": "ログアウト成功" },
-
-  "currentPassword": "現在のパスワード",
-  "@currentPassword": { "description": "現在のパスワードラベル" },
-
-  "newPassword": "新しいパスワード",
-  "@newPassword": { "description": "新しいパスワードラベル" },
-
-  "confirmPassword": "パスワード確認",
-  "@confirmPassword": { "description": "パスワード確認ラベル" },
-
-  "passwordChanged": "パスワードを変更しました",
-  "@passwordChanged": { "description": "パスワード変更成功" },
-
-  "changeName": "名前を変更",
-  "@changeName": { "description": "名前変更ボタン" },
-
-  "nameChanged": "名前を変更しました",
-  "@nameChanged": { "description": "名前変更成功" },
-
-  "prefecture": "都道府県",
-  "@prefecture": { "description": "都道府県ラベル" },
-
-  "dateSelect": "日付を選択",
-  "@dateSelect": { "description": "日付選択" },
-
-  "required": "必須",
-  "@required": { "description": "必須ラベル" },
-
-  "optional": "任意",
-  "@optional": { "description": "任意ラベル" },
-
-  "yen": "円",
-  "@yen": { "description": "円" },
-
-  "itemCount": "{count}件",
+  "@accountSettings": {
+    "description": "アカウント設定ページタイトル"
+  },
+  "@accountSettings_snackDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackDeleteFailedGeneric": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackExportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackPasswordChangeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@accountSettings_snackUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@address": {
+    "description": "住所ラベル"
+  },
+  "@adminApplicants_bulkApproveConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproveCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_bulkApproved": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_changeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_changeStatusConfirm": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_noApplicantsForStatus": {
+    "placeholders": {
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_qualityScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_statusChanged": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplicants_statusUpdateNotifBody": {
+    "placeholders": {
+      "jobTitle": {
+        "type": "String"
+      },
+      "statusLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminApplications": {
+    "description": "応募管理メニュー"
+  },
+  "@adminBadge": {
+    "description": "管理者バッジ"
+  },
+  "@adminDashboard_alertCount": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_loadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_notifyRejectedBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_requestDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminEarlyPayments_yenFormat": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminHome": {
+    "description": "管理者ホームタイトル"
+  },
+  "@adminIdentityVerification_approveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminIdentityVerification_rejectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminJobManagement": {
+    "description": "案件管理メニュー"
+  },
+  "@adminJobManagement_applicantCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminLogin": {
+    "description": "管理者ログインタイトル"
+  },
+  "@adminLoginDescription": {
+    "description": "管理者ログイン説明"
+  },
+  "@adminLogin_lockoutMessage": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminPassword": {
+    "description": "管理者パスワードラベル"
+  },
+  "@adminPayments": {
+    "description": "決済管理メニュー"
+  },
+  "@adminQualifications_approveSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminQualifications_category": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminQualifications_rejectSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@adminUsers": {
+    "description": "ユーザー管理メニュー"
+  },
+  "@agreeToPrivacy": {
+    "description": "プライバシーポリシー同意チェック"
+  },
+  "@agreeToTerms": {
+    "description": "利用規約同意チェック"
+  },
+  "@allPrefectures": {
+    "description": "全都道府県"
+  },
+  "@alreadyApplied": {
+    "description": "応募済み表示"
+  },
+  "@amount": {
+    "description": "金額ラベル"
+  },
+  "@appName": {
+    "description": "アプリ名"
+  },
+  "@appTagline": {
+    "description": "アプリのキャッチコピー"
+  },
+  "@appleLoginSuccess": {
+    "description": "Appleログイン成功メッセージ"
+  },
+  "@applicant": {
+    "description": "応募者ラベル"
+  },
+  "@applicationConfirm": {
+    "description": "応募確認メッセージ"
+  },
+  "@applicationDate": {
+    "description": "応募日ラベル"
+  },
+  "@applicationSuccess": {
+    "description": "応募成功メッセージ"
+  },
+  "@apply": {
+    "description": "応募ボタン"
+  },
+  "@applyForJob": {
+    "description": "案件応募ボタン"
+  },
+  "@authError": {
+    "description": "認証エラー"
+  },
+  "@back": {
+    "description": "汎用戻るボタン"
+  },
+  "@birthDate": {
+    "description": "生年月日ラベル"
+  },
+  "@cameraPermissionRequired": {
+    "description": "カメラ許可要求"
+  },
+  "@cancel": {
+    "description": "汎用キャンセルボタン"
+  },
+  "@changeName": {
+    "description": "名前変更ボタン"
+  },
+  "@changePassword": {
+    "description": "パスワード変更ボタン"
+  },
+  "@chatWith": {
+    "description": "チャットタイトル"
+  },
+  "@checkIn": {
+    "description": "出勤ボタン"
+  },
+  "@checkInSuccess": {
+    "description": "出勤成功メッセージ"
+  },
+  "@checkOut": {
+    "description": "退勤ボタン"
+  },
+  "@checkOutSuccess": {
+    "description": "退勤成功メッセージ"
+  },
+  "@checkedIn": {
+    "description": "出勤済み表示"
+  },
+  "@checkedOut": {
+    "description": "退勤済み表示"
+  },
+  "@close": {
+    "description": "汎用閉じるボタン"
+  },
+  "@common_loadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@confirm": {
+    "description": "汎用確認ボタン"
+  },
+  "@confirmPassword": {
+    "description": "パスワード確認ラベル"
+  },
+  "@contactBody": {
+    "description": "問い合わせ内容ラベル"
+  },
+  "@contactCategory": {
+    "description": "カテゴリラベル"
+  },
+  "@contactCategoryBug": {
+    "description": "カテゴリ: 不具合"
+  },
+  "@contactCategoryFeature": {
+    "description": "カテゴリ: 機能要望"
+  },
+  "@contactCategoryGeneral": {
+    "description": "カテゴリ: 一般"
+  },
+  "@contactCategoryOther": {
+    "description": "カテゴリ: その他"
+  },
+  "@contactCategoryPayment": {
+    "description": "カテゴリ: 支払い"
+  },
+  "@contactSent": {
+    "description": "問い合わせ送信成功"
+  },
+  "@contactSubject": {
+    "description": "件名ラベル"
+  },
+  "@contactTitle": {
+    "description": "お問い合わせタイトル"
+  },
+  "@createEarnings": {
+    "description": "売上登録ボタン"
+  },
+  "@currentPassword": {
+    "description": "現在のパスワードラベル"
+  },
+  "@dataExportSuccess": {
+    "description": "データエクスポート成功"
+  },
+  "@dateSelect": {
+    "description": "日付選択"
+  },
+  "@delete": {
+    "description": "汎用削除ボタン"
+  },
+  "@deleteAccount": {
+    "description": "アカウント削除ボタン"
+  },
+  "@deleteAccountConfirm": {
+    "description": "アカウント削除確認"
+  },
+  "@deleteAccountSuccess": {
+    "description": "アカウント削除成功"
+  },
+  "@deleteAccountTitle": {
+    "description": "アカウント削除タイトル"
+  },
+  "@deleteJobConfirm": {
+    "description": "案件削除確認"
+  },
+  "@dispatchLaw": {
+    "description": "派遣法ページタイトル"
+  },
+  "@displayName": {
+    "description": "表示名ラベル"
+  },
+  "@downloadData": {
+    "description": "データダウンロードボタン"
+  },
+  "@earningsCreate_registerFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreate_stripeCreated": {
+    "placeholders": {
+      "paymentId": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreate_stripeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@earningsCreated": {
+    "description": "売上登録成功"
+  },
+  "@earningsDetail": {
+    "description": "売上詳細タイトル"
+  },
+  "@edit": {
+    "description": "汎用編集ボタン"
+  },
+  "@editProfile": {
+    "description": "プロフィール編集"
+  },
+  "@ekycApproveConfirm": {
+    "description": "承認確認ダイアログ"
+  },
+  "@ekycApproved": {
+    "description": "承認通知"
+  },
+  "@ekycDocumentType": {
+    "description": "身分証タイプ選択"
+  },
+  "@ekycDriversLicense": {
+    "description": "運転免許証"
+  },
+  "@ekycMyNumber": {
+    "description": "マイナンバーカード"
+  },
+  "@ekycPassport": {
+    "description": "パスポート"
+  },
+  "@ekycPendingReview": {
+    "description": "管理者向け申請通知"
+  },
+  "@ekycRejectConfirm": {
+    "description": "却下確認ダイアログ"
+  },
+  "@ekycRejected": {
+    "description": "却下通知"
+  },
+  "@ekycRejectionReason": {
+    "description": "却下理由ラベル"
+  },
+  "@ekycResidenceCard": {
+    "description": "在留カード"
+  },
+  "@ekycResubmit": {
+    "description": "再申請ボタン"
+  },
+  "@ekycTitle": {
+    "description": "本人確認タイトル"
+  },
+  "@email": {
+    "description": "メールアドレスラベル"
+  },
+  "@emailAlreadyInUse": {
+    "description": "メール重複エラー"
+  },
+  "@emailAuthDialog_authError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "@emailAuth_errorGeneric": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "@employer": {
+    "description": "雇用主ラベル"
+  },
+  "@employmentSecurityLaw": {
+    "description": "職業安定法ページタイトル"
+  },
+  "@errorDataNotFound": {
+    "description": "データ未検出タイトル"
+  },
+  "@errorDefaultMessage": {
+    "description": "汎用エラー詳細メッセージ"
+  },
+  "@errorGeneric": {
+    "description": "汎用エラーメッセージ"
+  },
+  "@errorLabel": {
+    "description": "コンパクトエラーラベル"
+  },
+  "@errorNetwork": {
+    "description": "ネットワークエラーメッセージ"
+  },
+  "@errorNetworkMessage": {
+    "description": "ネットワークエラー詳細メッセージ"
+  },
+  "@errorNetworkTitle": {
+    "description": "ネットワークエラータイトル"
+  },
+  "@errorSearchRetry": {
+    "description": "検索リトライメッセージ"
+  },
+  "@errorTimeout": {
+    "description": "タイムアウトエラータイトル"
+  },
+  "@errorTimeoutMessage": {
+    "description": "タイムアウトエラー詳細メッセージ"
+  },
+  "@experienceYears": {
+    "description": "経験年数ラベル"
+  },
+  "@familyName": {
+    "description": "姓ラベル"
+  },
+  "@familyNameKana": {
+    "description": "姓カナラベル"
+  },
+  "@faqTitle": {
+    "description": "FAQタイトル"
+  },
+  "@featureQuickEarn": {
+    "description": "特徴カード: 即収入"
+  },
+  "@featureSearch": {
+    "description": "特徴カード: 検索"
+  },
+  "@featureSecurePayment": {
+    "description": "特徴カード: 安全決済"
+  },
+  "@filterByPrefecture": {
+    "description": "都道府県フィルター"
+  },
+  "@forgotPassword": {
+    "description": "パスワード忘れリンク"
+  },
+  "@gender": {
+    "description": "性別ラベル"
+  },
+  "@genderFemale": {
+    "description": "女性"
+  },
+  "@genderMale": {
+    "description": "男性"
+  },
+  "@genderOther": {
+    "description": "その他"
+  },
+  "@getStarted": {
+    "description": "オンボーディング: 始める"
+  },
+  "@givenName": {
+    "description": "名ラベル"
+  },
+  "@givenNameKana": {
+    "description": "名カナラベル"
+  },
+  "@guestCannotApply": {
+    "description": "ゲスト応募不可メッセージ"
+  },
+  "@guestLoginSuccess": {
+    "description": "ゲストログイン成功メッセージ"
+  },
+  "@guestModeWarning": {
+    "description": "ゲストモード警告"
+  },
+  "@hidePassword": {
+    "description": "パスワード非表示切替"
+  },
+  "@home_navTabLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
+    }
+  },
+  "@home_notifications": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@home_notificationsUnread": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@identityVerification": {
+    "description": "本人確認タイトル"
+  },
+  "@identityVerification_rejectionReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "@identityVerification_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@imagePicker_uploadPartial": {
+    "placeholders": {
+      "successCount": {
+        "type": "String"
+      },
+      "failedCount": {
+        "type": "String"
+      }
+    }
+  },
+  "@imagePicker_uploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@inspection_completedLog": {
+    "placeholders": {
+      "result": {
+        "type": "String"
+      }
+    }
+  },
+  "@inspection_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@introduction": {
+    "description": "自己紹介ラベル"
+  },
+  "@invalidEmail": {
+    "description": "メール形式エラー"
+  },
+  "@inviteFriends": {
+    "description": "友達招待メニュー"
+  },
+  "@inviteFriendsSubtitle": {
+    "description": "友達招待サブタイトル"
+  },
   "@itemCount": {
-    "description": "件数表示",
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "String"
+      }
     }
   },
-
-  "unreadCount": "未読{count}件",
+  "@jobCard_remainingSlots": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobCard_semanticsLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobCreateTitle": {
+    "description": "案件作成タイトル"
+  },
+  "@jobDate": {
+    "description": "勤務日ラベル"
+  },
+  "@jobDeleted": {
+    "description": "案件削除成功"
+  },
+  "@jobDescription": {
+    "description": "仕事内容ラベル"
+  },
+  "@jobDetail": {
+    "description": "案件詳細タイトル"
+  },
+  "@jobDetail_applicationReceived": {
+    "placeholders": {
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobEditTitle": {
+    "description": "案件編集タイトル"
+  },
+  "@jobEdit_snackUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@jobListTitle": {
+    "description": "仕事一覧ページタイトル"
+  },
+  "@jobLocation": {
+    "description": "勤務地ラベル"
+  },
+  "@jobNotes": {
+    "description": "備考ラベル"
+  },
+  "@jobOverview": {
+    "description": "概要ラベル"
+  },
+  "@jobPrice": {
+    "description": "報酬ラベル"
+  },
+  "@jobSaved": {
+    "description": "案件保存成功"
+  },
+  "@jobTitle": {
+    "description": "案件名ラベル"
+  },
+  "@laborInsurance": {
+    "description": "労災保険ページタイトル"
+  },
+  "@legalCompliance": {
+    "description": "法令遵守セクション"
+  },
+  "@legalDocuments": {
+    "description": "法的ドキュメントセクション"
+  },
+  "@legalIndex": {
+    "description": "法的情報ページタイトル"
+  },
+  "@legalInfo": {
+    "description": "法的情報メニュー項目"
+  },
+  "@legalInfoSubtitle": {
+    "description": "法的情報サブタイトル"
+  },
+  "@loadMore": {
+    "description": "もっと見るボタン"
+  },
+  "@loading": {
+    "description": "ローディング表示"
+  },
+  "@locationPermissionRequired": {
+    "description": "位置情報許可要求"
+  },
+  "@login": {
+    "description": "ログインボタン"
+  },
+  "@loginSuccess": {
+    "description": "ログイン成功メッセージ"
+  },
+  "@logout": {
+    "description": "ログアウトボタン"
+  },
+  "@logoutConfirm": {
+    "description": "ログアウト確認"
+  },
+  "@logoutSuccess": {
+    "description": "ログアウト成功"
+  },
+  "@mapSearch_pricePerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@markAsRead": {
+    "description": "既読マークボタン"
+  },
+  "@messagesTitle": {
+    "description": "メッセージページタイトル"
+  },
+  "@messages_statusLabel": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "@myProfile": {
+    "description": "マイプロフィール"
+  },
+  "@myProfile_requiredField": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@name": {
+    "description": "氏名ラベル"
+  },
+  "@nameChanged": {
+    "description": "名前変更成功"
+  },
+  "@navHome": {
+    "description": "BottomNavigation: ホーム"
+  },
+  "@navMessages": {
+    "description": "BottomNavigation: メッセージ"
+  },
+  "@navMyPage": {
+    "description": "BottomNavigation: マイページ"
+  },
+  "@navProfile": {
+    "description": "BottomNavigation: プロフィール"
+  },
+  "@navSales": {
+    "description": "BottomNavigation: 売上"
+  },
+  "@navSearch": {
+    "description": "BottomNavigation: 検索"
+  },
+  "@navWork": {
+    "description": "BottomNavigation: 仕事"
+  },
+  "@netAmount": {
+    "description": "振込金額ラベル"
+  },
+  "@networkCheckConnection": {
+    "description": "ネットワーク確認メッセージ"
+  },
+  "@newPassword": {
+    "description": "新しいパスワードラベル"
+  },
+  "@next": {
+    "description": "オンボーディング: 次へ"
+  },
+  "@noData": {
+    "description": "データなし表示"
+  },
+  "@noEarnings": {
+    "description": "売上なしメッセージ"
+  },
+  "@noJobsFound": {
+    "description": "仕事なしメッセージ"
+  },
+  "@noMessages": {
+    "description": "メッセージなし"
+  },
+  "@noMoreData": {
+    "description": "追加データなし"
+  },
+  "@noNotifications": {
+    "description": "通知なしメッセージ"
+  },
+  "@noWork": {
+    "description": "仕事なしメッセージ"
+  },
+  "@notificationSettings": {
+    "description": "通知設定セクション"
+  },
+  "@notifications": {
+    "description": "お知らせタイトル"
+  },
+  "@notifications_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@onboardingDesc1": {
+    "description": "オンボーディング1説明"
+  },
+  "@onboardingDesc2": {
+    "description": "オンボーディング2説明"
+  },
+  "@onboardingDesc3": {
+    "description": "オンボーディング3説明"
+  },
+  "@onboardingTitle1": {
+    "description": "オンボーディング1タイトル"
+  },
+  "@onboardingTitle2": {
+    "description": "オンボーディング2タイトル"
+  },
+  "@onboardingTitle3": {
+    "description": "オンボーディング3タイトル"
+  },
+  "@onboarding_pageIndicator": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@openSettings": {
+    "description": "設定を開くボタン"
+  },
+  "@optional": {
+    "description": "任意ラベル"
+  },
+  "@password": {
+    "description": "パスワードラベル"
+  },
+  "@passwordChanged": {
+    "description": "パスワード変更成功"
+  },
+  "@passwordResetDescription": {
+    "description": "パスワードリセット説明"
+  },
+  "@passwordResetSent": {
+    "description": "パスワードリセットメール送信"
+  },
+  "@passwordResetTitle": {
+    "description": "パスワードリセットタイトル"
+  },
+  "@paymentDetail": {
+    "description": "決済詳細タイトル"
+  },
+  "@paymentFailed": {
+    "description": "決済失敗"
+  },
+  "@paymentPending": {
+    "description": "決済待ち"
+  },
+  "@paymentStatus": {
+    "description": "決済状況ラベル"
+  },
+  "@paymentSucceeded": {
+    "description": "決済成功"
+  },
+  "@payoutDate": {
+    "description": "支払い日ラベル"
+  },
+  "@phone": {
+    "description": "電話番号ラベル"
+  },
+  "@phoneAuth_codeSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@phoneAuth_resendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "@platformFee": {
+    "description": "手数料ラベル"
+  },
+  "@postJob": {
+    "description": "案件投稿ボタン"
+  },
+  "@postJobSuccess": {
+    "description": "案件投稿成功"
+  },
+  "@postJobTitle": {
+    "description": "案件投稿ページタイトル"
+  },
+  "@post_snackPostFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@postalCode": {
+    "description": "郵便番号ラベル"
+  },
+  "@prefecture": {
+    "description": "都道府県ラベル"
+  },
+  "@privacyPolicy": {
+    "description": "プライバシーポリシーリンク"
+  },
+  "@profilePhotoChange": {
+    "description": "プロフィール写真変更"
+  },
+  "@profileSaved": {
+    "description": "プロフィール保存成功"
+  },
+  "@profileTitle": {
+    "description": "マイページタイトル"
+  },
+  "@projectName": {
+    "description": "プロジェクト名"
+  },
+  "@qrCheckIn": {
+    "description": "QR出勤タイトル"
+  },
+  "@qrCheckin_errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qrCheckin_gpsVerification": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "@qrCheckin_title": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualificationAdd_registerFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualifications": {
+    "description": "資格ラベル"
+  },
+  "@qualifications_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@qualifications_expiryDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "@ratingDialog_submitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@ratingLabel": {
+    "description": "評価ラベル"
+  },
+  "@ratingStars_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@receiveNotifications": {
+    "description": "通知設定トグル"
+  },
+  "@referral_statsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@refreshing": {
+    "description": "リフレッシュ中"
+  },
+  "@register": {
+    "description": "新規登録ボタン"
+  },
+  "@registerSuccess": {
+    "description": "登録成功メッセージ"
+  },
+  "@registrationPrompt_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@registrationPrompt_title": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "@required": {
+    "description": "必須ラベル"
+  },
+  "@retry": {
+    "description": "エラー時のリトライボタン"
+  },
+  "@router_pageDoesNotExist": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "@salesTitle": {
+    "description": "売上ページタイトル"
+  },
+  "@sales_dataCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_monthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_monthStatement": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@sales_nextPaymentDate": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@save": {
+    "description": "汎用保存ボタン"
+  },
+  "@scanQrCode": {
+    "description": "QRスキャン説明"
+  },
+  "@search": {
+    "description": "汎用検索"
+  },
+  "@searchJobs": {
+    "description": "仕事検索ヒント"
+  },
+  "@send": {
+    "description": "汎用送信ボタン"
+  },
+  "@sendMessage": {
+    "description": "メッセージ送信ボタン"
+  },
+  "@sendResetLink": {
+    "description": "リセットリンク送信ボタン"
+  },
+  "@shareJob": {
+    "description": "案件シェアボタン"
+  },
+  "@shiftQr": {
+    "description": "シフトQRタイトル"
+  },
+  "@shiftQr_generateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@showPassword": {
+    "description": "パスワード表示切替"
+  },
+  "@signInWithApple": {
+    "description": "Apple Sign In ボタン"
+  },
+  "@signInWithEmail": {
+    "description": "メールログインボタン"
+  },
+  "@signInWithLine": {
+    "description": "LINE ログインボタン"
+  },
+  "@skip": {
+    "description": "オンボーディング: スキップ"
+  },
+  "@sortByNewest": {
+    "description": "新着順ソート"
+  },
+  "@sortByPriceHigh": {
+    "description": "報酬高い順ソート"
+  },
+  "@startAsGuest": {
+    "description": "ゲストログインボタン"
+  },
+  "@startOnboarding": {
+    "description": "口座設定開始ボタン"
+  },
+  "@statementDetail_completedDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_earlyPaymentConfirm": {
+    "placeholders": {
+      "totalAmount": {
+        "type": "String"
+      },
+      "fee": {
+        "type": "String"
+      },
+      "payout": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@statementDetail_monthLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "@statusApplied": {
+    "description": "ステータス: 応募済み"
+  },
+  "@statusAssigned": {
+    "description": "ステータス: 確定"
+  },
+  "@statusCancelled": {
+    "description": "ステータス: キャンセル"
+  },
+  "@statusCompleted": {
+    "description": "ステータス: 完了"
+  },
+  "@statusPending": {
+    "description": "ステータス: 審査中"
+  },
+  "@statusRejected": {
+    "description": "ステータス: 不採用"
+  },
+  "@stripeOnboarding": {
+    "description": "Stripe口座設定タイトル"
+  },
+  "@stripeOnboardingDescription": {
+    "description": "Stripe設定説明"
+  },
+  "@tabSelected": {
+    "description": "タブ選択中アクセシビリティ"
+  },
+  "@termsOfService": {
+    "description": "利用規約リンク"
+  },
+  "@timeline_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@today": {
+    "description": "今日ラベル"
+  },
+  "@tooManyRequests": {
+    "description": "リクエスト過多エラー"
+  },
+  "@totalEarnings": {
+    "description": "合計報酬ラベル"
+  },
+  "@typeMessage": {
+    "description": "メッセージ入力ヒント"
+  },
   "@unreadCount": {
-    "description": "未読件数",
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "String"
+      }
     }
   },
-
-  "onboardingTitle1": "仕事を見つけよう",
-  "@onboardingTitle1": { "description": "オンボーディング1タイトル" },
-
-  "onboardingDesc1": "建設業界の仕事を簡単に検索・応募できます",
-  "@onboardingDesc1": { "description": "オンボーディング1説明" },
-
-  "onboardingTitle2": "QRで出退勤",
-  "@onboardingTitle2": { "description": "オンボーディング2タイトル" },
-
-  "onboardingDesc2": "QRコードをスキャンして簡単に出退勤管理",
-  "@onboardingDesc2": { "description": "オンボーディング2説明" },
-
-  "onboardingTitle3": "安心の支払い",
-  "@onboardingTitle3": { "description": "オンボーディング3タイトル" },
-
-  "onboardingDesc3": "Stripe決済で安全・確実に報酬を受け取れます",
-  "@onboardingDesc3": { "description": "オンボーディング3説明" },
-
-  "tabSelected": "選択中",
-  "@tabSelected": { "description": "タブ選択中アクセシビリティ" },
-
-  "cameraPermissionRequired": "カメラの許可が必要です",
-  "@cameraPermissionRequired": { "description": "カメラ許可要求" },
-
-  "locationPermissionRequired": "位置情報の許可が必要です",
-  "@locationPermissionRequired": { "description": "位置情報許可要求" },
-
-  "openSettings": "設定を開く",
-  "@openSettings": { "description": "設定を開くボタン" },
-
-  "ratingLabel": "評価",
-  "@ratingLabel": { "description": "評価ラベル" },
-
+  "@update": {
+    "description": "汎用更新ボタン"
+  },
+  "@userDisabled": {
+    "description": "アカウント無効エラー"
+  },
+  "@userNotFound": {
+    "description": "アカウント未検出エラー"
+  },
+  "@weakPassword": {
+    "description": "弱パスワードエラー"
+  },
+  "@workDetail": {
+    "description": "仕事詳細タイトル"
+  },
+  "@workDetail_statusCompleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDetail_statusInProgress": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_noDocuments": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_uploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workDocs_uploadSuccess": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "@workPhotos_uploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workPhotos_uploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReportCreate_logSubmitted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReportCreate_saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workReports_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@workStatus": {
+    "description": "勤務状況ラベル"
+  },
+  "@workTitle": {
+    "description": "はたらくページタイトル"
+  },
+  "@workerLabel": {
+    "description": "ワーカーラベル"
+  },
+  "@wrongPassword": {
+    "description": "パスワード不正エラー"
+  },
+  "@yen": {
+    "description": "円"
+  },
+  "@yesterday": {
+    "description": "昨日ラベル"
+  },
+  "accountSettings": "アカウント設定",
+  "accountSettings_cancel": "・チャット履歴\\n",
+  "accountSettings_changePasswordButton": "新しいパスワード（6文字以上）",
+  "accountSettings_changePasswordLabel": "名前を入力",
+  "accountSettings_confirm": "確認",
+  "accountSettings_currentPasswordHint": "現在のパスワード",
+  "accountSettings_delete": "アカウントを削除すると、全てのデータが完全に失われます。\\n\\n",
+  "accountSettings_deleteAccount": "アカウントを削除すると、全てのデータが完全に失われます。\\n\\n",
+  "accountSettings_deleteConfirmMessage": "アカウントを削除すると、全てのデータが完全に失われます。\\n\\n",
+  "accountSettings_displayNameLabel": "表示名",
+  "accountSettings_downloadData": "データをダウンロード",
+  "accountSettings_emailLabel": "メールアドレス",
+  "accountSettings_languageLabel": "言語設定",
+  "accountSettings_loginRequired": "ログインが必要です",
+  "accountSettings_nameHint": "名前を入力",
+  "accountSettings_newPasswordHint": "新しいパスワード（6文字以上）",
+  "accountSettings_notSet": "未設定",
+  "accountSettings_notificationSettings": "通知設定",
+  "accountSettings_receiveNotifications": "お知らせ通知を受け取る",
+  "accountSettings_snackDataCopied": "データをクリップボードにコピーしました",
+  "accountSettings_snackDeleteFailed": "アカウント削除に失敗しました: {error}",
+  "accountSettings_snackDeleteFailedGeneric": "アカウント削除に失敗しました: {error}",
+  "accountSettings_snackEnterBothPasswords": "現在のパスワードと新しいパスワードを入力してください",
+  "accountSettings_snackError": "エラー: {error}",
+  "accountSettings_snackExportFailed": "データエクスポートに失敗しました: {error}",
+  "accountSettings_snackNameUpdated": "表示名を更新しました",
+  "accountSettings_snackPasswordChangeFailed": "パスワード変更に失敗しました: {error}",
+  "accountSettings_snackPasswordChanged": "パスワードを変更しました",
+  "accountSettings_snackPasswordMinLength": "パスワードは6文字以上にしてください",
+  "accountSettings_snackUpdateFailed": "更新に失敗しました: {error}",
+  "accountSettings_snackWrongPassword": "現在のパスワードが正しくありません",
+  "accountSettings_title": "未設定",
+  "address": "住所",
+  "adminApplicants_bulkApproveButton": "一括承認する",
+  "adminApplicants_bulkApproveConfirm": "応募中の{count}件をすべて「アサイン済み」に変更しますか？",
+  "adminApplicants_bulkApproveCount": "一括承認 ({count}件)",
+  "adminApplicants_bulkApproveFailed": "一括承認に失敗しました: {error}",
+  "adminApplicants_bulkApproveTitle": "一括承認",
+  "adminApplicants_bulkApproved": "{count}件を承認しました",
+  "adminApplicants_changeButton": "変更する",
+  "adminApplicants_changeFailed": "変更に失敗しました: {error}",
+  "adminApplicants_changeStatusConfirm": "「{jobTitle}」のステータスを「{statusLabel}」に変更しますか？",
+  "adminApplicants_changeStatusTitle": "ステータス変更",
+  "adminApplicants_filterAll": "すべて",
+  "adminApplicants_filterApplied": "応募中",
+  "adminApplicants_filterAssigned": "アサイン済み",
+  "adminApplicants_filterDone": "完了",
+  "adminApplicants_filterInProgress": "作業中",
+  "adminApplicants_noApplicantsForStatus": "「{statusLabel}」の応募者はいません",
+  "adminApplicants_noApplicantsYet": "応募者はまだいません",
+  "adminApplicants_qualityScore": "品質: {score}",
+  "adminApplicants_searchHint": "名前で検索…",
+  "adminApplicants_startWork": "作業開始",
+  "adminApplicants_statusChanged": "「{jobTitle}」→「{statusLabel}」に変更しました",
+  "adminApplicants_statusUpdateNotifBody": "「{jobTitle}」のステータスが「{statusLabel}」に変更されました",
+  "adminApplicants_statusUpdateNotifTitle": "ステータスが更新されました",
+  "adminApplicants_workCompleted": "作業完了",
+  "adminApplications": "応募管理",
+  "adminBadge": "管理者",
+  "adminDashboard_activeJobs": "掲載中の案件",
+  "adminDashboard_alertCount": "{label} {count}件",
+  "adminDashboard_applicationCount": "応募数",
+  "adminDashboard_checkSales": "売上を確認",
+  "adminDashboard_earlyPaymentApproval": "即金承認",
+  "adminDashboard_identityVerification": "本人確認",
+  "adminDashboard_noApplications": "まだ応募はありません",
+  "adminDashboard_noJobTitle": "案件名なし",
+  "adminDashboard_pendingAlerts": "未処理アラート",
+  "adminDashboard_pendingApplications": "未対応の応募",
+  "adminDashboard_pendingApproval": "承認待ちの応募",
+  "adminDashboard_pendingEarlyPayments": "即金申請待ち",
+  "adminDashboard_pendingQualifications": "資格承認待ち",
+  "adminDashboard_pendingVerifications": "本人確認待ち",
+  "adminDashboard_postJob": "案件を投稿",
+  "adminDashboard_qualificationApproval": "資格承認",
+  "adminDashboard_quickActions": "クイックアクション",
+  "adminDashboard_recentApplications": "最近の応募",
+  "adminDashboard_registeredUsers": "登録ユーザー",
+  "adminDashboard_title": "管理者ダッシュボード",
+  "adminEarlyPayments_approveLabel": "承認",
+  "adminEarlyPayments_cancel": "キャンセル",
+  "adminEarlyPayments_emptyDescription": "ワーカーが即金申請を行うと、ここに表示されます。",
+  "adminEarlyPayments_emptyTitle": "承認待ちの即金申請はありません",
+  "adminEarlyPayments_fee": "手数料 (10%)",
+  "adminEarlyPayments_loadError": "読み込みエラー: {error}",
+  "adminEarlyPayments_loading": "読み込み中...",
+  "adminEarlyPayments_nameNotSet": "名前未設定",
+  "adminEarlyPayments_notifyApprovedBody": "即金申請が承認されました。まもなく振り込まれます。",
+  "adminEarlyPayments_notifyApprovedTitle": "即金申請が承認されました",
+  "adminEarlyPayments_notifyRejectedBody": "即金申請が却下されました。理由: {reason}",
+  "adminEarlyPayments_notifyRejectedTitle": "即金申請が却下されました",
+  "adminEarlyPayments_payoutAmount": "支払額",
+  "adminEarlyPayments_rejectButton": "却下する",
+  "adminEarlyPayments_rejectLabel": "却下",
+  "adminEarlyPayments_rejectReasonHint": "却下の理由を入力してください",
+  "adminEarlyPayments_rejectReasonRequired": "却下理由を入力してください",
+  "adminEarlyPayments_rejectReasonTitle": "却下理由",
+  "adminEarlyPayments_requestDate": "申請日時: {date}",
+  "adminEarlyPayments_requestedAmount": "申請額",
+  "adminEarlyPayments_snackApproveFailed": "承認に失敗しました",
+  "adminEarlyPayments_snackApproved": "即金申請を承認しました",
+  "adminEarlyPayments_snackRejectFailed": "却下に失敗しました",
+  "adminEarlyPayments_snackRejected": "即金申請を却下しました",
+  "adminEarlyPayments_statusRequested": "申請中",
+  "adminEarlyPayments_targetMonth": "対象月",
+  "adminEarlyPayments_title": "即金申請一覧",
+  "adminEarlyPayments_yenFormat": "{amount}円",
+  "adminHome": "管理者ダッシュボード",
+  "adminHome_admin": "管理者",
+  "adminHome_applicants": "応募者",
+  "adminHome_dashboard": "ダッシュボード",
+  "adminHome_jobManagement": "ダッシュボード",
+  "adminHome_notifications": "お知らせ",
+  "adminHome_salesManagement": "応募者",
+  "adminHome_settings": "応募者",
+  "adminIdentityVerification_approveButton": "承認する",
+  "adminIdentityVerification_approveConfirm": "この本人確認を承認しますか？",
+  "adminIdentityVerification_approveFailed": "承認に失敗しました: {error}",
+  "adminIdentityVerification_approveTitle": "承認確認",
+  "adminIdentityVerification_approved": "承認しました",
+  "adminIdentityVerification_enterRejectReason": "却下理由を入力してください",
+  "adminIdentityVerification_idDocumentPhoto": "身分証明書",
+  "adminIdentityVerification_noPendingRequests": "審査待ちの申請はありません",
+  "adminIdentityVerification_rejectButton": "却下する",
+  "adminIdentityVerification_rejectFailed": "却下に失敗しました: {error}",
+  "adminIdentityVerification_rejectReasonHint": "例: 写真が不鮮明です",
+  "adminIdentityVerification_rejectTitle": "却下確認",
+  "adminIdentityVerification_rejected": "却下しました",
+  "adminIdentityVerification_selfiePhoto": "自撮り写真",
+  "adminIdentityVerification_title": "本人確認管理",
+  "adminJobManagement": "案件管理",
+  "adminJobManagement_applicantCount": "応募者 {count}",
+  "adminJobManagement_checkNetwork": "権限がありません",
+  "adminJobManagement_dateTbd": "未定",
+  "adminJobManagement_filterActive": "すべて",
+  "adminJobManagement_filterAll": "すべて",
+  "adminJobManagement_filterCompleted": "すべて",
+  "adminJobManagement_filterDraft": "公開中",
+  "adminJobManagement_loadFailed": "データの読み込みに失敗しました",
+  "adminJobManagement_locationNotSet": "場所未設定",
+  "adminJobManagement_noJobs": "案件がまだありません",
+  "adminJobManagement_noPermission": "権限がありません",
+  "adminJobManagement_noTitle": "タイトルなし",
+  "adminJobManagement_postHint": "案件がまだありません",
+  "adminJobManagement_postJob": "案件を投稿",
+  "adminJobManagement_searchHint": "タイトル・場所で検索",
+  "adminJobManagement_showMore": "もっと見る",
+  "adminLogin": "管理者ログイン",
+  "adminLoginDescription": "管理者パスワードを入力してください",
+  "adminLogin_email": "メールアドレス",
+  "adminLogin_emailInvalid": "有効なメールアドレスを入力してください",
+  "adminLogin_emailRequired": "メールアドレスを入力してください",
+  "adminLogin_lockoutMessage": "ログイン試行回数の上限に達しました。{minutes}分{seconds}秒後にお試しください",
+  "adminLogin_login": "ログインしました",
+  "adminLogin_loginSuccess": "ログインしました",
+  "adminLogin_password": "パスワード",
+  "adminLogin_passwordMinLength": "パスワードは6文字以上で入力してください",
+  "adminLogin_passwordRequired": "パスワードを入力してください",
+  "adminLogin_title": "管理者ログイン",
+  "adminPassword": "管理者パスワード",
+  "adminPayments": "決済管理",
+  "adminQualifications_approve": "承認",
+  "adminQualifications_approveError": "承認に失敗しました",
+  "adminQualifications_approveSuccess": "{name}を承認しました",
+  "adminQualifications_category": "カテゴリ: {category}",
+  "adminQualifications_emptyDescription": "承認待ちの資格はありません",
+  "adminQualifications_emptyTitle": "承認待ちの資格はありません",
+  "adminQualifications_imageLoadError": "画像を読み込めませんでした",
+  "adminQualifications_loadError": "読み込みに失敗しました",
+  "adminQualifications_noName": "名前なし",
+  "adminQualifications_pendingApproval": "承認待ち",
+  "adminQualifications_reject": "却下",
+  "adminQualifications_rejectButton": "却下する",
+  "adminQualifications_rejectError": "却下に失敗しました",
+  "adminQualifications_rejectReasonHint": "却下の理由を入力してください",
+  "adminQualifications_rejectReasonRequired": "却下理由を入力してください",
+  "adminQualifications_rejectReasonTitle": "却下理由",
+  "adminQualifications_rejectSuccess": "{name}を却下しました",
+  "adminQualifications_title": "資格承認",
+  "adminSearch_hint": "検索…",
+  "adminUsers": "ユーザー管理",
+  "agreeToPrivacy": "プライバシーポリシーに同意する",
+  "agreeToTerms": "利用規約に同意する",
+  "allPrefectures": "全国",
+  "alreadyApplied": "応募済み",
+  "amount": "金額",
+  "appName": "ALBAWORK",
+  "appTagline": "建設業界の仕事マッチングアプリ",
+  "appleLoginSuccess": "Appleでログインしました",
   "applicant": "応募者",
-  "@applicant": { "description": "応募者ラベル" },
-
-  "employer": "雇用主",
-  "@employer": { "description": "雇用主ラベル" },
-
-  "chatWith": "チャット",
-  "@chatWith": { "description": "チャットタイトル" },
-
-  "sendMessage": "メッセージを送信",
-  "@sendMessage": { "description": "メッセージ送信ボタン" },
-
-  "today": "今日",
-  "@today": { "description": "今日ラベル" },
-
-  "yesterday": "昨日",
-  "@yesterday": { "description": "昨日ラベル" },
-
-  "postJobTitle": "案件を投稿",
-  "@postJobTitle": { "description": "案件投稿ページタイトル" },
-
-  "postJobSuccess": "案件を投稿しました",
-  "@postJobSuccess": { "description": "案件投稿成功" },
-
-  "loadMore": "もっと見る",
-  "@loadMore": { "description": "もっと見るボタン" },
-
-  "noMoreData": "これ以上データはありません",
-  "@noMoreData": { "description": "追加データなし" },
-
-  "refreshing": "更新中...",
-  "@refreshing": { "description": "リフレッシュ中" },
-
-  "workerLabel": "ワーカー",
-  "@workerLabel": { "description": "ワーカーラベル" },
-
+  "applicationConfirm": "この案件に応募しますか？",
   "applicationDate": "応募日",
-  "@applicationDate": { "description": "応募日ラベル" },
-
-  "guestModeWarning": "ゲストモードでは一部機能が制限されます",
-  "@guestModeWarning": { "description": "ゲストモード警告" },
-
-  "legalIndex": "法的情報",
-  "@legalIndex": { "description": "法的情報ページタイトル" },
-
-  "laborInsurance": "労災保険について",
-  "@laborInsurance": { "description": "労災保険ページタイトル" },
-
+  "applicationSuccess": "応募が完了しました",
+  "apply": "応募する",
+  "applyForJob": "この案件に応募する",
+  "asyncValue_errorOccurred": "エラーが発生しました",
+  "asyncValue_loadFailed": "ネットワークエラーが発生しました",
+  "asyncValue_networkError": "権限がありません",
+  "asyncValue_permissionDenied": "エラーが発生しました",
+  "authError": "認証エラーが発生しました",
+  "authGate_authError": "認証処理中にエラーが発生しました\nもう一度お試しください",
+  "authGate_roleError": "ユーザー情報の取得に失敗しました",
+  "back": "戻る",
+  "birthDate": "生年月日",
+  "cameraPermissionRequired": "カメラの許可が必要です",
+  "cancel": "キャンセル",
+  "changeName": "名前を変更",
+  "changePassword": "パスワードを変更",
+  "chatRoom_attachImage": "画像を添付",
+  "chatRoom_imageSendFailed": "画像の送信に失敗しました",
+  "chatRoom_inputHint": "メッセージを入力",
+  "chatRoom_loadError": "読み込みエラー",
+  "chatRoom_loginRequired": "チャットの準備ができていません",
+  "chatRoom_notReady": "チャットの準備ができていません",
+  "chatRoom_pickFromGallery": "ギャラリーから選択",
+  "chatRoom_read": "既読",
+  "chatRoom_retry": "再試行",
+  "chatRoom_sendFailed": "メッセージの送信に失敗しました",
+  "chatRoom_startConversation": "メッセージを始めましょう",
+  "chatRoom_takePhoto": "カメラで撮影",
+  "chatRoom_title": "チャット",
+  "chatRoom_today": "今日",
+  "chatRoom_uploadFailed": "画像のアップロードに失敗しました",
+  "chatRoom_yesterday": "今日",
+  "chatWith": "チャット",
+  "checkIn": "出勤",
+  "checkInSuccess": "出勤しました",
+  "checkOut": "退勤",
+  "checkOutSuccess": "退勤しました",
+  "checkedIn": "出勤済み",
+  "checkedOut": "退勤済み",
+  "close": "閉じる",
+  "common_adminOnlyView": "管理者のみ閲覧できます",
+  "common_all": "すべて",
+  "common_approve": "承認",
+  "common_cancel": "キャンセル",
+  "common_completed": "完了",
+  "common_confirmed": "確定済み",
+  "common_dataLoadError": "データの読み込みに失敗しました",
+  "common_delete": "削除",
+  "common_deleted": "削除しました",
+  "common_edit": "編集",
+  "common_itemsCount": "件",
+  "common_job": "案件",
+  "common_loadError": "読み込みエラー: {error}",
+  "common_noTitle": "タイトルなし",
+  "common_notSet": "未設定",
+  "common_ok": "OK",
+  "common_pleaseLogin": "ログインしてください",
+  "common_registerToSaveFavorites": "お気に入りを保存するには会員登録が必要です",
+  "common_registerToStart": "登録して始める",
+  "common_registering": "登録中…",
+  "common_reject": "却下",
+  "common_save": "保存",
+  "common_select": "選択",
+  "common_selected": "（選択中）",
+  "common_transferred": "振込済み",
+  "common_undecided": "未定",
+  "common_unknown": "不明",
+  "confirm": "確認",
+  "confirmPassword": "パスワード確認",
+  "contactBody": "お問い合わせ内容",
+  "contactCategory": "カテゴリ",
+  "contactCategoryBug": "不具合報告",
+  "contactCategoryFeature": "機能要望",
+  "contactCategoryGeneral": "一般",
+  "contactCategoryOther": "その他",
+  "contactCategoryPayment": "お支払い",
+  "contactSent": "お問い合わせを送信しました",
+  "contactSubject": "件名",
+  "contactTitle": "お問い合わせ",
+  "contact_bodyHint": "お問い合わせ内容を入力してください",
+  "contact_bodyLabel": "送信する",
+  "contact_categoryAccount": "アカウントについて",
+  "contact_categoryBug": "不具合・バグ報告",
+  "contact_categoryGeneral": "その他",
+  "contact_categoryJobs": "案件について",
+  "contact_categoryLabel": "件名を入力",
+  "contact_categoryOther": "その他",
+  "contact_categoryPayment": "報酬・支払いについて",
+  "contact_sendError": "カテゴリ",
+  "contact_sendSuccess": "お問い合わせ",
+  "contact_subjectHint": "送信する",
+  "contact_subjectLabel": "お問い合わせ内容を入力してください",
+  "contact_submitButton": "送信する",
+  "contact_title": "件名",
+  "contact_validationError": "お問い合わせを送信しました。ご回答までお待ちください。",
+  "createEarnings": "売上を登録",
+  "currentPassword": "現在のパスワード",
+  "dataExportSuccess": "データをエクスポートしました",
+  "dateSelect": "日付を選択",
+  "delete": "削除",
+  "deleteAccount": "アカウントを削除",
+  "deleteAccountConfirm": "アカウントを削除しますか？この操作は取り消せません。",
+  "deleteAccountSuccess": "アカウントを削除しました",
+  "deleteAccountTitle": "アカウント削除",
+  "deleteJobConfirm": "この案件を削除しますか？",
   "dispatchLaw": "労働者派遣法について",
-  "@dispatchLaw": { "description": "派遣法ページタイトル" },
-
-  "employmentSecurityLaw": "職業安定法について",
-  "@employmentSecurityLaw": { "description": "職業安定法ページタイトル" },
-
-  "legalDocuments": "法的ドキュメント",
-  "@legalDocuments": { "description": "法的ドキュメントセクション" },
-
-  "legalCompliance": "法令遵守",
-  "@legalCompliance": { "description": "法令遵守セクション" },
-
-  "legalInfo": "法的情報",
-  "@legalInfo": { "description": "法的情報メニュー項目" },
-
-  "legalInfoSubtitle": "プライバシーポリシー・利用規約・法令情報",
-  "@legalInfoSubtitle": { "description": "法的情報サブタイトル" },
-
-  "inviteFriends": "友達を招待",
-  "@inviteFriends": { "description": "友達招待メニュー" },
-
-  "inviteFriendsSubtitle": "紹介コードで友達を招待",
-  "@inviteFriendsSubtitle": { "description": "友達招待サブタイトル" },
-
-  "shareJob": "案件をシェア",
-  "@shareJob": { "description": "案件シェアボタン" },
-
-  "notificationSettings": "通知設定",
-  "@notificationSettings": { "description": "通知設定セクション" },
-
-  "receiveNotifications": "お知らせ通知を受け取る",
-  "@receiveNotifications": { "description": "通知設定トグル" },
-
-  "ekycTitle": "本人確認",
-  "@ekycTitle": { "description": "本人確認タイトル" },
-  "ekycDocumentType": "身分証の種類",
-  "@ekycDocumentType": { "description": "身分証タイプ選択" },
-  "ekycDriversLicense": "運転免許証",
-  "@ekycDriversLicense": { "description": "運転免許証" },
-  "ekycMyNumber": "マイナンバーカード",
-  "@ekycMyNumber": { "description": "マイナンバーカード" },
-  "ekycPassport": "パスポート",
-  "@ekycPassport": { "description": "パスポート" },
-  "ekycResidenceCard": "在留カード",
-  "@ekycResidenceCard": { "description": "在留カード" },
-  "ekycRejectionReason": "却下理由",
-  "@ekycRejectionReason": { "description": "却下理由ラベル" },
-  "ekycResubmit": "再申請する",
-  "@ekycResubmit": { "description": "再申請ボタン" },
-  "ekycPendingReview": "本人確認申請",
-  "@ekycPendingReview": { "description": "管理者向け申請通知" },
-  "ekycApproved": "本人確認が承認されました",
-  "@ekycApproved": { "description": "承認通知" },
-  "ekycRejected": "本人確認が却下されました",
-  "@ekycRejected": { "description": "却下通知" },
+  "displayName": "表示名",
+  "downloadData": "データをダウンロード",
+  "earningsCreate_adminOnly": "Stripe決済は管理者のみ利用できます",
+  "earningsCreate_amountHint": "例: 15000",
+  "earningsCreate_amountLabel": "金額（税込）",
+  "earningsCreate_applicantUidEmpty": "応募者UIDが空です",
+  "earningsCreate_earningRegistered": "売上を登録しました",
+  "earningsCreate_earningsNote": "※ 売上は管理者が確認後に反映されます",
+  "earningsCreate_enterAmount": "金額を入力してください",
+  "earningsCreate_enterAmountExample": "金額を入力してください（例: 15000）",
+  "earningsCreate_noAssignedJobs": "担当案件がありません",
+  "earningsCreate_paymentDateLabel": "支払日",
+  "earningsCreate_registerButton": "売上を登録",
+  "earningsCreate_registerFailed": "登録に失敗しました: {error}",
+  "earningsCreate_searchHint": "案件を検索…",
+  "earningsCreate_selectFromList": "上のリストから案件を選んでください",
+  "earningsCreate_selectJob": "先に案件を選んでください",
+  "earningsCreate_selectPaymentDate": "支払日を選択してください",
+  "earningsCreate_stripeCreated": "Stripe決済を作成しました (ID: {paymentId})",
+  "earningsCreate_stripeFailed": "Stripe決済に失敗: {error}",
+  "earningsCreate_stripePayButton": "Stripe決済を作成",
+  "earningsCreate_title": "売上登録",
+  "earningsCreated": "売上を登録しました",
+  "earningsDetail": "売上詳細",
+  "edit": "編集",
+  "editProfile": "プロフィール編集",
   "ekycApproveConfirm": "この本人確認を承認しますか？",
-  "@ekycApproveConfirm": { "description": "承認確認ダイアログ" },
+  "ekycApproved": "本人確認が承認されました",
+  "ekycDocumentType": "身分証の種類",
+  "ekycDriversLicense": "運転免許証",
+  "ekycMyNumber": "マイナンバーカード",
+  "ekycPassport": "パスポート",
+  "ekycPendingReview": "本人確認申請",
   "ekycRejectConfirm": "この本人確認を却下しますか？",
-  "@ekycRejectConfirm": { "description": "却下確認ダイアログ" }
+  "ekycRejected": "本人確認が却下されました",
+  "ekycRejectionReason": "却下理由",
+  "ekycResidenceCard": "在留カード",
+  "ekycResubmit": "再申請する",
+  "ekycTitle": "本人確認",
+  "email": "メールアドレス",
+  "emailAlreadyInUse": "このメールアドレスは既に登録されています",
+  "emailAuthDialog_authError": "認証エラー: {code}",
+  "emailAuthDialog_emailAlreadyInUse": "このメールアドレスは既に使用されています",
+  "emailAuthDialog_emailLabel": "メールアドレス",
+  "emailAuthDialog_enterEmailAndPassword": "メールアドレスとパスワードを入力してください",
+  "emailAuthDialog_hidePassword": "パスワードを非表示",
+  "emailAuthDialog_invalidEmail": "メールアドレスの形式が正しくありません",
+  "emailAuthDialog_loginButton": "ログイン",
+  "emailAuthDialog_loginFailed": "ログインに失敗しました",
+  "emailAuthDialog_loginLocked": "ログイン試行回数が上限に達しました。しばらくお待ちください",
+  "emailAuthDialog_loginSuccess": "ログインしました",
+  "emailAuthDialog_operationNotAllowed": "この認証方法は現在利用できません",
+  "emailAuthDialog_passwordLabel": "パスワード",
+  "emailAuthDialog_passwordMinLength": "パスワードは6文字以上にしてください",
+  "emailAuthDialog_showPassword": "パスワードを表示",
+  "emailAuthDialog_signUpButton": "新規登録",
+  "emailAuthDialog_signUpFailed": "アカウント作成に失敗しました",
+  "emailAuthDialog_signUpHint": "アカウントをお持ちでない場合は「新規登録」を押してください",
+  "emailAuthDialog_signUpSuccess": "アカウントを作成しました",
+  "emailAuthDialog_title": "メールアドレスでログイン",
+  "emailAuthDialog_weakPassword": "パスワードが弱すぎます。6文字以上にしてください",
+  "emailAuthDialog_wrongCredentials": "メールアドレスまたはパスワードが正しくありません",
+  "emailAuth_cancel": "キャンセル",
+  "emailAuth_emailInvalid": "メールアドレスの形式が正しくありません",
+  "emailAuth_emailLabel": "メールアドレス",
+  "emailAuth_emailRequired": "メールアドレスを入力してください",
+  "emailAuth_errorEmailInUse": "このメールアドレスは既に登録されています",
+  "emailAuth_errorGeneric": "エラーが発生しました（{code}）",
+  "emailAuth_errorInvalidEmail": "メールアドレスの形式が正しくありません",
+  "emailAuth_errorNetwork": "ネットワーク接続を確認してください",
+  "emailAuth_errorTooManyRequests": "リクエストが多すぎます。しばらくしてからお試しください",
+  "emailAuth_errorUserDisabled": "このアカウントは無効化されています",
+  "emailAuth_errorUserNotFound": "アカウントが見つかりません",
+  "emailAuth_errorWeakPassword": "パスワードが弱すぎます。6文字以上で設定してください",
+  "emailAuth_errorWrongPassword": "パスワードが正しくありません",
+  "emailAuth_forgotPassword": "パスワードを忘れた方",
+  "emailAuth_loginButton": "ログイン",
+  "emailAuth_passwordConfirmLabel": "パスワード（確認）",
+  "emailAuth_passwordConfirmRequired": "パスワードを再入力してください",
+  "emailAuth_passwordLabel": "パスワード",
+  "emailAuth_passwordMinLength": "パスワードは6文字以上で入力してください",
+  "emailAuth_passwordMismatch": "パスワードが一致しません",
+  "emailAuth_passwordRequired": "パスワードを入力してください",
+  "emailAuth_passwordResetTitle": "パスワードリセット",
+  "emailAuth_passwordWithMinLength": "パスワード（6文字以上）",
+  "emailAuth_registerButton": "新規登録",
+  "emailAuth_sendButton": "送信",
+  "emailAuth_snackLoginFailed": "ログインに失敗しました",
+  "emailAuth_snackRegisterFailed": "登録に失敗しました",
+  "emailAuth_snackResetSent": "パスワードリセットメールを送信しました",
+  "emailAuth_snackSendFailed": "送信に失敗しました",
+  "emailAuth_tabLogin": "ログイン",
+  "emailAuth_tabRegister": "新規登録",
+  "emailAuth_title": "メールアドレスで続ける",
+  "employer": "雇用主",
+  "employmentSecurityLaw": "職業安定法について",
+  "errorDataNotFound": "データが見つかりません",
+  "errorDefaultMessage": "しばらく経ってからもう一度お試しください",
+  "errorGeneric": "エラーが発生しました",
+  "errorLabel": "エラー",
+  "errorNetwork": "ネットワークエラーが発生しました",
+  "errorNetworkMessage": "インターネット接続を確認して\nもう一度お試しください",
+  "errorNetworkTitle": "ネットワークエラー",
+  "errorRetry_emptyMessage": "条件を変更して再検索してください",
+  "errorRetry_emptyTitle": "データが見つかりません",
+  "errorRetry_generalMessage": "予期しないエラーが発生しました",
+  "errorRetry_generalTitle": "エラーが発生しました",
+  "errorRetry_networkErrorMessage": "インターネット接続を確認してください",
+  "errorRetry_networkErrorTitle": "ネットワークエラー",
+  "errorRetry_timeoutMessage": "通信がタイムアウトしました。再試行してください",
+  "errorRetry_timeoutTitle": "タイムアウト",
+  "errorSearchRetry": "条件を変更して再検索してください",
+  "errorTimeout": "タイムアウト",
+  "errorTimeoutMessage": "サーバーへの接続に時間がかかっています\nもう一度お試しください",
+  "experienceYears": "経験年数",
+  "familyName": "姓",
+  "familyNameKana": "姓（カナ）",
+  "faqTitle": "よくある質問",
+  "faq_a1": "ALBAWORKとは何ですか？",
+  "faq_a2": "ALBAWORKとは何ですか？",
+  "faq_a3": "利用料金はかかりますか？",
+  "faq_a4": "応募するにはどうすればいいですか？",
+  "faq_a5": "出退勤はどのように記録しますか？",
+  "faq_a6": "報酬はどのように受け取れますか？",
+  "faq_a7": "本人確認は必要ですか？",
+  "faq_a8": "退会するにはどうすればいいですか？",
+  "faq_q1": "ALBAWORKとは何ですか？",
+  "faq_q2": "ALBAWORKとは何ですか？",
+  "faq_q3": "利用料金はかかりますか？",
+  "faq_q4": "応募するにはどうすればいいですか？",
+  "faq_q5": "出退勤はどのように記録しますか？",
+  "faq_q6": "報酬はどのように受け取れますか？",
+  "faq_q7": "本人確認は必要ですか？",
+  "faq_q8": "退会するにはどうすればいいですか？",
+  "faq_title": "よくある質問",
+  "favorites_empty": "お気に入りはまだありません",
+  "favorites_emptyDescription": "気になる案件をお気に入りに追加してみましょう",
+  "favorites_loginRequired": "ログインが必要です",
+  "favorites_noTitle": "タイトルなし",
+  "favorites_title": "お気に入り案件",
+  "featureQuickEarn": "すぐに稼げる",
+  "featureSearch": "仕事を探す",
+  "featureSecurePayment": "安心の支払い",
+  "filterByPrefecture": "都道府県で絞り込み",
+  "forceUpdate_available": "アップデートが必要です",
+  "forceUpdate_availableMessage": "最新バージョンにアップデートしてください。",
+  "forceUpdate_later": "あとで",
+  "forceUpdate_required": "アップデートが必要です",
+  "forceUpdate_requiredMessage": "最新バージョンにアップデートしてください。",
+  "forceUpdate_update": "アップデート",
+  "forgotPassword": "パスワードを忘れた方",
+  "gender": "性別",
+  "genderFemale": "女性",
+  "genderMale": "男性",
+  "genderOther": "その他",
+  "getStarted": "始める",
+  "givenName": "名",
+  "givenNameKana": "名（カナ）",
+  "guestCannotApply": "ゲストは応募できません。ログインしてください",
+  "guestHome_appleLoginSuccess": "Appleでログインしました",
+  "guestHome_emailLogin": "メールアドレスでログイン",
+  "guestHome_featureEarn": "すぐに稼げる",
+  "guestHome_featurePayment": "安心の支払い",
+  "guestHome_featureSearch": "仕事を探す",
+  "guestHome_guestLoginSuccess": "ゲストとしてログインしました",
+  "guestHome_lineLogin": "LINEでログイン",
+  "guestHome_phoneLogin": "電話番号でログイン",
+  "guestHome_privacyPolicy": "プライバシーポリシー",
+  "guestHome_startAsGuest": "ゲストとして始める",
+  "guestHome_subtitle": "建設業界の仕事マッチングアプリ",
+  "guestHome_termsOfService": "利用規約",
+  "guestLoginSuccess": "ゲストとしてログインしました",
+  "guestModeWarning": "ゲストモードでは一部機能が制限されます",
+  "hidePassword": "パスワードを非表示",
+  "home_admin": "管理者",
+  "home_greetingAfternoon": "おはようございます",
+  "home_greetingEvening": "おはようございます",
+  "home_greetingMorning": "おはようございます",
+  "home_navMessages": "検索",
+  "home_navProfile": "はたらく",
+  "home_navSales": "検索",
+  "home_navSearch": "検索",
+  "home_navSelected": "、選択中",
+  "home_navTabLabel": "{label}タブ{suffix}",
+  "home_navWork": "検索",
+  "home_notifications": "お知らせ、未読{count}件",
+  "home_notificationsUnread": "お知らせ、未読{count}件",
+  "home_postJob": "案件を投稿",
+  "home_statusAdmin": "ステータス: 管理者",
+  "identityVerification": "本人確認",
+  "identityVerification_documentTypeLabel": "書類の種類",
+  "identityVerification_ekycBanner": "提出された書類はeKYC（オンライン本人確認）に基づき、管理者が審査します。",
+  "identityVerification_idDocumentSubtitle": "運転免許証・マイナンバーカード等",
+  "identityVerification_idDocumentTitle": "身分証明書",
+  "identityVerification_instructions": "本人確認のため、身分証明書の写真と自撮り写真をアップロードしてください。",
+  "identityVerification_loadStatusFailed": "本人確認ステータスの読み込みに失敗しました",
+  "identityVerification_rejectionReason": "理由: {reason}",
+  "identityVerification_resubmitButton": "再申請する",
+  "identityVerification_selfieSubtitle": "顔全体が写るように撮影してください",
+  "identityVerification_selfieTitle": "自撮り写真",
+  "identityVerification_statusApproved": "本人確認が完了しました",
+  "identityVerification_statusPending": "審査中です。しばらくお待ちください",
+  "identityVerification_statusRejected": "本人確認が却下されました",
+  "identityVerification_stepSelfie": "自撮り",
+  "identityVerification_stepSubmit": "申請",
+  "identityVerification_stepUploadId": "身分証",
+  "identityVerification_submitButton": "本人確認を申請する",
+  "identityVerification_submitFailed": "申請に失敗しました: {error}",
+  "identityVerification_submitted": "本人確認を申請しました。審査をお待ちください",
+  "identityVerification_tapToSelect": "タップして選択",
+  "identityVerification_title": "本人確認",
+  "identityVerification_uploadBoth": "身分証明書と自撮り写真の両方をアップロードしてください",
+  "imagePicker_camera": "カメラで撮影",
+  "imagePicker_cancel": "キャンセル",
+  "imagePicker_error": "エラーが発生しました",
+  "imagePicker_gallery": "ギャラリーから選択（複数可）",
+  "imagePicker_galleryMultiple": "ギャラリーから選択（複数可）",
+  "imagePicker_noImageSelected": "画像が選択されませんでした",
+  "imagePicker_selectImage": "画像を選択",
+  "imagePicker_uploadPartial": "{successCount}枚成功、{failedCount}枚失敗しました",
+  "imagePicker_uploadSuccess": "{count}枚の画像をアップロードしました",
+  "imagePicker_uploaded": "画像をアップロードしました",
+  "inspection_checklist": "チェックリスト",
+  "inspection_completedLog": "検査完了: {result}",
+  "inspection_fail": "検査合格 → 完了",
+  "inspection_failedFixRequest": "検査合格 → 完了",
+  "inspection_needsFix": "要是正",
+  "inspection_overallComment": "総合コメント",
+  "inspection_pass": "合格",
+  "inspection_passed": "合格",
+  "inspection_passedComplete": "検査合格 → 完了",
+  "inspection_submitFailed": "検査提出に失敗: {error}",
+  "inspection_submitResult": "検査結果を提出",
+  "inspection_title": "施工検査",
+  "introduction": "自己紹介",
+  "invalidEmail": "メールアドレスの形式が正しくありません",
+  "inviteFriends": "友達を招待",
+  "inviteFriendsSubtitle": "紹介コードで友達を招待",
+  "itemCount": "{count}件",
+  "jobCard_actions": "操作",
+  "jobCard_addFavorite": "お気に入りから削除",
+  "jobCard_delete": "編集",
+  "jobCard_edit": "編集",
+  "jobCard_noOwnerId": "ownerIdなし",
+  "jobCard_perDay": " /日",
+  "jobCard_quickStart": "即日勤務OK",
+  "jobCard_remainingSlots": "残り{count}枠",
+  "jobCard_removeFavorite": "お気に入りから削除",
+  "jobCard_semanticsLabel": "{title}、場所: {location}、日程: {date}、報酬: {price}",
+  "jobCreateTitle": "案件作成",
+  "jobDate": "勤務日",
+  "jobDeleted": "案件を削除しました",
+  "jobDescription": "仕事内容",
+  "jobDetail": "案件詳細",
+  "jobDetail_addToFavorites": "お気に入りに追加",
+  "jobDetail_applicationReceived": "{projectName}に応募がありました",
+  "jobDetail_applied": "応募済み",
+  "jobDetail_applyButton": "応募する",
+  "jobDetail_applyError": "応募に失敗しました",
+  "jobDetail_applyToJob": "案件応募",
+  "jobDetail_applyToThisJob": "この案件に応募する",
+  "jobDetail_category": "カテゴリ",
+  "jobDetail_checking": "確認中...",
+  "jobDetail_checkingStatus": "確認中...",
+  "jobDetail_defaultDescription": "詳細情報はまだ登録されていません。",
+  "jobDetail_defaultNotes": "特記事項はありません。",
+  "jobDetail_deleteConfirmMessage": "この案件を削除してよろしいですか？この操作は取り消せません。",
+  "jobDetail_deleteConfirmTitle": "案件を削除",
+  "jobDetail_deleteError": "削除に失敗しました",
+  "jobDetail_deleteThisJob": "この案件を削除",
+  "jobDetail_favorite": "お気に入り",
+  "jobDetail_jobDescription": "仕事内容",
+  "jobDetail_legacyData": "旧データ",
+  "jobDetail_locationLabel": "場所",
+  "jobDetail_mayBeDeleted": "この案件は削除された可能性があります",
+  "jobDetail_newApplication": "新しい応募",
+  "jobDetail_notes": "備考・注意事項",
+  "jobDetail_paymentLabel": "報酬",
+  "jobDetail_removeFromFavorites": "お気に入りから削除",
+  "jobDetail_scheduleLabel": "日程",
+  "jobDetail_share": "共有",
+  "jobDetail_snackApplied": "応募が完了しました",
+  "jobDetail_status": "ステータス",
+  "jobDetail_title": "案件詳細",
+  "jobEditTitle": "案件編集",
+  "jobEdit_dateHint": "タップして日付を選択",
+  "jobEdit_dateLabel": "日程",
+  "jobEdit_datePickerCancel": "キャンセル",
+  "jobEdit_datePickerConfirm": "決定",
+  "jobEdit_datePickerHelp": "日程を選択",
+  "jobEdit_descriptionHint": "例）現場作業の補助、清掃、資材運搬など",
+  "jobEdit_descriptionLabel": "仕事内容",
+  "jobEdit_hintBody": "更新後は一覧に戻ります。日程はカレンダーから選択できます。緯度・経度を設定するとQR出退勤時のGPS検証が有効になります。",
+  "jobEdit_hintTitle": "ヒント",
+  "jobEdit_latitudeHint": "例）35.6812",
+  "jobEdit_latitudeLabel": "緯度（任意）",
+  "jobEdit_locationHint": "例）千葉県千葉市花見川区",
+  "jobEdit_locationLabel": "場所",
+  "jobEdit_longitudeHint": "例）139.7671",
+  "jobEdit_longitudeLabel": "経度（任意）",
+  "jobEdit_notesHint": "例）遅刻厳禁、安全第一、詳細はチャットで確認など",
+  "jobEdit_notesLabel": "注意事項",
+  "jobEdit_priceHint": "例）30000",
+  "jobEdit_priceLabel": "報酬（円）",
+  "jobEdit_sectionSubtitle": "案件の情報を更新してください",
+  "jobEdit_sectionTitle": "編集内容",
+  "jobEdit_snackEmptyFields": "未入力の項目があります",
+  "jobEdit_snackPriceNumeric": "金額は数字で入力してください",
+  "jobEdit_snackSelectDateFromCalendar": "日程はカレンダーから選択してください",
+  "jobEdit_snackUpdateFailed": "更新に失敗しました: {error}",
+  "jobEdit_title": "案件を編集",
+  "jobEdit_titleHint": "例）クロス張替え（1LDK）",
+  "jobEdit_titleLabel": "タイトル",
+  "jobEdit_updateButton": "更新する",
+  "jobFilter_areaHint": "エリアを選択",
+  "jobFilter_areaLabel": "エリア",
+  "jobFilter_dateRange": "日程",
+  "jobFilter_dateSeparator": "〜",
+  "jobFilter_endDate": "終了日",
+  "jobFilter_priceRange": "報酬範囲",
+  "jobFilter_qualBuildingManagement": "建築施工管理技士",
+  "jobFilter_qualCivilEngineering": "土木施工管理技士",
+  "jobFilter_qualElectrician": "電気工事士",
+  "jobFilter_qualForklift": "フォークリフト運転者",
+  "jobFilter_qualHazmat": "危険物取扱者",
+  "jobFilter_qualScaffolding": "建築施工管理",
+  "jobFilter_qualSlinging": "玉掛け技能者",
+  "jobFilter_qualWelding": "溶接技能者",
+  "jobFilter_requiredQualifications": "必要資格",
+  "jobFilter_reset": "リセット",
+  "jobFilter_searchButton": "検索する",
+  "jobFilter_startDate": "開始日",
+  "jobFilter_title": "絞り込み検索",
+  "jobListTitle": "仕事一覧",
+  "jobList_dataLoadError": "データの読み込みに失敗しました",
+  "jobList_deleteConfirmMessage": "この案件を削除してよろしいですか？この操作は取り消せません。",
+  "jobList_deleteConfirmTitle": "案件を削除",
+  "jobList_deleteError": "削除に失敗しました",
+  "jobList_fetchJobsError": "案件情報の取得に失敗しました",
+  "jobList_filter": "フィルタ",
+  "jobList_filterActiveLabel": "フィルタ適用中",
+  "jobList_locationError": "位置情報の取得に失敗しました",
+  "jobList_monthLabel": "すべて",
+  "jobList_nextMonth": "すべて",
+  "jobList_noJobs": "案件がありません",
+  "jobList_noJobsDescription": "現在、この条件に該当する案件はありません。",
+  "jobList_noMatchingJobs": "該当する案件がありません",
+  "jobList_noMatchingJobsDescription": "条件を変更して再度検索してください。",
+  "jobList_openSearchFilter": "検索フィルタを開く",
+  "jobList_prefChiba": "今月",
+  "jobList_prefKanagawa": "今月",
+  "jobList_prefOther": "今月",
+  "jobList_prefTokyo": "今月",
+  "jobList_searchByAreaCondition": "エリア・条件で検索",
+  "jobList_sortDistance": "距離順",
+  "jobList_sortHighestPay": "金額が高い順",
+  "jobList_sortNewest": "新着順",
+  "jobList_sortTooltip": "並べ替え",
+  "jobList_thisMonth": "すべて",
+  "jobList_viewOnMap": "マップで見る",
+  "jobList_viewOnMapAccessibility": "地図で案件を見る",
+  "jobLocation": "勤務地",
+  "jobNotes": "備考",
+  "jobOverview": "概要",
+  "jobPrice": "報酬",
+  "jobSaved": "案件を保存しました",
+  "jobTitle": "案件名",
+  "laborInsurance": "労災保険について",
+  "legalCompliance": "法令遵守",
+  "legalDocuments": "法的ドキュメント",
+  "legalIndex": "法的情報",
+  "legalIndex_compliance": "法令遵守",
+  "legalIndex_dispatchLaw": "労働者派遣法について",
+  "legalIndex_employmentSecurityLaw": "職業安定法について",
+  "legalIndex_laborInsurance": "労災保険について",
+  "legalIndex_legalDocuments": "法的ドキュメント",
+  "legalIndex_privacyPolicy": "プライバシーポリシー",
+  "legalIndex_termsOfService": "利用規約",
+  "legalIndex_title": "法的情報",
+  "legalInfo": "法的情報",
+  "legalInfoSubtitle": "プライバシーポリシー・利用規約・法令情報",
+  "loadMore": "もっと見る",
+  "loadMore_showMore": "もっと表示",
+  "loading": "読み込み中...",
+  "locationPermissionRequired": "位置情報の許可が必要です",
+  "login": "ログイン",
+  "loginSuccess": "ログインしました",
+  "logout": "ログアウト",
+  "logoutConfirm": "ログアウトしますか？",
+  "logoutSuccess": "ログアウトしました",
+  "mapSearch_details": "詳細",
+  "mapSearch_noJobs": "地図に表示できる案件がありません",
+  "mapSearch_noTitle": "タイトルなし",
+  "mapSearch_notSet": "タイトルなし",
+  "mapSearch_pricePerDay": "¥{price} /日",
+  "mapSearch_title": "地図で探す",
+  "markAsRead": "既読にする",
+  "messagesTitle": "メッセージ",
+  "messages_emptyAdmin": "チャットルームはまだありません",
+  "messages_emptyDescription": "案件に応募するとチャットが開始されます",
+  "messages_emptyUser": "メッセージはまだありません",
+  "messages_featureName": "メッセージ",
+  "messages_noSearchResults": "検索結果なし",
+  "messages_registrationRequiredDescription": "会員登録をして、メッセージ機能をご利用ください。",
+  "messages_registrationRequiredTitle": "メッセージを利用するには会員登録が必要です",
+  "messages_searchHint": "メッセージを検索…",
+  "messages_statusLabel": "ステータス: {status}",
+  "messages_title": "メッセージ",
+  "messages_titleAdmin": "メッセージ（管理者）",
+  "messages_tryDifferentKeyword": "別のキーワードで検索してください",
+  "myProfile": "プロフィール",
+  "myProfile_addQualification": "資格を追加",
+  "myProfile_addressHint": "例: 東京都渋谷区...",
+  "myProfile_addressLabel": "住所",
+  "myProfile_addressSection": "住所",
+  "myProfile_adminRating": "管理者からの評価",
+  "myProfile_avatarUpdated": "プロフィール写真を更新しました",
+  "myProfile_avatarUploadError": "写真のアップロードに失敗しました",
+  "myProfile_basicInfo": "基本情報",
+  "myProfile_birthDate": "生年月日",
+  "myProfile_birthDateLabel": "生年月日",
+  "myProfile_completionRate": "完了率",
+  "myProfile_experienceSkills": "経験・スキル",
+  "myProfile_experienceYearsHint": "例: 5",
+  "myProfile_experienceYearsLabel": "経験年数",
+  "myProfile_familyName": "姓",
+  "myProfile_familyNameKana": "セイ",
+  "myProfile_familyNameKanaLabel": "セイ（カナ）",
+  "myProfile_familyNameLabel": "姓",
+  "myProfile_genderFemale": "女性",
+  "myProfile_genderLabel": "性別",
+  "myProfile_genderMale": "男性",
+  "myProfile_genderNotAnswered": "未回答",
+  "myProfile_genderOther": "その他",
+  "myProfile_genderRequired": "性別を選択してください",
+  "myProfile_givenName": "名",
+  "myProfile_givenNameKana": "メイ",
+  "myProfile_givenNameKanaLabel": "メイ（カナ）",
+  "myProfile_givenNameLabel": "名",
+  "myProfile_identityVerified": "本人確認済み",
+  "myProfile_introHint": "得意な作業や経験をアピールしましょう",
+  "myProfile_introLabel": "自己紹介",
+  "myProfile_loadError": "プロフィールの読み込みに失敗しました",
+  "myProfile_loginRequired": "ログインが必要です",
+  "myProfile_loginRequiredMessage": "プロフィール編集にはログインが必要です。設定画面からログインしてください。",
+  "myProfile_loginRequiredTitle": "ログインが必要です",
+  "myProfile_photoSetByVerification": "本人確認後に写真が設定されます",
+  "myProfile_pickFromGallery": "ギャラリーから選択",
+  "myProfile_postalCodeHint": "例: 123-4567",
+  "myProfile_postalCodeInvalid": "郵便番号の形式が正しくありません",
+  "myProfile_postalCodeLabel": "郵便番号",
+  "myProfile_profilePhoto": "プロフィール写真",
+  "myProfile_qualificationHint": "資格名を入力",
+  "myProfile_qualifications": "資格",
+  "myProfile_qualityScore": "品質スコア",
+  "myProfile_ratingAverage": "評価平均",
+  "myProfile_requiredField": "{label}は必須です",
+  "myProfile_saveButton": "保存する",
+  "myProfile_saveError": "保存に失敗しました",
+  "myProfile_saveSuccess": "プロフィールを保存しました",
+  "myProfile_selectBirthDate": "生年月日を選択",
+  "myProfile_selectGender": "性別を選択してください",
+  "myProfile_stripeActive": "Stripe連携済み — 報酬の受け取りが可能です",
+  "myProfile_stripeIntegration": "Stripe連携",
+  "myProfile_stripeNotConfigured": "Stripe未設定 — 報酬の受け取りにはStripe連携が必要です",
+  "myProfile_stripePending": "Stripe審査中 — 確認が完了するまでお待ちください",
+  "myProfile_takePhoto": "写真を撮る",
+  "myProfile_tapToChangePhoto": "タップして写真を変更",
+  "myProfile_title": "プロフィール編集",
+  "myProfile_verifiedQualifications": "認定資格",
+  "myProfile_yearsSuffix": "年",
+  "myProfile_yourRating": "あなたの評価",
+  "name": "氏名",
+  "nameChanged": "名前を変更しました",
+  "navHome": "ホーム",
+  "navMessages": "メッセージ",
+  "navMyPage": "マイページ",
+  "navProfile": "プロフィール",
+  "navSales": "売上",
+  "navSearch": "検索",
+  "navWork": "仕事",
+  "netAmount": "振込金額",
+  "networkCheckConnection": "ネットワーク接続を確認してください",
+  "newPassword": "新しいパスワード",
+  "next": "次へ",
+  "noData": "データがありません",
+  "noEarnings": "売上データがありません",
+  "noJobsFound": "条件に合う仕事が見つかりません",
+  "noMessages": "メッセージはありません",
+  "noMoreData": "これ以上データはありません",
+  "noNotifications": "お知らせはありません",
+  "noWork": "現在の仕事はありません",
+  "notificationSettings": "通知設定",
+  "notifications": "お知らせ",
+  "notifications_allRead": "すべて既読にしました",
+  "notifications_empty": "お知らせはまだありません",
+  "notifications_emptyDescription": "お知らせはまだありません",
+  "notifications_error": "エラー: {error}",
+  "notifications_loginDescription": "ログインが必要です",
+  "notifications_loginRequired": "お知らせ",
+  "notifications_markAllRead": "すべて既読にしました",
+  "notifications_title": "お知らせ",
+  "offlineBanner_connectionRestored": "接続が復旧しました",
+  "offlineBanner_offlineMode": "オフラインモード — キャッシュデータを表示中",
+  "offlineBanner_retry": "再試行",
+  "onboardingDesc1": "建設業界の仕事を簡単に検索・応募できます",
+  "onboardingDesc2": "QRコードをスキャンして簡単に出退勤管理",
+  "onboardingDesc3": "Stripe決済で安全・確実に報酬を受け取れます",
+  "onboardingTitle1": "仕事を見つけよう",
+  "onboardingTitle2": "QRで出退勤",
+  "onboardingTitle3": "安心の支払い",
+  "onboarding_agreed": "、同意済み",
+  "onboarding_getStarted": "アプリを始める",
+  "onboarding_nextPage": "アプリを始める",
+  "onboarding_pageIndicator": "ページ{current} / {total}",
+  "onboarding_privacyPolicy": "プライバシーポリシー",
+  "onboarding_skip": "オンボーディングをスキップ",
+  "onboarding_termsOfService": "利用規約",
+  "openSettings": "設定を開く",
+  "optional": "任意",
+  "password": "パスワード",
+  "passwordChanged": "パスワードを変更しました",
+  "passwordResetDescription": "登録されたメールアドレスにリセットリンクを送信します",
+  "passwordResetSent": "パスワードリセットメールを送信しました",
+  "passwordResetTitle": "パスワードリセット",
+  "paymentDetail": "決済詳細",
+  "paymentDetail_createdAt": "作成日時",
+  "paymentDetail_netAmount": "支払い金額",
+  "paymentDetail_notFound": "支払い情報が見つかりません",
+  "paymentDetail_paymentAmount": "案件名",
+  "paymentDetail_paymentStatus": "受取金額",
+  "paymentDetail_payoutStatus": "決済ステータス",
+  "paymentDetail_platformFee": "支払い金額",
+  "paymentDetail_projectName": "案件名",
+  "paymentDetail_title": "支払い詳細",
+  "paymentFailed": "決済失敗",
+  "paymentPending": "決済待ち",
+  "paymentStatus": "決済状況",
+  "paymentSucceeded": "決済完了",
+  "payoutDate": "支払い日",
+  "phone": "電話番号",
+  "phoneAuth_changePhoneNumber": "電話番号を変更する",
+  "phoneAuth_codeSentTo": "{phone} に送信された6桁のコードを入力してください",
+  "phoneAuth_enterCode": "認証コードを入力",
+  "phoneAuth_enterJapaneseNumber": "日本の電話番号を入力してください",
+  "phoneAuth_enterSixDigitCode": "6桁のコードを入力してください",
+  "phoneAuth_invalidPhoneNumber": "有効な電話番号を入力してください（10〜11桁）",
+  "phoneAuth_login": "ログイン",
+  "phoneAuth_loginSuccess": "ログインしました",
+  "phoneAuth_phoneNumberLabel": "電話番号",
+  "phoneAuth_resendCode": "コードを再送信",
+  "phoneAuth_resendCountdown": "再送信まで {seconds}秒",
+  "phoneAuth_restartVerification": "認証コードの送信からやり直してください",
+  "phoneAuth_sendCode": "認証コードを送信",
+  "phoneAuth_smsDescription": "SMSで認証コードを送信します",
+  "phoneAuth_title": "電話番号でログイン",
+  "phoneAuth_verificationCodeLabel": "認証コード",
+  "platformFee": "プラットフォーム手数料",
+  "postJob": "案件を投稿",
+  "postJobSuccess": "案件を投稿しました",
+  "postJobTitle": "案件を投稿",
+  "post_dateHint": "タップして日付を選択",
+  "post_dateLabel": "日程",
+  "post_datePickerCancel": "キャンセル",
+  "post_datePickerConfirm": "決定",
+  "post_datePickerHelp": "日程を選択",
+  "post_hintBody": "日程はカレンダーから選択できます。緯度・経度を入力するとQR出退勤時にGPS検証が有効になります。",
+  "post_hintTitle": "ヒント",
+  "post_latitudeHint": "例）35.6812",
+  "post_latitudeLabel": "緯度（任意）",
+  "post_locationHint": "例）千葉県千葉市花見川区",
+  "post_locationLabel": "場所",
+  "post_longitudeHint": "例）139.7671",
+  "post_longitudeLabel": "経度（任意）",
+  "post_noPermissionMessage": "この画面は管理者のみ利用できます。",
+  "post_noPermissionTitle": "権限がありません",
+  "post_priceHint": "例）30000",
+  "post_priceLabel": "報酬（円）",
+  "post_sectionBasicInfo": "基本情報",
+  "post_sectionBasicInfoSubtitle": "案件の内容を入力してください",
+  "post_snackAdminOnly": "管理者のみ投稿できます",
+  "post_snackCheckingPermission": "権限確認中です。少し待ってください。",
+  "post_snackEmptyFields": "未入力の項目があります",
+  "post_snackLoginRequired": "ログインが必要です",
+  "post_snackPostFailed": "投稿失敗: {error}",
+  "post_snackPriceNumeric": "金額は数字で入力してください",
+  "post_snackSelectDateFromCalendar": "日程はカレンダーから選択してください",
+  "post_submitButton": "投稿する",
+  "post_title": "案件を投稿",
+  "post_titleHint": "例）クロス張替え（1LDK）",
+  "post_titleLabel": "タイトル",
+  "postalCode": "郵便番号",
+  "prefecture": "都道府県",
+  "privacyPolicy": "プライバシーポリシー",
+  "profilePhotoChange": "写真を変更",
+  "profileSaved": "プロフィールを保存しました",
+  "profileTitle": "マイページ",
+  "profileWidgets_guest": "Guest",
+  "profileWidgets_loggedIn": "Logged in",
+  "profileWidgets_status": "Status",
+  "profile_accountSettings": "アカウント設定",
+  "profile_adminLogin": "管理者ログイン",
+  "profile_adminLoginSubtitle": "案件の投稿・編集ができます",
+  "profile_adminLogout": "管理者ログアウト",
+  "profile_adminLogoutSubtitle": "現在ログインしていません",
+  "profile_contact": "お問い合わせ",
+  "profile_darkMode": "ダークモード",
+  "profile_darkModeDescription": "ダークモードはお使いの端末のシステム設定に連動しています。\\n\\n",
+  "profile_darkModeSubtitle": "システム設定に従う",
+  "profile_faq": "よくある質問",
+  "profile_favoriteJobs": "お気に入り案件",
+  "profile_favoriteJobsSubtitle": "保存した案件を確認",
+  "profile_guest": "ゲスト",
+  "profile_identityVerification": "本人確認",
+  "profile_identityVerificationSubtitle": "身分証明書と顔写真を提出",
+  "profile_inviteFriends": "友達を招待",
+  "profile_inviteFriendsSubtitle": "紹介コードで友達を招待",
+  "profile_legalInfo": "法的情報",
+  "profile_legalInfoSubtitle": "プライバシーポリシー・利用規約・法令情報",
+  "profile_lineLoginButton": "LINEでログイン",
+  "profile_lineLoginSemanticsLabel": "LINEアカウントでログインする",
+  "profile_loggedIn": "ログインすると応募・チャットが使えます",
+  "profile_loggedInUser": "ログインユーザー",
+  "profile_loginButton": "ログインする",
+  "profile_loginPromptSubtitle": "ログインすると応募・チャットが使えます",
+  "profile_loginRequired": "ログインが必要です",
+  "profile_loginRequiredMessage": "応募・チャットなど一部機能を利用するにはログインが必要です。",
+  "profile_notLoggedIn": "現在ログインしていません",
+  "profile_qualifications": "資格管理",
+  "profile_qualificationsSubtitle": "保有資格の登録・確認",
+  "profile_sectionAccount": "アカウント",
+  "profile_sectionAdmin": "管理者",
+  "profile_sectionOther": "その他",
+  "profile_sectionSupport": "サポート",
+  "profile_snackLoggedOut": "ログアウトしました（ゲストに戻りました）",
+  "profile_stripeAccount": "Stripe口座設定",
+  "profile_stripeAccountSubtitle": "報酬の受取口座を設定",
+  "profile_yourProfile": "あなたのプロフィール",
+  "projectName": "案件名",
+  "qrCheckIn": "QR出勤",
+  "qrCheckin_clockIn": "退勤",
+  "qrCheckin_clockOut": "退勤",
+  "qrCheckin_error": "エラー",
+  "qrCheckin_errorOccurred": "エラーが発生しました: {error}",
+  "qrCheckin_gpsVerification": "GPS検証: 現場から100m以内で{action}できます",
+  "qrCheckin_scanAdminQr": "管理者のQRコードをスキャンしてください",
+  "qrCheckin_title": "QRスキャン（{action}）",
+  "qualificationAdd_categoryLabel": "カテゴリ *",
+  "qualificationAdd_expiryDate": "有効期限",
+  "qualificationAdd_nameHint": "資格名 *",
+  "qualificationAdd_nameLabel": "資格名 *",
+  "qualificationAdd_nameRequired": "資格名を入力してください",
+  "qualificationAdd_noExpiry": "有効期限",
+  "qualificationAdd_register": "資格を登録しました（審査待ち）",
+  "qualificationAdd_registerFailed": "登録に失敗: {error}",
+  "qualificationAdd_registered": "資格を登録しました（審査待ち）",
+  "qualificationAdd_title": "資格を追加",
+  "qualifications": "資格",
+  "qualifications_addHint": "登録された資格はありません",
+  "qualifications_approved": "承認済み",
+  "qualifications_empty": "登録された資格はありません",
+  "qualifications_error": "エラー: {error}",
+  "qualifications_expired": "（期限切れ）",
+  "qualifications_expiryDate": "有効期限: {date}{status}",
+  "qualifications_loginRequired": "ログインが必要です",
+  "qualifications_pending": "承認済み",
+  "qualifications_rejected": "審査中",
+  "qualifications_title": "資格管理",
+  "ratingDialog_average": "不満",
+  "ratingDialog_commentHint": "コメント（任意）",
+  "ratingDialog_dissatisfied": "不満",
+  "ratingDialog_excellent": "コメント（任意）",
+  "ratingDialog_good": "コメント（任意）",
+  "ratingDialog_later": "後で",
+  "ratingDialog_selectStars": "星を選択してください",
+  "ratingDialog_somewhatDissatisfied": "不満",
+  "ratingDialog_submit": "評価を送信しました",
+  "ratingDialog_submitFailed": "送信に失敗しました: {error}",
+  "ratingDialog_submitSuccess": "評価を送信しました",
+  "ratingDialog_title": "お仕事の評価",
+  "ratingLabel": "評価",
+  "ratingStars_count": "({count}件)",
+  "ratingStars_noRating": "評価なし",
+  "receiveNotifications": "お知らせ通知を受け取る",
+  "referral_applyButton": "適用する",
+  "referral_codeApplied": "紹介コードを適用しました",
+  "referral_codeCopied": "コードをコピーしました",
+  "referral_codeHint": "例: ABC123",
+  "referral_copy": "コピー",
+  "referral_enterCode": "紹介コードを入力",
+  "referral_enterCodeDescription": "紹介コードを入力",
+  "referral_inviteDescription": "友達を招待して特典を受け取ろう",
+  "referral_loginRequired": "ログインが必要です",
+  "referral_share": "シェア",
+  "referral_stats": "紹介実績",
+  "referral_statsCount": "{count} 人",
+  "referral_title": "友達を招待",
+  "referral_yourCode": "あなたの紹介コード",
+  "refreshing": "更新中...",
+  "register": "新規登録",
+  "registerSuccess": "アカウントを作成しました",
+  "registrationPrompt_defaultFeature": "この機能",
+  "registrationPrompt_description": "LINEまたはメールアドレスで登録して、\\nすべての機能をご利用ください。",
+  "registrationPrompt_emailLogin": "メールアドレスで登録",
+  "registrationPrompt_error": "エラーが発生しました: {error}",
+  "registrationPrompt_later": "後で",
+  "registrationPrompt_lineLogin": "LINEで登録",
+  "registrationPrompt_lineRedirect": "LINEログインページへ移動します",
+  "registrationPrompt_title": "{feature}には登録が必要です",
+  "required": "必須",
+  "retry": "再試行",
+  "router_goHome": "ホームに戻る",
+  "router_pageDoesNotExist": "{uri} は存在しません",
+  "router_pageNotFound": "ページが見つかりません",
+  "router_statementsTitle": "明細一覧",
+  "router_workTimelineTitle": "工程タイムライン",
+  "salesTitle": "売上",
+  "sales_checkSales": "売上確認",
+  "sales_constructionCompleted": "施工完了",
+  "sales_dataCount": "データ件数: {count}件",
+  "sales_earningsNote": "※ 管理者が報酬を確定すると収入に反映されます",
+  "sales_incomeAndStatements": "収入・明細",
+  "sales_incomeNote": "※ 確定済みの報酬のみ表示",
+  "sales_monthLabel": "{month}月",
+  "sales_monthStatement": "{month}月 明細",
+  "sales_monthlyTrend": "月別推移",
+  "sales_nextPaymentDate": "次回支払日: {month}月10日",
+  "sales_noPaymentData": "支払いデータがありません",
+  "sales_noStatements": "明細がありません",
+  "sales_noStatementsDescription": "月次明細が生成されるとここに表示されます。",
+  "sales_paid": "支払済",
+  "sales_paymentHistory": "支払い履歴",
+  "sales_paymentManagement": "支払い管理",
+  "sales_registerPayment": "報酬を登録",
+  "sales_registerToStart": "登録して始める",
+  "sales_registrationDescription": "売上情報を確認するには会員登録が必要です。",
+  "sales_registrationRequired": "会員登録が必要です",
+  "sales_resetToThisMonth": "今月に戻す",
+  "sales_salesTitle": "売上",
+  "sales_selectedMonthIncome": "選択月の収入",
+  "sales_statusDraft": "集計中",
+  "sales_statusPaid": "支払済み",
+  "sales_tabIncome": "収入",
+  "sales_tabStatements": "明細",
+  "sales_thisMonthIncome": "今月の収入",
+  "sales_total": "合計",
+  "sales_totalIncome": "累計収入",
+  "sales_unconfirmedEarnings": "未確定の報酬",
+  "sales_unpaid": "未払い",
+  "save": "保存",
+  "scanQrCode": "QRコードをスキャン",
+  "search": "検索",
+  "searchJobs": "仕事を検索",
+  "send": "送信",
+  "sendMessage": "メッセージを送信",
+  "sendResetLink": "リセットリンクを送信",
+  "shareJob": "案件をシェア",
+  "shiftQr": "シフトQR",
+  "shiftQr_generateFailed": "生成に失敗: {error}",
+  "shiftQr_generateNew": "生成中...",
+  "shiftQr_generated": "QRコードを生成しました",
+  "shiftQr_generating": "生成中...",
+  "shiftQr_noQrCodes": "QRコードはまだ生成されていません",
+  "shiftQr_scanInstruction": "職人にこのQRコードをスキャンしてもらってください",
+  "shiftQr_title": "QR出退勤管理",
+  "showPassword": "パスワードを表示",
+  "signInWithApple": "Appleでサインイン",
+  "signInWithEmail": "メールアドレスでログイン",
+  "signInWithLine": "LINEでログイン",
+  "skip": "スキップ",
+  "sortByNewest": "新着順",
+  "sortByPriceHigh": "報酬が高い順",
+  "startAsGuest": "ゲストとして始める",
+  "startOnboarding": "口座設定を開始",
+  "statementDetail_applyButton": "キャンセル",
+  "statementDetail_completedDate": "完了日: {date}",
+  "statementDetail_earlyPaymentButton": "即金申請（手数料10%）",
+  "statementDetail_earlyPaymentConfirm": "即金申請しますか？手数料10%が差し引かれます。（金額: ¥{totalAmount}、手数料: ¥{fee}、支払額: ¥{payout}）",
+  "statementDetail_earlyPaymentError": "即金申請を送信しました",
+  "statementDetail_earlyPaymentPending": "即金申請済み（審査中）",
+  "statementDetail_earlyPaymentSuccess": "即金申請を送信しました",
+  "statementDetail_earlyPaymentTitle": "即金申請",
+  "statementDetail_error": "エラー: {error}",
+  "statementDetail_jobDetails": "案件明細",
+  "statementDetail_monthLabel": "{month}月",
+  "statementDetail_title": "明細詳細",
+  "statusApplied": "応募中",
+  "statusAssigned": "確定",
+  "statusBadge_applied": "応募中",
+  "statusBadge_assigned": "着工前",
+  "statusBadge_completed": "施工完了",
+  "statusBadge_done": "完了",
+  "statusBadge_fixing": "是正中",
+  "statusBadge_inProgress": "着工中",
+  "statusBadge_inspection": "検収中",
+  "statusCancelled": "キャンセル",
+  "statusCompleted": "完了",
+  "statusPending": "審査中",
+  "statusRejected": "不採用",
+  "stripeOnboarding": "口座設定",
+  "stripeOnboardingDescription": "報酬を受け取るために口座情報を設定してください",
+  "stripeOnboarding_initFailed": "URLの取得に失敗しました",
+  "stripeOnboarding_retry": "リトライ",
+  "stripeOnboarding_title": "Stripe口座設定",
+  "stripeOnboarding_urlFetchFailed": "URLの取得に失敗しました",
+  "tabSelected": "選択中",
+  "termsOfService": "利用規約",
+  "timeline_empty": "タイムラインはまだありません",
+  "timeline_error": "エラー: {error}",
+  "today": "今日",
+  "tooManyRequests": "リクエストが多すぎます。しばらくしてからお試しください",
+  "totalEarnings": "合計報酬",
+  "typeMessage": "メッセージを入力",
+  "unreadCount": "未読{count}件",
+  "update": "更新",
+  "userDisabled": "このアカウントは無効化されています",
+  "userNotFound": "アカウントが見つかりません",
+  "weakPassword": "パスワードが弱すぎます。6文字以上で設定してください",
+  "workDetail": "仕事詳細",
+  "workDetail_chat": "チャット",
+  "workDetail_checkedIn": "出勤中",
+  "workDetail_checkedOut": "退勤済み",
+  "workDetail_completeButton": "完了報告",
+  "workDetail_jobName": "案件名",
+  "workDetail_jobNotFound": "案件が見つかりません",
+  "workDetail_location": "場所",
+  "workDetail_loginRequired": "ログインが必要です",
+  "workDetail_noJobIdWarning": "※ jobIdが未設定のため、元の案件情報を表示できません。",
+  "workDetail_noPermission": "この案件の閲覧権限がありません",
+  "workDetail_notCheckedIn": "未出勤",
+  "workDetail_payment": "報酬",
+  "workDetail_paymentUnconfirmed": "未確定",
+  "workDetail_qrAttendance": "QR勤怠",
+  "workDetail_qrClockIn": "QR出勤",
+  "workDetail_qrClockOut": "QR退勤",
+  "workDetail_rateButton": "評価する",
+  "workDetail_rated": "評価済み",
+  "workDetail_reinspect": "再検査",
+  "workDetail_reportRequired": "完了するには日報を1件以上提出してください",
+  "workDetail_schedule": "日程",
+  "workDetail_snackCompleteError": "完了処理に失敗しました",
+  "workDetail_snackCompleted": "施工完了しました",
+  "workDetail_snackStartError": "着工処理に失敗しました",
+  "workDetail_snackStarted": "着工しました",
+  "workDetail_startButton": "着工",
+  "workDetail_startInspection": "検収",
+  "workDetail_statusCompleted": "{title}が「施工完了」になりました",
+  "workDetail_statusInProgress": "{title}が「着工中」になりました",
+  "workDetail_statusUpdate": "ステータス更新",
+  "workDetail_tabDailyReport": "日報",
+  "workDetail_tabDocuments": "資料",
+  "workDetail_tabOverview": "概要",
+  "workDetail_tabPhotos": "写真",
+  "workDetail_timeline": "タイムライン",
+  "workDocs_add": "追加",
+  "workDocs_noDocuments": "「{folder}」の資料はまだありません",
+  "workDocs_title": "資料管理",
+  "workDocs_uploadFailed": "アップロードに失敗しました: {error}",
+  "workDocs_uploadSuccess": "{folder}にアップロードしました",
+  "workPhotos_add": "追加",
+  "workPhotos_cancel": "キャンセル",
+  "workPhotos_delete": "削除",
+  "workPhotos_deleteConfirm": "この写真を削除しますか？",
+  "workPhotos_deleteSuccess": "写真を削除しました",
+  "workPhotos_deleteTitle": "写真を削除",
+  "workPhotos_noPhotos": "写真はまだありません",
+  "workPhotos_title": "現場写真",
+  "workPhotos_uploadFailed": "アップロードに失敗しました: {error}",
+  "workPhotos_uploadHint": "「追加」ボタンから写真をアップロード",
+  "workPhotos_uploadSuccess": "{count}枚の写真をアップロードしました",
+  "workReportCreate_contentHint": "作業内容 *",
+  "workReportCreate_contentLabel": "作業内容 *",
+  "workReportCreate_contentRequired": "作業内容 *",
+  "workReportCreate_date": "日付",
+  "workReportCreate_hoursLabel": "作業時間（時間）",
+  "workReportCreate_hoursSuffix": "作業時間（時間）",
+  "workReportCreate_hoursValidation": "時間",
+  "workReportCreate_logSubmitted": "日報: {title} 提出",
+  "workReportCreate_notesHint": "備考",
+  "workReportCreate_notesLabel": "備考",
+  "workReportCreate_saveFailed": "保存に失敗: {error}",
+  "workReportCreate_submit": "日報を提出しました",
+  "workReportCreate_submitted": "日報を提出しました",
+  "workReportCreate_title": "日報作成",
+  "workReports_addHint": "日報はまだありません",
+  "workReports_empty": "日報はまだありません",
+  "workReports_error": "エラー: {error}",
+  "workStatus": "勤務状況",
+  "workTitle": "はたらく",
+  "work_chatTooltip": "チャット",
+  "work_emptyApplications": "応募した案件はありません",
+  "work_emptyAssigned": "アサイン済みの案件はありません",
+  "work_emptyCompleted": "施工完了の案件はありません",
+  "work_emptyDefault": "該当する案件はありません",
+  "work_emptyDone": "完了した案件はありません",
+  "work_emptyFixing": "是正中の案件はありません",
+  "work_emptyInProgress": "作業中の案件はありません",
+  "work_emptyInspection": "検収中の案件はありません",
+  "work_featureName": "仕事管理",
+  "work_groupApplied": "応募中",
+  "work_groupApproved": "承認済み・作業中",
+  "work_groupCompleted": "完了・検収",
+  "work_noJobs": "該当なし",
+  "work_registrationRequiredDescription": "会員登録をして、お仕事の応募・管理機能をご利用ください。",
+  "work_registrationRequiredTitle": "仕事管理を利用するには会員登録が必要です",
+  "work_tabApplications": "応募一覧",
+  "work_tabAssigned": "アサイン済み",
+  "work_tabCompleted": "施工完了",
+  "work_tabDone": "完了",
+  "work_tabFixing": "是正中",
+  "work_tabInProgress": "作業中",
+  "work_tabInspection": "検収中",
+  "workerLabel": "ワーカー",
+  "wrongPassword": "パスワードが正しくありません",
+  "yen": "円",
+  "yesterday": "昨日"
 }

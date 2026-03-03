@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/presentation/widgets/chat_image_bubble.dart';
 
 void main() {
   Widget buildTestWidget(ChatImageBubble bubble) {
     return MaterialApp(
+      theme: ThemeData(extensions: const [AppColorsExtension.light]),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('ja'),
       home: Scaffold(
         body: Center(child: bubble),
       ),
@@ -26,6 +38,15 @@ void main() {
 
     testWidgets('isMine=true → 右寄せ可能（Container存在確認）', (tester) async {
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: Scaffold(
           body: Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -47,6 +68,15 @@ void main() {
 
     testWidgets('isMine=false → 左寄せ可能', (tester) async {
       await tester.pumpWidget(MaterialApp(
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
         home: Scaffold(
           body: Row(
             mainAxisAlignment: MainAxisAlignment.start,

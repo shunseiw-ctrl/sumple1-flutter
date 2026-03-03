@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/extensions/build_context_extensions.dart';
 import '../../core/services/inspection_service.dart';
 import '../../core/services/activity_log_service.dart';
 import '../../core/utils/haptic_utils.dart';
@@ -79,7 +79,7 @@ class _InspectionPageState extends State<InspectionPage> {
       await ActivityLogService().logEvent(
         applicationId: widget.applicationId,
         eventType: 'inspection_completed',
-        description: '検査完了: ${result == 'passed' ? '合格' : '要修正'}',
+        description: context.l10n.inspection_completedLog(result == 'passed' ? context.l10n.inspection_passed : context.l10n.inspection_needsFix),
         metadata: {'result': result},
       );
 
@@ -87,14 +87,14 @@ class _InspectionPageState extends State<InspectionPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result == 'passed' ? '検査合格 → 完了' : '検査不合格 → 修正依頼'),
+          content: Text(result == 'passed' ? context.l10n.inspection_passedComplete : context.l10n.inspection_failedFixRequest),
         ),
       );
       context.pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('検査提出に失敗: $e')),
+        SnackBar(content: Text(context.l10n.inspection_submitFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -104,13 +104,13 @@ class _InspectionPageState extends State<InspectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('施工検査')),
+      appBar: AppBar(title: Text(context.l10n.inspection_title)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'チェックリスト',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+          Text(
+            context.l10n.inspection_checklist,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
           ),
           const SizedBox(height: 12),
           ..._checks.map((check) => _CheckItemWidget(
@@ -121,9 +121,9 @@ class _InspectionPageState extends State<InspectionPage> {
           TextFormField(
             controller: _commentController,
             maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: '総合コメント',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.inspection_overallComment,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 24),
@@ -133,7 +133,7 @@ class _InspectionPageState extends State<InspectionPage> {
             child: ElevatedButton(
               onPressed: _isSaving ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.ruri,
+                backgroundColor: context.appColors.primary,
                 foregroundColor: Colors.white,
               ),
               child: _isSaving
@@ -142,8 +142,8 @@ class _InspectionPageState extends State<InspectionPage> {
                       height: 20,
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white))
-                  : const Text('検査結果を提出',
-                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  : Text(context.l10n.inspection_submitResult,
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -181,7 +181,7 @@ class _CheckItemWidget extends StatelessWidget {
             Row(
               children: [
                 _ResultChip(
-                  label: '合格',
+                  label: context.l10n.inspection_pass,
                   selected: check.result == 'pass',
                   color: Colors.green,
                   onTap: () {
@@ -191,7 +191,7 @@ class _CheckItemWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 _ResultChip(
-                  label: '不合格',
+                  label: context.l10n.inspection_fail,
                   selected: check.result == 'fail',
                   color: Colors.red,
                   onTap: () {

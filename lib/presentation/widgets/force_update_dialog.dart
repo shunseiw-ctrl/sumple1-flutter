@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
 class ForceUpdateDialog extends StatelessWidget {
   final bool isForced;
@@ -23,22 +23,22 @@ class ForceUpdateDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadiusLg),
       ),
       title: Text(
-        isForced ? 'アップデートが必要です' : '新しいバージョンがあります',
+        isForced ? context.l10n.forceUpdate_required : context.l10n.forceUpdate_available,
         style: AppTextStyles.headingSmall,
       ),
       content: Text(
         message?.isNotEmpty == true
             ? message!
             : isForced
-                ? '最新バージョンにアップデートしてください。'
-                : '新機能が追加されました。最新バージョンをお使いください。',
+                ? context.l10n.forceUpdate_requiredMessage
+                : context.l10n.forceUpdate_availableMessage,
         style: AppTextStyles.bodyMedium,
       ),
       actions: [
         if (!isForced)
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('あとで', style: AppTextStyles.labelMedium),
+            child: Text(context.l10n.forceUpdate_later, style: AppTextStyles.labelMedium),
           ),
         ElevatedButton(
           onPressed: () async {
@@ -48,10 +48,10 @@ class ForceUpdateDialog extends StatelessWidget {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.ruri,
+            backgroundColor: context.appColors.primary,
             foregroundColor: Colors.white,
           ),
-          child: const Text('アップデート'),
+          child: Text(context.l10n.forceUpdate_update),
         ),
       ],
     );

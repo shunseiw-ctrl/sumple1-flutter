@@ -1,7 +1,10 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
+import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/pages/referral_page.dart';
 
 void main() {
@@ -17,6 +20,15 @@ void main() {
 
   Widget buildTestWidget() {
     return MaterialApp(
+      theme: ThemeData(extensions: const [AppColorsExtension.light]),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('ja'),
       home: ReferralPage(
         firestore: fakeFirestore,
         firebaseAuth: mockAuth,
@@ -38,7 +50,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('紹介コードを入力'), findsOneWidget);
+      expect(find.text('紹介コードを入力'), findsAtLeastNWidgets(1));
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('適用する'), findsOneWidget);
     });

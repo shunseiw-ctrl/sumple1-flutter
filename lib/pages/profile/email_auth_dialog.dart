@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 
 /// メール認証ダイアログを表示する
@@ -30,22 +30,22 @@ Future<void> showEmailAuthDialog({
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  String authErrorMessageJa(FirebaseAuthException e) {
+  String authErrorMessage(BuildContext ctx, FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-email':
-        return 'メールアドレスの形式が正しくありません';
+        return ctx.l10n.emailAuthDialog_invalidEmail;
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
-        return 'メールアドレスまたはパスワードが正しくありません';
+        return ctx.l10n.emailAuthDialog_wrongCredentials;
       case 'email-already-in-use':
-        return 'そのメールアドレスは既に使われています';
+        return ctx.l10n.emailAuthDialog_emailAlreadyInUse;
       case 'weak-password':
-        return 'パスワードが弱すぎます（6文字以上推奨）';
+        return ctx.l10n.emailAuthDialog_weakPassword;
       case 'operation-not-allowed':
-        return 'Firebase側でメール/パスワード認証が有効化されていません';
+        return ctx.l10n.emailAuthDialog_operationNotAllowed;
       default:
-        return '認証エラー: ${e.code}';
+        return ctx.l10n.emailAuthDialog_authError(e.code);
     }
   }
 
@@ -57,7 +57,7 @@ Future<void> showEmailAuthDialog({
         builder: (dialogContext, setLocalState) {
           Future<void> signIn() async {
             if (isLockedOut()) {
-              await showSnack('ログイン試行回数の上限に達しました。しばらくお待ちください');
+              await showSnack(dialogContext.l10n.emailAuthDialog_loginLocked);
               return;
             }
 
@@ -65,7 +65,7 @@ Future<void> showEmailAuthDialog({
             final pass = passController.text;
 
             if (email.isEmpty || pass.isEmpty) {
-              await showSnack('メールアドレスとパスワードを入力してください');
+              await showSnack(dialogContext.l10n.emailAuthDialog_enterEmailAndPassword);
               return;
             }
 
@@ -83,19 +83,19 @@ Future<void> showEmailAuthDialog({
                 Navigator.pop(dialogContext);
               }
               onAuthStateChanged();
-              await showSnack('ログインしました');
+              await showSnack(dialogContext.l10n.emailAuthDialog_loginSuccess);
             } on FirebaseAuthException catch (e) {
               failedAttempts++;
               if (failedAttempts >= maxAttempts) {
                 lockoutUntil = DateTime.now().add(lockoutDuration);
               }
-              await showSnack(authErrorMessageJa(e));
+              await showSnack(authErrorMessage(dialogContext, e));
             } catch (e) {
               failedAttempts++;
               if (failedAttempts >= maxAttempts) {
                 lockoutUntil = DateTime.now().add(lockoutDuration);
               }
-              await showSnack('ログインに失敗しました');
+              await showSnack(dialogContext.l10n.emailAuthDialog_loginFailed);
             } finally {
               if (dialogContext.mounted) {
                 setLocalState(() => isLoading = false);
@@ -108,11 +108,11 @@ Future<void> showEmailAuthDialog({
             final pass = passController.text;
 
             if (email.isEmpty || pass.isEmpty) {
-              await showSnack('メールアドレスとパスワードを入力してください');
+              await showSnack(dialogContext.l10n.emailAuthDialog_enterEmailAndPassword);
               return;
             }
             if (pass.length < 6) {
-              await showSnack('パスワードは6文字以上にしてください');
+              await showSnack(dialogContext.l10n.emailAuthDialog_passwordMinLength);
               return;
             }
 
@@ -137,11 +137,11 @@ Future<void> showEmailAuthDialog({
                 Navigator.pop(dialogContext);
               }
               onAuthStateChanged();
-              await showSnack('登録しました（ログイン済み）');
+              await showSnack(dialogContext.l10n.emailAuthDialog_signUpSuccess);
             } on FirebaseAuthException catch (e) {
-              await showSnack(authErrorMessageJa(e));
+              await showSnack(authErrorMessage(dialogContext, e));
             } catch (e) {
-              await showSnack('登録に失敗しました');
+              await showSnack(dialogContext.l10n.emailAuthDialog_signUpFailed);
             } finally {
               if (dialogContext.mounted) {
                 setLocalState(() => isLoading = false);
@@ -153,7 +153,7 @@ Future<void> showEmailAuthDialog({
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             ),
-            title: Text('メールでログイン', style: AppTextStyles.headingSmall),
+            title: Text(dialogContext.l10n.emailAuthDialog_title, style: AppTextStyles.headingSmall),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -161,21 +161,21 @@ Future<void> showEmailAuthDialog({
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'メールアドレス',
+                    labelText: dialogContext.l10n.emailAuthDialog_emailLabel,
                     prefixIcon: const Icon(Icons.email_outlined, size: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: dialogContext.appColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                      borderSide: const BorderSide(color: AppColors.ruri, width: 2),
+                      borderSide: BorderSide(color: dialogContext.appColors.primary, width: 2),
                     ),
                     filled: true,
-                    fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
+                    fillColor: dialogContext.appColors.primarySurface.withValues(alpha: 0.3),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
@@ -184,11 +184,11 @@ Future<void> showEmailAuthDialog({
                   controller: passController,
                   obscureText: obscure,
                   decoration: InputDecoration(
-                    labelText: 'パスワード',
+                    labelText: dialogContext.l10n.emailAuthDialog_passwordLabel,
                     prefixIcon: const Icon(Icons.lock_outline, size: 20),
                     suffixIcon: Semantics(
                       button: true,
-                      label: obscure ? 'パスワードを表示' : 'パスワードを隠す',
+                      label: obscure ? dialogContext.l10n.emailAuthDialog_showPassword : dialogContext.l10n.emailAuthDialog_hidePassword,
                       child: IconButton(
                         onPressed: () => setLocalState(() => obscure = !obscure),
                         icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
@@ -199,14 +199,14 @@ Future<void> showEmailAuthDialog({
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: dialogContext.appColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                      borderSide: const BorderSide(color: AppColors.ruri, width: 2),
+                      borderSide: BorderSide(color: dialogContext.appColors.primary, width: 2),
                     ),
                     filled: true,
-                    fillColor: AppColors.ruriSurface.withValues(alpha: 0.3),
+                    fillColor: dialogContext.appColors.primarySurface.withValues(alpha: 0.3),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
@@ -214,7 +214,7 @@ Future<void> showEmailAuthDialog({
                 if (isLoading) const LinearProgressIndicator(minHeight: 3),
                 const SizedBox(height: 8),
                 Text(
-                  '新規登録もこの画面からできます',
+                  dialogContext.l10n.emailAuthDialog_signUpHint,
                   style: AppTextStyles.labelSmall,
                 ),
               ],
@@ -222,15 +222,15 @@ Future<void> showEmailAuthDialog({
             actions: [
               TextButton(
                 onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
-                child: const Text('キャンセル'),
+                child: Text(dialogContext.l10n.common_cancel),
               ),
               TextButton(
                 onPressed: isLoading ? null : signUp,
-                child: const Text('新規登録'),
+                child: Text(dialogContext.l10n.emailAuthDialog_signUpButton),
               ),
               ElevatedButton(
                 onPressed: isLoading ? null : signIn,
-                child: const Text('ログイン'),
+                child: Text(dialogContext.l10n.emailAuthDialog_loginButton),
               ),
             ],
           );
