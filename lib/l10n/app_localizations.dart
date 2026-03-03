@@ -5551,6 +5551,24 @@ abstract class AppLocalizations {
   /// **'システム設定に従う'**
   String get profile_darkModeSubtitle;
 
+  /// No description provided for @profile_darkModeLight.
+  ///
+  /// In ja, this message translates to:
+  /// **'ライト'**
+  String get profile_darkModeLight;
+
+  /// No description provided for @profile_darkModeDark.
+  ///
+  /// In ja, this message translates to:
+  /// **'ダーク'**
+  String get profile_darkModeDark;
+
+  /// No description provided for @profile_darkModeSystem.
+  ///
+  /// In ja, this message translates to:
+  /// **'システム設定に従う'**
+  String get profile_darkModeSystem;
+
   /// No description provided for @profile_faq.
   ///
   /// In ja, this message translates to:

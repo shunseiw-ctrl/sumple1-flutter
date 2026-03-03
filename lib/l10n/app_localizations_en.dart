@@ -2947,6 +2947,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile_darkModeSubtitle => 'Follows system settings';
 
   @override
+  String get profile_darkModeLight => 'Light';
+
+  @override
+  String get profile_darkModeDark => 'Dark';
+
+  @override
+  String get profile_darkModeSystem => 'Follow system settings';
+
+  @override
   String get profile_faq => 'FAQ';
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/services/line_auth_service.dart';
@@ -8,6 +9,7 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/router/route_paths.dart';
+import 'package:sumple1/core/providers/theme_mode_provider.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -247,26 +249,66 @@ class _ProfilePageState extends State<ProfilePage> {
                 ProfileSectionHeader(title: context.l10n.profile_sectionOther),
                 ProfileMenuGroup(
                   children: [
-                    ProfileMenuTile(
-                      icon: Icons.dark_mode_outlined,
-                      iconColor: context.appColors.primary,
-                      title: context.l10n.profile_darkMode,
-                      subtitle: context.l10n.profile_darkModeSubtitle,
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text(context.l10n.profile_darkMode),
-                            content: Text(
-                              context.l10n.profile_darkModeDescription,
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: const Text('OK'),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final currentMode = ref.watch(themeModeProvider);
+                        String subtitle;
+                        switch (currentMode) {
+                          case ThemeMode.light:
+                            subtitle = context.l10n.profile_darkModeLight;
+                            break;
+                          case ThemeMode.dark:
+                            subtitle = context.l10n.profile_darkModeDark;
+                            break;
+                          case ThemeMode.system:
+                            subtitle = context.l10n.profile_darkModeSystem;
+                            break;
+                        }
+                        return ProfileMenuTile(
+                          icon: Icons.dark_mode_outlined,
+                          iconColor: context.appColors.primary,
+                          title: context.l10n.profile_darkMode,
+                          subtitle: subtitle,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text(context.l10n.profile_darkMode),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    RadioListTile<ThemeMode>(
+                                      title: Text(context.l10n.profile_darkModeLight),
+                                      value: ThemeMode.light,
+                                      groupValue: currentMode,
+                                      onChanged: (v) {
+                                        ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                                        Navigator.pop(ctx);
+                                      },
+                                    ),
+                                    RadioListTile<ThemeMode>(
+                                      title: Text(context.l10n.profile_darkModeDark),
+                                      value: ThemeMode.dark,
+                                      groupValue: currentMode,
+                                      onChanged: (v) {
+                                        ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                                        Navigator.pop(ctx);
+                                      },
+                                    ),
+                                    RadioListTile<ThemeMode>(
+                                      title: Text(context.l10n.profile_darkModeSystem),
+                                      value: ThemeMode.system,
+                                      groupValue: currentMode,
+                                      onChanged: (v) {
+                                        ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                                        Navigator.pop(ctx);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
                     ),

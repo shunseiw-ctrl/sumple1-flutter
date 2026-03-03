@@ -2865,6 +2865,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profile_darkModeSubtitle => 'システム設定に従う';
 
   @override
+  String get profile_darkModeLight => 'ライト';
+
+  @override
+  String get profile_darkModeDark => 'ダーク';
+
+  @override
+  String get profile_darkModeSystem => 'システム設定に従う';
+
+  @override
   String get profile_faq => 'よくある質問';
 
   @override

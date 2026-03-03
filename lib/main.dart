@@ -30,6 +30,7 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'core/config/feature_flags.dart';
 import 'core/providers/locale_provider.dart';
+import 'core/providers/theme_mode_provider.dart';
 import 'core/services/splash_remover.dart';
 import 'package:go_router/go_router.dart';
 import 'core/services/deep_link_service.dart';
@@ -545,7 +546,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           },
         ),
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ref.watch(themeModeProvider),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
