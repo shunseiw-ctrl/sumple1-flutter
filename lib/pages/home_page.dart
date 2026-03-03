@@ -139,10 +139,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                     ],
                   ),
-                  Text(
-                    _greeting(context),
-                    style: AppTextStyles.bodySmall.copyWith(fontSize: 12),
-                  ),
                 ],
               ),
             ),

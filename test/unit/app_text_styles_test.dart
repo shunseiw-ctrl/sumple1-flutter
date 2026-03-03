@@ -17,8 +17,8 @@ void main() {
       expect(AppTextStyles.labelSmall.fontSize, 11);
     });
 
-    testWidgets('salary: color == AppColors.salaryHighlight', (tester) async {
-      expect(AppTextStyles.salary.color, AppColors.salaryHighlight);
+    testWidgets('salary: color is null (inherits from theme)', (tester) async {
+      expect(AppTextStyles.salary.color, isNull);
     });
 
     testWidgets('button: fontWeight == FontWeight.w700', (tester) async {
