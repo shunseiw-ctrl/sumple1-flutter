@@ -59,7 +59,16 @@ class WorkReportService {
         .orderBy('reportDate', descending: true)
         .snapshots()
         .map((snap) => snap.docs
-            .map((doc) => WorkReportModel.fromFirestore(doc))
+            .map((doc) {
+              try {
+                return WorkReportModel.fromFirestore(doc);
+              } catch (e) {
+                Logger.error('Failed to parse work report',
+                    tag: 'WorkReportService', error: e);
+                return null;
+              }
+            })
+            .whereType<WorkReportModel>()
             .toList());
   }
 
