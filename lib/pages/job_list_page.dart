@@ -20,6 +20,7 @@ import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/job_card.dart';
+import 'package:sumple1/presentation/widgets/job_card_grid.dart';
 import 'package:sumple1/pages/job_filter_sheet.dart';
 
 class JobListPage extends ConsumerStatefulWidget {
@@ -35,6 +36,8 @@ class _JobListPageState extends ConsumerState<JobListPage> {
   String? _selectedMonthKey;
 
   String _sortKey = 'newest';
+
+  bool _isGridView = false;
 
   final _favoritesService = FavoritesService();
   final _distanceSortService = DistanceSortService();
@@ -284,6 +287,14 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       label: _sortLabel(context),
                       onSelected: (value) => _onSortSelected(value),
                     ),
+                    const SizedBox(width: AppSpacing.sm),
+                    _ViewToggle(
+                      isGrid: _isGridView,
+                      onToggle: () {
+                        AppHaptics.selection();
+                        setState(() => _isGridView = !_isGridView);
+                      },
+                    ),
                     const Spacer(),
                     Semantics(
                       button: true,
@@ -460,88 +471,9 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                         await Future.delayed(const Duration(milliseconds: 500));
                       },
                       color: context.appColors.primary,
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        cacheExtent: AppConstants.listCacheExtent,
-                        padding: AppSpacing.listInsets,
-                        itemCount: filteredDocs.length,
-                        itemBuilder: (context, index) {
-                          final doc = filteredDocs[index];
-                          final data = doc.data() as Map<String, dynamic>;
-
-                          final title = data['title']?.toString() ?? context.l10n.common_noTitle;
-                          final location = data['location']?.toString() ?? context.l10n.common_notSet;
-                          final price = data['price']?.toString() ?? '0';
-                          final date = data['date']?.toString() ?? context.l10n.common_notSet;
-                          final imageUrl = data['imageUrl']?.toString();
-                          final category = data['category']?.toString();
-
-                          final ownerId = data['ownerId']?.toString();
-                          final isOwner = currentUser != null &&
-                              ownerId != null &&
-                              ownerId.isNotEmpty &&
-                              ownerId == currentUser.uid;
-
-                          final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
-
-                          final badges = <BadgeSpec>[];
-
-                          final isFav = _favoritesService.isRegistered
-                              ? firestoreFavs.contains(doc.id)
-                              : _guestFavorites.contains(doc.id);
-
-                          return StaggeredFadeSlide(
-                            index: index,
-                            child: Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.base),
-                            child: JobCard(
-                              title: title,
-                              location: location,
-                              dateText: date,
-                              priceText: '¥$price',
-                              imageUrl: imageUrl,
-                              heroTag: imageUrl != null ? 'hero-job-image-${doc.id}' : null,
-                              category: category,
-                              badges: badges,
-                              showLegacyWarning: !hasOwnerId,
-                              data: data,
-                              isOwner: isOwner,
-                              isFavorite: isFav,
-                              distanceLabel: distanceLabels[doc.id],
-                              onToggleFavorite: () {
-                                AppHaptics.tap();
-                                if (_favoritesService.isRegistered) {
-                                  _favoritesService.toggleFavorite(doc.id);
-                                } else {
-                                  setState(() {
-                                    if (_guestFavorites.contains(doc.id)) {
-                                      _guestFavorites.remove(doc.id);
-                                    } else {
-                                      _guestFavorites.add(doc.id);
-                                    }
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(context.l10n.common_registerToSaveFavorites),
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              },
-                              onTap: () {
-                                context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
-                              },
-                              onEdit: isOwner
-                                  ? () {
-                                context.push(RoutePaths.jobEditPath(doc.id), extra: data);
-                              }
-                                  : null,
-                              onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
-                            ),
-                          ),
-                          );
-                        },
-                      ),
+                      child: _isGridView
+                          ? _buildGridView(context, filteredDocs, firestoreFavs, distanceLabels, currentUser)
+                          : _buildListView(context, filteredDocs, firestoreFavs, distanceLabels, currentUser),
                     );
                   },
                 );
@@ -570,6 +502,154 @@ class _JobListPageState extends ConsumerState<JobListPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildListView(
+    BuildContext context,
+    List<QueryDocumentSnapshot> filteredDocs,
+    List<String> firestoreFavs,
+    Map<String, String> distanceLabels,
+    User? currentUser,
+  ) {
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      cacheExtent: AppConstants.listCacheExtent,
+      padding: AppSpacing.listInsets,
+      itemCount: filteredDocs.length,
+      itemBuilder: (context, index) {
+        final doc = filteredDocs[index];
+        final data = doc.data() as Map<String, dynamic>;
+
+        final title = data['title']?.toString() ?? context.l10n.common_noTitle;
+        final location = data['location']?.toString() ?? context.l10n.common_notSet;
+        final price = data['price']?.toString() ?? '0';
+        final date = data['date']?.toString() ?? context.l10n.common_notSet;
+        final imageUrl = data['imageUrl']?.toString();
+        final category = data['category']?.toString();
+
+        final ownerId = data['ownerId']?.toString();
+        final isOwner = currentUser != null &&
+            ownerId != null &&
+            ownerId.isNotEmpty &&
+            ownerId == currentUser.uid;
+
+        final hasOwnerId = ownerId != null && ownerId.isNotEmpty;
+
+        final badges = <BadgeSpec>[];
+
+        final isFav = _favoritesService.isRegistered
+            ? firestoreFavs.contains(doc.id)
+            : _guestFavorites.contains(doc.id);
+
+        return StaggeredFadeSlide(
+          index: index,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.base),
+            child: JobCard(
+              title: title,
+              location: location,
+              dateText: date,
+              priceText: '¥$price',
+              imageUrl: imageUrl,
+              heroTag: imageUrl != null ? 'hero-job-image-${doc.id}' : null,
+              category: category,
+              badges: badges,
+              showLegacyWarning: !hasOwnerId,
+              data: data,
+              isOwner: isOwner,
+              isFavorite: isFav,
+              distanceLabel: distanceLabels[doc.id],
+              onToggleFavorite: () => _toggleFavorite(doc.id),
+              onTap: () {
+                context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
+              },
+              onEdit: isOwner
+                  ? () {
+                      context.push(RoutePaths.jobEditPath(doc.id), extra: data);
+                    }
+                  : null,
+              onDelete: isOwner ? () => _showDeleteDialog(context, doc.id) : null,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGridView(
+    BuildContext context,
+    List<QueryDocumentSnapshot> filteredDocs,
+    List<String> firestoreFavs,
+    Map<String, String> distanceLabels,
+    User? currentUser,
+  ) {
+    return GridView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      cacheExtent: AppConstants.listCacheExtent,
+      padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 12, AppSpacing.pagePadding, 24),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.72,
+      ),
+      itemCount: filteredDocs.length,
+      itemBuilder: (context, index) {
+        final doc = filteredDocs[index];
+        final data = doc.data() as Map<String, dynamic>;
+
+        final title = data['title']?.toString() ?? context.l10n.common_noTitle;
+        final location = data['location']?.toString() ?? context.l10n.common_notSet;
+        final price = data['price']?.toString() ?? '0';
+        final date = data['date']?.toString() ?? context.l10n.common_notSet;
+        final imageUrl = data['imageUrl']?.toString();
+        final category = data['category']?.toString();
+
+        final isFav = _favoritesService.isRegistered
+            ? firestoreFavs.contains(doc.id)
+            : _guestFavorites.contains(doc.id);
+
+        return StaggeredFadeSlide(
+          index: index,
+          child: JobCardGrid(
+            title: title,
+            location: location,
+            dateText: date,
+            priceText: '¥$price',
+            imageUrl: imageUrl,
+            category: category,
+            data: data,
+            isFavorite: isFav,
+            distanceLabel: distanceLabels[doc.id],
+            onToggleFavorite: () => _toggleFavorite(doc.id),
+            onTap: () {
+              context.push(RoutePaths.jobDetailPath(doc.id), extra: data);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _toggleFavorite(String docId) {
+    AppHaptics.tap();
+    if (_favoritesService.isRegistered) {
+      _favoritesService.toggleFavorite(docId);
+    } else {
+      setState(() {
+        if (_guestFavorites.contains(docId)) {
+          _guestFavorites.remove(docId);
+        } else {
+          _guestFavorites.add(docId);
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.common_registerToSaveFavorites),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }
 
@@ -796,6 +876,36 @@ class _SortDropDown extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Icon(Icons.arrow_drop_down_rounded, size: 20, color: context.appColors.textSecondary),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ViewToggle extends StatelessWidget {
+  final bool isGrid;
+  final VoidCallback onToggle;
+
+  const _ViewToggle({required this.isGrid, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: isGrid ? context.l10n.jobList_viewList : context.l10n.jobList_viewGrid,
+      child: GestureDetector(
+        onTap: onToggle,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.sm + 2),
+          decoration: BoxDecoration(
+            color: context.appColors.chipUnselected,
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+          ),
+          child: Icon(
+            isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,
+            size: 18,
+            color: context.appColors.textSecondary,
+          ),
         ),
       ),
     );

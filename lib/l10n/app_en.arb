@@ -1323,6 +1323,8 @@
   "jobList_sortTooltip": "Sort",
   "jobList_thisMonth": "This month",
   "jobList_viewOnMap": "Map View",
+  "jobList_viewGrid": "Switch to grid view",
+  "jobList_viewList": "Switch to list view",
   "jobList_viewOnMapAccessibility": "View jobs on map",
   "jobLocation": "Location",
   "jobNotes": "Notes",

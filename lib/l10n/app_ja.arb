@@ -2094,6 +2094,8 @@
   "jobList_sortTooltip": "並べ替え",
   "jobList_thisMonth": "すべて",
   "jobList_viewOnMap": "マップで見る",
+  "jobList_viewGrid": "グリッド表示に切替",
+  "jobList_viewList": "リスト表示に切替",
   "jobList_viewOnMapAccessibility": "地図で案件を見る",
   "jobLocation": "勤務地",
   "jobNotes": "備考",
