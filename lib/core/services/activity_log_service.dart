@@ -69,7 +69,16 @@ class ActivityLogService {
         .limit(limit)
         .snapshots()
         .map((snap) => snap.docs
-            .map((doc) => ActivityLogModel.fromFirestore(doc))
+            .map((doc) {
+              try {
+                return ActivityLogModel.fromFirestore(doc);
+              } catch (e) {
+                Logger.error('Failed to parse activity log',
+                    tag: 'ActivityLogService', error: e);
+                return null;
+              }
+            })
+            .whereType<ActivityLogModel>()
             .toList());
   }
 }

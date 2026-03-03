@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @adminHome_jobManagement.
   ///
   /// In ja, this message translates to:
-  /// **'ダッシュボード'**
+  /// **'案件管理'**
   String get adminHome_jobManagement;
 
   /// No description provided for @adminHome_notifications.
@@ -785,13 +785,13 @@ abstract class AppLocalizations {
   /// No description provided for @adminHome_salesManagement.
   ///
   /// In ja, this message translates to:
-  /// **'応募者'**
+  /// **'売上管理'**
   String get adminHome_salesManagement;
 
   /// No description provided for @adminHome_settings.
   ///
   /// In ja, this message translates to:
-  /// **'応募者'**
+  /// **'設定'**
   String get adminHome_settings;
 
   /// No description provided for @adminIdentityVerification_approveButton.
@@ -2945,13 +2945,13 @@ abstract class AppLocalizations {
   /// No description provided for @home_greetingAfternoon.
   ///
   /// In ja, this message translates to:
-  /// **'おはようございます'**
+  /// **'こんにちは'**
   String get home_greetingAfternoon;
 
   /// No description provided for @home_greetingEvening.
   ///
   /// In ja, this message translates to:
-  /// **'おはようございます'**
+  /// **'こんばんは'**
   String get home_greetingEvening;
 
   /// No description provided for @home_greetingMorning.
@@ -2963,19 +2963,19 @@ abstract class AppLocalizations {
   /// No description provided for @home_navMessages.
   ///
   /// In ja, this message translates to:
-  /// **'検索'**
+  /// **'メッセージ'**
   String get home_navMessages;
 
   /// No description provided for @home_navProfile.
   ///
   /// In ja, this message translates to:
-  /// **'はたらく'**
+  /// **'プロフィール'**
   String get home_navProfile;
 
   /// No description provided for @home_navSales.
   ///
   /// In ja, this message translates to:
-  /// **'検索'**
+  /// **'収入'**
   String get home_navSales;
 
   /// No description provided for @home_navSearch.
@@ -2999,7 +2999,7 @@ abstract class AppLocalizations {
   /// No description provided for @home_navWork.
   ///
   /// In ja, this message translates to:
-  /// **'検索'**
+  /// **'はたらく'**
   String get home_navWork;
 
   /// No description provided for @home_notifications.

@@ -394,16 +394,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get adminHome_dashboard => 'ダッシュボード';
 
   @override
-  String get adminHome_jobManagement => 'ダッシュボード';
+  String get adminHome_jobManagement => '案件管理';
 
   @override
   String get adminHome_notifications => 'お知らせ';
 
   @override
-  String get adminHome_salesManagement => '応募者';
+  String get adminHome_salesManagement => '売上管理';
 
   @override
-  String get adminHome_settings => '応募者';
+  String get adminHome_settings => '設定';
 
   @override
   String get adminIdentityVerification_approveButton => '承認する';
@@ -1506,22 +1506,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_admin => '管理者';
 
   @override
-  String get home_greetingAfternoon => 'おはようございます';
+  String get home_greetingAfternoon => 'こんにちは';
 
   @override
-  String get home_greetingEvening => 'おはようございます';
+  String get home_greetingEvening => 'こんばんは';
 
   @override
   String get home_greetingMorning => 'おはようございます';
 
   @override
-  String get home_navMessages => '検索';
+  String get home_navMessages => 'メッセージ';
 
   @override
-  String get home_navProfile => 'はたらく';
+  String get home_navProfile => 'プロフィール';
 
   @override
-  String get home_navSales => '検索';
+  String get home_navSales => '収入';
 
   @override
   String get home_navSearch => '検索';
@@ -1535,7 +1535,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get home_navWork => '検索';
+  String get home_navWork => 'はたらく';
 
   @override
   String home_notifications(String count) {

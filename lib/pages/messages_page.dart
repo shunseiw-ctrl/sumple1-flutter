@@ -256,6 +256,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
     final applicationsQuery = _db
         .collection('applications')
         .where(_isAdmin ? 'adminUid' : 'applicantUid', isEqualTo: _myUid)
+        .orderBy('createdAt', descending: true)
         .limit(50);
 
     return Scaffold(
