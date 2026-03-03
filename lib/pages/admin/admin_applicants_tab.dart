@@ -72,6 +72,55 @@ class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab> {
     }
   }
 
+  Future<void> _bulkApprove(List<ApplicantItem> items) async {
+    final appliedItems = items.where((i) => i.status == 'applied').toList();
+    if (appliedItems.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('一括承認'),
+        content: Text('${appliedItems.length}件の応募を一括承認しますか？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('キャンセル'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('一括承認する'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final batch = FirebaseFirestore.instance.batch();
+      for (final item in appliedItems) {
+        final ref = FirebaseFirestore.instance.collection('applications').doc(item.id);
+        batch.update(ref, {
+          'status': 'assigned',
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+      await batch.commit();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${appliedItems.length}件を承認しました')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('一括承認に失敗しました: $e')),
+        );
+      }
+    }
+  }
+
   List<ApplicantItem> _applyFilters(AdminListState<ApplicantItem> state) {
     var items = state.items;
 
@@ -131,6 +180,23 @@ class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab> {
                 ref.read(adminApplicantsProvider.notifier).setSearchQuery(query);
               },
             ),
+            if (state.filterStatus == 'applied' && filteredItems.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _bulkApprove(filteredItems),
+                    icon: const Icon(Icons.check_circle_outline, size: 18),
+                    label: Text('${filteredItems.length}件を一括承認'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.success,
+                      side: const BorderSide(color: AppColors.success),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ),
             Expanded(
               child: filteredItems.isEmpty
                   ? Center(

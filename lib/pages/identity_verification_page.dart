@@ -7,6 +7,7 @@ import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/ekyc_service.dart';
 import 'package:sumple1/core/services/ekyc_manual_service.dart';
+import 'package:sumple1/data/models/identity_verification_model.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
@@ -25,6 +26,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   String? _selfieUrl;
   bool _uploading = false;
   String? _verificationStatus;
+  String _documentType = 'drivers_license';
+  String? _rejectionReason;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -51,10 +54,17 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           _selfieUrl = (data['selfieUrl'] ?? '').toString();
           if (_idPhotoUrl!.isEmpty) _idPhotoUrl = null;
           if (_selfieUrl!.isEmpty) _selfieUrl = null;
+          _documentType = (data['documentType'] ?? 'drivers_license').toString();
+          _rejectionReason = data['rejectionReason']?.toString();
         });
       }
     } catch (e) {
       Logger.warning('本人確認ステータスの読み込みに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('本人確認ステータスの読み込みに失敗しました')),
+        );
+      }
     }
   }
 
@@ -126,6 +136,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           .set({
         'idPhotoUrl': _idPhotoUrl,
         'selfieUrl': _selfieUrl,
+        'documentType': _documentType,
         'status': 'pending',
         'submittedAt': FieldValue.serverTimestamp(),
         'uid': _uid,
@@ -287,6 +298,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
         icon = Icons.cancel;
         color = AppColors.error;
         message = '本人確認が却下されました。再度お試しください。';
+        if (_rejectionReason != null && _rejectionReason!.isNotEmpty) {
+          message += '\n却下理由: $_rejectionReason';
+        }
         break;
       default:
         return const SizedBox.shrink();
@@ -377,6 +391,35 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
           ),
           const SizedBox(height: 8),
+          // 身分証の種類ドロップダウン
+          if (!isApproved && !isPending)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.divider),
+              ),
+              child: DropdownButtonFormField<String>(
+                value: _documentType,
+                decoration: const InputDecoration(
+                  labelText: '身分証の種類',
+                  border: InputBorder.none,
+                ),
+                items: IdentityVerificationModel.documentTypes.entries
+                    .map((e) => DropdownMenuItem(
+                          value: e.key,
+                          child: Text(e.value),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _documentType = value);
+                  }
+                },
+              ),
+            ),
           _buildPhotoUploadCard(
             title: '身分証明書',
             subtitle: '運転免許証・マイナンバーカード・パスポート等',
@@ -403,6 +446,27 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 onPressed: (_idPhotoUrl != null && _selfieUrl != null) ? _submit : null,
                 icon: const Icon(Icons.send),
                 label: const Text('本人確認を申請する', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          if (_verificationStatus == 'rejected' && !_uploading)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _verificationStatus = null;
+                      _idPhotoUrl = null;
+                      _selfieUrl = null;
+                      _rejectionReason = null;
+                      _documentType = 'drivers_license';
+                    });
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('再申請する', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                ),
               ),
             ),
         ],

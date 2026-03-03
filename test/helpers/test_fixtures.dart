@@ -321,4 +321,57 @@ class TestFixtures {
   }) {
     return 'albawork://checkin/$jobId/$shiftCode';
   }
+
+  /// 本人確認テストデータ
+  static Map<String, dynamic> identityVerificationData({
+    String? uid,
+    String? idPhotoUrl,
+    String? selfieUrl,
+    String? documentType,
+    String? status,
+    String? reviewedBy,
+    String? rejectionReason,
+  }) {
+    return {
+      'uid': uid ?? 'worker-001',
+      'idPhotoUrl': idPhotoUrl ?? 'https://example.com/id.jpg',
+      'selfieUrl': selfieUrl ?? 'https://example.com/selfie.jpg',
+      'documentType': documentType ?? 'drivers_license',
+      'status': status ?? 'pending',
+      if (reviewedBy != null) 'reviewedBy': reviewedBy,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      'submittedAt': DateTime(2025, 1, 1),
+      'createdAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 管理者プロフィールテストデータ
+  static Map<String, dynamic> adminProfileData({
+    String? uid,
+    String? displayName,
+    String? email,
+  }) {
+    return {
+      'uid': uid ?? 'admin-001',
+      'displayName': displayName ?? '管理者テスト',
+      'email': email ?? 'admin@albawork.com',
+      'role': 'admin',
+      'createdAt': DateTime(2025, 1, 1),
+      'updatedAt': DateTime(2025, 1, 1),
+    };
+  }
+
+  /// 決済テスト結果データ
+  static Map<String, dynamic> paymentTestResultData({
+    bool? allPassed,
+    int? passedCount,
+    int? failedCount,
+  }) {
+    return {
+      'allPassed': allPassed ?? true,
+      'passedCount': passedCount ?? 2,
+      'failedCount': failedCount ?? 0,
+      'testedAt': DateTime(2025, 1, 1),
+    };
+  }
 }

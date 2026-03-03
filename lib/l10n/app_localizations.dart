@@ -1569,6 +1569,84 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'お知らせ通知を受け取る'**
   String get receiveNotifications;
+
+  /// 本人確認タイトル
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認'**
+  String get ekycTitle;
+
+  /// 身分証タイプ選択
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証の種類'**
+  String get ekycDocumentType;
+
+  /// 運転免許証
+  ///
+  /// In ja, this message translates to:
+  /// **'運転免許証'**
+  String get ekycDriversLicense;
+
+  /// マイナンバーカード
+  ///
+  /// In ja, this message translates to:
+  /// **'マイナンバーカード'**
+  String get ekycMyNumber;
+
+  /// パスポート
+  ///
+  /// In ja, this message translates to:
+  /// **'パスポート'**
+  String get ekycPassport;
+
+  /// 在留カード
+  ///
+  /// In ja, this message translates to:
+  /// **'在留カード'**
+  String get ekycResidenceCard;
+
+  /// 却下理由ラベル
+  ///
+  /// In ja, this message translates to:
+  /// **'却下理由'**
+  String get ekycRejectionReason;
+
+  /// 再申請ボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'再申請する'**
+  String get ekycResubmit;
+
+  /// 管理者向け申請通知
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認申請'**
+  String get ekycPendingReview;
+
+  /// 承認通知
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認が承認されました'**
+  String get ekycApproved;
+
+  /// 却下通知
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認が却下されました'**
+  String get ekycRejected;
+
+  /// 承認確認ダイアログ
+  ///
+  /// In ja, this message translates to:
+  /// **'この本人確認を承認しますか？'**
+  String get ekycApproveConfirm;
+
+  /// 却下確認ダイアログ
+  ///
+  /// In ja, this message translates to:
+  /// **'この本人確認を却下しますか？'**
+  String get ekycRejectConfirm;
 }
 
 class _AppLocalizationsDelegate

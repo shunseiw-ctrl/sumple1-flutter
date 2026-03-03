@@ -747,5 +747,32 @@
   "@notificationSettings": { "description": "通知設定セクション" },
 
   "receiveNotifications": "お知らせ通知を受け取る",
-  "@receiveNotifications": { "description": "通知設定トグル" }
+  "@receiveNotifications": { "description": "通知設定トグル" },
+
+  "ekycTitle": "本人確認",
+  "@ekycTitle": { "description": "本人確認タイトル" },
+  "ekycDocumentType": "身分証の種類",
+  "@ekycDocumentType": { "description": "身分証タイプ選択" },
+  "ekycDriversLicense": "運転免許証",
+  "@ekycDriversLicense": { "description": "運転免許証" },
+  "ekycMyNumber": "マイナンバーカード",
+  "@ekycMyNumber": { "description": "マイナンバーカード" },
+  "ekycPassport": "パスポート",
+  "@ekycPassport": { "description": "パスポート" },
+  "ekycResidenceCard": "在留カード",
+  "@ekycResidenceCard": { "description": "在留カード" },
+  "ekycRejectionReason": "却下理由",
+  "@ekycRejectionReason": { "description": "却下理由ラベル" },
+  "ekycResubmit": "再申請する",
+  "@ekycResubmit": { "description": "再申請ボタン" },
+  "ekycPendingReview": "本人確認申請",
+  "@ekycPendingReview": { "description": "管理者向け申請通知" },
+  "ekycApproved": "本人確認が承認されました",
+  "@ekycApproved": { "description": "承認通知" },
+  "ekycRejected": "本人確認が却下されました",
+  "@ekycRejected": { "description": "却下通知" },
+  "ekycApproveConfirm": "この本人確認を承認しますか？",
+  "@ekycApproveConfirm": { "description": "承認確認ダイアログ" },
+  "ekycRejectConfirm": "この本人確認を却下しますか？",
+  "@ekycRejectConfirm": { "description": "却下確認ダイアログ" }
 }

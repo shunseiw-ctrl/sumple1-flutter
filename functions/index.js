@@ -83,6 +83,14 @@ exports.onReferralApplied = referrals.onReferralApplied;
 const reengagement = require("./src/reengagement");
 exports.sendReengagementNotifications = reengagement.sendReengagementNotifications;
 
+// --- 本人確認通知 (Phase 20) ---
+const identityVerification = require("./src/identityVerification");
+exports.onVerificationStatusChanged = identityVerification.onVerificationStatusChanged;
+
+// --- Stripe テストヘルパー (Phase 20) ---
+const stripeTestHelper = require("./src/stripeTestHelper");
+exports.simulateStripeWebhook = stripeTestHelper.simulateStripeWebhook;
+
 // --- 監査ログ (Phase 9) ---
 const auditLog = require("./src/auditLog");
 exports.onAuditJobWrite = auditLog.onAuditJobWrite;

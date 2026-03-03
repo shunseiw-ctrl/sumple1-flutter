@@ -158,6 +158,14 @@ class AdminDashboardTab extends ConsumerWidget {
                     count: counts.pendingEarlyPayments,
                     onTap: () => context.push(RoutePaths.adminEarlyPayments),
                   ),
+                if (counts.pendingVerifications > 0)
+                  _AlertCard(
+                    icon: Icons.verified_user,
+                    color: AppColors.info,
+                    label: '本人確認待ち',
+                    count: counts.pendingVerifications,
+                    onTap: () => context.push(RoutePaths.adminIdentityVerification),
+                  ),
                 const SizedBox(height: 20),
               ],
             );
@@ -202,6 +210,32 @@ class AdminDashboardTab extends ConsumerWidget {
                 },
               ),
             ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _ActionButton(
+                icon: Icons.verified_user,
+                label: '本人確認',
+                onTap: () {
+                  context.push(RoutePaths.adminIdentityVerification);
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ActionButton(
+                icon: Icons.flash_on,
+                label: '即金承認',
+                onTap: () {
+                  context.push(RoutePaths.adminEarlyPayments);
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(child: SizedBox()),
           ],
         ),
         const SizedBox(height: 20),

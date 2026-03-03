@@ -87,11 +87,24 @@ class _FutureRetryBuilderState<T> extends State<FutureRetryBuilder<T>> {
     _future = widget.futureFactory();
   }
 
-  void _retry() {
-    setState(() {
-      _retryCount++;
-      _future = widget.futureFactory();
-    });
+  static const _maxRetries = 3;
+
+  Future<void> _retry() async {
+    if (_retryCount >= _maxRetries) {
+      setState(() {
+        _retryCount++;
+        _future = widget.futureFactory();
+      });
+      return;
+    }
+    final delay = Duration(seconds: 1 << _retryCount);
+    await Future.delayed(delay);
+    if (mounted) {
+      setState(() {
+        _retryCount++;
+        _future = widget.futureFactory();
+      });
+    }
   }
 
   @override

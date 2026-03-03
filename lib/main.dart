@@ -37,6 +37,7 @@ import 'l10n/app_localizations.dart';
 import 'core/services/force_update_service.dart';
 import 'presentation/widgets/force_update_dialog.dart';
 import 'core/services/analytics_service.dart';
+import 'presentation/widgets/app_error_boundary.dart';
 
 /// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
 @pragma('vm:entry-point')
@@ -211,7 +212,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       Theme.of(context).textTheme,
     );
 
-    return MaterialApp.router(
+    return AppErrorBoundary(child: MaterialApp.router(
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: 'ALBAWORK',
@@ -545,7 +546,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('ja'),
-    );
+    ));
   }
 }
 

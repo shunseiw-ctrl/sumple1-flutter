@@ -749,4 +749,43 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get receiveNotifications => 'お知らせ通知を受け取る';
+
+  @override
+  String get ekycTitle => '本人確認';
+
+  @override
+  String get ekycDocumentType => '身分証の種類';
+
+  @override
+  String get ekycDriversLicense => '運転免許証';
+
+  @override
+  String get ekycMyNumber => 'マイナンバーカード';
+
+  @override
+  String get ekycPassport => 'パスポート';
+
+  @override
+  String get ekycResidenceCard => '在留カード';
+
+  @override
+  String get ekycRejectionReason => '却下理由';
+
+  @override
+  String get ekycResubmit => '再申請する';
+
+  @override
+  String get ekycPendingReview => '本人確認申請';
+
+  @override
+  String get ekycApproved => '本人確認が承認されました';
+
+  @override
+  String get ekycRejected => '本人確認が却下されました';
+
+  @override
+  String get ekycApproveConfirm => 'この本人確認を承認しますか？';
+
+  @override
+  String get ekycRejectConfirm => 'この本人確認を却下しますか？';
 }

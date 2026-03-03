@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 class ConnectivityService {
@@ -8,69 +9,44 @@ class ConnectivityService {
 
   final _controller = StreamController<bool>.broadcast();
   bool _isOnline = true;
-  Timer? _checkTimer;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   bool get isOnline => _isOnline;
   Stream<bool> get onConnectivityChanged => _controller.stream;
 
   void startMonitoring() {
-    _checkTimer?.cancel();
-    _checkTimer = Timer.periodic(const Duration(seconds: 15), (_) => _check());
-    _check();
+    _subscription?.cancel();
+    _subscription = Connectivity().onConnectivityChanged.listen((results) {
+      final online = results.any((r) => r != ConnectivityResult.none);
+      if (_isOnline != online) {
+        _isOnline = online;
+        _controller.add(online);
+      }
+    });
+    // Check initial state
+    _checkInitial();
+  }
+
+  Future<void> _checkInitial() async {
+    try {
+      final results = await Connectivity().checkConnectivity();
+      final online = results.any((r) => r != ConnectivityResult.none);
+      if (_isOnline != online) {
+        _isOnline = online;
+        _controller.add(online);
+      }
+    } catch (e) {
+      debugPrint('[Connectivity] 初期チェックに失敗: $e');
+    }
   }
 
   void stopMonitoring() {
-    _checkTimer?.cancel();
-    _checkTimer = null;
-  }
-
-  Future<void> _check() async {
-    try {
-      final wasOnline = _isOnline;
-      if (kIsWeb) {
-        _isOnline = await _checkWebConnectivity();
-      } else {
-        _isOnline = true;
-      }
-      if (wasOnline != _isOnline) {
-        _controller.add(_isOnline);
-      }
-    } catch (e) {
-      debugPrint('[Connectivity] 接続チェックに失敗: $e');
-      if (_isOnline) {
-        _isOnline = false;
-        _controller.add(false);
-      }
-    }
-  }
-
-  Future<bool> _checkWebConnectivity() async {
-    try {
-      return _checkNavigatorOnline();
-    } catch (e) {
-      debugPrint('[Connectivity] Web接続チェックに失敗: $e');
-      return false;
-    }
-  }
-
-  bool _checkNavigatorOnline() {
-    if (kIsWeb) {
-      return _webNavigatorOnline();
-    }
-    return true;
+    _subscription?.cancel();
+    _subscription = null;
   }
 
   void dispose() {
     stopMonitoring();
     _controller.close();
-  }
-}
-
-bool _webNavigatorOnline() {
-  try {
-    return true;
-  } catch (e) {
-    debugPrint('[Connectivity] navigator.onLine チェックに失敗: $e');
-    return true;
   }
 }

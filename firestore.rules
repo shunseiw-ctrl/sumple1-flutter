@@ -394,6 +394,29 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // --- 本人確認 (identity_verification) ---
+    match /identity_verification/{verifyUid} {
+      // ユーザーは自分のドキュメントのみ読み取り可能、管理者は全件
+      allow read: if signedIn() && (uid() == verifyUid || isAdminUid());
+
+      // ユーザーは自分のドキュメントを作成（pending状態のみ）
+      allow create: if signedIn() && uid() == verifyUid
+        && request.resource.data.status == 'pending'
+        && isString(request.resource.data.idPhotoUrl)
+        && isString(request.resource.data.selfieUrl);
+
+      // ユーザー: 再申請（rejected→pending）、管理者: ステータス変更
+      allow update: if signedIn() && (
+        (uid() == verifyUid
+          && request.resource.data.status == 'pending')
+        ||
+        (isAdminUid()
+          && request.resource.data.status in ['approved', 'rejected'])
+      );
+
+      allow delete: if false;
+    }
+
     // --- 紹介コード ---
     match /referral_codes/{uid} {
       allow read: if signedIn();
