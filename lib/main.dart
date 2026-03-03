@@ -211,8 +211,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     _goRouterInstance = router;
-    final baseTextTheme = GoogleFonts.notoSansJpTextTheme(
-      Theme.of(context).textTheme,
+    final lightTextTheme = GoogleFonts.notoSansJpTextTheme(
+      ThemeData.light().textTheme,
+    );
+    final darkTextTheme = GoogleFonts.notoSansJpTextTheme(
+      ThemeData.dark().textTheme,
     );
 
     return AppErrorBoundary(child: MaterialApp.router(
@@ -224,7 +227,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppColors.background,
         extensions: const [AppColorsExtension.light],
-        textTheme: baseTextTheme,
+        textTheme: lightTextTheme,
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: AppColors.textPrimary,
@@ -386,7 +389,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         colorSchemeSeed: AppColors.ruri,
         scaffoldBackgroundColor: AppDarkColors.background,
         extensions: const [AppColorsExtension.dark],
-        textTheme: baseTextTheme,
+        textTheme: darkTextTheme,
         appBarTheme: AppBarTheme(
           backgroundColor: AppDarkColors.surface,
           foregroundColor: AppDarkColors.textPrimary,

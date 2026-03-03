@@ -73,9 +73,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       appBar: AppBar(
         titleSpacing: 12,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, Color(0xFFF5F8FF)],
+              colors: [context.appColors.surface, context.appColors.background],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
