@@ -220,16 +220,29 @@ class _DetailScaffoldState extends State<_DetailScaffold> {
       appBar: AppBar(
         title: Text(context.l10n.jobDetail_title, style: AppTextStyles.appBarTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_outlined),
-            tooltip: context.l10n.jobDetail_share,
-            onPressed: () {
-              final title = data['title']?.toString() ?? '';
-              final price = data['price']?.toString() ?? '';
-              final location = data['location']?.toString() ?? '';
-              ShareService.shareJob(jobId, title, price, location);
-              AnalyticsService.logShareJob(jobId);
-            },
+          Builder(
+            builder: (btnContext) => IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: context.l10n.jobDetail_share,
+              onPressed: () async {
+                final title = data['title']?.toString() ?? '';
+                final price = data['price']?.toString() ?? '';
+                final location = data['location']?.toString() ?? '';
+                try {
+                  final box = btnContext.findRenderObject() as RenderBox?;
+                  final origin = box != null
+                      ? box.localToGlobal(Offset.zero) & box.size
+                      : null;
+                  await ShareService.shareJob(jobId, title, price, location, origin: origin);
+                  AnalyticsService.logShareJob(jobId);
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${context.l10n.common_dataLoadError}: $e')),
+                  );
+                }
+              },
+            ),
           ),
           StreamBuilder<List<String>>(
             stream: _favoritesService.favoritesStream(),

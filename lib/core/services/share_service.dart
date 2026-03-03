@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:share_plus/share_plus.dart';
 
 /// シェア機能のユーティリティクラス
@@ -18,15 +20,24 @@ class ShareService {
 
   // --- シェア実行 ---
 
-  static Future<void> shareJob(String jobId, String title, String price, String location) async {
-    await Share.share(shareJobText(jobId, title, price, location));
+  static Future<void> shareJob(String jobId, String title, String price, String location, {Rect? origin}) async {
+    await Share.share(
+      shareJobText(jobId, title, price, location),
+      sharePositionOrigin: origin,
+    );
   }
 
-  static Future<void> shareReferral(String code) async {
-    await Share.share(shareReferralText(code));
+  static Future<void> shareReferral(String code, {Rect? origin}) async {
+    await Share.share(
+      shareReferralText(code),
+      sharePositionOrigin: origin,
+    );
   }
 
-  static Future<void> shareApp() async {
-    await Share.share(shareAppText());
+  static Future<void> shareApp({Rect? origin}) async {
+    await Share.share(
+      shareAppText(),
+      sharePositionOrigin: origin,
+    );
   }
 }
