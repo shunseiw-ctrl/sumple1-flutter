@@ -13,7 +13,7 @@ void main() {
 
     group('parseUri', () {
       test('jobs/{jobId} パスを解析できる', () {
-        final uri = Uri.parse('https://albawork.app/jobs/job123');
+        final uri = Uri.parse('https://alba-work.web.app/jobs/job123');
         final route = service.parseUri(uri);
 
         expect(route, isNotNull);
@@ -22,7 +22,7 @@ void main() {
       });
 
       test('jobs パスのみの場合は一覧ルート', () {
-        final uri = Uri.parse('https://albawork.app/jobs');
+        final uri = Uri.parse('https://alba-work.web.app/jobs');
         final route = service.parseUri(uri);
 
         expect(route, isNotNull);
@@ -30,7 +30,7 @@ void main() {
       });
 
       test('chat/{chatId} パスを解析できる', () {
-        final uri = Uri.parse('https://albawork.app/chat/chat456');
+        final uri = Uri.parse('https://alba-work.web.app/chat/chat456');
         final route = service.parseUri(uri);
 
         expect(route, isNotNull);
@@ -39,7 +39,7 @@ void main() {
       });
 
       test('notifications パスを解析できる', () {
-        final uri = Uri.parse('https://albawork.app/notifications');
+        final uri = Uri.parse('https://alba-work.web.app/notifications');
         final route = service.parseUri(uri);
 
         expect(route, isNotNull);
@@ -47,7 +47,7 @@ void main() {
       });
 
       test('profile パスを解析できる', () {
-        final uri = Uri.parse('https://albawork.app/profile');
+        final uri = Uri.parse('https://alba-work.web.app/profile');
         final route = service.parseUri(uri);
 
         expect(route, isNotNull);
@@ -55,14 +55,14 @@ void main() {
       });
 
       test('不明なパスではnullを返す', () {
-        final uri = Uri.parse('https://albawork.app/unknown/path');
+        final uri = Uri.parse('https://alba-work.web.app/unknown/path');
         final route = service.parseUri(uri);
 
         expect(route, isNull);
       });
 
       test('空パスではnullを返す', () {
-        final uri = Uri.parse('https://albawork.app/');
+        final uri = Uri.parse('https://alba-work.web.app/');
         final route = service.parseUri(uri);
 
         expect(route, isNull);
@@ -78,7 +78,7 @@ void main() {
       });
 
       test('chat パスのみ (chatIdなし) ではnullを返す', () {
-        final uri = Uri.parse('https://albawork.app/chat');
+        final uri = Uri.parse('https://alba-work.web.app/chat');
         final route = service.parseUri(uri);
 
         expect(route, isNull);
@@ -155,42 +155,42 @@ void main() {
 
     group('goRouterPath', () {
       test('jobs/{jobId} URI を go_router パスに変換', () {
-        final uri = Uri.parse('https://albawork.app/jobs/job123');
+        final uri = Uri.parse('https://alba-work.web.app/jobs/job123');
         final path = service.goRouterPath(uri);
 
         expect(path, '/jobs/job123');
       });
 
       test('jobs URI を一覧パスに変換', () {
-        final uri = Uri.parse('https://albawork.app/jobs');
+        final uri = Uri.parse('https://alba-work.web.app/jobs');
         final path = service.goRouterPath(uri);
 
         expect(path, '/jobs');
       });
 
       test('chat/{chatId} URI を go_router パスに変換', () {
-        final uri = Uri.parse('https://albawork.app/chat/chat456');
+        final uri = Uri.parse('https://alba-work.web.app/chat/chat456');
         final path = service.goRouterPath(uri);
 
         expect(path, '/chat/chat456');
       });
 
       test('notifications URI を go_router パスに変換', () {
-        final uri = Uri.parse('https://albawork.app/notifications');
+        final uri = Uri.parse('https://alba-work.web.app/notifications');
         final path = service.goRouterPath(uri);
 
         expect(path, '/notifications');
       });
 
       test('profile URI を go_router パスに変換', () {
-        final uri = Uri.parse('https://albawork.app/profile');
+        final uri = Uri.parse('https://alba-work.web.app/profile');
         final path = service.goRouterPath(uri);
 
         expect(path, '/profile');
       });
 
       test('不明な URI ではnullを返す', () {
-        final uri = Uri.parse('https://albawork.app/unknown');
+        final uri = Uri.parse('https://alba-work.web.app/unknown');
         final path = service.goRouterPath(uri);
 
         expect(path, isNull);

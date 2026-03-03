@@ -5,15 +5,15 @@ class ShareService {
   // --- テキスト生成（テスト用に公開） ---
 
   static String shareJobText(String jobId, String title, String price, String location) {
-    return '【ALBAWORK】$title\n場所: $location\n日給: $price円\nhttps://albawork.app/jobs/$jobId';
+    return '【ALBAWORK】$title\n場所: $location\n日給: $price円\nhttps://alba-work.web.app/jobs/$jobId';
   }
 
   static String shareReferralText(String code) {
-    return 'ALBAWORKで一緒に働こう！紹介コード: $code\nhttps://albawork.app';
+    return 'ALBAWORKで一緒に働こう！紹介コード: $code\nhttps://alba-work.web.app';
   }
 
   static String shareAppText() {
-    return 'ALBAWORKで建設業の仕事を見つけよう！\nhttps://albawork.app';
+    return 'ALBAWORKで建設業の仕事を見つけよう！\nhttps://alba-work.web.app';
   }
 
   // --- シェア実行 ---

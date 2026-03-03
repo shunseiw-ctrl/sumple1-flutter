@@ -73,7 +73,7 @@ void main() {
       expect(text, contains('【ALBAWORK】内装工事スタッフ'));
       expect(text, contains('場所: 東京都新宿区'));
       expect(text, contains('日給: 15000円'));
-      expect(text, contains('https://albawork.app/jobs/job123'));
+      expect(text, contains('https://alba-work.web.app/jobs/job123'));
     });
 
     // 4. EkycManualService → checkStatus 各状態遷移
@@ -173,7 +173,7 @@ void main() {
       // shareJobText
       final jobText = ShareService.shareJobText('id', 'title', '10000', 'loc');
       expect(jobText, contains('ALBAWORK'));
-      expect(jobText, contains('https://albawork.app/jobs/id'));
+      expect(jobText, contains('https://alba-work.web.app/jobs/id'));
 
       // shareReferralText
       final refText = ShareService.shareReferralText('CODE');
@@ -181,7 +181,7 @@ void main() {
 
       // shareAppText
       final appText = ShareService.shareAppText();
-      expect(appText, contains('albawork.app'));
+      expect(appText, contains('alba-work.web.app'));
     });
   });
 }

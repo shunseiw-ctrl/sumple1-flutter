@@ -8,25 +8,25 @@ void main() {
       expect(text, contains('【ALBAWORK】テスト案件'));
       expect(text, contains('場所: 東京都'));
       expect(text, contains('日給: 15000円'));
-      expect(text, contains('https://albawork.app/jobs/job1'));
+      expect(text, contains('https://alba-work.web.app/jobs/job1'));
     });
 
     test('shareReferralText generates correct format', () {
       final text = ShareService.shareReferralText('ABC123');
       expect(text, contains('紹介コード: ABC123'));
-      expect(text, contains('https://albawork.app'));
+      expect(text, contains('https://alba-work.web.app'));
     });
 
     test('shareAppText generates correct format', () {
       final text = ShareService.shareAppText();
       expect(text, contains('ALBAWORK'));
-      expect(text, contains('https://albawork.app'));
+      expect(text, contains('https://alba-work.web.app'));
     });
 
     test('shareJobText handles empty values', () {
       final text = ShareService.shareJobText('', '', '', '');
       expect(text, contains('【ALBAWORK】'));
-      expect(text, contains('https://albawork.app/jobs/'));
+      expect(text, contains('https://alba-work.web.app/jobs/'));
     });
   });
 }

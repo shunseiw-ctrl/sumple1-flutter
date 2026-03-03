@@ -10,9 +10,9 @@ void main() {
 
     test('ShareService text contains required elements', () {
       // Test share text format
-      final text = '【ALBAWORK】テスト\n場所: 東京\n日給: 15000円\nhttps://albawork.app/jobs/id1';
+      final text = '【ALBAWORK】テスト\n場所: 東京\n日給: 15000円\nhttps://alba-work.web.app/jobs/id1';
       expect(text, contains('【ALBAWORK】'));
-      expect(text, contains('https://albawork.app/jobs/'));
+      expect(text, contains('https://alba-work.web.app/jobs/'));
     });
   });
 }
