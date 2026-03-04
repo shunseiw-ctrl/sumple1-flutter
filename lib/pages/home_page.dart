@@ -18,6 +18,7 @@ import '../core/services/analytics_service.dart';
 import '../core/providers/connectivity_provider.dart';
 import '../core/providers/auth_provider.dart';
 import '../core/providers/notification_providers.dart';
+import '../core/providers/chat_providers.dart';
 import '../presentation/widgets/offline_banner.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -167,11 +168,21 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: _ModernBottomNav(
-        currentIndex: _index,
-        onTap: (i) {
-          AppHaptics.selection();
-          setState(() => _index = i);
+      bottomNavigationBar: Consumer(
+        builder: (context, ref, _) {
+          final unreadChat = ref.watch(unreadChatCountProvider).when(
+            data: (c) => c,
+            loading: () => 0,
+            error: (_, __) => 0,
+          );
+          return _ModernBottomNav(
+            currentIndex: _index,
+            unreadMessageCount: unreadChat,
+            onTap: (i) {
+              AppHaptics.selection();
+              setState(() => _index = i);
+            },
+          );
         },
       ),
     );
@@ -192,10 +203,12 @@ class _NavItem {
 
 class _ModernBottomNav extends StatelessWidget {
   final int currentIndex;
+  final int unreadMessageCount;
   final ValueChanged<int> onTap;
 
   const _ModernBottomNav({
     required this.currentIndex,
+    this.unreadMessageCount = 0,
     required this.onTap,
   });
 
@@ -209,6 +222,7 @@ class _ModernBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final items = _items(context);
     return Container(
       decoration: BoxDecoration(
         color: context.appColors.surface,
@@ -225,13 +239,18 @@ class _ModernBottomNav extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(top: 6, bottom: 4),
           child: Row(
-            children: List.generate(_items(context).length, (index) {
-              final item = _items(context)[index];
+            children: List.generate(items.length, (index) {
+              final item = items[index];
               final isSelected = index == currentIndex;
+              // メッセージタブ(index==2)に未読バッジ
+              final showBadge = index == 2 && unreadMessageCount > 0;
+
               return Expanded(
                 child: Semantics(
                   button: true,
-                  label: context.l10n.home_navTabLabel(item.label, isSelected ? context.l10n.home_navSelected : ''),
+                  label: showBadge
+                      ? '${item.label}、${context.l10n.home_unreadMessages(unreadMessageCount.toString())}'
+                      : context.l10n.home_navTabLabel(item.label, isSelected ? context.l10n.home_navSelected : ''),
                   selected: isSelected,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -250,10 +269,35 @@ class _ModernBottomNav extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Icon(
-                          isSelected ? item.selectedIcon : item.unselectedIcon,
-                          size: 26,
-                          color: isSelected ? context.appColors.primary : context.appColors.textHint,
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              isSelected ? item.selectedIcon : item.unselectedIcon,
+                              size: 26,
+                              color: isSelected ? context.appColors.primary : context.appColors.textHint,
+                            ),
+                            if (showBadge)
+                              Positioned(
+                                right: -8,
+                                top: -4,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: context.appColors.error,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    unreadMessageCount > 99 ? '99+' : unreadMessageCount.toString(),
+                                    style: GoogleFonts.notoSansJp(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(

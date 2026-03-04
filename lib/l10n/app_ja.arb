@@ -2655,5 +2655,63 @@
   "workerLabel": "ワーカー",
   "wrongPassword": "パスワードが正しくありません",
   "yen": "円",
-  "yesterday": "昨日"
+  "yesterday": "昨日",
+
+  "jobList_monthNumLabel": "{month}月",
+  "@jobList_monthNumLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "jobList_resultCount": "{count}件",
+  "@jobList_resultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "messages_filterAll": "すべて",
+  "messages_filterUnread": "未読",
+  "messages_noUnread": "未読メッセージはありません",
+
+  "profile_totalJobs": "完了案件",
+  "profile_rating": "評価",
+  "profile_qualityScore": "スコア",
+  "profile_logout": "ログアウト",
+
+  "home_unreadMessages": "未読メッセージ{count}件",
+  "@home_unreadMessages": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "work_unreadChat": "未読{count}件",
+  "@work_unreadChat": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "post_sectionImages": "画像",
+  "post_sectionImagesSubtitle": "案件の写真を追加（最大5枚）",
+  "post_addImages": "画像を追加（{current}/{max}）",
+  "@post_addImages": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  }
 }

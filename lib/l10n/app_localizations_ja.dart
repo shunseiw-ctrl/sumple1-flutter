@@ -3874,4 +3874,56 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get yesterday => '昨日';
+
+  @override
+  String jobList_monthNumLabel(String month) {
+    return '$month月';
+  }
+
+  @override
+  String jobList_resultCount(String count) {
+    return '$count件';
+  }
+
+  @override
+  String get messages_filterAll => 'すべて';
+
+  @override
+  String get messages_filterUnread => '未読';
+
+  @override
+  String get messages_noUnread => '未読メッセージはありません';
+
+  @override
+  String get profile_totalJobs => '完了案件';
+
+  @override
+  String get profile_rating => '評価';
+
+  @override
+  String get profile_qualityScore => 'スコア';
+
+  @override
+  String get profile_logout => 'ログアウト';
+
+  @override
+  String home_unreadMessages(String count) {
+    return '未読メッセージ$count件';
+  }
+
+  @override
+  String work_unreadChat(String count) {
+    return '未読$count件';
+  }
+
+  @override
+  String get post_sectionImages => '画像';
+
+  @override
+  String get post_sectionImagesSubtitle => '案件の写真を追加（最大5枚）';
+
+  @override
+  String post_addImages(String current, String max) {
+    return '画像を追加（$current/$max）';
+  }
 }

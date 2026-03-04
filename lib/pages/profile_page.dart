@@ -8,28 +8,55 @@ import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
+import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/providers/theme_mode_provider.dart';
+import 'package:sumple1/core/providers/auth_provider.dart';
+import 'package:sumple1/core/services/quality_score_service.dart';
+import 'package:sumple1/core/enums/user_role.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
 import 'profile/profile_widgets.dart';
 import 'profile/email_auth_dialog.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isAnonymous(User? user) => user == null || user.isAnonymous;
+
+  WorkerQualityScore? _qualityScore;
+  bool _loadingScore = true;
 
   @override
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('profile');
+    _loadQualityScore();
+  }
+
+  Future<void> _loadQualityScore() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || FirebaseAuth.instance.currentUser?.isAnonymous == true) {
+      setState(() => _loadingScore = false);
+      return;
+    }
+    try {
+      final score = await QualityScoreService().calculateScore(uid);
+      if (mounted) {
+        setState(() {
+          _qualityScore = score;
+          _loadingScore = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loadingScore = false);
+    }
   }
 
   void _openEmailAuthDialog() {
@@ -38,6 +65,15 @@ class _ProfilePageState extends State<ProfilePage> {
       onAuthStateChanged: () {
         if (mounted) setState(() {});
       },
+    );
+  }
+
+  bool get _isAdmin {
+    final roleAsync = ref.watch(userRoleProvider);
+    return roleAsync.when(
+      data: (role) => role.isAdmin,
+      loading: () => false,
+      error: (_, __) => false,
     );
   }
 
@@ -76,6 +112,17 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
+          // ワーカー統計カード
+          if (!isAnon) ...[
+            const SizedBox(height: 12),
+            StaggeredFadeSlide(
+              index: 1,
+              child: _WorkerStatsCard(
+                score: _qualityScore,
+                loading: _loadingScore,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
 
           if (isAnon) ...[
@@ -329,49 +376,163 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
 
           const SizedBox(height: 20),
-          StaggeredFadeSlide(
-            index: isAnon ? 6 : 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ProfileSectionHeader(title: context.l10n.profile_sectionAdmin),
-                ProfileMenuGroup(
-                  children: [
-                    ProfileMenuTile(
-                      icon: Icons.admin_panel_settings_outlined,
-                      iconColor: context.appColors.primaryDark,
-                      title: context.l10n.profile_adminLogin,
-                      subtitle: context.l10n.profile_adminLoginSubtitle,
-                      onTap: () {
-                        context.push(RoutePaths.adminLogin);
-                      },
-                    ),
-                    ProfileMenuTile(
-                      icon: Icons.logout,
-                      iconColor: context.appColors.error,
-                      title: context.l10n.profile_adminLogout,
-                      subtitle: isAnon ? context.l10n.profile_notLoggedIn : context.l10n.profile_adminLogoutSubtitle,
-                      isLast: true,
-                      onTap: () async {
-                        final auth = FirebaseAuth.instance;
-                        await auth.signOut();
-                        await auth.signInAnonymously();
-
-                        if (!context.mounted) return;
-                        setState(() {});
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(context.l10n.profile_snackLoggedOut)),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
+          if (_isAdmin)
+            StaggeredFadeSlide(
+              index: isAnon ? 6 : 5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ProfileSectionHeader(title: context.l10n.profile_sectionAdmin),
+                  ProfileMenuGroup(
+                    children: [
+                      ProfileMenuTile(
+                        icon: Icons.admin_panel_settings_outlined,
+                        iconColor: context.appColors.primaryDark,
+                        title: context.l10n.profile_adminLogin,
+                        subtitle: context.l10n.profile_adminLoginSubtitle,
+                        isLast: true,
+                        onTap: () {
+                          context.push(RoutePaths.adminLogin);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
-          ),
+          // ログアウトボタン（全ユーザーに表示）
+          if (!isAnon)
+            StaggeredFadeSlide(
+              index: isAnon ? 7 : 6,
+              child: ProfileMenuGroup(
+                children: [
+                  ProfileMenuTile(
+                    icon: Icons.logout,
+                    iconColor: context.appColors.error,
+                    title: context.l10n.profile_logout,
+                    subtitle: context.l10n.profile_adminLogoutSubtitle,
+                    isLast: true,
+                    onTap: () async {
+                      final auth = FirebaseAuth.instance;
+                      await auth.signOut();
+                      await auth.signInAnonymously();
+
+                      if (!context.mounted) return;
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(context.l10n.profile_snackLoggedOut)),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
         ),
+      ),
+    );
+  }
+}
+
+/// ワーカー統計カード
+class _WorkerStatsCard extends StatelessWidget {
+  final WorkerQualityScore? score;
+  final bool loading;
+
+  const _WorkerStatsCard({required this.score, required this.loading});
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.base),
+        decoration: BoxDecoration(
+          color: context.appColors.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          boxShadow: AppShadows.subtle,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(3, (_) => const SizedBox(
+            width: 60,
+            height: 40,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          )),
+        ),
+      );
+    }
+
+    final s = score;
+    if (s == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _StatItem(
+            label: context.l10n.profile_totalJobs,
+            value: '${s.totalCompleted}',
+            icon: Icons.check_circle_outline,
+            color: context.appColors.success,
+          ),
+          Container(width: 1, height: 36, color: context.appColors.divider),
+          _StatItem(
+            label: context.l10n.profile_rating,
+            value: s.ratingsCount > 0 ? s.ratingsAverage.toStringAsFixed(1) : '-',
+            icon: Icons.star_outline,
+            color: context.appColors.warning,
+          ),
+          Container(width: 1, height: 36, color: context.appColors.divider),
+          _StatItem(
+            label: context.l10n.profile_qualityScore,
+            value: s.overallScore.toStringAsFixed(1),
+            icon: Icons.emoji_events_outlined,
+            color: context.appColors.primary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '$label: $value',
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: AppTextStyles.headingSmall.copyWith(fontWeight: FontWeight.w900),
+          ),
+          Text(
+            label,
+            style: AppTextStyles.labelSmall.copyWith(color: context.appColors.textSecondary),
+          ),
+        ],
       ),
     );
   }

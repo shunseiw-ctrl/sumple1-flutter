@@ -4,7 +4,7 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
+import 'package:sumple1/presentation/widgets/job_image_slider.dart';
 import 'package:sumple1/presentation/widgets/scale_tap.dart';
 
 /// Badge display specification for JobCard.
@@ -52,6 +52,7 @@ class JobCard extends StatelessWidget {
   final String dateText;
   final String priceText;
   final String? imageUrl;
+  final List<String> imageUrls;
   final String? category;
   final List<BadgeSpec> badges;
   final bool showLegacyWarning;
@@ -73,6 +74,7 @@ class JobCard extends StatelessWidget {
     required this.dateText,
     required this.priceText,
     this.imageUrl,
+    this.imageUrls = const [],
     this.category,
     required this.badges,
     required this.showLegacyWarning,
@@ -109,10 +111,15 @@ class JobCard extends StatelessWidget {
     }
   }
 
+  /// imageUrls用のヘルパー: imageUrlsが空ならimageUrlをフォールバック
+  List<String> get _effectiveImageUrls {
+    if (imageUrls.isNotEmpty) return imageUrls;
+    if (imageUrl != null && imageUrl!.isNotEmpty) return [imageUrl!];
+    return [];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
-
     return Semantics(
       label: context.l10n.jobCard_semanticsLabel(title, location, dateText, priceText),
       child: ScaleTap(
@@ -127,103 +134,47 @@ class JobCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 180,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (hasImage)
-                    heroTag != null
-                        ? Hero(
-                            tag: heroTag!,
-                            child: AppCachedImage(
-                              imageUrl: imageUrl!,
-                              fit: BoxFit.cover,
-                              errorWidget: _placeholderImage(context),
-                            ),
-                          )
-                        : AppCachedImage(
-                            imageUrl: imageUrl!,
-                            fit: BoxFit.cover,
-                            errorWidget: _placeholderImage(context),
-                          )
-                  else
-                    _placeholderImage(context),
+            // 画像スライダー + オーバーレイUI
+            Stack(
+              children: [
+                JobImageSlider(
+                  imageUrls: _effectiveImageUrls,
+                  category: category,
+                  heroTag: heroTag,
+                ),
 
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 80,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.4),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  if (category != null && category!.isNotEmpty)
-                    Positioned(
-                      top: AppSpacing.md,
-                      left: AppSpacing.md,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(categoryIcon(category), size: 14, color: context.appColors.primary),
-                            const SizedBox(width: AppSpacing.xs),
-                            Text(
-                              category!,
-                              style: AppTextStyles.badgeText.copyWith(color: context.appColors.primary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
+                if (category != null && category!.isNotEmpty)
                   Positioned(
                     top: AppSpacing.md,
-                    right: AppSpacing.md,
-                    child: Semantics(
-                      button: true,
-                      label: isFavorite ? context.l10n.jobCard_removeFavorite : context.l10n.jobCard_addFavorite,
-                      child: GestureDetector(
-                        onTap: onToggleFavorite,
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            shape: BoxShape.circle,
-                            boxShadow: AppShadows.subtle,
+                    left: AppSpacing.md,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(categoryIcon(category), size: 14, color: context.appColors.primary),
+                          const SizedBox(width: AppSpacing.xs),
+                          Text(
+                            category!,
+                            style: AppTextStyles.badgeText.copyWith(color: context.appColors.primary),
                           ),
-                          child: Icon(
-                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                            color: isFavorite ? context.appColors.error : context.appColors.textHint,
-                            size: 20,
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
 
-                  if (isOwner)
-                    Positioned(
-                      top: AppSpacing.md,
-                      right: AppSpacing.md + 44,
+                Positioned(
+                  top: AppSpacing.md,
+                  right: AppSpacing.md,
+                  child: Semantics(
+                    button: true,
+                    label: isFavorite ? context.l10n.jobCard_removeFavorite : context.l10n.jobCard_addFavorite,
+                    child: GestureDetector(
+                      onTap: onToggleFavorite,
                       child: Container(
                         width: 38,
                         height: 38,
@@ -232,26 +183,47 @@ class JobCard extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: AppShadows.subtle,
                         ),
-                        child: PopupMenuButton<String>(
-                          tooltip: context.l10n.jobCard_actions,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-                          iconSize: 20,
-                          icon: Icon(Icons.more_horiz_rounded, color: context.appColors.textSecondary, size: 20),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
-                          onSelected: (v) {
-                            if (v == 'edit') onEdit?.call();
-                            if (v == 'delete') onDelete?.call();
-                          },
-                          itemBuilder: (_) => [
-                            PopupMenuItem(value: 'edit', child: Text(context.l10n.jobCard_edit, style: AppTextStyles.bodyMedium)),
-                            PopupMenuItem(value: 'delete', child: Text(context.l10n.jobCard_delete, style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.error))),
-                          ],
+                        child: Icon(
+                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFavorite ? context.appColors.error : context.appColors.textHint,
+                          size: 20,
                         ),
                       ),
                     ),
-                ],
-              ),
+                  ),
+                ),
+
+                if (isOwner)
+                  Positioned(
+                    top: AppSpacing.md,
+                    right: AppSpacing.md + 44,
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        shape: BoxShape.circle,
+                        boxShadow: AppShadows.subtle,
+                      ),
+                      child: PopupMenuButton<String>(
+                        tooltip: context.l10n.jobCard_actions,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+                        iconSize: 20,
+                        icon: Icon(Icons.more_horiz_rounded, color: context.appColors.textSecondary, size: 20),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.inputRadius)),
+                        onSelected: (v) {
+                          if (v == 'edit') onEdit?.call();
+                          if (v == 'delete') onDelete?.call();
+                        },
+                        itemBuilder: (_) => [
+                          PopupMenuItem(value: 'edit', child: Text(context.l10n.jobCard_edit, style: AppTextStyles.bodyMedium)),
+                          PopupMenuItem(value: 'delete', child: Text(context.l10n.jobCard_delete, style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.error))),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
 
             Padding(
@@ -259,63 +231,7 @@ class JobCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (badges.isNotEmpty || showLegacyWarning || _isNewJob()) ...[
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        if (_isNewJob())
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: context.appColors.error,
-                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                            ),
-                            child: Text(
-                              'NEW',
-                              style: AppTextStyles.badgeText.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                        for (final b in badges)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: b.bg,
-                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                            ),
-                            child: Text(
-                              b.label,
-                              style: AppTextStyles.badgeText.copyWith(color: b.fg),
-                            ),
-                          ),
-                        if (showLegacyWarning)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                            decoration: BoxDecoration(
-                              color: context.appColors.warningLight,
-                              borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-                            ),
-                            child: Text(
-                              context.l10n.jobCard_noOwnerId,
-                              style: AppTextStyles.badgeText.copyWith(color: const Color(0xFFE65100)),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.headingSmall,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  _buildMetricsRow(context, JobCardMetrics.fromData(data)),
-                  const SizedBox(height: AppSpacing.md),
-
+                  // 価格を画像直下に配置（大きく表示）
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -336,7 +252,15 @@ class JobCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.headingSmall,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
 
                   Row(
                     children: [
@@ -373,6 +297,56 @@ class JobCard extends StatelessWidget {
                         dateText,
                         style: AppTextStyles.bodySmall,
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  // メトリクス + バッジ
+                  Row(
+                    children: [
+                      Expanded(child: _buildMetricsRow(context, JobCardMetrics.fromData(data))),
+                      if (badges.isNotEmpty || showLegacyWarning || _isNewJob())
+                        Wrap(
+                          spacing: 4,
+                          children: [
+                            if (_isNewJob())
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                                decoration: BoxDecoration(
+                                  color: context.appColors.error,
+                                  borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                                ),
+                                child: Text(
+                                  'NEW',
+                                  style: AppTextStyles.badgeText.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            for (final b in badges)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                                decoration: BoxDecoration(
+                                  color: b.bg,
+                                  borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                                ),
+                                child: Text(
+                                  b.label,
+                                  style: AppTextStyles.badgeText.copyWith(color: b.fg),
+                                ),
+                              ),
+                            if (showLegacyWarning)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                                decoration: BoxDecoration(
+                                  color: context.appColors.warningLight,
+                                  borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                                ),
+                                child: Text(
+                                  context.l10n.jobCard_noOwnerId,
+                                  style: AppTextStyles.badgeText.copyWith(color: const Color(0xFFE65100)),
+                                ),
+                              ),
+                          ],
+                        ),
                     ],
                   ),
                 ],
@@ -443,26 +417,4 @@ class JobCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholderImage(BuildContext context) {
-    final colors = context.appColors;
-    return Semantics(
-      excludeSemantics: true,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [colors.primaryPale, const Color(0xFFE0E7F2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            categoryIcon(category),
-            size: 48,
-            color: colors.primary.withValues(alpha: 0.3),
-          ),
-        ),
-      ),
-    );
-  }
 }

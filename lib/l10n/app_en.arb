@@ -1884,5 +1884,63 @@
   "workerLabel": "Worker",
   "wrongPassword": "Incorrect password",
   "yen": "JPY",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+
+  "jobList_monthNumLabel": "Month {month}",
+  "@jobList_monthNumLabel": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "jobList_resultCount": "{count} results",
+  "@jobList_resultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "messages_filterAll": "All",
+  "messages_filterUnread": "Unread",
+  "messages_noUnread": "No unread messages",
+
+  "profile_totalJobs": "Completed",
+  "profile_rating": "Rating",
+  "profile_qualityScore": "Score",
+  "profile_logout": "Log out",
+
+  "home_unreadMessages": "{count} unread",
+  "@home_unreadMessages": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "work_unreadChat": "{count} unread",
+  "@work_unreadChat": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "post_sectionImages": "Images",
+  "post_sectionImagesSubtitle": "Add job photos (up to 5)",
+  "post_addImages": "Add images ({current}/{max})",
+  "@post_addImages": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  }
 }

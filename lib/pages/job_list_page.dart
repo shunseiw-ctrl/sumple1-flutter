@@ -64,6 +64,7 @@ class JobListPageState extends ConsumerState<JobListPage> {
     }
   }
 
+  /// 'other'の場合はnullを返し、クライアントサイドでフィルタ
   String? get _selectedPrefValue {
     switch (_selectedPref) {
       case 'tokyo': return '東京都';
@@ -72,6 +73,9 @@ class JobListPageState extends ConsumerState<JobListPage> {
       default: return null;
     }
   }
+
+  /// 'other'の場合: 東京/神奈川/千葉以外をフィルタ
+  static const _majorPrefs = {'東京都', '神奈川県', '千葉県'};
 
   @override
   void initState() {
@@ -361,6 +365,12 @@ class JobListPageState extends ConsumerState<JobListPage> {
                     final filteredDocs = docs.where((d) {
                       final data = d.data() as Map<String, dynamic>;
 
+                      // 'other'都道府県フィルター
+                      if (_selectedPref == 'other') {
+                        final pref = (data['prefecture'] ?? '').toString();
+                        if (_majorPrefs.contains(pref)) return false;
+                      }
+
                       if (_filterState.areaFilter.isNotEmpty) {
                         final location = (data['location'] ?? '').toString().toLowerCase();
                         if (!location.contains(_filterState.areaFilter.toLowerCase())) return false;
@@ -421,7 +431,20 @@ class JobListPageState extends ConsumerState<JobListPage> {
                       );
                     }
 
-                    return RefreshIndicator(
+                    return Column(
+                      children: [
+                        // 検索結果件数
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: AppSpacing.xs),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              context.l10n.jobList_resultCount(filteredDocs.length.toString()),
+                              style: AppTextStyles.labelSmall.copyWith(color: context.appColors.textSecondary),
+                            ),
+                          ),
+                        ),
+                        Expanded(child: RefreshIndicator(
                       onRefresh: () async {
                         setState(() => _refreshKey = UniqueKey());
                         await Future.delayed(const Duration(milliseconds: 500));
@@ -430,6 +453,8 @@ class JobListPageState extends ConsumerState<JobListPage> {
                       child: _isGridView
                           ? _buildGridView(context, filteredDocs, firestoreFavs, distanceLabels, currentUser)
                           : _buildListView(context, filteredDocs, firestoreFavs, distanceLabels, currentUser),
+                    )),
+                      ],
                     );
                   },
                 );
@@ -482,6 +507,10 @@ class JobListPageState extends ConsumerState<JobListPage> {
         final date = data['date']?.toString() ?? context.l10n.common_notSet;
         final imageUrl = data['imageUrl']?.toString();
         final category = data['category']?.toString();
+        final rawImageUrls = data['imageUrls'];
+        final imageUrlsList = (rawImageUrls is List)
+            ? rawImageUrls.map((e) => e.toString()).toList()
+            : <String>[];
 
         final ownerId = data['ownerId']?.toString();
         final isOwner = currentUser != null &&
@@ -507,6 +536,7 @@ class JobListPageState extends ConsumerState<JobListPage> {
               dateText: date,
               priceText: '¥$price',
               imageUrl: imageUrl,
+              imageUrls: imageUrlsList,
               heroTag: imageUrl != null ? 'hero-job-image-${doc.id}' : null,
               category: category,
               badges: badges,
@@ -560,6 +590,10 @@ class JobListPageState extends ConsumerState<JobListPage> {
         final date = data['date']?.toString() ?? context.l10n.common_notSet;
         final imageUrl = data['imageUrl']?.toString();
         final category = data['category']?.toString();
+        final rawGridImageUrls = data['imageUrls'];
+        final gridImageUrlsList = (rawGridImageUrls is List)
+            ? rawGridImageUrls.map((e) => e.toString()).toList()
+            : <String>[];
 
         final isFav = _favoritesService.isRegistered
             ? firestoreFavs.contains(doc.id)
@@ -573,6 +607,7 @@ class JobListPageState extends ConsumerState<JobListPage> {
             dateText: date,
             priceText: '¥$price',
             imageUrl: imageUrl,
+            imageUrls: gridImageUrlsList,
             category: category,
             data: data,
             isFavorite: isFav,
@@ -716,8 +751,7 @@ class _MonthChip {
       default:
         if (labelKey.startsWith('month_')) {
           final monthNum = labelKey.replaceFirst('month_', '');
-          // TODO: i18n - jobList_monthLabel should be "{month}月" pattern
-          return '$monthNum月';
+          return context.l10n.jobList_monthNumLabel(monthNum);
         }
         return labelKey;
     }

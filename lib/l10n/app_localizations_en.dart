@@ -3973,4 +3973,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yesterday => 'Yesterday';
+
+  @override
+  String jobList_monthNumLabel(String month) {
+    return 'Month $month';
+  }
+
+  @override
+  String jobList_resultCount(String count) {
+    return '$count results';
+  }
+
+  @override
+  String get messages_filterAll => 'All';
+
+  @override
+  String get messages_filterUnread => 'Unread';
+
+  @override
+  String get messages_noUnread => 'No unread messages';
+
+  @override
+  String get profile_totalJobs => 'Completed';
+
+  @override
+  String get profile_rating => 'Rating';
+
+  @override
+  String get profile_qualityScore => 'Score';
+
+  @override
+  String get profile_logout => 'Log out';
+
+  @override
+  String home_unreadMessages(String count) {
+    return '$count unread';
+  }
+
+  @override
+  String work_unreadChat(String count) {
+    return '$count unread';
+  }
+
+  @override
+  String get post_sectionImages => 'Images';
+
+  @override
+  String get post_sectionImagesSubtitle => 'Add job photos (up to 5)';
+
+  @override
+  String post_addImages(String current, String max) {
+    return 'Add images ($current/$max)';
+  }
 }

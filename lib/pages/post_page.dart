@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/utils/prefecture_utils.dart';
@@ -27,6 +32,10 @@ class _PostPageState extends State<PostPage> {
   final _dateController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+
+  final List<XFile> _selectedImages = [];
+  static const _maxImages = 5;
+  final _picker = ImagePicker();
 
   bool _isLoading = false;
 
@@ -77,6 +86,41 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+
+  Future<void> _pickImages() async {
+    final remaining = _maxImages - _selectedImages.length;
+    if (remaining <= 0) return;
+
+    final images = await _picker.pickMultiImage(
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 80,
+    );
+    if (images.isEmpty) return;
+
+    setState(() {
+      _selectedImages.addAll(images.take(remaining));
+    });
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
+  Future<List<String>> _uploadImages(String jobId) async {
+    final urls = <String>[];
+    for (int i = 0; i < _selectedImages.length; i++) {
+      final file = File(_selectedImages[i].path);
+      final ref = FirebaseStorage.instance
+          .ref('job_images/$jobId/image_$i.jpg');
+      await ref.putFile(file);
+      final url = await ref.getDownloadURL();
+      urls.add(url);
+    }
+    return urls;
+  }
 
   Future<void> _pickDate() async {
     DateTime initial = DateTime.now();
@@ -174,7 +218,7 @@ class _PostPageState extends State<PostPage> {
     final lng = double.tryParse(_longitudeController.text.trim());
 
     try {
-      await FirebaseFirestore.instance.collection('jobs').add({
+      final docRef = await FirebaseFirestore.instance.collection('jobs').add({
         'title': title,
         'location': location,
         'prefecture': prefecture,
@@ -195,6 +239,15 @@ class _PostPageState extends State<PostPage> {
         'description': '',
         'notes': '',
       });
+
+      // 画像アップロード
+      if (_selectedImages.isNotEmpty) {
+        final imageUrls = await _uploadImages(docRef.id);
+        await docRef.update({
+          'imageUrls': imageUrls,
+          'imageUrl': imageUrls.first,
+        });
+      }
 
       if (!mounted) return;
       AppHaptics.success();
@@ -337,6 +390,66 @@ class _PostPageState extends State<PostPage> {
                     textInputAction: TextInputAction.done,
                     prefixIcon: Icons.my_location,
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            SectionTitle(
+              title: context.l10n.post_sectionImages,
+              subtitle: context.l10n.post_sectionImagesSubtitle,
+            ),
+            const SizedBox(height: 10),
+            WhiteCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_selectedImages.isNotEmpty)
+                    SizedBox(
+                      height: 100,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _selectedImages.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+                        itemBuilder: (_, i) {
+                          return Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                                child: Image.file(
+                                  File(_selectedImages[i].path),
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: GestureDetector(
+                                  onTap: () => _removeImage(i),
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: context.appColors.error,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.close, size: 14, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  if (_selectedImages.isNotEmpty) const SizedBox(height: AppSpacing.md),
+                  if (_selectedImages.length < _maxImages)
+                    OutlinedButton.icon(
+                      onPressed: _pickImages,
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                      label: Text(context.l10n.post_addImages(_selectedImages.length.toString(), _maxImages.toString())),
+                    ),
                 ],
               ),
             ),

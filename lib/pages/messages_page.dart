@@ -21,6 +21,9 @@ import 'package:sumple1/presentation/widgets/offline_banner.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/debouncer.dart';
+import 'package:sumple1/presentation/widgets/staggered_animation.dart';
+import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class MessagesPage extends ConsumerStatefulWidget {
   const MessagesPage({super.key});
@@ -36,6 +39,7 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
   String _query = '';
   bool _isAdmin = false;
+  bool _filterUnread = false;
 
   Key _refreshKey = UniqueKey();
   final _debouncer = Debouncer();
@@ -301,6 +305,26 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
               },
             ),
           ),
+          // 未読フィルタ
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+            child: Row(
+              children: [
+                _FilterChip(
+                  label: context.l10n.messages_filterAll,
+                  selected: !_filterUnread,
+                  onTap: () => setState(() => _filterUnread = false),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                _FilterChip(
+                  label: context.l10n.messages_filterUnread,
+                  selected: _filterUnread,
+                  onTap: () => setState(() => _filterUnread = true),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               key: _refreshKey,
@@ -310,7 +334,10 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                   return SkeletonList(itemBuilder: (_) => const SkeletonMessageCard());
                 }
                 if (snap.hasError) {
-                  return Center(child: Text(context.l10n.common_loadError('${snap.error}')));
+                  return ErrorRetryWidget.general(
+                    onRetry: () => setState(() => _refreshKey = UniqueKey()),
+                    message: context.l10n.common_loadError('${snap.error}'),
+                  );
                 }
 
                 final docs = snap.data?.docs.toList() ?? [];
@@ -347,6 +374,22 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                     icon: Icons.search_off,
                     title: context.l10n.messages_noSearchResults,
                     description: context.l10n.messages_tryDifferentKeyword,
+                  );
+                }
+
+                // 未読フィルター適用
+                if (_filterUnread) {
+                  filtered.removeWhere((d) {
+                    final chatData = _chatsCache[d.id];
+                    return _unreadFromChat(chatData) <= 0;
+                  });
+                }
+
+                if (filtered.isEmpty && _filterUnread) {
+                  return EmptyState(
+                    icon: Icons.mark_chat_read_outlined,
+                    title: context.l10n.messages_noUnread,
+                    description: '',
                   );
                 }
 
@@ -388,8 +431,13 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                           ? lastText
                           : (status.isEmpty ? ' ' : context.l10n.messages_statusLabel(status));
                       final sub2 = lastText.isNotEmpty && status.isNotEmpty ? context.l10n.messages_statusLabel(status) : '';
+                      final jobImageUrl = (app['jobImageUrlSnapshot'] ?? '').toString();
 
-                      return Container(
+                      return StaggeredFadeSlide(
+                        index: i,
+                        child: Semantics(
+                          label: '$title${unread > 0 ? "、${context.l10n.work_unreadChat(unread.toString())}" : ""}',
+                          child: Container(
                         decoration: BoxDecoration(
                           color: unread > 0 ? context.appColors.primaryPale : context.appColors.surface,
                           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
@@ -412,14 +460,27 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: context.appColors.primaryPale,
-                                      borderRadius: BorderRadius.circular(14),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: SizedBox(
+                                      width: 48,
+                                      height: 48,
+                                      child: jobImageUrl.isNotEmpty
+                                          ? AppCachedImage(
+                                              imageUrl: jobImageUrl,
+                                              fit: BoxFit.cover,
+                                              width: 48,
+                                              height: 48,
+                                              errorWidget: Container(
+                                                color: context.appColors.primaryPale,
+                                                child: Icon(Icons.work_outline, color: context.appColors.primary, size: 22),
+                                              ),
+                                            )
+                                          : Container(
+                                              color: context.appColors.primaryPale,
+                                              child: Icon(Icons.work_outline, color: context.appColors.primary, size: 22),
+                                            ),
                                     ),
-                                    child: Icon(Icons.work_outline, color: context.appColors.primary, size: 22),
                                   ),
                                   const SizedBox(width: AppSpacing.md),
                                   Expanded(
@@ -478,6 +539,8 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
                             ),
                           ),
                         ),
+                      ),
+                      ),
                       );
                     },
                   ),
@@ -486,6 +549,36 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? context.appColors.primary : context.appColors.chipUnselected,
+          borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.labelSmall.copyWith(
+            color: selected ? Colors.white : context.appColors.chipTextUnselected,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

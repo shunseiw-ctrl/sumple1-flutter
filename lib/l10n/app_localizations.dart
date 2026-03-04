@@ -7432,6 +7432,90 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'昨日'**
   String get yesterday;
+
+  /// No description provided for @jobList_monthNumLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'{month}月'**
+  String jobList_monthNumLabel(String month);
+
+  /// No description provided for @jobList_resultCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'{count}件'**
+  String jobList_resultCount(String count);
+
+  /// No description provided for @messages_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get messages_filterAll;
+
+  /// No description provided for @messages_filterUnread.
+  ///
+  /// In ja, this message translates to:
+  /// **'未読'**
+  String get messages_filterUnread;
+
+  /// No description provided for @messages_noUnread.
+  ///
+  /// In ja, this message translates to:
+  /// **'未読メッセージはありません'**
+  String get messages_noUnread;
+
+  /// No description provided for @profile_totalJobs.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了案件'**
+  String get profile_totalJobs;
+
+  /// No description provided for @profile_rating.
+  ///
+  /// In ja, this message translates to:
+  /// **'評価'**
+  String get profile_rating;
+
+  /// No description provided for @profile_qualityScore.
+  ///
+  /// In ja, this message translates to:
+  /// **'スコア'**
+  String get profile_qualityScore;
+
+  /// No description provided for @profile_logout.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログアウト'**
+  String get profile_logout;
+
+  /// No description provided for @home_unreadMessages.
+  ///
+  /// In ja, this message translates to:
+  /// **'未読メッセージ{count}件'**
+  String home_unreadMessages(String count);
+
+  /// No description provided for @work_unreadChat.
+  ///
+  /// In ja, this message translates to:
+  /// **'未読{count}件'**
+  String work_unreadChat(String count);
+
+  /// No description provided for @post_sectionImages.
+  ///
+  /// In ja, this message translates to:
+  /// **'画像'**
+  String get post_sectionImages;
+
+  /// No description provided for @post_sectionImagesSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件の写真を追加（最大5枚）'**
+  String get post_sectionImagesSubtitle;
+
+  /// No description provided for @post_addImages.
+  ///
+  /// In ja, this message translates to:
+  /// **'画像を追加（{current}/{max}）'**
+  String post_addImages(String current, String max);
 }
 
 class _AppLocalizationsDelegate

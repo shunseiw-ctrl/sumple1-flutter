@@ -13,6 +13,9 @@ import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
+import 'package:sumple1/presentation/widgets/staggered_animation.dart';
+import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
+import 'package:sumple1/core/utils/currency_utils.dart';
 
 class WorkPage extends StatefulWidget {
   const WorkPage({super.key});
@@ -26,6 +29,10 @@ class _WorkPageState extends State<WorkPage>
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
   Key _refreshKey = UniqueKey();
+
+  /// チャット未読数キャッシュ
+  Map<String, int> _chatUnreadCache = {};
+  List<String> _lastAppIds = [];
 
   late final TabController _statusTabController;
 
@@ -107,6 +114,36 @@ class _WorkPageState extends State<WorkPage>
     context.push(RoutePaths.workDetailPath(applicationId));
   }
 
+  /// チャット未読数をバッチ取得
+  Future<void> _fetchChatUnreads(List<String> appIds) async {
+    if (appIds.isEmpty) return;
+    final idsChanged = appIds.length != _lastAppIds.length ||
+        List.generate(appIds.length, (i) => appIds[i] != (_lastAppIds.length > i ? _lastAppIds[i] : '')).contains(true);
+    if (!idsChanged) return;
+
+    final result = <String, int>{};
+    const batchSize = 30;
+    final db = FirebaseFirestore.instance;
+    for (var i = 0; i < appIds.length; i += batchSize) {
+      final batch = appIds.sublist(i, (i + batchSize).clamp(0, appIds.length));
+      final snap = await db.collection('chats')
+          .where(FieldPath.documentId, whereIn: batch).get();
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final unread = data['unreadCountApplicant'];
+        if (unread is int && unread > 0) {
+          result[doc.id] = unread;
+        }
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _chatUnreadCache = result;
+        _lastAppIds = List.of(appIds);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -162,7 +199,10 @@ class _WorkPageState extends State<WorkPage>
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasError) {
-                    return Center(child: Text(context.l10n.common_loadError('${snap.error}')));
+                    return ErrorRetryWidget.general(
+                      onRetry: () => setState(() => _refreshKey = UniqueKey()),
+                      message: context.l10n.common_loadError('${snap.error}'),
+                    );
                   }
                   if (!snap.hasData) {
                     return SkeletonList(itemBuilder: (_) => const SkeletonWorkCard());
@@ -170,6 +210,12 @@ class _WorkPageState extends State<WorkPage>
 
                   final allDocs = snap.data!.docs.toList();
                   _sortByCreatedAtDesc(allDocs);
+
+                  // チャット未読数をバッチ取得
+                  final appIds = allDocs.map((d) => d.id).toList();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _fetchChatUnreads(appIds);
+                  });
 
                   List<QueryDocumentSnapshot<Map<String, dynamic>>> filtered;
                   if (selectedStatusKey == 'my_applications') {
@@ -274,33 +320,95 @@ class _WorkPageState extends State<WorkPage>
                           .toString();
 
                       final statusKey = (app['status'] ?? 'applied').toString();
+                      final locationSnap = (app['locationSnapshot'] ?? '').toString();
+                      final dateSnap = (app['dateSnapshot'] ?? '').toString();
+                      final priceSnap = app['priceSnapshot'];
+                      final priceInt = (priceSnap is int) ? priceSnap : int.tryParse((priceSnap ?? '').toString());
+                      final unread = _chatUnreadCache[applicationId] ?? 0;
 
-                      return _WhiteCard(
-                        child: ListTile(
-                          title: Text(
-                            titleSnap.isNotEmpty ? titleSnap : context.l10n.common_job,
-                            style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: AppSpacing.xs),
-                            child: StatusBadge.fromStatus(context, statusKey),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                tooltip: context.l10n.work_chatTooltip,
-                                icon: const Icon(Icons.chat_bubble_outline),
-                                onPressed: () {
-                                  context.push(RoutePaths.chatRoomPath(applicationId));
-                                },
+                      return StaggeredFadeSlide(
+                        index: i,
+                        child: Semantics(
+                          label: '${titleSnap.isNotEmpty ? titleSnap : context.l10n.common_job}、$statusKey',
+                          child: _WhiteCard(
+                          child: ListTile(
+                            title: Text(
+                              titleSnap.isNotEmpty ? titleSnap : context.l10n.common_job,
+                              style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: AppSpacing.xs),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      StatusBadge.fromStatus(context, statusKey),
+                                      if (dateSnap.isNotEmpty) ...[
+                                        const SizedBox(width: AppSpacing.sm),
+                                        Text(dateSnap, style: AppTextStyles.caption),
+                                      ],
+                                    ],
+                                  ),
+                                  if (locationSnap.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: AppSpacing.xs),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.place_outlined, size: 12, color: context.appColors.textHint),
+                                          const SizedBox(width: 2),
+                                          Expanded(
+                                            child: Text(locationSnap, style: AppTextStyles.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                          ),
+                                          if (priceInt != null) ...[
+                                            const SizedBox(width: AppSpacing.sm),
+                                            Text(CurrencyUtils.formatYen(priceInt), style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w700)),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                ],
                               ),
-                              const Icon(Icons.chevron_right),
-                            ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    IconButton(
+                                      tooltip: context.l10n.work_chatTooltip,
+                                      icon: const Icon(Icons.chat_bubble_outline),
+                                      onPressed: () {
+                                        context.push(RoutePaths.chatRoomPath(applicationId));
+                                      },
+                                    ),
+                                    if (unread > 0)
+                                      Positioned(
+                                        right: 4,
+                                        top: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                          decoration: BoxDecoration(
+                                            color: context.appColors.error,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            unread > 99 ? '99+' : unread.toString(),
+                                            style: AppTextStyles.overline.copyWith(color: Colors.white, fontSize: 9),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const Icon(Icons.chevron_right),
+                              ],
+                            ),
+                            onTap: () {
+                              context.push(RoutePaths.workDetailPath(applicationId));
+                            },
                           ),
-                          onTap: () {
-                            context.push(RoutePaths.workDetailPath(applicationId));
-                          },
+                        ),
                         ),
                       );
                     },

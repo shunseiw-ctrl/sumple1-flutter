@@ -13,6 +13,7 @@ class JobCardGrid extends StatelessWidget {
   final String dateText;
   final String priceText;
   final String? imageUrl;
+  final List<String> imageUrls;
   final String? category;
   final Map<String, dynamic> data;
   final bool isFavorite;
@@ -27,6 +28,7 @@ class JobCardGrid extends StatelessWidget {
     required this.dateText,
     required this.priceText,
     this.imageUrl,
+    this.imageUrls = const [],
     this.category,
     required this.data,
     this.isFavorite = false,
@@ -48,9 +50,16 @@ class JobCardGrid extends StatelessWidget {
     return DateTime.now().difference(created).inHours < 24;
   }
 
+  /// imageUrlsから先頭画像を取得
+  String? get _effectiveImageUrl {
+    if (imageUrls.isNotEmpty) return imageUrls.first;
+    return imageUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
+    final effectiveUrl = _effectiveImageUrl;
+    final hasImage = effectiveUrl != null && effectiveUrl.isNotEmpty;
     final colors = context.appColors;
 
     return Semantics(
@@ -81,7 +90,7 @@ class JobCardGrid extends StatelessWidget {
                   children: [
                     if (hasImage)
                       AppCachedImage(
-                        imageUrl: imageUrl!,
+                        imageUrl: effectiveUrl,
                         fit: BoxFit.cover,
                         errorWidget: _placeholderImage(context),
                       )

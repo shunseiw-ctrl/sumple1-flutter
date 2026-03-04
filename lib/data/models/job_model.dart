@@ -14,6 +14,11 @@ class JobModel {
   final double? latitude;
   final double? longitude;
   final List<String>? requiredQualifications;
+  final String? imageUrl;
+  final List<String> imageUrls;
+  final String? category;
+  final int? slots;
+  final int? applicantCount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -30,6 +35,11 @@ class JobModel {
     this.latitude,
     this.longitude,
     this.requiredQualifications,
+    this.imageUrl,
+    this.imageUrls = const [],
+    this.category,
+    this.slots,
+    this.applicantCount,
     this.createdAt,
     this.updatedAt,
   });
@@ -40,6 +50,12 @@ class JobModel {
     if (data == null) {
       throw Exception('Document data is null');
     }
+
+    final imgUrl = data['imageUrl']?.toString();
+    final rawUrls = _parseStringList(data['imageUrls']);
+    final imgUrls = (rawUrls != null && rawUrls.isNotEmpty)
+        ? rawUrls
+        : (imgUrl != null && imgUrl.isNotEmpty ? [imgUrl] : <String>[]);
 
     return JobModel(
       id: doc.id,
@@ -54,6 +70,11 @@ class JobModel {
       latitude: _parseDouble(data['latitude']),
       longitude: _parseDouble(data['longitude']),
       requiredQualifications: _parseStringList(data['requiredQualifications']),
+      imageUrl: imgUrl,
+      imageUrls: imgUrls,
+      category: data['category']?.toString(),
+      slots: _parseInt(data['slots']),
+      applicantCount: _parseInt(data['applicantCount']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -61,6 +82,12 @@ class JobModel {
 
   /// Mapからモデルを生成
   factory JobModel.fromMap(String id, Map<String, dynamic> data) {
+    final imgUrl = data['imageUrl']?.toString();
+    final rawUrls = _parseStringList(data['imageUrls']);
+    final imgUrls = (rawUrls != null && rawUrls.isNotEmpty)
+        ? rawUrls
+        : (imgUrl != null && imgUrl.isNotEmpty ? [imgUrl] : <String>[]);
+
     return JobModel(
       id: id,
       title: data['title']?.toString() ?? 'タイトルなし',
@@ -74,6 +101,11 @@ class JobModel {
       latitude: _parseDouble(data['latitude']),
       longitude: _parseDouble(data['longitude']),
       requiredQualifications: _parseStringList(data['requiredQualifications']),
+      imageUrl: imgUrl,
+      imageUrls: imgUrls,
+      category: data['category']?.toString(),
+      slots: _parseInt(data['slots']),
+      applicantCount: _parseInt(data['applicantCount']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -94,6 +126,11 @@ class JobModel {
       if (longitude != null) 'longitude': longitude,
       if (requiredQualifications != null)
         'requiredQualifications': requiredQualifications,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+      if (imageUrls.isNotEmpty) 'imageUrls': imageUrls,
+      if (category != null) 'category': category,
+      if (slots != null) 'slots': slots,
+      if (applicantCount != null) 'applicantCount': applicantCount,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -128,6 +165,11 @@ class JobModel {
     double? latitude,
     double? longitude,
     List<String>? requiredQualifications,
+    String? imageUrl,
+    List<String>? imageUrls,
+    String? category,
+    int? slots,
+    int? applicantCount,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -145,6 +187,11 @@ class JobModel {
       longitude: longitude ?? this.longitude,
       requiredQualifications:
           requiredQualifications ?? this.requiredQualifications,
+      imageUrl: imageUrl ?? this.imageUrl,
+      imageUrls: imageUrls ?? this.imageUrls,
+      category: category ?? this.category,
+      slots: slots ?? this.slots,
+      applicantCount: applicantCount ?? this.applicantCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -165,6 +212,10 @@ class JobModel {
           other.description == description &&
           other.latitude == latitude &&
           other.longitude == longitude &&
+          other.imageUrl == imageUrl &&
+          other.category == category &&
+          other.slots == slots &&
+          other.applicantCount == applicantCount &&
           other.createdAt == createdAt &&
           other.updatedAt == updatedAt);
 
@@ -181,6 +232,10 @@ class JobModel {
         description,
         latitude,
         longitude,
+        imageUrl,
+        category,
+        slots,
+        applicantCount,
         createdAt,
         updatedAt,
       );

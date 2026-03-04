@@ -6,3 +6,4 @@ export 'notification_providers.dart';
 export 'admin_list_state.dart';
 export 'admin_applicants_provider.dart';
 export 'admin_pending_counts_provider.dart';
+export 'chat_providers.dart';
