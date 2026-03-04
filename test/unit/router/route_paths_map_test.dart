@@ -12,7 +12,6 @@ void main() {
         RoutePaths.home,
         RoutePaths.login,
         RoutePaths.adminLogin,
-        RoutePaths.onboarding,
         RoutePaths.guestHome,
         RoutePaths.jobList,
         RoutePaths.work,

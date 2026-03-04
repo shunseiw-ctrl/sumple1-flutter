@@ -1508,6 +1508,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestCannotApply => 'Guests cannot apply. Please log in';
 
   @override
+  String get guestHome_agreeByLogin =>
+      'By logging in, you agree to our Terms of Service and Privacy Policy';
+
+  @override
   String get guestHome_appleLoginSuccess => 'Apple login successful';
 
   @override
@@ -2161,6 +2165,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jobList_viewOnMap => 'Map View';
+
+  @override
+  String get jobList_viewGrid => 'Switch to grid view';
+
+  @override
+  String get jobList_viewList => 'Switch to list view';
 
   @override
   String get jobList_viewOnMapAccessibility => 'View jobs on map';

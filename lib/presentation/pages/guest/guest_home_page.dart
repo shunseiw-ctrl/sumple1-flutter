@@ -14,6 +14,7 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/pages/legal_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
 
@@ -42,11 +43,21 @@ class _GuestHomePageState extends State<GuestHomePage> {
     });
   }
 
+  Future<void> _recordTermsAcceptance() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('terms_accepted_at') == null) {
+      final now = DateTime.now().toIso8601String();
+      await prefs.setString('terms_accepted_at', now);
+      await prefs.setString('privacy_accepted_at', now);
+    }
+  }
+
   Future<void> _signInAsGuest() async {
     setState(() => _isLoading = true);
 
     try {
       await _authService.signInAnonymously();
+      await _recordTermsAcceptance();
       Logger.info('Guest sign in successful', tag: 'GuestHomePage');
 
       if (!mounted) return;
@@ -72,6 +83,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
         Logger.info('Apple sign in cancelled', tag: 'GuestHomePage');
         return;
       }
+      await _recordTermsAcceptance();
       Logger.info('Apple sign in successful', tag: 'GuestHomePage');
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
@@ -403,7 +415,18 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              context.l10n.guestHome_agreeByLogin,
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: context.appColors.textHint,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Wrap(
                             alignment: WrapAlignment.center,
                             spacing: 4,

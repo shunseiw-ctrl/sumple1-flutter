@@ -2846,6 +2846,12 @@ abstract class AppLocalizations {
   /// **'ゲストは応募できません。ログインしてください'**
   String get guestCannotApply;
 
+  /// No description provided for @guestHome_agreeByLogin.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログインすることで利用規約・プライバシーポリシーに同意したものとみなします'**
+  String get guestHome_agreeByLogin;
+
   /// No description provided for @guestHome_appleLoginSuccess.
   ///
   /// In ja, this message translates to:
@@ -3958,7 +3964,7 @@ abstract class AppLocalizations {
   /// No description provided for @jobList_nextMonth.
   ///
   /// In ja, this message translates to:
-  /// **'すべて'**
+  /// **'来月'**
   String get jobList_nextMonth;
 
   /// No description provided for @jobList_noJobs.
@@ -3994,25 +4000,25 @@ abstract class AppLocalizations {
   /// No description provided for @jobList_prefChiba.
   ///
   /// In ja, this message translates to:
-  /// **'今月'**
+  /// **'千葉県'**
   String get jobList_prefChiba;
 
   /// No description provided for @jobList_prefKanagawa.
   ///
   /// In ja, this message translates to:
-  /// **'今月'**
+  /// **'神奈川県'**
   String get jobList_prefKanagawa;
 
   /// No description provided for @jobList_prefOther.
   ///
   /// In ja, this message translates to:
-  /// **'今月'**
+  /// **'その他'**
   String get jobList_prefOther;
 
   /// No description provided for @jobList_prefTokyo.
   ///
   /// In ja, this message translates to:
-  /// **'今月'**
+  /// **'東京都'**
   String get jobList_prefTokyo;
 
   /// No description provided for @jobList_searchByAreaCondition.
@@ -4048,7 +4054,7 @@ abstract class AppLocalizations {
   /// No description provided for @jobList_thisMonth.
   ///
   /// In ja, this message translates to:
-  /// **'すべて'**
+  /// **'今月'**
   String get jobList_thisMonth;
 
   /// No description provided for @jobList_viewOnMap.
@@ -4056,6 +4062,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'マップで見る'**
   String get jobList_viewOnMap;
+
+  /// No description provided for @jobList_viewGrid.
+  ///
+  /// In ja, this message translates to:
+  /// **'グリッド表示に切替'**
+  String get jobList_viewGrid;
+
+  /// No description provided for @jobList_viewList.
+  ///
+  /// In ja, this message translates to:
+  /// **'リスト表示に切替'**
+  String get jobList_viewList;
 
   /// No description provided for @jobList_viewOnMapAccessibility.
   ///

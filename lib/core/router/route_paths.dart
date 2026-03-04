@@ -6,7 +6,6 @@ class RoutePaths {
   static const String home = '/';
   static const String login = '/login';
   static const String adminLogin = '/admin-login';
-  static const String onboarding = '/onboarding';
   static const String guestHome = '/guest';
 
   // --- タブ（ShellRoute 内） ---

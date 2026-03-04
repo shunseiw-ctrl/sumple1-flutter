@@ -1458,6 +1458,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get guestCannotApply => 'ゲストは応募できません。ログインしてください';
 
   @override
+  String get guestHome_agreeByLogin => 'ログインすることで利用規約・プライバシーポリシーに同意したものとみなします';
+
+  @override
   String get guestHome_appleLoginSuccess => 'Appleでログインしました';
 
   @override
@@ -2046,7 +2049,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get jobList_monthLabel => 'すべて';
 
   @override
-  String get jobList_nextMonth => 'すべて';
+  String get jobList_nextMonth => '来月';
 
   @override
   String get jobList_noJobs => '案件がありません';
@@ -2064,16 +2067,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get jobList_openSearchFilter => '検索フィルタを開く';
 
   @override
-  String get jobList_prefChiba => '今月';
+  String get jobList_prefChiba => '千葉県';
 
   @override
-  String get jobList_prefKanagawa => '今月';
+  String get jobList_prefKanagawa => '神奈川県';
 
   @override
-  String get jobList_prefOther => '今月';
+  String get jobList_prefOther => 'その他';
 
   @override
-  String get jobList_prefTokyo => '今月';
+  String get jobList_prefTokyo => '東京都';
 
   @override
   String get jobList_searchByAreaCondition => 'エリア・条件で検索';
@@ -2091,10 +2094,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get jobList_sortTooltip => '並べ替え';
 
   @override
-  String get jobList_thisMonth => 'すべて';
+  String get jobList_thisMonth => '今月';
 
   @override
   String get jobList_viewOnMap => 'マップで見る';
+
+  @override
+  String get jobList_viewGrid => 'グリッド表示に切替';
+
+  @override
+  String get jobList_viewList => 'リスト表示に切替';
 
   @override
   String get jobList_viewOnMapAccessibility => '地図で案件を見る';

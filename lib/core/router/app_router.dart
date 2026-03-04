@@ -11,7 +11,7 @@ import 'route_paths.dart';
 // --- ページインポート ---
 import '../../main.dart' show AuthGate, navigatorKey;
 import '../../pages/admin_home_page.dart';
-import '../../pages/onboarding_page.dart';
+
 import '../../presentation/pages/guest/guest_home_page.dart';
 import '../../pages/email_auth_page.dart';
 import '../../pages/admin_login_page.dart';
@@ -87,13 +87,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => fadeThroughTransition(
           key: state.pageKey,
           child: const AdminLoginPage(),
-        ),
-      ),
-      GoRoute(
-        path: RoutePaths.onboarding,
-        pageBuilder: (context, state) => fadeThroughTransition(
-          key: state.pageKey,
-          child: const OnboardingPage(),
         ),
       ),
       GoRoute(

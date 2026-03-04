@@ -12,14 +12,14 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 import 'firebase_options.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'core/config/app_environment.dart';
 import 'pages/home_page.dart';
 import 'pages/admin_home_page.dart';
-import 'pages/onboarding_page.dart';
+
 import 'presentation/pages/guest/guest_home_page.dart';
 import 'core/utils/logger.dart';
 import 'core/services/auth_service.dart';
@@ -570,12 +570,10 @@ class _AuthGateState extends State<AuthGate> {
   final _authService = AuthService();
   UserRole? _cachedRole;
   String? _lastUid;
-  bool? _onboardingComplete;
 
   @override
   void initState() {
     super.initState();
-    _checkOnboarding();
     _checkForUpdate();
   }
 
@@ -600,16 +598,6 @@ class _AuthGateState extends State<AuthGate> {
     );
   }
 
-  Future<void> _checkOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    final done = prefs.getBool('onboarding_complete') ?? false;
-    if (mounted) {
-      setState(() {
-        _onboardingComplete = done;
-      });
-    }
-  }
-
   Future<UserRole> _resolveRole(User user) async {
     if (_lastUid == user.uid && _cachedRole != null) {
       return _cachedRole!;
@@ -622,18 +610,6 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_onboardingComplete == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: AppColors.ruri),
-        ),
-      );
-    }
-
-    if (_onboardingComplete == false) {
-      return const OnboardingPage();
-    }
-
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {

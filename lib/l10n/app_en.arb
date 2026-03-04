@@ -1122,6 +1122,7 @@
   "givenName": "First Name",
   "givenNameKana": "First Name (Kana)",
   "guestCannotApply": "Guests cannot apply. Please log in",
+  "guestHome_agreeByLogin": "By logging in, you agree to our Terms of Service and Privacy Policy",
   "guestHome_appleLoginSuccess": "Apple login successful",
   "guestHome_emailLogin": "Log in with email",
   "guestHome_featureEarn": "Earn money",
