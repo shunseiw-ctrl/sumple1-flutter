@@ -8,6 +8,8 @@ import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/providers/admin_applicants_provider.dart';
 import 'package:sumple1/core/providers/admin_list_state.dart';
+import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/presentation/widgets/admin_search_bar.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/load_more_button.dart';
@@ -27,6 +29,9 @@ class AdminApplicantsTab extends ConsumerStatefulWidget {
 class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab>
     with TickerProviderStateMixin {
   late final TabController _tabController;
+  NotificationService? _notificationServiceInstance;
+  NotificationService get _notificationService =>
+      _notificationServiceInstance ??= NotificationService();
 
   static const _statusKeys = [
     'all',
@@ -93,31 +98,22 @@ class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab>
       final applicantUid =
           (appDoc.data()?['applicantUid'] ?? '').toString();
       if (applicantUid.isNotEmpty) {
-        await FirebaseFirestore.instance.collection('notifications').add({
-          'targetUid': applicantUid,
-          'title': context.l10n.adminApplicants_statusUpdateNotifTitle,
-          'body': context.l10n.adminApplicants_statusUpdateNotifBody(
+        await _notificationService.createNotification(
+          targetUid: applicantUid,
+          title: context.l10n.adminApplicants_statusUpdateNotifTitle,
+          body: context.l10n.adminApplicants_statusUpdateNotifBody(
               jobTitle, StatusBadge.labelFor(newStatus)),
-          'type': 'status_update',
-          'read': false,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+          type: 'status_update',
+        );
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(context.l10n.adminApplicants_statusChanged(
-                  jobTitle, StatusBadge.labelFor(newStatus)))),
-        );
+        ErrorHandler.showSuccess(context, context.l10n.adminApplicants_statusChanged(
+            jobTitle, StatusBadge.labelFor(newStatus)));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(context.l10n.adminApplicants_changeFailed('$e'))),
-        );
+        ErrorHandler.showError(context, e, customMessage: context.l10n.adminApplicants_changeFailed('$e'));
       }
     }
   }
@@ -149,32 +145,30 @@ class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab>
     if (confirmed != true) return;
 
     try {
-      final batch = FirebaseFirestore.instance.batch();
-      for (final item in appliedItems) {
-        final ref = FirebaseFirestore.instance
-            .collection('applications')
-            .doc(item.id);
-        batch.update(ref, {
-          'status': 'assigned',
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+      // バッチは500件制限なので分割
+      for (var i = 0; i < appliedItems.length; i += 500) {
+        final chunk = appliedItems.skip(i).take(500).toList();
+        final batch = FirebaseFirestore.instance.batch();
+        for (final item in chunk) {
+          final ref = FirebaseFirestore.instance
+              .collection('applications')
+              .doc(item.id);
+          batch.update(ref, {
+            'status': 'assigned',
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
+        await batch.commit();
       }
-      await batch.commit();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(context.l10n.adminApplicants_bulkApproved(
-                  appliedItems.length.toString()))),
-        );
+        ErrorHandler.showSuccess(context, context.l10n.adminApplicants_bulkApproved(
+            appliedItems.length.toString()));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(context.l10n
-                  .adminApplicants_bulkApproveFailed('$e'))),
-        );
+        ErrorHandler.showError(context, e, customMessage: context.l10n
+            .adminApplicants_bulkApproveFailed('$e'));
       }
     }
   }

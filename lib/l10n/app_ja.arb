@@ -2777,5 +2777,98 @@
         "type": "String"
       }
     }
-  }
+  },
+  "adminApproval_noName": "名前未設定",
+  "adminApproval_approve": "承認",
+  "adminApproval_reject": "却下",
+  "adminApproval_rejectReasonTitle": "却下理由",
+  "adminApproval_rejectReasonHint": "却下理由を入力してください",
+  "adminApproval_rejectButton": "却下する",
+  "adminKpi_noData": "データなし",
+
+  "adminNav_jobs": "案件",
+  "adminNav_approvals": "承認",
+  "adminNav_workers": "ワーカー",
+  "adminNav_settings": "設定",
+  "adminNav_jobManagement": "案件管理",
+  "adminNav_applicants": "応募者管理",
+
+  "adminApproval_qualifications": "資格",
+  "adminApproval_earlyPayments": "即金",
+  "adminApproval_verification": "本人確認",
+  "adminApproval_emptyTitle": "未処理の承認はありません",
+  "adminApproval_emptyDescription": "すべての承認が処理されました",
+  "adminApproval_pendingReview": "審査待ち",
+
+  "adminKpi_dailyTrend": "応募トレンド（直近7日）",
+  "adminKpi_monthlyKpi": "月次KPI",
+  "adminKpi_mau": "MAU",
+  "adminKpi_monthlyEarnings": "月間売上",
+  "adminKpi_jobFillRate": "充足率",
+
+  "adminWorkers_activeList": "稼働一覧",
+  "adminWorkers_reports": "日報",
+  "adminWorkers_inspections": "検査",
+  "adminWorkers_searchHint": "ワーカー名で検索",
+  "adminWorkers_emptyTitle": "稼働中のワーカーはいません",
+  "adminWorkers_emptyDescription": "現在稼働中のワーカーはいません",
+  "adminWorkers_inProgressCount": "稼働中 {count}人",
+  "@adminWorkers_inProgressCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorkers_assignedCount": "割当済 {count}人",
+  "@adminWorkers_assignedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorkers_jobUnit": "件",
+
+  "adminWorkReports_emptyTitle": "日報はまだありません",
+  "adminWorkReports_emptyDescription": "ワーカーが日報を提出するとここに表示されます",
+  "adminWorkReports_hours": "{hours}時間",
+  "@adminWorkReports_hours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+
+  "adminInspections_filterAll": "すべて",
+  "adminInspections_filterPassed": "合格",
+  "adminInspections_filterFailed": "不合格",
+  "adminInspections_filterPartial": "一部不合格",
+  "adminInspections_emptyTitle": "検査記録はありません",
+  "adminInspections_emptyDescription": "検査が実施されるとここに表示されます",
+  "adminInspections_passed": "合格",
+  "adminInspections_failed": "不合格",
+  "adminInspections_partial": "一部不合格",
+  "adminInspections_checkSummary": "{total}項目中{passed}件合格",
+  "@adminInspections_checkSummary": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "passed": {
+        "type": "String"
+      }
+    }
+  },
+
+  "adminSettings_admin": "管理者",
+  "adminSettings_notifications": "通知設定",
+  "adminSettings_appVersion": "アプリバージョン",
+  "adminSettings_legal": "法的情報",
+  "adminSettings_logout": "ログアウト",
+  "adminSettings_logoutTitle": "ログアウト",
+  "adminSettings_logoutConfirm": "ログアウトしますか？",
+
+  "adminDashboard_workReports": "日報管理"
 }

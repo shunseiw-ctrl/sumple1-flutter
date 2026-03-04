@@ -234,6 +234,54 @@ class SkeletonSalesCard extends StatelessWidget {
   }
 }
 
+class SkeletonApprovalCard extends StatelessWidget {
+  const SkeletonApprovalCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        border: Border.all(color: context.appColors.divider),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SkeletonLoader(width: 40, height: 40, borderRadius: 20),
+              SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SkeletonLoader(width: 120, height: 16, borderRadius: 6),
+                    SizedBox(height: 4),
+                    SkeletonLoader(width: 80, height: 12, borderRadius: 6),
+                  ],
+                ),
+              ),
+              SkeletonLoader(width: 60, height: 24, borderRadius: 12),
+            ],
+          ),
+          SizedBox(height: AppSpacing.md),
+          SkeletonLoader(height: 80, borderRadius: 10),
+          SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(child: SkeletonLoader(height: 36, borderRadius: 10)),
+              SizedBox(width: 10),
+              Expanded(child: SkeletonLoader(height: 36, borderRadius: 10)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class SkeletonList extends StatelessWidget {
   final int itemCount;
   final Widget Function(BuildContext context)? itemBuilder;

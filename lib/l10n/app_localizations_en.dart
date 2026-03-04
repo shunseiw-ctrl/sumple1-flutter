@@ -4084,4 +4084,178 @@ class AppLocalizationsEn extends AppLocalizations {
   String post_addImages(String current, String max) {
     return 'Add images ($current/$max)';
   }
+
+  @override
+  String get adminApproval_noName => 'No name set';
+
+  @override
+  String get adminApproval_approve => 'Approve';
+
+  @override
+  String get adminApproval_reject => 'Reject';
+
+  @override
+  String get adminApproval_rejectReasonTitle => 'Rejection reason';
+
+  @override
+  String get adminApproval_rejectReasonHint =>
+      'Please enter the reason for rejection';
+
+  @override
+  String get adminApproval_rejectButton => 'Reject';
+
+  @override
+  String get adminKpi_noData => 'No data';
+
+  @override
+  String get adminNav_jobs => 'Jobs';
+
+  @override
+  String get adminNav_approvals => 'Approvals';
+
+  @override
+  String get adminNav_workers => 'Workers';
+
+  @override
+  String get adminNav_settings => 'Settings';
+
+  @override
+  String get adminNav_jobManagement => 'Job Management';
+
+  @override
+  String get adminNav_applicants => 'Applicants';
+
+  @override
+  String get adminApproval_qualifications => 'Qualifications';
+
+  @override
+  String get adminApproval_earlyPayments => 'Early Payment';
+
+  @override
+  String get adminApproval_verification => 'Verification';
+
+  @override
+  String get adminApproval_emptyTitle => 'No pending approvals';
+
+  @override
+  String get adminApproval_emptyDescription =>
+      'All approvals have been processed';
+
+  @override
+  String get adminApproval_pendingReview => 'Pending Review';
+
+  @override
+  String get adminKpi_dailyTrend => 'Application Trend (Last 7 Days)';
+
+  @override
+  String get adminKpi_monthlyKpi => 'Monthly KPI';
+
+  @override
+  String get adminKpi_mau => 'MAU';
+
+  @override
+  String get adminKpi_monthlyEarnings => 'Monthly Earnings';
+
+  @override
+  String get adminKpi_jobFillRate => 'Job Fill Rate';
+
+  @override
+  String get adminWorkers_activeList => 'Active Workers';
+
+  @override
+  String get adminWorkers_reports => 'Reports';
+
+  @override
+  String get adminWorkers_inspections => 'Inspections';
+
+  @override
+  String get adminWorkers_searchHint => 'Search by worker name';
+
+  @override
+  String get adminWorkers_emptyTitle => 'No active workers';
+
+  @override
+  String get adminWorkers_emptyDescription => 'No workers currently active';
+
+  @override
+  String adminWorkers_inProgressCount(String count) {
+    return 'Active $count';
+  }
+
+  @override
+  String adminWorkers_assignedCount(String count) {
+    return 'Assigned $count';
+  }
+
+  @override
+  String get adminWorkers_jobUnit => ' jobs';
+
+  @override
+  String get adminWorkReports_emptyTitle => 'No work reports yet';
+
+  @override
+  String get adminWorkReports_emptyDescription =>
+      'Work reports will appear here when submitted';
+
+  @override
+  String adminWorkReports_hours(String hours) {
+    return '$hours hours';
+  }
+
+  @override
+  String get adminInspections_filterAll => 'All';
+
+  @override
+  String get adminInspections_filterPassed => 'Passed';
+
+  @override
+  String get adminInspections_filterFailed => 'Failed';
+
+  @override
+  String get adminInspections_filterPartial => 'Partial';
+
+  @override
+  String get adminInspections_emptyTitle => 'No inspections';
+
+  @override
+  String get adminInspections_emptyDescription =>
+      'Inspections will appear here';
+
+  @override
+  String get adminInspections_passed => 'Passed';
+
+  @override
+  String get adminInspections_failed => 'Failed';
+
+  @override
+  String get adminInspections_partial => 'Partial';
+
+  @override
+  String adminInspections_checkSummary(String total, String passed) {
+    return '$passed of $total items passed';
+  }
+
+  @override
+  String get adminSettings_admin => 'Administrator';
+
+  @override
+  String get adminSettings_notifications => 'Notifications';
+
+  @override
+  String get adminSettings_appVersion => 'App Version';
+
+  @override
+  String get adminSettings_legal => 'Legal';
+
+  @override
+  String get adminSettings_logout => 'Logout';
+
+  @override
+  String get adminSettings_logoutTitle => 'Logout';
+
+  @override
+  String get adminSettings_logoutConfirm => 'Are you sure you want to log out?';
+
+  @override
+  String get adminDashboard_workReports => 'Reports';
 }

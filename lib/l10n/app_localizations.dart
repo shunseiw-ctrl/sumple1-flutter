@@ -7606,6 +7606,330 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'画像を追加（{current}/{max}）'**
   String post_addImages(String current, String max);
+
+  /// No description provided for @adminApproval_noName.
+  ///
+  /// In ja, this message translates to:
+  /// **'名前未設定'**
+  String get adminApproval_noName;
+
+  /// No description provided for @adminApproval_approve.
+  ///
+  /// In ja, this message translates to:
+  /// **'承認'**
+  String get adminApproval_approve;
+
+  /// No description provided for @adminApproval_reject.
+  ///
+  /// In ja, this message translates to:
+  /// **'却下'**
+  String get adminApproval_reject;
+
+  /// No description provided for @adminApproval_rejectReasonTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'却下理由'**
+  String get adminApproval_rejectReasonTitle;
+
+  /// No description provided for @adminApproval_rejectReasonHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'却下理由を入力してください'**
+  String get adminApproval_rejectReasonHint;
+
+  /// No description provided for @adminApproval_rejectButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'却下する'**
+  String get adminApproval_rejectButton;
+
+  /// No description provided for @adminKpi_noData.
+  ///
+  /// In ja, this message translates to:
+  /// **'データなし'**
+  String get adminKpi_noData;
+
+  /// No description provided for @adminNav_jobs.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件'**
+  String get adminNav_jobs;
+
+  /// No description provided for @adminNav_approvals.
+  ///
+  /// In ja, this message translates to:
+  /// **'承認'**
+  String get adminNav_approvals;
+
+  /// No description provided for @adminNav_workers.
+  ///
+  /// In ja, this message translates to:
+  /// **'ワーカー'**
+  String get adminNav_workers;
+
+  /// No description provided for @adminNav_settings.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定'**
+  String get adminNav_settings;
+
+  /// No description provided for @adminNav_jobManagement.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件管理'**
+  String get adminNav_jobManagement;
+
+  /// No description provided for @adminNav_applicants.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募者管理'**
+  String get adminNav_applicants;
+
+  /// No description provided for @adminApproval_qualifications.
+  ///
+  /// In ja, this message translates to:
+  /// **'資格'**
+  String get adminApproval_qualifications;
+
+  /// No description provided for @adminApproval_earlyPayments.
+  ///
+  /// In ja, this message translates to:
+  /// **'即金'**
+  String get adminApproval_earlyPayments;
+
+  /// No description provided for @adminApproval_verification.
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認'**
+  String get adminApproval_verification;
+
+  /// No description provided for @adminApproval_emptyTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'未処理の承認はありません'**
+  String get adminApproval_emptyTitle;
+
+  /// No description provided for @adminApproval_emptyDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべての承認が処理されました'**
+  String get adminApproval_emptyDescription;
+
+  /// No description provided for @adminApproval_pendingReview.
+  ///
+  /// In ja, this message translates to:
+  /// **'審査待ち'**
+  String get adminApproval_pendingReview;
+
+  /// No description provided for @adminKpi_dailyTrend.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募トレンド（直近7日）'**
+  String get adminKpi_dailyTrend;
+
+  /// No description provided for @adminKpi_monthlyKpi.
+  ///
+  /// In ja, this message translates to:
+  /// **'月次KPI'**
+  String get adminKpi_monthlyKpi;
+
+  /// No description provided for @adminKpi_mau.
+  ///
+  /// In ja, this message translates to:
+  /// **'MAU'**
+  String get adminKpi_mau;
+
+  /// No description provided for @adminKpi_monthlyEarnings.
+  ///
+  /// In ja, this message translates to:
+  /// **'月間売上'**
+  String get adminKpi_monthlyEarnings;
+
+  /// No description provided for @adminKpi_jobFillRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'充足率'**
+  String get adminKpi_jobFillRate;
+
+  /// No description provided for @adminWorkers_activeList.
+  ///
+  /// In ja, this message translates to:
+  /// **'稼働一覧'**
+  String get adminWorkers_activeList;
+
+  /// No description provided for @adminWorkers_reports.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報'**
+  String get adminWorkers_reports;
+
+  /// No description provided for @adminWorkers_inspections.
+  ///
+  /// In ja, this message translates to:
+  /// **'検査'**
+  String get adminWorkers_inspections;
+
+  /// No description provided for @adminWorkers_searchHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'ワーカー名で検索'**
+  String get adminWorkers_searchHint;
+
+  /// No description provided for @adminWorkers_emptyTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'稼働中のワーカーはいません'**
+  String get adminWorkers_emptyTitle;
+
+  /// No description provided for @adminWorkers_emptyDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在稼働中のワーカーはいません'**
+  String get adminWorkers_emptyDescription;
+
+  /// No description provided for @adminWorkers_inProgressCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'稼働中 {count}人'**
+  String adminWorkers_inProgressCount(String count);
+
+  /// No description provided for @adminWorkers_assignedCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'割当済 {count}人'**
+  String adminWorkers_assignedCount(String count);
+
+  /// No description provided for @adminWorkers_jobUnit.
+  ///
+  /// In ja, this message translates to:
+  /// **'件'**
+  String get adminWorkers_jobUnit;
+
+  /// No description provided for @adminWorkReports_emptyTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報はまだありません'**
+  String get adminWorkReports_emptyTitle;
+
+  /// No description provided for @adminWorkReports_emptyDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'ワーカーが日報を提出するとここに表示されます'**
+  String get adminWorkReports_emptyDescription;
+
+  /// No description provided for @adminWorkReports_hours.
+  ///
+  /// In ja, this message translates to:
+  /// **'{hours}時間'**
+  String adminWorkReports_hours(String hours);
+
+  /// No description provided for @adminInspections_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get adminInspections_filterAll;
+
+  /// No description provided for @adminInspections_filterPassed.
+  ///
+  /// In ja, this message translates to:
+  /// **'合格'**
+  String get adminInspections_filterPassed;
+
+  /// No description provided for @adminInspections_filterFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'不合格'**
+  String get adminInspections_filterFailed;
+
+  /// No description provided for @adminInspections_filterPartial.
+  ///
+  /// In ja, this message translates to:
+  /// **'一部不合格'**
+  String get adminInspections_filterPartial;
+
+  /// No description provided for @adminInspections_emptyTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'検査記録はありません'**
+  String get adminInspections_emptyTitle;
+
+  /// No description provided for @adminInspections_emptyDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'検査が実施されるとここに表示されます'**
+  String get adminInspections_emptyDescription;
+
+  /// No description provided for @adminInspections_passed.
+  ///
+  /// In ja, this message translates to:
+  /// **'合格'**
+  String get adminInspections_passed;
+
+  /// No description provided for @adminInspections_failed.
+  ///
+  /// In ja, this message translates to:
+  /// **'不合格'**
+  String get adminInspections_failed;
+
+  /// No description provided for @adminInspections_partial.
+  ///
+  /// In ja, this message translates to:
+  /// **'一部不合格'**
+  String get adminInspections_partial;
+
+  /// No description provided for @adminInspections_checkSummary.
+  ///
+  /// In ja, this message translates to:
+  /// **'{total}項目中{passed}件合格'**
+  String adminInspections_checkSummary(String total, String passed);
+
+  /// No description provided for @adminSettings_admin.
+  ///
+  /// In ja, this message translates to:
+  /// **'管理者'**
+  String get adminSettings_admin;
+
+  /// No description provided for @adminSettings_notifications.
+  ///
+  /// In ja, this message translates to:
+  /// **'通知設定'**
+  String get adminSettings_notifications;
+
+  /// No description provided for @adminSettings_appVersion.
+  ///
+  /// In ja, this message translates to:
+  /// **'アプリバージョン'**
+  String get adminSettings_appVersion;
+
+  /// No description provided for @adminSettings_legal.
+  ///
+  /// In ja, this message translates to:
+  /// **'法的情報'**
+  String get adminSettings_legal;
+
+  /// No description provided for @adminSettings_logout.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログアウト'**
+  String get adminSettings_logout;
+
+  /// No description provided for @adminSettings_logoutTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログアウト'**
+  String get adminSettings_logoutTitle;
+
+  /// No description provided for @adminSettings_logoutConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログアウトしますか？'**
+  String get adminSettings_logoutConfirm;
+
+  /// No description provided for @adminDashboard_workReports.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報管理'**
+  String get adminDashboard_workReports;
 }
 
 class _AppLocalizationsDelegate

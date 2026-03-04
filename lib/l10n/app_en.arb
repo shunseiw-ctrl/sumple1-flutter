@@ -2006,5 +2006,98 @@
         "type": "String"
       }
     }
-  }
+  },
+  "adminApproval_noName": "No name set",
+  "adminApproval_approve": "Approve",
+  "adminApproval_reject": "Reject",
+  "adminApproval_rejectReasonTitle": "Rejection reason",
+  "adminApproval_rejectReasonHint": "Please enter the reason for rejection",
+  "adminApproval_rejectButton": "Reject",
+  "adminKpi_noData": "No data",
+
+  "adminNav_jobs": "Jobs",
+  "adminNav_approvals": "Approvals",
+  "adminNav_workers": "Workers",
+  "adminNav_settings": "Settings",
+  "adminNav_jobManagement": "Job Management",
+  "adminNav_applicants": "Applicants",
+
+  "adminApproval_qualifications": "Qualifications",
+  "adminApproval_earlyPayments": "Early Payment",
+  "adminApproval_verification": "Verification",
+  "adminApproval_emptyTitle": "No pending approvals",
+  "adminApproval_emptyDescription": "All approvals have been processed",
+  "adminApproval_pendingReview": "Pending Review",
+
+  "adminKpi_dailyTrend": "Application Trend (Last 7 Days)",
+  "adminKpi_monthlyKpi": "Monthly KPI",
+  "adminKpi_mau": "MAU",
+  "adminKpi_monthlyEarnings": "Monthly Earnings",
+  "adminKpi_jobFillRate": "Job Fill Rate",
+
+  "adminWorkers_activeList": "Active Workers",
+  "adminWorkers_reports": "Reports",
+  "adminWorkers_inspections": "Inspections",
+  "adminWorkers_searchHint": "Search by worker name",
+  "adminWorkers_emptyTitle": "No active workers",
+  "adminWorkers_emptyDescription": "No workers currently active",
+  "adminWorkers_inProgressCount": "Active {count}",
+  "@adminWorkers_inProgressCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorkers_assignedCount": "Assigned {count}",
+  "@adminWorkers_assignedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorkers_jobUnit": " jobs",
+
+  "adminWorkReports_emptyTitle": "No work reports yet",
+  "adminWorkReports_emptyDescription": "Work reports will appear here when submitted",
+  "adminWorkReports_hours": "{hours} hours",
+  "@adminWorkReports_hours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+
+  "adminInspections_filterAll": "All",
+  "adminInspections_filterPassed": "Passed",
+  "adminInspections_filterFailed": "Failed",
+  "adminInspections_filterPartial": "Partial",
+  "adminInspections_emptyTitle": "No inspections",
+  "adminInspections_emptyDescription": "Inspections will appear here",
+  "adminInspections_passed": "Passed",
+  "adminInspections_failed": "Failed",
+  "adminInspections_partial": "Partial",
+  "adminInspections_checkSummary": "{passed} of {total} items passed",
+  "@adminInspections_checkSummary": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "passed": {
+        "type": "String"
+      }
+    }
+  },
+
+  "adminSettings_admin": "Administrator",
+  "adminSettings_notifications": "Notifications",
+  "adminSettings_appVersion": "App Version",
+  "adminSettings_legal": "Legal",
+  "adminSettings_logout": "Logout",
+  "adminSettings_logoutTitle": "Logout",
+  "adminSettings_logoutConfirm": "Are you sure you want to log out?",
+
+  "adminDashboard_workReports": "Reports"
 }

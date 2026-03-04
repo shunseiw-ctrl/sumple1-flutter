@@ -42,9 +42,6 @@ import '../../pages/qualification_add_page.dart';
 import '../../pages/statement_detail_page.dart';
 import '../../pages/favorites_page.dart';
 import '../../pages/phone_auth_page.dart';
-import '../../pages/admin/admin_qualifications_page.dart';
-import '../../pages/admin/admin_early_payments_page.dart';
-import '../../pages/admin/admin_identity_verification_page.dart';
 import '../../pages/admin/admin_worker_detail_page.dart';
 import '../../pages/referral_page.dart';
 
@@ -106,26 +103,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const AdminHomePage(),
         ),
       ),
+      // 承認ページ → 承認センター（admin_home_page内タブ）にリダイレクト
       GoRoute(
         path: RoutePaths.adminQualifications,
-        pageBuilder: (context, state) => slideRightTransition(
-          key: state.pageKey,
-          child: const AdminQualificationsPage(),
-        ),
+        redirect: (context, state) => RoutePaths.adminHome,
       ),
       GoRoute(
         path: RoutePaths.adminEarlyPayments,
-        pageBuilder: (context, state) => slideRightTransition(
-          key: state.pageKey,
-          child: const AdminEarlyPaymentsPage(),
-        ),
+        redirect: (context, state) => RoutePaths.adminHome,
       ),
       GoRoute(
         path: RoutePaths.adminIdentityVerification,
-        pageBuilder: (context, state) => slideRightTransition(
-          key: state.pageKey,
-          child: const AdminIdentityVerificationPage(),
-        ),
+        redirect: (context, state) => RoutePaths.adminHome,
       ),
       GoRoute(
         path: RoutePaths.adminWorkerDetail,

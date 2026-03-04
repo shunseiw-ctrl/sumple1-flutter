@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rxdart/rxdart.dart';
 
 /// 管理者未処理件数
 class AdminPendingCounts {
@@ -22,47 +23,44 @@ class AdminPendingCounts {
       pendingVerifications;
 }
 
-/// 未処理件数StreamProvider
+/// 未処理件数StreamProvider（combineLatest4で並列監視）
 final adminPendingCountsProvider =
     StreamProvider.autoDispose<AdminPendingCounts>((ref) {
   final db = FirebaseFirestore.instance;
 
-  final applicationsStream = db
-      .collection('applications')
-      .where('status', isEqualTo: 'applied')
-      .snapshots()
-      .map((snap) => snap.docs.length);
+  // AggregateQuery.count()のストリーム化ヘルパー
+  Stream<int> countStream(Query<Map<String, dynamic>> query) {
+    return query.snapshots().map((snap) => snap.docs.length);
+  }
 
-  final qualificationsStream = db
-      .collectionGroup('qualifications_v2')
-      .where('verificationStatus', isEqualTo: 'pending')
-      .snapshots()
-      .map((snap) => snap.docs.length);
+  final applicationsStream = countStream(
+    db.collection('applications').where('status', isEqualTo: 'applied'),
+  );
 
-  final earlyPaymentsStream = db
-      .collection('early_payment_requests')
-      .where('status', isEqualTo: 'requested')
-      .snapshots()
-      .map((snap) => snap.docs.length);
+  final qualificationsStream = countStream(
+    db.collectionGroup('qualifications_v2').where('verificationStatus', isEqualTo: 'pending'),
+  );
 
-  final verificationsStream = db
-      .collection('identity_verification')
-      .where('status', isEqualTo: 'pending')
-      .snapshots()
-      .map((snap) => snap.docs.length);
+  final earlyPaymentsStream = countStream(
+    db.collection('early_payment_requests').where('status', isEqualTo: 'requested'),
+  );
 
-  return applicationsStream.asyncExpand((appCount) {
-    return qualificationsStream.asyncExpand((qualCount) {
-      return earlyPaymentsStream.asyncExpand((payCount) {
-        return verificationsStream.map((verifyCount) {
-          return AdminPendingCounts(
-            pendingApplications: appCount,
-            pendingQualifications: qualCount,
-            pendingEarlyPayments: payCount,
-            pendingVerifications: verifyCount,
-          );
-        });
-      });
-    });
-  });
+  final verificationsStream = countStream(
+    db.collection('identity_verification').where('status', isEqualTo: 'pending'),
+  );
+
+  return Rx.combineLatest4(
+    applicationsStream,
+    qualificationsStream,
+    earlyPaymentsStream,
+    verificationsStream,
+    (int apps, int quals, int payments, int verifications) {
+      return AdminPendingCounts(
+        pendingApplications: apps,
+        pendingQualifications: quals,
+        pendingEarlyPayments: payments,
+        pendingVerifications: verifications,
+      );
+    },
+  );
 });

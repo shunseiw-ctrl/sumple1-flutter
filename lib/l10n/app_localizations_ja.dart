@@ -3985,4 +3985,174 @@ class AppLocalizationsJa extends AppLocalizations {
   String post_addImages(String current, String max) {
     return '画像を追加（$current/$max）';
   }
+
+  @override
+  String get adminApproval_noName => '名前未設定';
+
+  @override
+  String get adminApproval_approve => '承認';
+
+  @override
+  String get adminApproval_reject => '却下';
+
+  @override
+  String get adminApproval_rejectReasonTitle => '却下理由';
+
+  @override
+  String get adminApproval_rejectReasonHint => '却下理由を入力してください';
+
+  @override
+  String get adminApproval_rejectButton => '却下する';
+
+  @override
+  String get adminKpi_noData => 'データなし';
+
+  @override
+  String get adminNav_jobs => '案件';
+
+  @override
+  String get adminNav_approvals => '承認';
+
+  @override
+  String get adminNav_workers => 'ワーカー';
+
+  @override
+  String get adminNav_settings => '設定';
+
+  @override
+  String get adminNav_jobManagement => '案件管理';
+
+  @override
+  String get adminNav_applicants => '応募者管理';
+
+  @override
+  String get adminApproval_qualifications => '資格';
+
+  @override
+  String get adminApproval_earlyPayments => '即金';
+
+  @override
+  String get adminApproval_verification => '本人確認';
+
+  @override
+  String get adminApproval_emptyTitle => '未処理の承認はありません';
+
+  @override
+  String get adminApproval_emptyDescription => 'すべての承認が処理されました';
+
+  @override
+  String get adminApproval_pendingReview => '審査待ち';
+
+  @override
+  String get adminKpi_dailyTrend => '応募トレンド（直近7日）';
+
+  @override
+  String get adminKpi_monthlyKpi => '月次KPI';
+
+  @override
+  String get adminKpi_mau => 'MAU';
+
+  @override
+  String get adminKpi_monthlyEarnings => '月間売上';
+
+  @override
+  String get adminKpi_jobFillRate => '充足率';
+
+  @override
+  String get adminWorkers_activeList => '稼働一覧';
+
+  @override
+  String get adminWorkers_reports => '日報';
+
+  @override
+  String get adminWorkers_inspections => '検査';
+
+  @override
+  String get adminWorkers_searchHint => 'ワーカー名で検索';
+
+  @override
+  String get adminWorkers_emptyTitle => '稼働中のワーカーはいません';
+
+  @override
+  String get adminWorkers_emptyDescription => '現在稼働中のワーカーはいません';
+
+  @override
+  String adminWorkers_inProgressCount(String count) {
+    return '稼働中 $count人';
+  }
+
+  @override
+  String adminWorkers_assignedCount(String count) {
+    return '割当済 $count人';
+  }
+
+  @override
+  String get adminWorkers_jobUnit => '件';
+
+  @override
+  String get adminWorkReports_emptyTitle => '日報はまだありません';
+
+  @override
+  String get adminWorkReports_emptyDescription => 'ワーカーが日報を提出するとここに表示されます';
+
+  @override
+  String adminWorkReports_hours(String hours) {
+    return '$hours時間';
+  }
+
+  @override
+  String get adminInspections_filterAll => 'すべて';
+
+  @override
+  String get adminInspections_filterPassed => '合格';
+
+  @override
+  String get adminInspections_filterFailed => '不合格';
+
+  @override
+  String get adminInspections_filterPartial => '一部不合格';
+
+  @override
+  String get adminInspections_emptyTitle => '検査記録はありません';
+
+  @override
+  String get adminInspections_emptyDescription => '検査が実施されるとここに表示されます';
+
+  @override
+  String get adminInspections_passed => '合格';
+
+  @override
+  String get adminInspections_failed => '不合格';
+
+  @override
+  String get adminInspections_partial => '一部不合格';
+
+  @override
+  String adminInspections_checkSummary(String total, String passed) {
+    return '$total項目中$passed件合格';
+  }
+
+  @override
+  String get adminSettings_admin => '管理者';
+
+  @override
+  String get adminSettings_notifications => '通知設定';
+
+  @override
+  String get adminSettings_appVersion => 'アプリバージョン';
+
+  @override
+  String get adminSettings_legal => '法的情報';
+
+  @override
+  String get adminSettings_logout => 'ログアウト';
+
+  @override
+  String get adminSettings_logoutTitle => 'ログアウト';
+
+  @override
+  String get adminSettings_logoutConfirm => 'ログアウトしますか？';
+
+  @override
+  String get adminDashboard_workReports => '日報管理';
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'sales_page.dart';
-import 'profile_page.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/notification_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
@@ -10,9 +8,13 @@ import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/providers/admin_pending_counts_provider.dart';
 import 'package:sumple1/pages/admin/admin_dashboard_tab.dart';
-import 'package:sumple1/pages/admin/admin_job_management_tab.dart';
-import 'package:sumple1/pages/admin/admin_applicants_tab.dart';
+import 'package:sumple1/pages/admin/admin_jobs_and_applicants_tab.dart';
+import 'package:sumple1/pages/admin/admin_approval_center_tab.dart';
+import 'package:sumple1/pages/admin/admin_workers_tab.dart';
+import 'package:sumple1/pages/admin/admin_settings_tab.dart';
 
+/// 管理者ホームページ（5タブ構成）
+/// [ダッシュボード] [案件] [承認] [ワーカー] [設定]
 class AdminHomePage extends ConsumerStatefulWidget {
   const AdminHomePage({super.key});
 
@@ -22,17 +24,21 @@ class AdminHomePage extends ConsumerStatefulWidget {
 
 class _AdminHomePageState extends ConsumerState<AdminHomePage> {
   int _currentIndex = 0;
+  late final NotificationService _notificationService;
 
   @override
   void initState() {
     super.initState();
+    _notificationService = NotificationService();
     AnalyticsService.logScreenView('admin_home');
   }
 
   @override
   Widget build(BuildContext context) {
     final pendingCounts = ref.watch(adminPendingCountsProvider);
-    final pendingApplicants = pendingCounts.valueOrNull?.pendingApplications ?? 0;
+    final approvalTotal = (pendingCounts.valueOrNull?.pendingQualifications ?? 0) +
+        (pendingCounts.valueOrNull?.pendingEarlyPayments ?? 0) +
+        (pendingCounts.valueOrNull?.pendingVerifications ?? 0);
 
     return Scaffold(
       backgroundColor: context.appColors.background,
@@ -82,7 +88,7 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
         ),
         actions: [
           StreamBuilder<int>(
-            stream: NotificationService().unreadCountStream(
+            stream: _notificationService.unreadCountStream(
               FirebaseAuth.instance.currentUser?.uid ?? '',
             ),
             builder: (context, snap) {
@@ -126,10 +132,10 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
           AdminDashboardTab(
             onNavigateToTab: (index) => setState(() => _currentIndex = index),
           ),
-          const AdminJobManagementTab(),
-          const AdminApplicantsTab(),
-          const SalesPage(),
-          const ProfilePage(),
+          const AdminJobsAndApplicantsTab(),
+          const AdminApprovalCenterTab(),
+          const AdminWorkersTab(),
+          const AdminSettingsTab(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -139,29 +145,45 @@ class _AdminHomePageState extends ConsumerState<AdminHomePage> {
         unselectedItemColor: context.appColors.textSecondary,
         onTap: (i) => setState(() => _currentIndex = i),
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.dashboard_outlined), activeIcon: const Icon(Icons.dashboard), label: context.l10n.adminHome_dashboard),
-          BottomNavigationBarItem(icon: const Icon(Icons.work_outline), activeIcon: const Icon(Icons.work), label: context.l10n.adminHome_jobManagement),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.dashboard_outlined),
+            activeIcon: const Icon(Icons.dashboard),
+            label: context.l10n.adminHome_dashboard,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.work_outline),
+            activeIcon: const Icon(Icons.work),
+            label: context.l10n.adminNav_jobs,
+          ),
           BottomNavigationBarItem(
             icon: Badge(
-              isLabelVisible: pendingApplicants > 0,
+              isLabelVisible: approvalTotal > 0,
               label: Text(
-                pendingApplicants > 99 ? '99+' : pendingApplicants.toString(),
+                approvalTotal > 99 ? '99+' : approvalTotal.toString(),
                 style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
               ),
-              child: const Icon(Icons.people_outline),
+              child: const Icon(Icons.assignment_turned_in_outlined),
             ),
             activeIcon: Badge(
-              isLabelVisible: pendingApplicants > 0,
+              isLabelVisible: approvalTotal > 0,
               label: Text(
-                pendingApplicants > 99 ? '99+' : pendingApplicants.toString(),
+                approvalTotal > 99 ? '99+' : approvalTotal.toString(),
                 style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800),
               ),
-              child: const Icon(Icons.people),
+              child: const Icon(Icons.assignment_turned_in),
             ),
-            label: context.l10n.adminHome_applicants,
+            label: context.l10n.adminNav_approvals,
           ),
-          BottomNavigationBarItem(icon: const Icon(Icons.payments_outlined), activeIcon: const Icon(Icons.payments), label: context.l10n.adminHome_salesManagement),
-          BottomNavigationBarItem(icon: const Icon(Icons.settings_outlined), activeIcon: const Icon(Icons.settings), label: context.l10n.adminHome_settings),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.people_outline),
+            activeIcon: const Icon(Icons.people),
+            label: context.l10n.adminNav_workers,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings_outlined),
+            activeIcon: const Icon(Icons.settings),
+            label: context.l10n.adminNav_settings,
+          ),
         ],
       ),
     );
