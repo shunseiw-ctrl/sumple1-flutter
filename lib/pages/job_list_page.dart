@@ -31,9 +31,8 @@ class JobListPage extends ConsumerStatefulWidget {
 }
 
 class _JobListPageState extends ConsumerState<JobListPage> {
-  String _selectedPref = 'tokyo';
-
   String? _selectedMonthKey;
+  String _selectedPref = 'all';
 
   String _sortKey = 'newest';
 
@@ -50,33 +49,29 @@ class _JobListPageState extends ConsumerState<JobListPage> {
   List<JobWithDistance>? _sortedByDistance;
   bool _loadingLocation = false;
 
-  static const List<String> _prefKeys = [
-    'chiba',
-    'tokyo',
-    'kanagawa',
-    'other',
-  ];
+  late final List<_MonthChip> _monthChips = _buildMonthChips();
 
-  static const Map<String, String> _prefValues = {
-    'chiba': '千葉県',
-    'tokyo': '東京都',
-    'kanagawa': '神奈川県',
-    'other': 'その他',
-  };
+  static const _prefKeys = ['all', 'tokyo', 'kanagawa', 'chiba', 'other'];
 
-  static String _prefLabel(BuildContext context, String key) {
+  String _prefLabel(BuildContext context, String key) {
     switch (key) {
-      case 'chiba': return context.l10n.jobList_prefChiba;
+      case 'all': return context.l10n.common_all;
       case 'tokyo': return context.l10n.jobList_prefTokyo;
       case 'kanagawa': return context.l10n.jobList_prefKanagawa;
+      case 'chiba': return context.l10n.jobList_prefChiba;
       case 'other': return context.l10n.jobList_prefOther;
       default: return key;
     }
   }
 
-  String get _selectedPrefValue => _prefValues[_selectedPref] ?? _selectedPref;
-
-  late final List<_MonthChip> _monthChips = _buildMonthChips();
+  String? get _selectedPrefValue {
+    switch (_selectedPref) {
+      case 'tokyo': return '東京都';
+      case 'kanagawa': return '神奈川県';
+      case 'chiba': return '千葉県';
+      default: return null;
+    }
+  }
 
   @override
   void initState() {
@@ -228,33 +223,6 @@ class _JobListPageState extends ConsumerState<JobListPage> {
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, AppSpacing.md, AppSpacing.pagePadding, AppSpacing.sm),
-            color: context.appColors.surface,
-            child: Semantics(
-              button: true,
-              label: context.l10n.jobList_openSearchFilter,
-              child: GestureDetector(
-                onTap: _showFilterSheet,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: context.appColors.background,
-                    borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: context.appColors.textHint, size: 20),
-                      const SizedBox(width: 12),
-                      Text(context.l10n.jobList_searchByAreaCondition, style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.textHint)),
-                      const Spacer(),
-                      Icon(Icons.tune_rounded, color: context.appColors.textSecondary, size: 20),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(
             decoration: BoxDecoration(
               color: context.appColors.surface,
               boxShadow: AppShadows.subtle,
@@ -266,12 +234,12 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                   prefKeys: _prefKeys,
                   labelBuilder: (key) => _prefLabel(context, key),
                   selected: _selectedPref,
-                  onSelected: (p) {
+                  onSelected: (key) {
                     AppHaptics.selection();
-                    setState(() => _selectedPref = p);
+                    setState(() => _selectedPref = key);
                   },
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
                 _MonthChips(
                   months: _monthChips,
                   selectedMonthKey: _selectedMonthKey,
@@ -351,7 +319,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                   stream: (() {
                     Query<Map<String, dynamic>> q = FirebaseFirestore.instance.collection('jobs');
 
-                    if (_selectedPref != 'other') {
+                    if (_selectedPrefValue != null) {
                       q = q.where('prefecture', isEqualTo: _selectedPrefValue);
                     }
 
@@ -388,19 +356,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       );
                     }
 
-                    final rawDocs = snapshot.data!.docs;
-
-                    const excludePrefs = {'千葉県', '東京都', '神奈川県'};
-
-                    final docs = _selectedPref == 'other'
-                        ? rawDocs.where((d) {
-                      final data = d.data() as Map<String, dynamic>;
-                      final pref = data['prefecture']?.toString();
-
-                      if (pref == null || pref.isEmpty || pref == '未設定') return true;
-                      return !excludePrefs.contains(pref);
-                    }).toList()
-                        : rawDocs;
+                    final docs = snapshot.data!.docs;
 
                     final filteredDocs = docs.where((d) {
                       final data = d.data() as Map<String, dynamic>;
@@ -707,11 +663,11 @@ class _PrefChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: prefKeys.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
         itemBuilder: (_, i) {
           final key = prefKeys[i];
           final label = labelBuilder(key);
@@ -724,7 +680,7 @@ class _PrefChips extends StatelessWidget {
               onTap: () => onSelected(key),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: 6),
                 decoration: BoxDecoration(
                   color: isSelected ? context.appColors.primary : context.appColors.chipUnselected,
                   borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
@@ -732,8 +688,10 @@ class _PrefChips extends StatelessWidget {
                 child: Center(
                   child: Text(
                     label,
-                    style: AppTextStyles.chipText.copyWith(
+                    style: AppTextStyles.labelSmall.copyWith(
+                      fontSize: 12,
                       color: isSelected ? Colors.white : context.appColors.chipTextUnselected,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
