@@ -511,6 +511,10 @@ class _StatusGroup extends StatelessWidget {
             final app = appDoc.data();
             final titleSnap = (app['jobTitleSnapshot'] ?? app['projectNameSnapshot'] ?? '').toString();
             final statusKey = (app['status'] ?? 'applied').toString();
+            final locationSnap = (app['locationSnapshot'] ?? '').toString();
+            final dateSnap = (app['dateSnapshot'] ?? '').toString();
+            final priceSnap = app['priceSnapshot'];
+            final priceInt = (priceSnap is int) ? priceSnap : int.tryParse((priceSnap ?? '').toString());
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: _WhiteCard(
@@ -523,7 +527,37 @@ class _StatusGroup extends StatelessWidget {
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    child: StatusBadge.fromStatus(context, statusKey),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            StatusBadge.fromStatus(context, statusKey),
+                            if (dateSnap.isNotEmpty) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(dateSnap, style: AppTextStyles.caption),
+                            ],
+                          ],
+                        ),
+                        if (locationSnap.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Row(
+                              children: [
+                                Icon(Icons.place_outlined, size: 12, color: context.appColors.textHint),
+                                const SizedBox(width: 2),
+                                Expanded(
+                                  child: Text(locationSnap, style: AppTextStyles.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                ),
+                                if (priceInt != null) ...[
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Text(CurrencyUtils.formatYen(priceInt), style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.w700)),
+                                ],
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   trailing: const Icon(Icons.chevron_right, size: 20),
                   onTap: () => onTapItem(appDoc.id),

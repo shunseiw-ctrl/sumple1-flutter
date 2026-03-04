@@ -11,16 +11,24 @@ import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 
 /// 明細タブ
-class StatementsContent extends StatelessWidget {
+class StatementsContent extends StatefulWidget {
   final String uid;
   const StatementsContent({super.key, required this.uid});
 
   @override
+  State<StatementsContent> createState() => _StatementsContentState();
+}
+
+class _StatementsContentState extends State<StatementsContent> {
+  Key _refreshKey = UniqueKey();
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      key: _refreshKey,
       stream: FirebaseFirestore.instance
           .collection('monthly_statements')
-          .where('workerUid', isEqualTo: uid)
+          .where('workerUid', isEqualTo: widget.uid)
           .orderBy('month', descending: true)
           .snapshots(),
       builder: (context, snap) {
@@ -29,7 +37,7 @@ class StatementsContent extends StatelessWidget {
         }
         if (snap.hasError) {
           return ErrorRetryWidget.general(
-            onRetry: () {},
+            onRetry: () => setState(() => _refreshKey = UniqueKey()),
             message: '${snap.error}',
           );
         }

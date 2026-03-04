@@ -104,6 +104,14 @@
         { "fieldPath": "uid", "order": "ASCENDING" },
         { "fieldPath": "payoutConfirmedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "monthly_statements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "workerUid", "order": "ASCENDING" },
+        { "fieldPath": "month", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
