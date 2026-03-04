@@ -29,6 +29,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   int _index = 0;
+  final _jobListKey = GlobalKey<JobListPageState>();
 
   @override
   void initState() {
@@ -46,12 +47,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  late final List<Widget> _pages = const [
-    JobListPage(),
-    WorkPage(),
-    MessagesPage(),
-    SalesPage(),
-    ProfilePage(),
+  late final List<Widget> _pages = [
+    JobListPage(key: _jobListKey),
+    const WorkPage(),
+    const MessagesPage(),
+    const SalesPage(),
+    const ProfilePage(),
   ];
 
   Future<void> _goToPost() async {
@@ -76,67 +77,31 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          children: [
-            Semantics(
-              excludeSemantics: true,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/logo.png',
-                  height: 36,
-                  width: 36,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+        title: _index == 0
+            ? GestureDetector(
+                onTap: () => _jobListKey.currentState?.showFilterSheet(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: context.appColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 2),
+                      Icon(Icons.search, color: context.appColors.textHint, size: 20),
+                      const SizedBox(width: 10),
+                      Expanded(
                         child: Text(
-                          'ALBAWORK',
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                            color: context.appColors.textPrimary,
-                          ),
+                          context.l10n.jobList_searchByAreaCondition,
+                          style: AppTextStyles.bodyMedium.copyWith(color: context.appColors.textHint),
                         ),
                       ),
-                      if (_isAdmin)
-                        Semantics(
-                          label: context.l10n.home_statusAdmin,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: context.appColors.primaryPale,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                context.l10n.home_admin,
-                                style: AppTextStyles.badgeText.copyWith(
-                                  color: context.appColors.primary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      Icon(Icons.tune_rounded, color: context.appColors.textSecondary, size: 20),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
+                ),
+              )
+            : null,
         actions: [
           Consumer(
             builder: (context, ref, _) {

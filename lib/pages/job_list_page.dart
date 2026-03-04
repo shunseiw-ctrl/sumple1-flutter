@@ -27,10 +27,10 @@ class JobListPage extends ConsumerStatefulWidget {
   const JobListPage({super.key});
 
   @override
-  ConsumerState<JobListPage> createState() => _JobListPageState();
+  ConsumerState<JobListPage> createState() => JobListPageState();
 }
 
-class _JobListPageState extends ConsumerState<JobListPage> {
+class JobListPageState extends ConsumerState<JobListPage> {
   String? _selectedMonthKey;
   String _selectedPref = 'all';
 
@@ -55,7 +55,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
 
   String _prefLabel(BuildContext context, String key) {
     switch (key) {
-      case 'all': return context.l10n.common_all;
+      case 'all': return context.l10n.jobList_sortNewest;
       case 'tokyo': return context.l10n.jobList_prefTokyo;
       case 'kanagawa': return context.l10n.jobList_prefKanagawa;
       case 'chiba': return context.l10n.jobList_prefChiba;
@@ -202,7 +202,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
     });
   }
 
-  Future<void> _showFilterSheet() async {
+  Future<void> showFilterSheet() async {
     final result = await showJobFilterSheet(
       context,
       current: _filterState,
@@ -268,7 +268,7 @@ class _JobListPageState extends ConsumerState<JobListPage> {
                       button: true,
                       label: _filterState.hasActiveFilters ? context.l10n.jobList_filterActiveLabel : context.l10n.jobList_filter,
                       child: GestureDetector(
-                        onTap: _showFilterSheet,
+                        onTap: showFilterSheet,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.sm + 2),
                           decoration: BoxDecoration(
