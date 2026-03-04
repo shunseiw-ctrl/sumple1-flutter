@@ -25,13 +25,7 @@ void main() {
         ),
       ));
 
-      final containers = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).toList();
-
       // The active dot (index 1) should have width 24
-      final activeContainer = containers[1];
-      final activeBox = activeContainer.constraints;
       // AnimatedContainer uses width/height directly, check via BoxConstraints
       // Instead, verify the rendered size
       final activeElement = tester.elementList(find.byType(AnimatedContainer)).elementAt(1);

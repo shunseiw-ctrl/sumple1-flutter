@@ -169,7 +169,7 @@ class ErrorRetryWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRetryButton({required bool compact, required AppLocalizations l10n, BuildContext? ctx}) {
+  Widget _buildRetryButton({required bool compact, required AppLocalizations l10n}) {
     return Builder(
       builder: (context) {
         return SizedBox(

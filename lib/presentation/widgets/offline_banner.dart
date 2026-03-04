@@ -17,7 +17,7 @@ class _OfflineBannerState extends State<OfflineBanner> {
   late final ConnectivityService _connectivity;
   late bool _isOffline;
   StreamSubscription<bool>? _subscription;
-  bool _showRecoverySnackBar = false;
+
 
   @override
   void initState() {
@@ -29,7 +29,6 @@ class _OfflineBannerState extends State<OfflineBanner> {
         final wasOffline = _isOffline;
         setState(() => _isOffline = !online);
         if (wasOffline && online) {
-          _showRecoverySnackBar = true;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(context.l10n.offlineBanner_connectionRestored),

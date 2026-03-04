@@ -451,9 +451,6 @@ class _UnconfirmedEarningsSection extends StatelessWidget {
         final appDocs = appSnap.data?.docs ?? [];
         if (appDocs.isEmpty) return const SizedBox.shrink();
 
-        // applicationId一覧
-        final appIds = appDocs.map((d) => d.id).toList();
-
         // earningsからapplicationIdで確認
         return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: db.collection('earnings')

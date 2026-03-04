@@ -46,13 +46,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  String _greeting(BuildContext context) {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return context.l10n.home_greetingMorning;
-    if (hour < 18) return context.l10n.home_greetingAfternoon;
-    return context.l10n.home_greetingEvening;
-  }
-
   late final List<Widget> _pages = const [
     JobListPage(),
     WorkPage(),

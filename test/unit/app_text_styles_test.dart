@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
+
 
 void main() {
   group('AppTextStyles', () {
