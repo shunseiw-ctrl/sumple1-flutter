@@ -32,7 +32,7 @@ final adminPendingCountsProvider =
   Stream<int> countStream(Query<Map<String, dynamic>> query) {
     return query.snapshots()
         .map((snap) => snap.docs.length)
-        .handleError((_) => 0);
+        .onErrorReturn(0);
   }
 
   final applicationsStream = countStream(

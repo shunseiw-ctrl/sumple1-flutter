@@ -440,6 +440,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // --- collectionGroup: 資格 (admin読み取り) ---
+    match /{path=**}/qualifications_v2/{qualId} {
+      allow read: if signedIn() && isAdminUid();
+    }
+
     // --- collectionGroup: 日報 (admin読み取り) ---
     match /{path=**}/work_reports/{reportId} {
       allow read: if signedIn() && isAdminUid();
