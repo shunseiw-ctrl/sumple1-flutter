@@ -28,9 +28,11 @@ final adminPendingCountsProvider =
     StreamProvider.autoDispose<AdminPendingCounts>((ref) {
   final db = FirebaseFirestore.instance;
 
-  // AggregateQuery.count()のストリーム化ヘルパー
+  // クエリのストリーム化ヘルパー（エラー時は0を返す）
   Stream<int> countStream(Query<Map<String, dynamic>> query) {
-    return query.snapshots().map((snap) => snap.docs.length);
+    return query.snapshots()
+        .map((snap) => snap.docs.length)
+        .handleError((_) => 0);
   }
 
   final applicationsStream = countStream(

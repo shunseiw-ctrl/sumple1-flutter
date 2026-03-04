@@ -38,10 +38,10 @@ class AdminActiveWorkersNotifier
 
   Future<AdminListState<ActiveWorkerItem>> _fetch() async {
     // 稼働中・割当済みの応募を取得
+    // orderByを使わない（複合インデックス不要に）
     final snap = await _db
         .collection('applications')
         .where('status', whereIn: ['assigned', 'in_progress'])
-        .orderBy('updatedAt', descending: true)
         .limit(100)
         .get();
 

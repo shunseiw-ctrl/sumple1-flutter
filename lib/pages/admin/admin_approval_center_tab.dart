@@ -335,8 +335,10 @@ class _AdminApprovalCenterTabState
       loading: () => SkeletonList(itemBuilder: (_) => const SkeletonApprovalCard()),
       error: (error, _) => Center(child: Text(context.l10n.common_loadError('$error'))),
       data: (state) {
-        // ワーカー名の解決
-        _resolveWorkerNames(state.items);
+        // ワーカー名の解決（build外で非同期実行）
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _resolveWorkerNames(state.items);
+        });
 
         if (state.items.isEmpty) {
           return EmptyState(
@@ -481,9 +483,9 @@ class _AdminApprovalCenterTabState
 
   Widget _buildEarlyPaymentCard(ApprovalItem item, String workerName) {
     final month = (item.data['month'] ?? '').toString();
-    final requestedAmount = (item.data['requestedAmount'] ?? 0) as int;
-    final fee = (item.data['earlyPaymentFee'] ?? 0) as int;
-    final payout = (item.data['payoutAmount'] ?? 0) as int;
+    final requestedAmount = (item.data['requestedAmount'] as num?)?.toInt() ?? 0;
+    final fee = (item.data['earlyPaymentFee'] as num?)?.toInt() ?? 0;
+    final payout = (item.data['payoutAmount'] as num?)?.toInt() ?? 0;
 
     String dateStr = '';
     if (item.createdAt != null) {

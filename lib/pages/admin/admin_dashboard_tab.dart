@@ -87,11 +87,12 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
           StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance.doc('stats/realtime').snapshots(),
             builder: (context, snap) {
+              if (snap.hasError) return const SizedBox.shrink();
               final data = snap.data?.data() ?? {};
-              final totalJobs = (data['totalJobs'] ?? 0) as int;
-              final totalApplications = (data['totalApplications'] ?? 0) as int;
-              final totalUsers = (data['totalUsers'] ?? 0) as int;
-              final pendingApplications = (data['pendingApplications'] ?? 0) as int;
+              final totalJobs = (data['totalJobs'] as num?)?.toInt() ?? 0;
+              final totalApplications = (data['totalApplications'] as num?)?.toInt() ?? 0;
+              final totalUsers = (data['totalUsers'] as num?)?.toInt() ?? 0;
+              final pendingApplications = (data['pendingApplications'] as num?)?.toInt() ?? 0;
               return Column(
                 children: [
                   Row(
@@ -368,6 +369,9 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
                 .limit(5)
                 .snapshots(),
             builder: (context, snap) {
+              if (snap.hasError) {
+                return _EmptyCard(message: context.l10n.adminDashboard_noApplications);
+              }
               if (snap.connectionState == ConnectionState.waiting) {
                 return const Center(child: Padding(
                   padding: EdgeInsets.all(20),

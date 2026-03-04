@@ -51,27 +51,22 @@ class AdminApprovalNotifier extends AutoDisposeFamilyAsyncNotifier<
       case ApprovalType.qualification:
         query = _db
             .collectionGroup('qualifications_v2')
-            .where('verificationStatus', isEqualTo: 'pending')
-            .orderBy('createdAt', descending: true);
+            .where('verificationStatus', isEqualTo: 'pending');
         break;
       case ApprovalType.earlyPayment:
         query = _db
             .collection('early_payment_requests')
-            .where('status', isEqualTo: 'requested')
-            .orderBy('createdAt', descending: true);
+            .where('status', isEqualTo: 'requested');
         break;
       case ApprovalType.verification:
         query = _db
             .collection('identity_verification')
-            .where('status', isEqualTo: 'pending')
-            .orderBy('submittedAt', descending: false);
+            .where('status', isEqualTo: 'pending');
         break;
     }
 
-    if (startAfter != null) {
-      query = query.startAfterDocument(startAfter);
-    }
-    query = query.limit(_pageSize);
+    // ページネーションなしで全件取得（pending件数は通常少ない）
+    query = query.limit(100);
 
     final snap = await query.get();
     final newItems = snap.docs.map((doc) {
@@ -111,11 +106,16 @@ class AdminApprovalNotifier extends AutoDisposeFamilyAsyncNotifier<
     }).toList();
 
     final allItems = [...existing, ...newItems];
+    // クライアント側でソート（createdAtの降順）
+    allItems.sort((a, b) {
+      final aTime = a.createdAt ?? DateTime(2000);
+      final bTime = b.createdAt ?? DateTime(2000);
+      return bTime.compareTo(aTime);
+    });
 
     return AdminListState<ApprovalItem>(
       items: allItems,
-      hasMore: snap.docs.length >= _pageSize,
-      lastDocument: snap.docs.isNotEmpty ? snap.docs.last : null,
+      hasMore: false,
     );
   }
 

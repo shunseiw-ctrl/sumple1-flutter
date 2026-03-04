@@ -65,7 +65,7 @@ class AdminMiniBarChart extends StatelessWidget {
                   Container(
                     height: barHeight.clamp(2.0, height),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.2 + 0.6 * ratio),
+                      color: color.withValues(alpha: (0.2 + 0.6 * ratio).clamp(0.0, 1.0)),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(4),
                       ),

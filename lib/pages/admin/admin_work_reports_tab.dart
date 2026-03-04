@@ -45,7 +45,10 @@ class _AdminWorkReportsTabState extends ConsumerState<AdminWorkReportsTab> {
       loading: () => SkeletonList(itemBuilder: (_) => const SkeletonWorkCard()),
       error: (error, _) => Center(child: Text(context.l10n.common_loadError('$error'))),
       data: (state) {
-        _resolveNames(state.items);
+        // ワーカー名の解決（build外で非同期実行）
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _resolveNames(state.items);
+        });
 
         if (state.items.isEmpty) {
           return EmptyState(
@@ -127,7 +130,7 @@ class _WorkReportCard extends StatelessWidget {
               Icon(Icons.person, size: 14, color: context.appColors.textHint),
               const SizedBox(width: 4),
               Text(
-                workerName.isNotEmpty ? workerName : 'UID: ${item.workerUid.substring(0, 8)}...',
+                workerName.isNotEmpty ? workerName : 'UID: ${item.workerUid.length > 8 ? item.workerUid.substring(0, 8) : item.workerUid}...',
                 style: TextStyle(
                   fontSize: 12,
                   color: context.appColors.primary,

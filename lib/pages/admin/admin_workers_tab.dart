@@ -198,7 +198,7 @@ class _WorkerCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      worker.name.isNotEmpty ? worker.name : 'UID: ${worker.uid.substring(0, 8)}...',
+                      worker.name.isNotEmpty ? worker.name : 'UID: ${worker.uid.length > 8 ? worker.uid.substring(0, 8) : worker.uid}...',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

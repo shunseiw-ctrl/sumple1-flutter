@@ -64,14 +64,10 @@ class AdminWorkReportsNotifier
     DocumentSnapshot? startAfter,
     List<WorkReportItem> existing = const [],
   }) async {
-    var query = _db
+    // collectionGroupではorderByを使わない（インデックス不要に）
+    final query = _db
         .collectionGroup('work_reports')
-        .orderBy('createdAt', descending: true)
-        .limit(_pageSize);
-
-    if (startAfter != null) {
-      query = query.startAfterDocument(startAfter);
-    }
+        .limit(100);
 
     final snap = await query.get();
     final newItems = snap.docs.map((doc) {
@@ -94,11 +90,16 @@ class AdminWorkReportsNotifier
     }).toList();
 
     final allItems = [...existing, ...newItems];
+    // クライアント側でソート（createdAtの降順）
+    allItems.sort((a, b) {
+      final aTime = a.createdAt ?? DateTime(2000);
+      final bTime = b.createdAt ?? DateTime(2000);
+      return bTime.compareTo(aTime);
+    });
 
     return AdminListState<WorkReportItem>(
       items: allItems,
-      hasMore: snap.docs.length >= _pageSize,
-      lastDocument: snap.docs.isNotEmpty ? snap.docs.last : null,
+      hasMore: false,
     );
   }
 

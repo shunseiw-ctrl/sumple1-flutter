@@ -65,18 +65,14 @@ class AdminInspectionsNotifier
     DocumentSnapshot? startAfter,
     List<InspectionItem> existing = const [],
   }) async {
-    Query<Map<String, dynamic>> query = _db
-        .collectionGroup('inspections')
-        .orderBy('createdAt', descending: true);
+    // collectionGroupではorderByを使わない（インデックス不要に）
+    Query<Map<String, dynamic>> query = _db.collectionGroup('inspections');
 
     if (_filterResult != 'all') {
       query = query.where('result', isEqualTo: _filterResult);
     }
 
-    if (startAfter != null) {
-      query = query.startAfterDocument(startAfter);
-    }
-    query = query.limit(_pageSize);
+    query = query.limit(100);
 
     final snap = await query.get();
     final newItems = snap.docs.map((doc) {
@@ -103,11 +99,16 @@ class AdminInspectionsNotifier
     }).toList();
 
     final allItems = [...existing, ...newItems];
+    // クライアント側でソート（createdAtの降順）
+    allItems.sort((a, b) {
+      final aTime = a.createdAt ?? DateTime(2000);
+      final bTime = b.createdAt ?? DateTime(2000);
+      return bTime.compareTo(aTime);
+    });
 
     return AdminListState<InspectionItem>(
       items: allItems,
-      hasMore: snap.docs.length >= _pageSize,
-      lastDocument: snap.docs.isNotEmpty ? snap.docs.last : null,
+      hasMore: false,
       filterStatus: _filterResult,
     );
   }

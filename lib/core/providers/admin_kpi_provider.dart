@@ -15,19 +15,19 @@ class AdminKpiData {
     this.previousMonthKpi,
   });
 
-  int get totalJobs => (realtimeStats['totalJobs'] ?? 0) as int;
-  int get totalApplications => (realtimeStats['totalApplications'] ?? 0) as int;
-  int get totalUsers => (realtimeStats['totalUsers'] ?? 0) as int;
-  int get pendingApplications => (realtimeStats['pendingApplications'] ?? 0) as int;
+  int get totalJobs => (realtimeStats['totalJobs'] as num?)?.toInt() ?? 0;
+  int get totalApplications => (realtimeStats['totalApplications'] as num?)?.toInt() ?? 0;
+  int get totalUsers => (realtimeStats['totalUsers'] as num?)?.toInt() ?? 0;
+  int get pendingApplications => (realtimeStats['pendingApplications'] as num?)?.toInt() ?? 0;
 
   // 月次KPI
-  int get mau => (currentMonthKpi?['mau'] ?? 0) as int;
-  int get monthlyEarnings => (currentMonthKpi?['monthlyEarnings'] ?? 0) as int;
-  double get jobFillRate => ((currentMonthKpi?['jobFillRate'] ?? 0) as num).toDouble();
+  int get mau => (currentMonthKpi?['mau'] as num?)?.toInt() ?? 0;
+  int get monthlyEarnings => (currentMonthKpi?['monthlyEarnings'] as num?)?.toInt() ?? 0;
+  double get jobFillRate => (currentMonthKpi?['jobFillRate'] as num?)?.toDouble() ?? 0.0;
 
-  int get prevMau => (previousMonthKpi?['mau'] ?? 0) as int;
-  int get prevMonthlyEarnings => (previousMonthKpi?['monthlyEarnings'] ?? 0) as int;
-  double get prevJobFillRate => ((previousMonthKpi?['jobFillRate'] ?? 0) as num).toDouble();
+  int get prevMau => (previousMonthKpi?['mau'] as num?)?.toInt() ?? 0;
+  int get prevMonthlyEarnings => (previousMonthKpi?['monthlyEarnings'] as num?)?.toInt() ?? 0;
+  double get prevJobFillRate => (previousMonthKpi?['jobFillRate'] as num?)?.toDouble() ?? 0.0;
 }
 
 /// KPIデータプロバイダー
