@@ -812,6 +812,70 @@
   "adminJobManagement_postJob": "Post job",
   "adminJobManagement_searchHint": "Search jobs...",
   "adminJobManagement_showMore": "Show more",
+  "adminJob_viewJobs": "Jobs",
+  "adminJob_viewApplications": "All Applications",
+  "adminJob_summaryTotal": "Total {count}",
+  "@adminJob_summaryTotal": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminJob_summaryActive": "{count} active",
+  "@adminJob_summaryActive": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminJob_summaryCompleted": "{count} completed",
+  "@adminJob_summaryCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryPending": "{count} pending",
+  "@adminApplicants_summaryPending": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryAssigned": "{count} assigned",
+  "@adminApplicants_summaryAssigned": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryInProgress": "{count} in progress",
+  "@adminApplicants_summaryInProgress": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryDone": "{count} done",
+  "@adminApplicants_summaryDone": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorker_title": "Worker Detail",
+  "adminWorker_applicationHistory": "Application History",
+  "adminWorker_qualifications": "Qualifications",
+  "adminWorker_unknownWorker": "Unknown worker",
+  "adminWorker_noApplications": "No application history",
+  "adminWorker_noQualifications": "No qualifications",
   "adminLogin": "Admin Login",
   "adminLoginDescription": "Enter admin password",
   "adminLogin_email": "Email",

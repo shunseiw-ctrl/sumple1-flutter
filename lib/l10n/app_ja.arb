@@ -1583,6 +1583,70 @@
   "adminJobManagement_postJob": "案件を投稿",
   "adminJobManagement_searchHint": "タイトル・場所で検索",
   "adminJobManagement_showMore": "もっと見る",
+  "adminJob_viewJobs": "案件一覧",
+  "adminJob_viewApplications": "全応募ステータス",
+  "adminJob_summaryTotal": "全{count}件",
+  "@adminJob_summaryTotal": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminJob_summaryActive": "募集中{count}件",
+  "@adminJob_summaryActive": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminJob_summaryCompleted": "完了{count}件",
+  "@adminJob_summaryCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryPending": "要対応{count}件",
+  "@adminApplicants_summaryPending": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryAssigned": "確定済{count}件",
+  "@adminApplicants_summaryAssigned": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryInProgress": "進行中{count}件",
+  "@adminApplicants_summaryInProgress": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminApplicants_summaryDone": "完了{count}件",
+  "@adminApplicants_summaryDone": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adminWorker_title": "職人詳細",
+  "adminWorker_applicationHistory": "応募履歴",
+  "adminWorker_qualifications": "資格情報",
+  "adminWorker_unknownWorker": "不明な職人",
+  "adminWorker_noApplications": "応募履歴はありません",
+  "adminWorker_noQualifications": "資格情報はありません",
   "adminLogin": "管理者ログイン",
   "adminLoginDescription": "管理者パスワードを入力してください",
   "adminLogin_email": "メールアドレス",

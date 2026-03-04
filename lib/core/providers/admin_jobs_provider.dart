@@ -5,49 +5,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'admin_list_state.dart';
 
-/// 応募データモデル（プロバイダー用）
-class ApplicantItem {
+/// 案件データモデル（プロバイダー用）
+class JobItem {
   final String id;
-  final String jobTitle;
+  final String title;
+  final String location;
+  final int price;
+  final String date;
   final String status;
-  final String applicantUid;
+  final int applicantCount;
+  final int? slots;
   final DateTime? createdAt;
-  final String workerName;
-  final double ratingAverage;
-  final int ratingCount;
-  final double? qualityScore;
-  final String locationSnapshot;
-  final String dateSnapshot;
-  final int? priceSnapshot;
 
-  const ApplicantItem({
+  const JobItem({
     required this.id,
-    required this.jobTitle,
+    required this.title,
+    required this.location,
+    required this.price,
+    required this.date,
     required this.status,
-    required this.applicantUid,
+    this.applicantCount = 0,
+    this.slots,
     this.createdAt,
-    this.workerName = '',
-    this.ratingAverage = 0,
-    this.ratingCount = 0,
-    this.qualityScore,
-    this.locationSnapshot = '',
-    this.dateSnapshot = '',
-    this.priceSnapshot,
   });
 }
 
-/// 応募者リスト AsyncNotifier
-class AdminApplicantsNotifier
-    extends AutoDisposeAsyncNotifier<AdminListState<ApplicantItem>> {
+/// 案件一覧 AsyncNotifier
+class AdminJobsNotifier
+    extends AutoDisposeAsyncNotifier<AdminListState<JobItem>> {
   static const int _pageSize = 20;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
   final FirebaseFirestore _db;
 
-  AdminApplicantsNotifier({FirebaseFirestore? firestore})
+  AdminJobsNotifier({FirebaseFirestore? firestore})
       : _db = firestore ?? FirebaseFirestore.instance;
 
   @override
-  FutureOr<AdminListState<ApplicantItem>> build() async {
+  FutureOr<AdminListState<JobItem>> build() async {
     ref.onDispose(() {
       _subscription?.cancel();
     });
@@ -55,15 +49,15 @@ class AdminApplicantsNotifier
     final items = await _fetchInitialPage();
     _listenToRealtimeUpdates();
 
-    return AdminListState<ApplicantItem>(
+    return AdminListState<JobItem>(
       items: items,
       hasMore: items.length >= _pageSize,
     );
   }
 
-  Future<List<ApplicantItem>> _fetchInitialPage() async {
+  Future<List<JobItem>> _fetchInitialPage() async {
     final snap = await _db
-        .collection('applications')
+        .collection('jobs')
         .orderBy('createdAt', descending: true)
         .limit(_pageSize)
         .get();
@@ -74,7 +68,7 @@ class AdminApplicantsNotifier
   void _listenToRealtimeUpdates() {
     _subscription?.cancel();
     _subscription = _db
-        .collection('applications')
+        .collection('jobs')
         .orderBy('createdAt', descending: true)
         .limit(_pageSize)
         .snapshots()
@@ -83,7 +77,6 @@ class AdminApplicantsNotifier
       if (current == null) return;
 
       final freshItems = _docsToItems(snap.docs);
-      // マージ: 初回ページのみリアルタイム更新、それ以降は維持
       final existingIds = freshItems.map((e) => e.id).toSet();
       final olderItems =
           current.items.where((e) => !existingIds.contains(e.id)).toList();
@@ -94,7 +87,7 @@ class AdminApplicantsNotifier
     });
   }
 
-  List<ApplicantItem> _docsToItems(
+  List<JobItem> _docsToItems(
       List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
     return docs.map((doc) {
       final data = doc.data();
@@ -103,22 +96,20 @@ class AdminApplicantsNotifier
       if (createdAt is Timestamp) {
         dt = createdAt.toDate();
       }
-      final priceRaw = data['priceSnapshot'];
-      final priceInt =
-          (priceRaw is int) ? priceRaw : int.tryParse('$priceRaw');
+      final priceRaw = data['price'];
+      final price =
+          (priceRaw is int) ? priceRaw : int.tryParse('$priceRaw') ?? 0;
 
-      return ApplicantItem(
+      return JobItem(
         id: doc.id,
-        jobTitle: (data['jobTitleSnapshot'] ?? '案件名なし').toString(),
-        status: (data['status'] ?? 'applied').toString(),
-        applicantUid: (data['applicantUid'] ?? '').toString(),
+        title: (data['title'] ?? '').toString(),
+        location: (data['location'] ?? '').toString(),
+        price: price,
+        date: (data['date'] ?? '').toString(),
+        status: (data['status'] ?? 'active').toString(),
+        applicantCount: (data['applicantCount'] ?? 0) as int,
+        slots: data['slots'] as int?,
         createdAt: dt,
-        workerName: (data['workerNameSnapshot'] ?? '').toString(),
-        ratingAverage: (data['ratingAverageSnapshot'] ?? 0).toDouble(),
-        ratingCount: (data['ratingCountSnapshot'] ?? 0) as int,
-        locationSnapshot: (data['locationSnapshot'] ?? '').toString(),
-        dateSnapshot: (data['dateSnapshot'] ?? '').toString(),
-        priceSnapshot: priceInt,
       );
     }).toList();
   }
@@ -132,16 +123,15 @@ class AdminApplicantsNotifier
 
     try {
       var query = _db
-          .collection('applications')
+          .collection('jobs')
           .orderBy('createdAt', descending: true)
           .limit(_pageSize);
 
       if (current.items.isNotEmpty) {
-        // 最後のアイテムのcreatedAtでstartAfter
         final lastItem = current.items.last;
         if (lastItem.createdAt != null) {
-          query = query.startAfter(
-              [Timestamp.fromDate(lastItem.createdAt!)]);
+          query = query
+              .startAfter([Timestamp.fromDate(lastItem.createdAt!)]);
         }
       }
 
@@ -165,7 +155,7 @@ class AdminApplicantsNotifier
     state = AsyncData(current.copyWith(filterStatus: status));
   }
 
-  /// 検索クエリ変更（クライアント側フィルタ）
+  /// 検索クエリ変更
   void setSearchQuery(String query) {
     final current = state.valueOrNull;
     if (current == null) return;
@@ -178,7 +168,7 @@ class AdminApplicantsNotifier
     state = const AsyncLoading();
     final items = await _fetchInitialPage();
     _listenToRealtimeUpdates();
-    state = AsyncData(AdminListState<ApplicantItem>(
+    state = AsyncData(AdminListState<JobItem>(
       items: items,
       hasMore: items.length >= _pageSize,
     ));
@@ -186,6 +176,5 @@ class AdminApplicantsNotifier
 }
 
 /// プロバイダー定義
-final adminApplicantsProvider = AsyncNotifierProvider.autoDispose<
-    AdminApplicantsNotifier,
-    AdminListState<ApplicantItem>>(AdminApplicantsNotifier.new);
+final adminJobsProvider = AsyncNotifierProvider.autoDispose<
+    AdminJobsNotifier, AdminListState<JobItem>>(AdminJobsNotifier.new);

@@ -508,6 +508,65 @@ class AppLocalizationsJa extends AppLocalizations {
   String get adminJobManagement_showMore => 'もっと見る';
 
   @override
+  String get adminJob_viewJobs => '案件一覧';
+
+  @override
+  String get adminJob_viewApplications => '全応募ステータス';
+
+  @override
+  String adminJob_summaryTotal(String count) {
+    return '全$count件';
+  }
+
+  @override
+  String adminJob_summaryActive(String count) {
+    return '募集中$count件';
+  }
+
+  @override
+  String adminJob_summaryCompleted(String count) {
+    return '完了$count件';
+  }
+
+  @override
+  String adminApplicants_summaryPending(String count) {
+    return '要対応$count件';
+  }
+
+  @override
+  String adminApplicants_summaryAssigned(String count) {
+    return '確定済$count件';
+  }
+
+  @override
+  String adminApplicants_summaryInProgress(String count) {
+    return '進行中$count件';
+  }
+
+  @override
+  String adminApplicants_summaryDone(String count) {
+    return '完了$count件';
+  }
+
+  @override
+  String get adminWorker_title => '職人詳細';
+
+  @override
+  String get adminWorker_applicationHistory => '応募履歴';
+
+  @override
+  String get adminWorker_qualifications => '資格情報';
+
+  @override
+  String get adminWorker_unknownWorker => '不明な職人';
+
+  @override
+  String get adminWorker_noApplications => '応募履歴はありません';
+
+  @override
+  String get adminWorker_noQualifications => '資格情報はありません';
+
+  @override
   String get adminLogin => '管理者ログイン';
 
   @override

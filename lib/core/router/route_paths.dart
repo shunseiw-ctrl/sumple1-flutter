@@ -77,6 +77,7 @@ class RoutePaths {
   static const String adminQualifications = '/admin/qualifications';
   static const String adminEarlyPayments = '/admin/early-payments';
   static const String adminIdentityVerification = '/admin/identity-verification';
+  static const String adminWorkerDetail = '/admin/worker/:uid';
 
   /// パスパラメータを展開するヘルパー
   static String jobDetailPath(String jobId) => '/jobs/$jobId';
@@ -90,4 +91,5 @@ class RoutePaths {
   static String workInspectionPath(String applicationId) => '/work/$applicationId/inspection';
   static String workTimelinePath(String applicationId) => '/work/$applicationId/timeline';
   static String statementDetailPath(String statementId) => '/statements/$statementId';
+  static String adminWorkerDetailPath(String uid) => '/admin/worker/$uid';
 }

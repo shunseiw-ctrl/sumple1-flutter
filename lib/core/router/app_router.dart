@@ -45,6 +45,7 @@ import '../../pages/phone_auth_page.dart';
 import '../../pages/admin/admin_qualifications_page.dart';
 import '../../pages/admin/admin_early_payments_page.dart';
 import '../../pages/admin/admin_identity_verification_page.dart';
+import '../../pages/admin/admin_worker_detail_page.dart';
 import '../../pages/referral_page.dart';
 
 /// GoRouter インスタンスプロバイダー
@@ -125,6 +126,16 @@ final routerProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: const AdminIdentityVerificationPage(),
         ),
+      ),
+      GoRoute(
+        path: RoutePaths.adminWorkerDetail,
+        pageBuilder: (context, state) {
+          final uid = state.pathParameters['uid'] ?? '';
+          return slideRightTransition(
+            key: state.pageKey,
+            child: AdminWorkerDetailPage(workerUid: uid),
+          );
+        },
       ),
 
       // --- 案件系 ---

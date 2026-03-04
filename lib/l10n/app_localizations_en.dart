@@ -519,6 +519,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminJobManagement_showMore => 'Show more';
 
   @override
+  String get adminJob_viewJobs => 'Jobs';
+
+  @override
+  String get adminJob_viewApplications => 'All Applications';
+
+  @override
+  String adminJob_summaryTotal(String count) {
+    return 'Total $count';
+  }
+
+  @override
+  String adminJob_summaryActive(String count) {
+    return '$count active';
+  }
+
+  @override
+  String adminJob_summaryCompleted(String count) {
+    return '$count completed';
+  }
+
+  @override
+  String adminApplicants_summaryPending(String count) {
+    return '$count pending';
+  }
+
+  @override
+  String adminApplicants_summaryAssigned(String count) {
+    return '$count assigned';
+  }
+
+  @override
+  String adminApplicants_summaryInProgress(String count) {
+    return '$count in progress';
+  }
+
+  @override
+  String adminApplicants_summaryDone(String count) {
+    return '$count done';
+  }
+
+  @override
+  String get adminWorker_title => 'Worker Detail';
+
+  @override
+  String get adminWorker_applicationHistory => 'Application History';
+
+  @override
+  String get adminWorker_qualifications => 'Qualifications';
+
+  @override
+  String get adminWorker_unknownWorker => 'Unknown worker';
+
+  @override
+  String get adminWorker_noApplications => 'No application history';
+
+  @override
+  String get adminWorker_noQualifications => 'No qualifications';
+
+  @override
   String get adminLogin => 'Admin Login';
 
   @override

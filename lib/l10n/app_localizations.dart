@@ -986,6 +986,96 @@ abstract class AppLocalizations {
   /// **'もっと見る'**
   String get adminJobManagement_showMore;
 
+  /// No description provided for @adminJob_viewJobs.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件一覧'**
+  String get adminJob_viewJobs;
+
+  /// No description provided for @adminJob_viewApplications.
+  ///
+  /// In ja, this message translates to:
+  /// **'全応募ステータス'**
+  String get adminJob_viewApplications;
+
+  /// No description provided for @adminJob_summaryTotal.
+  ///
+  /// In ja, this message translates to:
+  /// **'全{count}件'**
+  String adminJob_summaryTotal(String count);
+
+  /// No description provided for @adminJob_summaryActive.
+  ///
+  /// In ja, this message translates to:
+  /// **'募集中{count}件'**
+  String adminJob_summaryActive(String count);
+
+  /// No description provided for @adminJob_summaryCompleted.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了{count}件'**
+  String adminJob_summaryCompleted(String count);
+
+  /// No description provided for @adminApplicants_summaryPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'要対応{count}件'**
+  String adminApplicants_summaryPending(String count);
+
+  /// No description provided for @adminApplicants_summaryAssigned.
+  ///
+  /// In ja, this message translates to:
+  /// **'確定済{count}件'**
+  String adminApplicants_summaryAssigned(String count);
+
+  /// No description provided for @adminApplicants_summaryInProgress.
+  ///
+  /// In ja, this message translates to:
+  /// **'進行中{count}件'**
+  String adminApplicants_summaryInProgress(String count);
+
+  /// No description provided for @adminApplicants_summaryDone.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了{count}件'**
+  String adminApplicants_summaryDone(String count);
+
+  /// No description provided for @adminWorker_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'職人詳細'**
+  String get adminWorker_title;
+
+  /// No description provided for @adminWorker_applicationHistory.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募履歴'**
+  String get adminWorker_applicationHistory;
+
+  /// No description provided for @adminWorker_qualifications.
+  ///
+  /// In ja, this message translates to:
+  /// **'資格情報'**
+  String get adminWorker_qualifications;
+
+  /// No description provided for @adminWorker_unknownWorker.
+  ///
+  /// In ja, this message translates to:
+  /// **'不明な職人'**
+  String get adminWorker_unknownWorker;
+
+  /// No description provided for @adminWorker_noApplications.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募履歴はありません'**
+  String get adminWorker_noApplications;
+
+  /// No description provided for @adminWorker_noQualifications.
+  ///
+  /// In ja, this message translates to:
+  /// **'資格情報はありません'**
+  String get adminWorker_noQualifications;
+
   /// 管理者ログインタイトル
   ///
   /// In ja, this message translates to:
