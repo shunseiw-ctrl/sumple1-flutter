@@ -79,6 +79,9 @@ dependencies:
   rxdart: ^0.28.0
   google_sign_in: ^6.2.1
 
+  # LINE SDK ネイティブ統合 (Phase 23)
+  flutter_line_sdk: ^2.6.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

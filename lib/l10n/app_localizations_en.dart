@@ -4546,4 +4546,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bankAccount_required => 'This field is required';
+
+  @override
+  String get guestHome_lineLoginLoading => 'Signing in with LINE...';
+
+  @override
+  String get guestHome_lineLoginFailed => 'LINE sign in failed';
+
+  @override
+  String get guestHome_lineLoginSuccess => 'Signed in with LINE';
+
+  @override
+  String get accountLinking_title => 'Account Linking';
+
+  @override
+  String get accountLinking_linked => 'Linked';
+
+  @override
+  String get accountLinking_linkGoogle => 'Link Google';
+
+  @override
+  String get accountLinking_linkApple => 'Link Apple';
+
+  @override
+  String get accountLinking_linkLine => 'Link LINE';
+
+  @override
+  String get accountLinking_unlink => 'Unlink';
+
+  @override
+  String get accountLinking_unlinkConfirm =>
+      'Are you sure you want to unlink this account?';
+
+  @override
+  String get accountLinking_cannotUnlinkLast =>
+      'You must keep at least one login method';
+
+  @override
+  String get accountLinking_alreadyInUse =>
+      'This account is already linked to another user';
 }

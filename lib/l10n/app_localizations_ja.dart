@@ -4436,4 +4436,40 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get bankAccount_required => 'この項目は必須です';
+
+  @override
+  String get guestHome_lineLoginLoading => 'LINEでログイン中...';
+
+  @override
+  String get guestHome_lineLoginFailed => 'LINEログインに失敗しました';
+
+  @override
+  String get guestHome_lineLoginSuccess => 'LINEでログインしました';
+
+  @override
+  String get accountLinking_title => 'アカウント連携';
+
+  @override
+  String get accountLinking_linked => '連携済み';
+
+  @override
+  String get accountLinking_linkGoogle => 'Googleを連携';
+
+  @override
+  String get accountLinking_linkApple => 'Appleを連携';
+
+  @override
+  String get accountLinking_linkLine => 'LINEを連携';
+
+  @override
+  String get accountLinking_unlink => '連携解除';
+
+  @override
+  String get accountLinking_unlinkConfirm => '連携を解除しますか？';
+
+  @override
+  String get accountLinking_cannotUnlinkLast => '最低1つのログイン方法が必要です';
+
+  @override
+  String get accountLinking_alreadyInUse => 'このアカウントは既に別のユーザーに連携されています';
 }

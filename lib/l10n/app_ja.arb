@@ -2995,5 +2995,19 @@
   "bankAccount_save": "保存",
   "bankAccount_saved": "銀行口座情報を保存しました",
   "bankAccount_saveFailed": "口座情報の保存に失敗しました",
-  "bankAccount_required": "この項目は必須です"
+  "bankAccount_required": "この項目は必須です",
+
+  "guestHome_lineLoginLoading": "LINEでログイン中...",
+  "guestHome_lineLoginFailed": "LINEログインに失敗しました",
+  "guestHome_lineLoginSuccess": "LINEでログインしました",
+
+  "accountLinking_title": "アカウント連携",
+  "accountLinking_linked": "連携済み",
+  "accountLinking_linkGoogle": "Googleを連携",
+  "accountLinking_linkApple": "Appleを連携",
+  "accountLinking_linkLine": "LINEを連携",
+  "accountLinking_unlink": "連携解除",
+  "accountLinking_unlinkConfirm": "連携を解除しますか？",
+  "accountLinking_cannotUnlinkLast": "最低1つのログイン方法が必要です",
+  "accountLinking_alreadyInUse": "このアカウントは既に別のユーザーに連携されています"
 }

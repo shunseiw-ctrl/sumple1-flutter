@@ -165,28 +165,40 @@ exports.lineAuthCallback = onRequest(
       }
 
       const lineUser = profileRes.data;
-      const firebaseUid = `line:${lineUser.userId}`;
 
-      // Firebase Auth ユーザー作成/更新
-      try {
-        await admin.auth().getUser(firebaseUid);
-      } catch (e) {
-        if (e.code === "auth/user-not-found") {
-          await admin.auth().createUser({
-            uid: firebaseUid,
-            displayName: lineUser.displayName || "LINEユーザー",
-            photoURL: lineUser.pictureUrl || undefined,
-          });
-          logger.info("Created new Firebase user for LINE", { uid: firebaseUid });
-        } else {
-          throw e;
+      // アカウントリンキング対応: リンク済みアカウントチェック
+      let firebaseUid = `line:${lineUser.userId}`;
+
+      const linkedDoc = await admin.firestore()
+        .collection("line_linked_accounts")
+        .doc(lineUser.userId)
+        .get();
+
+      if (linkedDoc.exists) {
+        firebaseUid = linkedDoc.data().firebaseUid;
+        logger.info("Using linked account for callback", { lineUserId: lineUser.userId, firebaseUid });
+      } else {
+        // Firebase Auth ユーザー作成/更新
+        try {
+          await admin.auth().getUser(firebaseUid);
+        } catch (e) {
+          if (e.code === "auth/user-not-found") {
+            await admin.auth().createUser({
+              uid: firebaseUid,
+              displayName: lineUser.displayName || "LINEユーザー",
+              photoURL: lineUser.pictureUrl || undefined,
+            });
+            logger.info("Created new Firebase user for LINE", { uid: firebaseUid });
+          } else {
+            throw e;
+          }
         }
-      }
 
-      await admin.auth().updateUser(firebaseUid, {
-        displayName: lineUser.displayName || "LINEユーザー",
-        photoURL: lineUser.pictureUrl || undefined,
-      });
+        await admin.auth().updateUser(firebaseUid, {
+          displayName: lineUser.displayName || "LINEユーザー",
+          photoURL: lineUser.pictureUrl || undefined,
+        });
+      }
 
       // カスタムトークン生成
       const customToken = await admin.auth().createCustomToken(firebaseUid, {
@@ -280,6 +292,137 @@ exports.lineAuthExchange = onRequest(
       });
     } catch (e) {
       logger.error("lineAuthExchange failed", e);
+      res.status(500).json({ error: "server_error" });
+    }
+  },
+);
+
+/**
+ * LINE SDK ネイティブログインのアクセストークンを検証し、Firebase custom token を返す
+ */
+exports.lineAuthVerifyToken = onRequest(
+  { region: REGION, cors: true },
+  async (req, res) => {
+    try {
+      if (req.method !== "POST") {
+        res.status(405).json({ error: "method_not_allowed" });
+        return;
+      }
+
+      // レート制限（IP ベース）
+      const { enforceRateLimitForRequest, PRESETS } = require("./rateLimiter");
+      const clientIp = req.ip || req.headers["x-forwarded-for"] || "unknown";
+      const allowed = await enforceRateLimitForRequest(
+        res,
+        `auth:${clientIp}`,
+        PRESETS.auth.maxRequests,
+        PRESETS.auth.windowMs,
+      );
+      if (!allowed) return;
+
+      const { accessToken } = req.body || {};
+      if (!accessToken) {
+        res.status(400).json({ error: "missing_access_token" });
+        return;
+      }
+
+      const lineChannelId = process.env.LINE_CHANNEL_ID || "";
+
+      // LINE Verify API でトークン検証
+      const verifyRes = await httpsRequest(
+        `https://api.line.me/oauth2/v2.1/verify?access_token=${encodeURIComponent(accessToken)}`,
+        { method: "GET" },
+      );
+
+      if (verifyRes.status !== 200) {
+        logger.warn("LINE token verification failed", { status: verifyRes.status });
+        res.status(401).json({ error: "invalid_token" });
+        return;
+      }
+
+      // Channel ID 一致確認
+      if (verifyRes.data.client_id !== lineChannelId) {
+        logger.warn("LINE channel ID mismatch", {
+          expected: lineChannelId,
+          got: verifyRes.data.client_id,
+        });
+        res.status(401).json({ error: "channel_mismatch" });
+        return;
+      }
+
+      // トークン期限切れチェック
+      if (verifyRes.data.expires_in <= 0) {
+        res.status(401).json({ error: "token_expired" });
+        return;
+      }
+
+      // LINE Profile API でユーザー情報取得
+      const profileRes = await httpsRequest("https://api.line.me/v2/profile", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (profileRes.status !== 200 || !profileRes.data.userId) {
+        logger.error("LINE profile fetch failed", { status: profileRes.status });
+        res.status(500).json({ error: "profile_failed" });
+        return;
+      }
+
+      const lineUser = profileRes.data;
+
+      // アカウントリンキング: 同一メールの既存ユーザーチェック
+      let firebaseUid = `line:${lineUser.userId}`;
+
+      // line_linked_accounts にマッピングがあるか確認
+      const linkedDoc = await admin.firestore()
+        .collection("line_linked_accounts")
+        .doc(lineUser.userId)
+        .get();
+
+      if (linkedDoc.exists) {
+        firebaseUid = linkedDoc.data().firebaseUid;
+        logger.info("Using linked account", { lineUserId: lineUser.userId, firebaseUid });
+      } else {
+        // Firebase Auth ユーザー作成/更新
+        try {
+          await admin.auth().getUser(firebaseUid);
+        } catch (e) {
+          if (e.code === "auth/user-not-found") {
+            await admin.auth().createUser({
+              uid: firebaseUid,
+              displayName: lineUser.displayName || "LINEユーザー",
+              photoURL: lineUser.pictureUrl || undefined,
+            });
+            logger.info("Created new Firebase user for LINE SDK", { uid: firebaseUid });
+          } else {
+            throw e;
+          }
+        }
+
+        await admin.auth().updateUser(firebaseUid, {
+          displayName: lineUser.displayName || "LINEユーザー",
+          photoURL: lineUser.pictureUrl || undefined,
+        });
+      }
+
+      // カスタムトークン生成
+      const customToken = await admin.auth().createCustomToken(firebaseUid, {
+        provider: "line",
+        lineUserId: lineUser.userId,
+      });
+
+      logger.info("LINE SDK verify-token successful", { uid: firebaseUid });
+
+      res.status(200).json({
+        customToken,
+        profile: {
+          displayName: lineUser.displayName || "",
+          photoUrl: lineUser.pictureUrl || "",
+          provider: "line",
+        },
+      });
+    } catch (e) {
+      logger.error("lineAuthVerifyToken failed", e);
       res.status(500).json({ error: "server_error" });
     }
   },

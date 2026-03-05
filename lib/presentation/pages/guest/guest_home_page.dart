@@ -129,6 +129,32 @@ class _GuestHomePageState extends State<GuestHomePage> {
     }
   }
 
+  Future<void> _signInWithLine() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await LineAuthService().startLineLogin();
+      if (result == null) {
+        // Web: リダイレクトフロー or キャンセル
+        Logger.info('LINE sign in cancelled or redirecting', tag: 'GuestHomePage');
+        return;
+      }
+      await _recordTermsAcceptance();
+      Logger.info('LINE sign in successful', tag: 'GuestHomePage');
+      if (!mounted) return;
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_lineLoginSuccess);
+      context.go('/');
+    } catch (e) {
+      Logger.error('LINE sign in failed', tag: 'GuestHomePage', error: e);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e, customMessage: context.l10n.guestHome_lineLoginFailed);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   void _goToEmailLogin() {
     Logger.info('Navigate to email login', tag: 'GuestHomePage');
     context.push(RoutePaths.login);
@@ -329,9 +355,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 ],
                               ),
                               child: ElevatedButton.icon(
-                                onPressed: _isLoading ? null : () {
-                                  LineAuthService().startLineLogin();
-                                },
+                                onPressed: _isLoading ? null : _signInWithLine,
                                 icon: const Icon(Icons.chat_bubble, size: 22),
                                 label: Text(
                                   context.l10n.guestHome_lineLogin,

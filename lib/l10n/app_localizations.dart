@@ -8476,6 +8476,78 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'この項目は必須です'**
   String get bankAccount_required;
+
+  /// No description provided for @guestHome_lineLoginLoading.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEでログイン中...'**
+  String get guestHome_lineLoginLoading;
+
+  /// No description provided for @guestHome_lineLoginFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEログインに失敗しました'**
+  String get guestHome_lineLoginFailed;
+
+  /// No description provided for @guestHome_lineLoginSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEでログインしました'**
+  String get guestHome_lineLoginSuccess;
+
+  /// No description provided for @accountLinking_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント連携'**
+  String get accountLinking_title;
+
+  /// No description provided for @accountLinking_linked.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携済み'**
+  String get accountLinking_linked;
+
+  /// No description provided for @accountLinking_linkGoogle.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleを連携'**
+  String get accountLinking_linkGoogle;
+
+  /// No description provided for @accountLinking_linkApple.
+  ///
+  /// In ja, this message translates to:
+  /// **'Appleを連携'**
+  String get accountLinking_linkApple;
+
+  /// No description provided for @accountLinking_linkLine.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEを連携'**
+  String get accountLinking_linkLine;
+
+  /// No description provided for @accountLinking_unlink.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携解除'**
+  String get accountLinking_unlink;
+
+  /// No description provided for @accountLinking_unlinkConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携を解除しますか？'**
+  String get accountLinking_unlinkConfirm;
+
+  /// No description provided for @accountLinking_cannotUnlinkLast.
+  ///
+  /// In ja, this message translates to:
+  /// **'最低1つのログイン方法が必要です'**
+  String get accountLinking_cannotUnlinkLast;
+
+  /// No description provided for @accountLinking_alreadyInUse.
+  ///
+  /// In ja, this message translates to:
+  /// **'このアカウントは既に別のユーザーに連携されています'**
+  String get accountLinking_alreadyInUse;
 }
 
 class _AppLocalizationsDelegate

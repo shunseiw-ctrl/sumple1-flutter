@@ -38,6 +38,7 @@ const lineAuth = require("./src/lineAuth");
 exports.lineAuthStart = lineAuth.lineAuthStart;
 exports.lineAuthCallback = lineAuth.lineAuthCallback;
 exports.lineAuthExchange = lineAuth.lineAuthExchange;
+exports.lineAuthVerifyToken = lineAuth.lineAuthVerifyToken;
 exports.cleanupExpiredLineAuthDocs = lineAuth.cleanupExpiredLineAuthDocs;
 
 // --- KPIバッチ (Cloud Scheduler) ---

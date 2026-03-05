@@ -26,6 +26,7 @@ import 'core/services/auth_service.dart';
 import 'core/enums/user_role.dart';
 import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 
@@ -159,6 +160,11 @@ Future<void> main() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     // 残りのFCM初期化は初回フレーム後に遅延（起動時間短縮）
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeFCM());
+  }
+
+  // LINE SDK 初期化（モバイルのみ）
+  if (!kIsWeb) {
+    await LineSDK.instance.setup('2009209066');
   }
 
   await LineAuthService().handleLineCallbackIfNeeded();

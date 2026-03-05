@@ -2224,5 +2224,19 @@
   "bankAccount_save": "Save",
   "bankAccount_saved": "Bank account information saved",
   "bankAccount_saveFailed": "Failed to save bank account information",
-  "bankAccount_required": "This field is required"
+  "bankAccount_required": "This field is required",
+
+  "guestHome_lineLoginLoading": "Signing in with LINE...",
+  "guestHome_lineLoginFailed": "LINE sign in failed",
+  "guestHome_lineLoginSuccess": "Signed in with LINE",
+
+  "accountLinking_title": "Account Linking",
+  "accountLinking_linked": "Linked",
+  "accountLinking_linkGoogle": "Link Google",
+  "accountLinking_linkApple": "Link Apple",
+  "accountLinking_linkLine": "Link LINE",
+  "accountLinking_unlink": "Unlink",
+  "accountLinking_unlinkConfirm": "Are you sure you want to unlink this account?",
+  "accountLinking_cannotUnlinkLast": "You must keep at least one login method",
+  "accountLinking_alreadyInUse": "This account is already linked to another user"
 }

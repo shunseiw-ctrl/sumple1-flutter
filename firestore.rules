@@ -144,7 +144,8 @@ service cloud.firestore {
           "birthDate","gender","postalCode","address",
           "introduction","experienceYears","qualifications",
           "termsAcceptedAt","privacyAcceptedAt",
-          "bankAccount"
+          "bankAccount",
+          "linkedProviders"
         ])
         && request.resource.data.displayName.size() <= 50
         && (!("introduction" in request.resource.data.diff(resource.data).changedKeys())
@@ -412,6 +413,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /line_auth_tokens/{tokenId} {
+      allow read, write: if false;
+    }
+
+    // --- LINE アカウントリンキング (Cloud Functions のみ管理) ---
+    match /line_linked_accounts/{lineUserId} {
       allow read, write: if false;
     }
 

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../utils/logger.dart';
 import 'web_redirect.dart' as web_redirect;
 import 'package:http/http.dart' as http;
 import 'analytics_service.dart';
+import 'line_sdk_wrapper.dart';
 
 class LineAuthService {
   static final LineAuthService _instance = LineAuthService._();
@@ -14,20 +14,24 @@ class LineAuthService {
   LineAuthService._()
       : _auth = FirebaseAuth.instance,
         _db = FirebaseFirestore.instance,
-        _httpClient = http.Client();
+        _httpClient = http.Client(),
+        _lineSDK = kIsWeb ? null : LineSDKWrapperImpl();
 
   /// テスト用コンストラクタ（DI対応）
   LineAuthService.forTesting({
     required FirebaseAuth auth,
     required FirebaseFirestore firestore,
     required http.Client httpClient,
+    LineSDKWrapper? lineSDK,
   })  : _auth = auth,
         _db = firestore,
-        _httpClient = httpClient;
+        _httpClient = httpClient,
+        _lineSDK = lineSDK;
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
   final http.Client _httpClient;
+  final LineSDKWrapper? _lineSDK;
 
   /// Firebase Hosting のベース URL
   static const String _hostingBaseUrl = 'https://alba-work.web.app';
@@ -128,23 +132,10 @@ class LineAuthService {
       final user = credential.user;
 
       if (user != null && profile != null) {
-        try {
-          await _db.doc('profiles/${user.uid}').set({
-            'displayName': profile['displayName'] ?? '',
-            'photoUrl': profile['photoUrl'] ?? '',
-            'provider': 'line',
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
-        } catch (e) {
-          Logger.warning('Failed to save LINE profile', tag: 'LineAuthService');
-        }
+        await _saveProfile(user, profile);
       }
 
-      try {
-        await AnalyticsService.logLogin('line');
-      } catch (_) {
-        // テスト環境ではFirebase Analytics未初期化のため無視
-      }
+      await _logAnalytics();
       Logger.info('LINE login successful', tag: 'LineAuthService');
       return true;
     } catch (e) {
@@ -153,7 +144,9 @@ class LineAuthService {
     }
   }
 
-  void startLineLogin() {
+  /// モバイル: LINE SDK ネイティブログイン
+  /// Web: 従来のOAuthリダイレクトフロー
+  Future<UserCredential?> startLineLogin() async {
     if (kIsWeb) {
       // Web: リダイレクトで認証開始
       final base = _getLineAuthBaseUrl();
@@ -162,18 +155,87 @@ class LineAuthService {
       } else {
         web_redirect.redirectTo('/auth/line');
       }
-    } else {
-      // モバイル: 外部ブラウザでLINE認証画面を開く
-      _startMobileLineLogin();
+      return null;
+    }
+
+    // モバイル: LINE SDK ネイティブログイン
+    return await _startNativeLineLogin();
+  }
+
+  /// LINE SDK ネイティブログインフロー
+  Future<UserCredential?> _startNativeLineLogin() async {
+    if (_lineSDK == null) {
+      Logger.error('LINE SDK not available', tag: 'LineAuthService');
+      return null;
+    }
+
+    try {
+      // LINE SDK ログイン
+      final loginResult = await _lineSDK.login();
+      if (loginResult == null) {
+        Logger.info('LINE SDK login cancelled', tag: 'LineAuthService');
+        return null;
+      }
+
+      // アクセストークンを Cloud Function で検証 → custom token 取得
+      final verifyUrl = '$_hostingBaseUrl/auth/line/verify-token';
+      final response = await _httpClient.post(
+        Uri.parse(verifyUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'accessToken': loginResult.accessToken}),
+      );
+
+      if (response.statusCode != 200) {
+        Logger.warning('LINE verify-token failed: ${response.statusCode}', tag: 'LineAuthService');
+        return null;
+      }
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final customToken = data['customToken'] as String?;
+      final profile = data['profile'] as Map<String, dynamic>?;
+
+      if (customToken == null || customToken.isEmpty) {
+        Logger.warning('No custom token from verify-token', tag: 'LineAuthService');
+        return null;
+      }
+
+      // Firebase Auth にサインイン
+      final credential = await _auth.signInWithCustomToken(customToken);
+      final user = credential.user;
+
+      if (user != null && profile != null) {
+        await _saveProfile(user, profile);
+      }
+
+      await _logAnalytics();
+      Logger.info('LINE SDK native login successful', tag: 'LineAuthService');
+      return credential;
+    } catch (e) {
+      Logger.error('LINE SDK native login failed', tag: 'LineAuthService', error: e);
+      rethrow;
     }
   }
 
-  Future<void> _startMobileLineLogin() async {
-    final url = Uri.parse('$_hostingBaseUrl/auth/line?platform=mobile');
+  /// プロフィール保存
+  Future<void> _saveProfile(User user, Map<String, dynamic> profile) async {
     try {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      await _db.doc('profiles/${user.uid}').set({
+        'displayName': profile['displayName'] ?? '',
+        'photoUrl': profile['photoUrl'] ?? '',
+        'provider': 'line',
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
-      Logger.error('Failed to launch LINE auth URL', tag: 'LineAuthService', error: e);
+      Logger.warning('Failed to save LINE profile', tag: 'LineAuthService');
+    }
+  }
+
+  /// Analytics記録
+  Future<void> _logAnalytics() async {
+    try {
+      await AnalyticsService.logLogin('line');
+    } catch (_) {
+      // テスト環境ではFirebase Analytics未初期化のため無視
     }
   }
 }
