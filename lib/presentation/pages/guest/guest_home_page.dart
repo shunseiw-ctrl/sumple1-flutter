@@ -64,6 +64,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_guestLoginSuccess);
+      context.go('/');
     } catch (e) {
       Logger.error('Guest sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
@@ -89,10 +90,12 @@ class _GuestHomePageState extends State<GuestHomePage> {
       Logger.info('Apple sign in successful', tag: 'GuestHomePage');
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
+      context.go('/');
     } catch (e) {
-      Logger.error('Apple sign in failed', tag: 'GuestHomePage', error: e);
+      Logger.error('Apple sign in failed: $e', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
-      ErrorHandler.showError(context, e);
+      // デバッグ用に具体的なエラーメッセージを表示
+      ErrorHandler.showError(context, e, customMessage: 'Apple: ${e.runtimeType}: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -114,6 +117,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
       Logger.info('Google sign in successful', tag: 'GuestHomePage');
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_googleLoginSuccess);
+      context.go('/');
     } catch (e) {
       Logger.error('Google sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;

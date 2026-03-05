@@ -6,13 +6,25 @@ import '../utils/logger.dart';
 import 'analytics_service.dart';
 
 class GoogleAuthService {
+  /// GoogleService-Info.plist の CLIENT_ID（iOS OAuth クライアント）
+  static const String _iosClientId =
+      '319960355608-svkte1q6p25mv675qqf8a0di89mi85lk.apps.googleusercontent.com';
+
+  /// Firebase Auth の Google プロバイダー Web クライアントID
+  static const String _webClientId =
+      '319960355608-pfuh6qe42hqtbm372ti9egv3r99bbh0k.apps.googleusercontent.com';
+
   GoogleAuthService({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
   })  : _auth = auth ?? FirebaseAuth.instance,
         _db = firestore ?? FirebaseFirestore.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              clientId: _iosClientId,
+              serverClientId: _webClientId,
+            );
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
