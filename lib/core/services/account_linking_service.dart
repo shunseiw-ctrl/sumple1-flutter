@@ -10,13 +10,22 @@ import '../utils/logger.dart';
 /// アカウントリンキングサービス
 /// Google/Apple/LINE プロバイダーのリンク・リンク解除を管理
 class AccountLinkingService {
+  static const String _iosClientId =
+      '319960355608-svkte1q6p25mv675qqf8a0di89mi85lk.apps.googleusercontent.com';
+  static const String _webClientId =
+      '319960355608-pfuh6qe42hqtbm372ti9egv3r99bbh0k.apps.googleusercontent.com';
+
   AccountLinkingService({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
   })  : _auth = auth ?? FirebaseAuth.instance,
         _db = firestore ?? FirebaseFirestore.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              clientId: _iosClientId,
+              serverClientId: _webClientId,
+            );
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
