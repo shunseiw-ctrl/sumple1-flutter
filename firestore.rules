@@ -32,7 +32,7 @@ service cloud.firestore {
         && request.resource.data.title.size() <= 100
         && isString(request.resource.data.location)
         && request.resource.data.location.size() <= 200
-        && isString(request.resource.data.price)
+        && (isString(request.resource.data.price) || request.resource.data.price is int)
         && isString(request.resource.data.date)
         && (!("description" in request.resource.data.keys()) || request.resource.data.description.size() <= 5000)
         && (!("notes" in request.resource.data.keys()) || request.resource.data.notes.size() <= 2000);

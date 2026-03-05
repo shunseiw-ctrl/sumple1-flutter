@@ -234,9 +234,19 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   Widget _buildFilterChip(String label, String type) {
     final selected = _filterType == type;
     return ChoiceChip(
-      label: Text(label, style: const TextStyle(fontSize: 11)),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: selected ? Colors.white : context.appColors.textPrimary,
+        ),
+      ),
       selected: selected,
       onSelected: (_) => setState(() => _filterType = type),
+      selectedColor: context.appColors.primary,
+      backgroundColor: context.appColors.surface,
+      side: BorderSide(color: context.appColors.divider),
       visualDensity: VisualDensity.compact,
     );
   }

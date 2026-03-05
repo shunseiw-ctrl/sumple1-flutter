@@ -202,9 +202,19 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChoiceChip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: selected ? Colors.white : context.appColors.textPrimary,
+        ),
+      ),
       selected: selected,
       onSelected: (_) => onSelected(),
+      selectedColor: context.appColors.primary,
+      backgroundColor: context.appColors.surface,
+      side: BorderSide(color: context.appColors.divider),
       visualDensity: VisualDensity.compact,
     );
   }
