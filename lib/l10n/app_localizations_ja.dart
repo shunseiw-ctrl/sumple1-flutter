@@ -4155,4 +4155,68 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminDashboard_workReports => '日報管理';
+
+  @override
+  String adminApplicants_qualCount(String count) {
+    return '資格$count';
+  }
+
+  @override
+  String adminApplicants_completedCount(String count) {
+    return '完了$count';
+  }
+
+  @override
+  String get adminApplicants_openChat => 'チャットを開く';
+
+  @override
+  String get adminSettings_accountSettings => 'アカウント設定';
+
+  @override
+  String get adminSettings_language => '言語';
+
+  @override
+  String get adminSettings_dataExport => 'データエクスポート';
+
+  @override
+  String get adminWorker_statistics => '統計';
+
+  @override
+  String get adminWorker_statCompleted => '完了数';
+
+  @override
+  String get adminWorker_statTotalEarnings => '総報酬';
+
+  @override
+  String get adminWorker_statCompletionRate => '完了率';
+
+  @override
+  String get adminWorker_memoTitle => '管理者メモ';
+
+  @override
+  String get adminWorker_memoHint => 'このワーカーに関するメモを入力…';
+
+  @override
+  String get adminWorker_memoSave => 'メモを保存';
+
+  @override
+  String get adminWorker_memoSaved => 'メモを保存しました';
+
+  @override
+  String get adminWorker_memoSaveFailed => 'メモの保存に失敗しました';
+
+  @override
+  String get adminWorker_openChat => 'チャットを開く';
+
+  @override
+  String get adminWorker_noChatAvailable => 'チャット可能な応募がありません';
+
+  @override
+  String get adminWorker_ekycApproved => '本人確認済';
+
+  @override
+  String get adminWorker_ekycPending => '確認中';
+
+  @override
+  String get adminWorker_ekycRejected => '確認否認';
 }

@@ -2099,5 +2099,38 @@
   "adminSettings_logoutTitle": "Logout",
   "adminSettings_logoutConfirm": "Are you sure you want to log out?",
 
-  "adminDashboard_workReports": "Reports"
+  "adminDashboard_workReports": "Reports",
+
+  "adminApplicants_qualCount": "{count} quals",
+  "@adminApplicants_qualCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_completedCount": "{count} done",
+  "@adminApplicants_completedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_openChat": "Open Chat",
+
+  "adminSettings_accountSettings": "Account Settings",
+  "adminSettings_language": "Language",
+  "adminSettings_dataExport": "Data Export",
+
+  "adminWorker_statistics": "Statistics",
+  "adminWorker_statCompleted": "Completed",
+  "adminWorker_statTotalEarnings": "Total Earnings",
+  "adminWorker_statCompletionRate": "Completion Rate",
+  "adminWorker_memoTitle": "Admin Notes",
+  "adminWorker_memoHint": "Enter notes about this worker...",
+  "adminWorker_memoSave": "Save Notes",
+  "adminWorker_memoSaved": "Notes saved",
+  "adminWorker_memoSaveFailed": "Failed to save notes",
+  "adminWorker_openChat": "Open Chat",
+  "adminWorker_noChatAvailable": "No applications available for chat",
+  "adminWorker_ekycApproved": "Verified",
+  "adminWorker_ekycPending": "Pending",
+  "adminWorker_ekycRejected": "Rejected"
 }

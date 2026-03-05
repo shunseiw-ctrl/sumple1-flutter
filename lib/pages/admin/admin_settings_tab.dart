@@ -1,22 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/providers/locale_provider.dart';
+import 'package:sumple1/core/providers/theme_mode_provider.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 
 /// 管理者設定タブ
-class AdminSettingsTab extends StatefulWidget {
+class AdminSettingsTab extends ConsumerStatefulWidget {
   const AdminSettingsTab({super.key});
 
   @override
-  State<AdminSettingsTab> createState() => _AdminSettingsTabState();
+  ConsumerState<AdminSettingsTab> createState() => _AdminSettingsTabState();
 }
 
-class _AdminSettingsTabState extends State<AdminSettingsTab> {
+class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
   String _appVersion = '';
 
   @override
@@ -57,9 +60,101 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
     }
   }
 
+  void _showThemeModeDialog() {
+    final currentMode = ref.read(themeModeProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.profile_darkMode),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<ThemeMode>(
+              title: Text(context.l10n.profile_darkModeLight),
+              value: ThemeMode.light,
+              groupValue: currentMode,
+              onChanged: (v) {
+                ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text(context.l10n.profile_darkModeDark),
+              value: ThemeMode.dark,
+              groupValue: currentMode,
+              onChanged: (v) {
+                ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text(context.l10n.profile_darkModeSystem),
+              value: ThemeMode.system,
+              groupValue: currentMode,
+              onChanged: (v) {
+                ref.read(themeModeProvider.notifier).setThemeMode(v!);
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    final currentLocale = ref.read(localeProvider);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.adminSettings_language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<Locale>(
+              title: const Text('日本語'),
+              value: const Locale('ja'),
+              groupValue: currentLocale,
+              onChanged: (v) {
+                ref.read(localeProvider.notifier).setLocale(v!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<Locale>(
+              title: const Text('English'),
+              value: const Locale('en'),
+              groupValue: currentLocale,
+              onChanged: (v) {
+                ref.read(localeProvider.notifier).setLocale(v!);
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final currentMode = ref.watch(themeModeProvider);
+    final currentLocale = ref.watch(localeProvider);
+
+    String themeModeLabel;
+    switch (currentMode) {
+      case ThemeMode.light:
+        themeModeLabel = context.l10n.profile_darkModeLight;
+        break;
+      case ThemeMode.dark:
+        themeModeLabel = context.l10n.profile_darkModeDark;
+        break;
+      case ThemeMode.system:
+        themeModeLabel = context.l10n.profile_darkModeSystem;
+        break;
+    }
+
+    final languageLabel = currentLocale.languageCode == 'ja' ? '日本語' : 'English';
 
     return ListView(
       padding: AppSpacing.listInsets,
@@ -109,13 +204,49 @@ class _AdminSettingsTabState extends State<AdminSettingsTab> {
         ),
         const SizedBox(height: AppSpacing.lg),
 
-        // 設定項目
+        // アカウント設定
         _SettingsSection(
           children: [
+            _SettingsItem(
+              icon: Icons.person_outline,
+              title: context.l10n.adminSettings_accountSettings,
+              onTap: () => context.push(RoutePaths.accountSettings),
+            ),
             _SettingsItem(
               icon: Icons.notifications_outlined,
               title: context.l10n.adminSettings_notifications,
               onTap: () => context.push(RoutePaths.notifications),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
+        // 表示設定
+        _SettingsSection(
+          children: [
+            _SettingsItem(
+              icon: Icons.dark_mode_outlined,
+              title: context.l10n.profile_darkMode,
+              trailing: Text(
+                themeModeLabel,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: context.appColors.textSecondary,
+                ),
+              ),
+              onTap: _showThemeModeDialog,
+            ),
+            _SettingsItem(
+              icon: Icons.language,
+              title: context.l10n.adminSettings_language,
+              trailing: Text(
+                languageLabel,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: context.appColors.textSecondary,
+                ),
+              ),
+              onTap: _showLanguageDialog,
             ),
           ],
         ),

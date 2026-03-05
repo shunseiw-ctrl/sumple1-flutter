@@ -7930,6 +7930,126 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日報管理'**
   String get adminDashboard_workReports;
+
+  /// No description provided for @adminApplicants_qualCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'資格{count}'**
+  String adminApplicants_qualCount(String count);
+
+  /// No description provided for @adminApplicants_completedCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了{count}'**
+  String adminApplicants_completedCount(String count);
+
+  /// No description provided for @adminApplicants_openChat.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャットを開く'**
+  String get adminApplicants_openChat;
+
+  /// No description provided for @adminSettings_accountSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント設定'**
+  String get adminSettings_accountSettings;
+
+  /// No description provided for @adminSettings_language.
+  ///
+  /// In ja, this message translates to:
+  /// **'言語'**
+  String get adminSettings_language;
+
+  /// No description provided for @adminSettings_dataExport.
+  ///
+  /// In ja, this message translates to:
+  /// **'データエクスポート'**
+  String get adminSettings_dataExport;
+
+  /// No description provided for @adminWorker_statistics.
+  ///
+  /// In ja, this message translates to:
+  /// **'統計'**
+  String get adminWorker_statistics;
+
+  /// No description provided for @adminWorker_statCompleted.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了数'**
+  String get adminWorker_statCompleted;
+
+  /// No description provided for @adminWorker_statTotalEarnings.
+  ///
+  /// In ja, this message translates to:
+  /// **'総報酬'**
+  String get adminWorker_statTotalEarnings;
+
+  /// No description provided for @adminWorker_statCompletionRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了率'**
+  String get adminWorker_statCompletionRate;
+
+  /// No description provided for @adminWorker_memoTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'管理者メモ'**
+  String get adminWorker_memoTitle;
+
+  /// No description provided for @adminWorker_memoHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'このワーカーに関するメモを入力…'**
+  String get adminWorker_memoHint;
+
+  /// No description provided for @adminWorker_memoSave.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモを保存'**
+  String get adminWorker_memoSave;
+
+  /// No description provided for @adminWorker_memoSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモを保存しました'**
+  String get adminWorker_memoSaved;
+
+  /// No description provided for @adminWorker_memoSaveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモの保存に失敗しました'**
+  String get adminWorker_memoSaveFailed;
+
+  /// No description provided for @adminWorker_openChat.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャットを開く'**
+  String get adminWorker_openChat;
+
+  /// No description provided for @adminWorker_noChatAvailable.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャット可能な応募がありません'**
+  String get adminWorker_noChatAvailable;
+
+  /// No description provided for @adminWorker_ekycApproved.
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認済'**
+  String get adminWorker_ekycApproved;
+
+  /// No description provided for @adminWorker_ekycPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認中'**
+  String get adminWorker_ekycPending;
+
+  /// No description provided for @adminWorker_ekycRejected.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認否認'**
+  String get adminWorker_ekycRejected;
 }
 
 class _AppLocalizationsDelegate

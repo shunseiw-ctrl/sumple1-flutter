@@ -4258,4 +4258,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminDashboard_workReports => 'Reports';
+
+  @override
+  String adminApplicants_qualCount(String count) {
+    return '$count quals';
+  }
+
+  @override
+  String adminApplicants_completedCount(String count) {
+    return '$count done';
+  }
+
+  @override
+  String get adminApplicants_openChat => 'Open Chat';
+
+  @override
+  String get adminSettings_accountSettings => 'Account Settings';
+
+  @override
+  String get adminSettings_language => 'Language';
+
+  @override
+  String get adminSettings_dataExport => 'Data Export';
+
+  @override
+  String get adminWorker_statistics => 'Statistics';
+
+  @override
+  String get adminWorker_statCompleted => 'Completed';
+
+  @override
+  String get adminWorker_statTotalEarnings => 'Total Earnings';
+
+  @override
+  String get adminWorker_statCompletionRate => 'Completion Rate';
+
+  @override
+  String get adminWorker_memoTitle => 'Admin Notes';
+
+  @override
+  String get adminWorker_memoHint => 'Enter notes about this worker...';
+
+  @override
+  String get adminWorker_memoSave => 'Save Notes';
+
+  @override
+  String get adminWorker_memoSaved => 'Notes saved';
+
+  @override
+  String get adminWorker_memoSaveFailed => 'Failed to save notes';
+
+  @override
+  String get adminWorker_openChat => 'Open Chat';
+
+  @override
+  String get adminWorker_noChatAvailable =>
+      'No applications available for chat';
+
+  @override
+  String get adminWorker_ekycApproved => 'Verified';
+
+  @override
+  String get adminWorker_ekycPending => 'Pending';
+
+  @override
+  String get adminWorker_ekycRejected => 'Rejected';
 }

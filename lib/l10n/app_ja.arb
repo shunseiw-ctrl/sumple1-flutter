@@ -2870,5 +2870,38 @@
   "adminSettings_logoutTitle": "ログアウト",
   "adminSettings_logoutConfirm": "ログアウトしますか？",
 
-  "adminDashboard_workReports": "日報管理"
+  "adminDashboard_workReports": "日報管理",
+
+  "adminApplicants_qualCount": "資格{count}",
+  "@adminApplicants_qualCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_completedCount": "完了{count}",
+  "@adminApplicants_completedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_openChat": "チャットを開く",
+
+  "adminSettings_accountSettings": "アカウント設定",
+  "adminSettings_language": "言語",
+  "adminSettings_dataExport": "データエクスポート",
+
+  "adminWorker_statistics": "統計",
+  "adminWorker_statCompleted": "完了数",
+  "adminWorker_statTotalEarnings": "総報酬",
+  "adminWorker_statCompletionRate": "完了率",
+  "adminWorker_memoTitle": "管理者メモ",
+  "adminWorker_memoHint": "このワーカーに関するメモを入力…",
+  "adminWorker_memoSave": "メモを保存",
+  "adminWorker_memoSaved": "メモを保存しました",
+  "adminWorker_memoSaveFailed": "メモの保存に失敗しました",
+  "adminWorker_openChat": "チャットを開く",
+  "adminWorker_noChatAvailable": "チャット可能な応募がありません",
+  "adminWorker_ekycApproved": "本人確認済",
+  "adminWorker_ekycPending": "確認中",
+  "adminWorker_ekycRejected": "確認否認"
 }

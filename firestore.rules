@@ -440,6 +440,21 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // --- 管理者メモ ---
+    match /admin_memos/{workerUid} {
+      allow read: if signedIn() && isAdminUid();
+      allow create: if signedIn() && isAdminUid()
+        && isString(request.resource.data.memo)
+        && request.resource.data.memo.size() <= 2000;
+      allow update: if signedIn() && isAdminUid()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "memo", "updatedAt", "updatedBy"
+        ])
+        && isString(request.resource.data.memo)
+        && request.resource.data.memo.size() <= 2000;
+      allow delete: if false;
+    }
+
     // --- collectionGroup: 資格 (admin読み取り) ---
     match /{path=**}/qualifications_v2/{qualId} {
       allow read: if signedIn() && isAdminUid();
