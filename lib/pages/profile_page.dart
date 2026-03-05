@@ -3,7 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../core/services/line_auth_service.dart';
+import 'package:sumple1/core/services/google_auth_service.dart';
+import 'package:sumple1/core/services/apple_auth_service.dart';
+import 'package:sumple1/core/utils/error_handler.dart';
+import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
@@ -29,6 +34,10 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isAnonymous(User? user) => user == null || user.isAnonymous;
+
+  final _googleAuthService = GoogleAuthService();
+  final _appleAuthService = AppleAuthService();
+  bool _isAuthLoading = false;
 
   WorkerQualityScore? _qualityScore;
   bool _loadingScore = true;
@@ -66,6 +75,40 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         if (mounted) setState(() {});
       },
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final result = await _googleAuthService.signInWithGoogle();
+      if (result == null) return;
+      if (!mounted) return;
+      setState(() {});
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_googleLoginSuccess);
+    } catch (e) {
+      Logger.error('Google sign in failed', tag: 'ProfilePage', error: e);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e);
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
+  }
+
+  Future<void> _signInWithApple() async {
+    setState(() => _isAuthLoading = true);
+    try {
+      final result = await _appleAuthService.signInWithApple();
+      if (result == null) return;
+      if (!mounted) return;
+      setState(() {});
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
+    } catch (e) {
+      Logger.error('Apple sign in failed', tag: 'ProfilePage', error: e);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e);
+    } finally {
+      if (mounted) setState(() => _isAuthLoading = false);
+    }
   }
 
   bool get _isAdmin {
@@ -174,6 +217,54 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+            // Google ログインボタン
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _isAuthLoading ? null : _signInWithGoogle,
+                icon: const Icon(Icons.g_mobiledata, size: 24),
+                label: Text(
+                  context.l10n.guestHome_googleLogin,
+                  style: AppTextStyles.button.copyWith(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4285F4),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
+            // Apple Sign In (iOS/macOS のみ表示)
+            if (!kIsWeb &&
+                (Theme.of(context).platform == TargetPlatform.iOS ||
+                    Theme.of(context).platform == TargetPlatform.macOS)) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: _isAuthLoading ? null : _signInWithApple,
+                  icon: const Icon(Icons.apple, size: 24),
+                  label: Text(
+                    context.l10n.signInWithApple,
+                    style: AppTextStyles.button.copyWith(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
           ],
 
