@@ -2253,10 +2253,5 @@
   "accountMerge_confirm": "Merge",
   "accountMerge_success": "Accounts merged successfully",
   "accountMerge_failed": "Account merge failed",
-  "accountMerge_rateLimited": "Merge is limited to once per hour",
-
-  "accountLinking_linkEmail": "Link Email",
-  "accountLinking_linkPhone": "Link Phone",
-  "phoneLinking_title": "Link Phone Number",
-  "phoneLinking_success": "Phone number linked"
+  "accountMerge_rateLimited": "Merge is limited to once per hour"
 }

@@ -158,68 +158,6 @@ class AccountLinkingService {
     }
   }
 
-  /// Email アカウントをリンク
-  Future<LinkResult> linkEmail({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) throw Exception('Not signed in');
-
-      final credential = EmailAuthProvider.credential(
-        email: email,
-        password: password,
-      );
-      await user.linkWithCredential(credential);
-
-      await _updateLinkedProviders(user);
-      Logger.info('Email account linked', tag: 'AccountLinkingService');
-      return const LinkResult.success();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'credential-already-in-use') {
-        Logger.warning(
-            'Email credential already in use', tag: 'AccountLinkingService');
-        if (e.credential != null && e.email != null) {
-          return LinkResult.merge(
-            credential: e.credential!,
-            conflictingEmail: e.email!,
-          );
-        }
-        rethrow;
-      }
-      Logger.error('Email link failed',
-          tag: 'AccountLinkingService', error: e);
-      rethrow;
-    }
-  }
-
-  /// Phone アカウントをリンク
-  Future<LinkResult> linkPhone({
-    required PhoneAuthCredential credential,
-  }) async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) throw Exception('Not signed in');
-
-      await user.linkWithCredential(credential);
-
-      await _updateLinkedProviders(user);
-      Logger.info('Phone account linked', tag: 'AccountLinkingService');
-      return const LinkResult.success();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'credential-already-in-use') {
-        Logger.warning(
-            'Phone credential already in use', tag: 'AccountLinkingService');
-        // Phone にはemailがないのでマージ不可→rethrow
-        rethrow;
-      }
-      Logger.error('Phone link failed',
-          tag: 'AccountLinkingService', error: e);
-      rethrow;
-    }
-  }
-
   /// CF mergeAccounts 呼び出し → linkWithCredential 再試行
   Future<void> mergeAndLink(AuthCredential credential,
       String conflictingEmail) async {

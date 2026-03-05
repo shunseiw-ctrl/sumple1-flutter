@@ -129,16 +129,20 @@ Future<void> main() async {
   Logger.info('Environment: ${AppConfig.environmentName}', tag: 'main');
 
   // --- App Check ---
-  if (kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-    );
-  } else {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.deviceCheck,
-    );
+  try {
+    if (kDebugMode) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      ).timeout(const Duration(seconds: 10));
+    } else {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      ).timeout(const Duration(seconds: 10));
+    }
+  } catch (e) {
+    Logger.error('App Check activation failed', tag: 'main', error: e);
   }
 
   // --- Crashlytics ---
@@ -150,7 +154,11 @@ Future<void> main() async {
     };
   }
 
-  await FirestoreSetup.initialize();
+  try {
+    await FirestoreSetup.initialize().timeout(const Duration(seconds: 10));
+  } catch (e) {
+    Logger.error('Firestore setup failed', tag: 'main', error: e);
+  }
 
   Logger.info('Firebase initialized', tag: 'main');
 
@@ -164,10 +172,20 @@ Future<void> main() async {
 
   // LINE SDK 初期化（モバイルのみ）
   if (!kIsWeb) {
-    await LineSDK.instance.setup('2009209066');
+    try {
+      await LineSDK.instance.setup('2009209066')
+          .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      Logger.error('LINE SDK setup failed', tag: 'main', error: e);
+    }
   }
 
-  await LineAuthService().handleLineCallbackIfNeeded();
+  try {
+    await LineAuthService().handleLineCallbackIfNeeded()
+        .timeout(const Duration(seconds: 10));
+  } catch (e) {
+    Logger.error('LINE callback handling failed', tag: 'main', error: e);
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 

@@ -8,13 +8,9 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 /// メール認証ダイアログを表示する
 ///
 /// [onAuthStateChanged] はログイン/登録成功後に呼ばれるコールバック（setState用）
-/// [linkMode] が true の場合、現在のアカウントにEmail紐付けモードで表示
-/// [onCredentialConflict] はlinkMode時にcredential-already-in-useが発生した場合のコールバック
 Future<void> showEmailAuthDialog({
   required BuildContext context,
   required VoidCallback onAuthStateChanged,
-  bool linkMode = false,
-  void Function(AuthCredential credential, String email)? onCredentialConflict,
 }) async {
   final emailController = TextEditingController();
   final passController = TextEditingController();
@@ -122,30 +118,19 @@ Future<void> showEmailAuthDialog({
 
             setLocalState(() => isLoading = true);
             try {
-              if (linkMode) {
-                // 連携モード: 現在のアカウントにEmail紐付け
-                final current = FirebaseAuth.instance.currentUser;
-                if (current == null) throw Exception('Not signed in');
+              final current = FirebaseAuth.instance.currentUser;
+
+              if (current != null && current.isAnonymous) {
                 final cred = EmailAuthProvider.credential(
                   email: email,
                   password: pass,
                 );
                 await current.linkWithCredential(cred);
               } else {
-                final current = FirebaseAuth.instance.currentUser;
-
-                if (current != null && current.isAnonymous) {
-                  final cred = EmailAuthProvider.credential(
-                    email: email,
-                    password: pass,
-                  );
-                  await current.linkWithCredential(cred);
-                } else {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                    email: email,
-                    password: pass,
-                  );
-                }
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  email: email,
+                  password: pass,
+                );
               }
 
               if (dialogContext.mounted) {
@@ -154,17 +139,6 @@ Future<void> showEmailAuthDialog({
               onAuthStateChanged();
               await showSnack(dialogContext.l10n.emailAuthDialog_signUpSuccess);
             } on FirebaseAuthException catch (e) {
-              if (linkMode && e.code == 'credential-already-in-use') {
-                if (dialogContext.mounted) {
-                  Navigator.pop(dialogContext);
-                }
-                if (onCredentialConflict != null &&
-                    e.credential != null &&
-                    e.email != null) {
-                  onCredentialConflict(e.credential!, e.email!);
-                }
-                return;
-              }
               await showSnack(authErrorMessage(dialogContext, e));
             } catch (e) {
               await showSnack(dialogContext.l10n.emailAuthDialog_signUpFailed);
@@ -250,21 +224,14 @@ Future<void> showEmailAuthDialog({
                 onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
                 child: Text(dialogContext.l10n.common_cancel),
               ),
-              if (linkMode)
-                ElevatedButton(
-                  onPressed: isLoading ? null : signUp,
-                  child: Text(dialogContext.l10n.accountLinking_linkEmail),
-                )
-              else ...[
-                TextButton(
-                  onPressed: isLoading ? null : signUp,
-                  child: Text(dialogContext.l10n.emailAuthDialog_signUpButton),
-                ),
-                ElevatedButton(
-                  onPressed: isLoading ? null : signIn,
-                  child: Text(dialogContext.l10n.emailAuthDialog_loginButton),
-                ),
-              ],
+              TextButton(
+                onPressed: isLoading ? null : signUp,
+                child: Text(dialogContext.l10n.emailAuthDialog_signUpButton),
+              ),
+              ElevatedButton(
+                onPressed: isLoading ? null : signIn,
+                child: Text(dialogContext.l10n.emailAuthDialog_loginButton),
+              ),
             ],
           );
         },

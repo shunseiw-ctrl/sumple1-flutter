@@ -3024,10 +3024,5 @@
   "accountMerge_confirm": "統合する",
   "accountMerge_success": "アカウントを統合しました",
   "accountMerge_failed": "アカウント統合に失敗しました",
-  "accountMerge_rateLimited": "統合は1時間に1回までです",
-
-  "accountLinking_linkEmail": "Emailを連携",
-  "accountLinking_linkPhone": "電話番号を連携",
-  "phoneLinking_title": "電話番号を連携",
-  "phoneLinking_success": "電話番号を連携しました"
+  "accountMerge_rateLimited": "統合は1時間に1回までです"
 }
