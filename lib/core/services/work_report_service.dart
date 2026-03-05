@@ -76,4 +76,53 @@ class WorkReportService {
     final snap = await _reportsRef(applicationId).get();
     return snap.docs.length;
   }
+
+  /// 管理者フィードバックを追加
+  Future<void> addFeedback({
+    required String applicationId,
+    required String reportId,
+    required String comment,
+  }) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) throw Exception('認証が必要です');
+
+    try {
+      await _reportsRef(applicationId).doc(reportId).update({
+        'adminComment': comment,
+        'reviewStatus': 'reviewed',
+        'reviewedBy': uid,
+        'reviewedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      Logger.info('Feedback added to work report',
+          tag: 'WorkReportService',
+          data: {'applicationId': applicationId, 'reportId': reportId});
+    } catch (e) {
+      Logger.error('Failed to add feedback',
+          tag: 'WorkReportService', error: e);
+      rethrow;
+    }
+  }
+
+  /// レビュー済みにマーク（コメントなし）
+  Future<void> markAsReviewed({
+    required String applicationId,
+    required String reportId,
+  }) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) throw Exception('認証が必要です');
+
+    try {
+      await _reportsRef(applicationId).doc(reportId).update({
+        'reviewStatus': 'reviewed',
+        'reviewedBy': uid,
+        'reviewedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      Logger.error('Failed to mark as reviewed',
+          tag: 'WorkReportService', error: e);
+      rethrow;
+    }
+  }
 }

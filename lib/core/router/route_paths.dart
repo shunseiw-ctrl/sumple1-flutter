@@ -78,6 +78,7 @@ class RoutePaths {
   static const String adminEarlyPayments = '/admin/early-payments';
   static const String adminIdentityVerification = '/admin/identity-verification';
   static const String adminWorkerDetail = '/admin/worker/:uid';
+  static const String adminDrafts = '/admin/drafts';
 
   /// パスパラメータを展開するヘルパー
   static String jobDetailPath(String jobId) => '/jobs/$jobId';

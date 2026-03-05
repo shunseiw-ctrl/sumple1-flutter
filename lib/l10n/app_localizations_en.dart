@@ -4323,4 +4323,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminWorker_ekycRejected => 'Rejected';
+
+  @override
+  String get post_saveDraft => 'Draft';
+
+  @override
+  String get post_draftSaved => 'Draft saved';
+
+  @override
+  String get post_draftSaveFailed => 'Failed to save draft';
+
+  @override
+  String get post_draftNeedTitle => 'Please enter a title';
+
+  @override
+  String get adminWorkReports_filterAll => 'All';
+
+  @override
+  String get adminWorkReports_filterPending => 'Pending';
+
+  @override
+  String get adminWorkReports_filterReviewed => 'Reviewed';
+
+  @override
+  String get adminWorkReports_reviewPending => 'Pending';
+
+  @override
+  String get adminWorkReports_reviewed => 'Reviewed';
+
+  @override
+  String get adminWorkReports_addFeedback => 'Add Comment';
+
+  @override
+  String get adminWorkReports_markReviewed => 'Mark Reviewed';
+
+  @override
+  String get adminWorkReports_feedbackTitle => 'Report Feedback';
+
+  @override
+  String get adminWorkReports_feedbackHint => 'Enter comment...';
+
+  @override
+  String get adminWorkReports_feedbackSubmit => 'Submit';
+
+  @override
+  String get adminWorkReports_feedbackCancel => 'Cancel';
+
+  @override
+  String get adminWorkReports_feedbackSent => 'Feedback sent';
+
+  @override
+  String get adminWorkReports_feedbackFailed => 'Failed to send feedback';
+
+  @override
+  String get adminWorkReports_markedReviewed => 'Marked as reviewed';
+
+  @override
+  String get adminWorkReports_markFailed => 'Failed to update review status';
+
+  @override
+  String get inspection_customItems => 'Custom Inspection Items';
+
+  @override
+  String get inspection_customItemsHint => 'Enter item name';
+
+  @override
+  String get inspection_addItem => 'Add Item';
+
+  @override
+  String get inspection_removeItem => 'Remove Item';
+
+  @override
+  String get inspection_defaultItems => 'Use Default Items';
+
+  @override
+  String get inspection_customItemsHelp =>
+      'Set custom inspection items per job';
+
+  @override
+  String get inspection_itemPhotoAttach => 'Attach Photo';
+
+  @override
+  String inspection_itemPhotoCount(String count) {
+    return '$count photos';
+  }
+
+  @override
+  String get adminDrafts_title => 'Drafts';
+
+  @override
+  String get adminDrafts_empty => 'No drafts';
+
+  @override
+  String get adminDrafts_publish => 'Publish';
+
+  @override
+  String get adminDrafts_delete => 'Delete';
+
+  @override
+  String get adminDrafts_deleteConfirm => 'Delete this draft?';
+
+  @override
+  String get adminDrafts_published => 'Job published';
+
+  @override
+  String get adminDrafts_publishFailed => 'Failed to publish';
+
+  @override
+  String get adminDrafts_deleted => 'Draft deleted';
+
+  @override
+  String get adminDrafts_deleteFailed => 'Failed to delete';
 }

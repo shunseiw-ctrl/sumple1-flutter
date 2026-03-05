@@ -47,7 +47,9 @@ service cloud.firestore {
           "updatedAt",
           "projectName",
           "latitude","longitude",
-          "requiredQualifications"
+          "requiredQualifications",
+          "status",
+          "customInspectionItems"
         ])
         && (!("title" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.title.size() <= 100)
         && (!("location" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.location.size() <= 200)
@@ -97,7 +99,14 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/applications/$(appId)).data.applicantUid == uid()
           && isString(request.resource.data.workContent)
           && request.resource.data.workContent.size() <= 2000;
-        allow update, delete: if false;
+        // 管理者のみフィードバック関連フィールドを更新可能
+        allow update: if isAdminUid()
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            "adminComment", "reviewStatus", "reviewedBy", "reviewedAt", "updatedAt"
+          ])
+          && (!("adminComment" in request.resource.data.diff(resource.data).changedKeys())
+              || request.resource.data.adminComment.size() <= 2000);
+        allow delete: if false;
       }
 
       // --- 活動ログ (activity_logs) ---

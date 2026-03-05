@@ -5,11 +5,13 @@ class InspectionCheckItem {
   final String label; // 例: "仕上がり品質", "清掃状況"
   final String result; // 'pass' | 'fail' | 'na'
   final String? comment; // 項目別コメント（max 500文字）
+  final List<String> photoUrls; // 項目別写真（最大5枚）
 
   InspectionCheckItem({
     required this.label,
     required this.result,
     this.comment,
+    this.photoUrls = const [],
   });
 
   factory InspectionCheckItem.fromMap(Map<String, dynamic> data) {
@@ -17,6 +19,7 @@ class InspectionCheckItem {
       label: data['label']?.toString() ?? '',
       result: data['result']?.toString() ?? 'na',
       comment: data['comment']?.toString(),
+      photoUrls: _parseStringList(data['photoUrls']),
     );
   }
 
@@ -25,7 +28,14 @@ class InspectionCheckItem {
       'label': label,
       'result': result,
       if (comment != null) 'comment': comment,
+      if (photoUrls.isNotEmpty) 'photoUrls': photoUrls,
     };
+  }
+
+  static List<String> _parseStringList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) return value.map((e) => e.toString()).toList();
+    return [];
   }
 
   @override
@@ -34,10 +44,19 @@ class InspectionCheckItem {
       (other is InspectionCheckItem &&
           other.label == label &&
           other.result == result &&
-          other.comment == comment);
+          other.comment == comment &&
+          _listEquals(other.photoUrls, photoUrls));
 
   @override
-  int get hashCode => Object.hash(label, result, comment);
+  int get hashCode => Object.hash(label, result, comment, Object.hashAll(photoUrls));
+
+  static bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 }
 
 /// 検査（Inspection）のデータモデル

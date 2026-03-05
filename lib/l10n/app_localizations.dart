@@ -8050,6 +8050,222 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'確認否認'**
   String get adminWorker_ekycRejected;
+
+  /// No description provided for @post_saveDraft.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書き'**
+  String get post_saveDraft;
+
+  /// No description provided for @post_draftSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きを保存しました'**
+  String get post_draftSaved;
+
+  /// No description provided for @post_draftSaveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きの保存に失敗しました'**
+  String get post_draftSaveFailed;
+
+  /// No description provided for @post_draftNeedTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイトルを入力してください'**
+  String get post_draftNeedTitle;
+
+  /// No description provided for @adminWorkReports_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get adminWorkReports_filterAll;
+
+  /// No description provided for @adminWorkReports_filterPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'未レビュー'**
+  String get adminWorkReports_filterPending;
+
+  /// No description provided for @adminWorkReports_filterReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済'**
+  String get adminWorkReports_filterReviewed;
+
+  /// No description provided for @adminWorkReports_reviewPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'未レビュー'**
+  String get adminWorkReports_reviewPending;
+
+  /// No description provided for @adminWorkReports_reviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済'**
+  String get adminWorkReports_reviewed;
+
+  /// No description provided for @adminWorkReports_addFeedback.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメント追加'**
+  String get adminWorkReports_addFeedback;
+
+  /// No description provided for @adminWorkReports_markReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認済みにする'**
+  String get adminWorkReports_markReviewed;
+
+  /// No description provided for @adminWorkReports_feedbackTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報フィードバック'**
+  String get adminWorkReports_feedbackTitle;
+
+  /// No description provided for @adminWorkReports_feedbackHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを入力…'**
+  String get adminWorkReports_feedbackHint;
+
+  /// No description provided for @adminWorkReports_feedbackSubmit.
+  ///
+  /// In ja, this message translates to:
+  /// **'送信'**
+  String get adminWorkReports_feedbackSubmit;
+
+  /// No description provided for @adminWorkReports_feedbackCancel.
+  ///
+  /// In ja, this message translates to:
+  /// **'キャンセル'**
+  String get adminWorkReports_feedbackCancel;
+
+  /// No description provided for @adminWorkReports_feedbackSent.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックを送信しました'**
+  String get adminWorkReports_feedbackSent;
+
+  /// No description provided for @adminWorkReports_feedbackFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックの送信に失敗しました'**
+  String get adminWorkReports_feedbackFailed;
+
+  /// No description provided for @adminWorkReports_markedReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済みにしました'**
+  String get adminWorkReports_markedReviewed;
+
+  /// No description provided for @adminWorkReports_markFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー更新に失敗しました'**
+  String get adminWorkReports_markFailed;
+
+  /// No description provided for @inspection_customItems.
+  ///
+  /// In ja, this message translates to:
+  /// **'カスタム検査項目'**
+  String get inspection_customItems;
+
+  /// No description provided for @inspection_customItemsHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目名を入力'**
+  String get inspection_customItemsHint;
+
+  /// No description provided for @inspection_addItem.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目を追加'**
+  String get inspection_addItem;
+
+  /// No description provided for @inspection_removeItem.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目を削除'**
+  String get inspection_removeItem;
+
+  /// No description provided for @inspection_defaultItems.
+  ///
+  /// In ja, this message translates to:
+  /// **'デフォルト項目を使用'**
+  String get inspection_defaultItems;
+
+  /// No description provided for @inspection_customItemsHelp.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件ごとにカスタム検査項目を設定できます'**
+  String get inspection_customItemsHelp;
+
+  /// No description provided for @inspection_itemPhotoAttach.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を添付'**
+  String get inspection_itemPhotoAttach;
+
+  /// No description provided for @inspection_itemPhotoCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'{count}枚'**
+  String inspection_itemPhotoCount(String count);
+
+  /// No description provided for @adminDrafts_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書き一覧'**
+  String get adminDrafts_title;
+
+  /// No description provided for @adminDrafts_empty.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きはありません'**
+  String get adminDrafts_empty;
+
+  /// No description provided for @adminDrafts_publish.
+  ///
+  /// In ja, this message translates to:
+  /// **'公開する'**
+  String get adminDrafts_publish;
+
+  /// No description provided for @adminDrafts_delete.
+  ///
+  /// In ja, this message translates to:
+  /// **'削除する'**
+  String get adminDrafts_delete;
+
+  /// No description provided for @adminDrafts_deleteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'この下書きを削除しますか？'**
+  String get adminDrafts_deleteConfirm;
+
+  /// No description provided for @adminDrafts_published.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件を公開しました'**
+  String get adminDrafts_published;
+
+  /// No description provided for @adminDrafts_publishFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'公開に失敗しました'**
+  String get adminDrafts_publishFailed;
+
+  /// No description provided for @adminDrafts_deleted.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きを削除しました'**
+  String get adminDrafts_deleted;
+
+  /// No description provided for @adminDrafts_deleteFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'削除に失敗しました'**
+  String get adminDrafts_deleteFailed;
 }
 
 class _AppLocalizationsDelegate

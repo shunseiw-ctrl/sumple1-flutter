@@ -4219,4 +4219,114 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminWorker_ekycRejected => '確認否認';
+
+  @override
+  String get post_saveDraft => '下書き';
+
+  @override
+  String get post_draftSaved => '下書きを保存しました';
+
+  @override
+  String get post_draftSaveFailed => '下書きの保存に失敗しました';
+
+  @override
+  String get post_draftNeedTitle => 'タイトルを入力してください';
+
+  @override
+  String get adminWorkReports_filterAll => 'すべて';
+
+  @override
+  String get adminWorkReports_filterPending => '未レビュー';
+
+  @override
+  String get adminWorkReports_filterReviewed => 'レビュー済';
+
+  @override
+  String get adminWorkReports_reviewPending => '未レビュー';
+
+  @override
+  String get adminWorkReports_reviewed => 'レビュー済';
+
+  @override
+  String get adminWorkReports_addFeedback => 'コメント追加';
+
+  @override
+  String get adminWorkReports_markReviewed => '確認済みにする';
+
+  @override
+  String get adminWorkReports_feedbackTitle => '日報フィードバック';
+
+  @override
+  String get adminWorkReports_feedbackHint => 'コメントを入力…';
+
+  @override
+  String get adminWorkReports_feedbackSubmit => '送信';
+
+  @override
+  String get adminWorkReports_feedbackCancel => 'キャンセル';
+
+  @override
+  String get adminWorkReports_feedbackSent => 'フィードバックを送信しました';
+
+  @override
+  String get adminWorkReports_feedbackFailed => 'フィードバックの送信に失敗しました';
+
+  @override
+  String get adminWorkReports_markedReviewed => 'レビュー済みにしました';
+
+  @override
+  String get adminWorkReports_markFailed => 'レビュー更新に失敗しました';
+
+  @override
+  String get inspection_customItems => 'カスタム検査項目';
+
+  @override
+  String get inspection_customItemsHint => '項目名を入力';
+
+  @override
+  String get inspection_addItem => '項目を追加';
+
+  @override
+  String get inspection_removeItem => '項目を削除';
+
+  @override
+  String get inspection_defaultItems => 'デフォルト項目を使用';
+
+  @override
+  String get inspection_customItemsHelp => '案件ごとにカスタム検査項目を設定できます';
+
+  @override
+  String get inspection_itemPhotoAttach => '写真を添付';
+
+  @override
+  String inspection_itemPhotoCount(String count) {
+    return '$count枚';
+  }
+
+  @override
+  String get adminDrafts_title => '下書き一覧';
+
+  @override
+  String get adminDrafts_empty => '下書きはありません';
+
+  @override
+  String get adminDrafts_publish => '公開する';
+
+  @override
+  String get adminDrafts_delete => '削除する';
+
+  @override
+  String get adminDrafts_deleteConfirm => 'この下書きを削除しますか？';
+
+  @override
+  String get adminDrafts_published => '案件を公開しました';
+
+  @override
+  String get adminDrafts_publishFailed => '公開に失敗しました';
+
+  @override
+  String get adminDrafts_deleted => '下書きを削除しました';
+
+  @override
+  String get adminDrafts_deleteFailed => '削除に失敗しました';
 }

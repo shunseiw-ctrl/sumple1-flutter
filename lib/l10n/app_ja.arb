@@ -2903,5 +2903,50 @@
   "adminWorker_noChatAvailable": "チャット可能な応募がありません",
   "adminWorker_ekycApproved": "本人確認済",
   "adminWorker_ekycPending": "確認中",
-  "adminWorker_ekycRejected": "確認否認"
+  "adminWorker_ekycRejected": "確認否認",
+
+  "post_saveDraft": "下書き",
+  "post_draftSaved": "下書きを保存しました",
+  "post_draftSaveFailed": "下書きの保存に失敗しました",
+  "post_draftNeedTitle": "タイトルを入力してください",
+
+  "adminWorkReports_filterAll": "すべて",
+  "adminWorkReports_filterPending": "未レビュー",
+  "adminWorkReports_filterReviewed": "レビュー済",
+  "adminWorkReports_reviewPending": "未レビュー",
+  "adminWorkReports_reviewed": "レビュー済",
+  "adminWorkReports_addFeedback": "コメント追加",
+  "adminWorkReports_markReviewed": "確認済みにする",
+  "adminWorkReports_feedbackTitle": "日報フィードバック",
+  "adminWorkReports_feedbackHint": "コメントを入力…",
+  "adminWorkReports_feedbackSubmit": "送信",
+  "adminWorkReports_feedbackCancel": "キャンセル",
+  "adminWorkReports_feedbackSent": "フィードバックを送信しました",
+  "adminWorkReports_feedbackFailed": "フィードバックの送信に失敗しました",
+  "adminWorkReports_markedReviewed": "レビュー済みにしました",
+  "adminWorkReports_markFailed": "レビュー更新に失敗しました",
+
+  "inspection_customItems": "カスタム検査項目",
+  "inspection_customItemsHint": "項目名を入力",
+  "inspection_addItem": "項目を追加",
+  "inspection_removeItem": "項目を削除",
+  "inspection_defaultItems": "デフォルト項目を使用",
+  "inspection_customItemsHelp": "案件ごとにカスタム検査項目を設定できます",
+  "inspection_itemPhotoAttach": "写真を添付",
+  "inspection_itemPhotoCount": "{count}枚",
+  "@inspection_itemPhotoCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+
+  "adminDrafts_title": "下書き一覧",
+  "adminDrafts_empty": "下書きはありません",
+  "adminDrafts_publish": "公開する",
+  "adminDrafts_delete": "削除する",
+  "adminDrafts_deleteConfirm": "この下書きを削除しますか？",
+  "adminDrafts_published": "案件を公開しました",
+  "adminDrafts_publishFailed": "公開に失敗しました",
+  "adminDrafts_deleted": "下書きを削除しました",
+  "adminDrafts_deleteFailed": "削除に失敗しました"
 }

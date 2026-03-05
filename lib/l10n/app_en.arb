@@ -2132,5 +2132,50 @@
   "adminWorker_noChatAvailable": "No applications available for chat",
   "adminWorker_ekycApproved": "Verified",
   "adminWorker_ekycPending": "Pending",
-  "adminWorker_ekycRejected": "Rejected"
+  "adminWorker_ekycRejected": "Rejected",
+
+  "post_saveDraft": "Draft",
+  "post_draftSaved": "Draft saved",
+  "post_draftSaveFailed": "Failed to save draft",
+  "post_draftNeedTitle": "Please enter a title",
+
+  "adminWorkReports_filterAll": "All",
+  "adminWorkReports_filterPending": "Pending",
+  "adminWorkReports_filterReviewed": "Reviewed",
+  "adminWorkReports_reviewPending": "Pending",
+  "adminWorkReports_reviewed": "Reviewed",
+  "adminWorkReports_addFeedback": "Add Comment",
+  "adminWorkReports_markReviewed": "Mark Reviewed",
+  "adminWorkReports_feedbackTitle": "Report Feedback",
+  "adminWorkReports_feedbackHint": "Enter comment...",
+  "adminWorkReports_feedbackSubmit": "Submit",
+  "adminWorkReports_feedbackCancel": "Cancel",
+  "adminWorkReports_feedbackSent": "Feedback sent",
+  "adminWorkReports_feedbackFailed": "Failed to send feedback",
+  "adminWorkReports_markedReviewed": "Marked as reviewed",
+  "adminWorkReports_markFailed": "Failed to update review status",
+
+  "inspection_customItems": "Custom Inspection Items",
+  "inspection_customItemsHint": "Enter item name",
+  "inspection_addItem": "Add Item",
+  "inspection_removeItem": "Remove Item",
+  "inspection_defaultItems": "Use Default Items",
+  "inspection_customItemsHelp": "Set custom inspection items per job",
+  "inspection_itemPhotoAttach": "Attach Photo",
+  "inspection_itemPhotoCount": "{count} photos",
+  "@inspection_itemPhotoCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+
+  "adminDrafts_title": "Drafts",
+  "adminDrafts_empty": "No drafts",
+  "adminDrafts_publish": "Publish",
+  "adminDrafts_delete": "Delete",
+  "adminDrafts_deleteConfirm": "Delete this draft?",
+  "adminDrafts_published": "Job published",
+  "adminDrafts_publishFailed": "Failed to publish",
+  "adminDrafts_deleted": "Draft deleted",
+  "adminDrafts_deleteFailed": "Failed to delete"
 }
