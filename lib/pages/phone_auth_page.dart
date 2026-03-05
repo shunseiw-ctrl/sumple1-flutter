@@ -96,46 +96,52 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
     setState(() => _isLoading = true);
     final phoneNumber = _formatPhoneNumber(raw);
 
-    await _phoneAuthService.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      resendToken: _resendToken,
-      onAutoVerified: (credential) async {
-        // 自動検証（Android）
-        try {
-          if (widget.linkMode) {
-            final user = FirebaseAuth.instance.currentUser;
-            if (user == null) throw Exception('Not signed in');
-            await user.linkWithCredential(credential);
+    try {
+      await _phoneAuthService.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        resendToken: _resendToken,
+        onAutoVerified: (credential) async {
+          // 自動検証（Android）
+          try {
+            if (widget.linkMode) {
+              final user = FirebaseAuth.instance.currentUser;
+              if (user == null) throw Exception('Not signed in');
+              await user.linkWithCredential(credential);
+              if (!mounted) return;
+              ErrorHandler.showSuccess(context, context.l10n.phoneLinking_success);
+              Navigator.pop(context, true);
+            } else {
+              await _phoneAuthService.signInWithCredential(credential);
+              if (!mounted) return;
+              ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
+              context.go(RoutePaths.home);
+            }
+          } catch (e) {
             if (!mounted) return;
-            ErrorHandler.showSuccess(context, context.l10n.phoneLinking_success);
-            Navigator.pop(context, true);
-          } else {
-            await _phoneAuthService.signInWithCredential(credential);
-            if (!mounted) return;
-            ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
-            context.go(RoutePaths.home);
+            ErrorHandler.showError(context, e);
           }
-        } catch (e) {
+        },
+        onCodeSent: (verificationId, resendToken) {
           if (!mounted) return;
+          setState(() {
+            _verificationId = verificationId;
+            _resendToken = resendToken;
+            _isStep2 = true;
+            _isLoading = false;
+          });
+          _startCountdown();
+        },
+        onError: (e) {
+          if (!mounted) return;
+          setState(() => _isLoading = false);
           ErrorHandler.showError(context, e);
-        }
-      },
-      onCodeSent: (verificationId, resendToken) {
-        if (!mounted) return;
-        setState(() {
-          _verificationId = verificationId;
-          _resendToken = resendToken;
-          _isStep2 = true;
-          _isLoading = false;
-        });
-        _startCountdown();
-      },
-      onError: (e) {
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-        ErrorHandler.showError(context, e);
-      },
-    );
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorHandler.showError(context, e);
+    }
   }
 
   Future<void> _verifyCode() async {
