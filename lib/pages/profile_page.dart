@@ -3,13 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
-import '../core/services/line_auth_service.dart';
-import 'package:sumple1/core/services/google_auth_service.dart';
-import 'package:sumple1/core/services/apple_auth_service.dart';
-import 'package:sumple1/core/utils/error_handler.dart';
-import 'package:sumple1/core/utils/logger.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -23,7 +16,6 @@ import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
 import 'profile/profile_widgets.dart';
-import 'profile/email_auth_dialog.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -34,10 +26,6 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isAnonymous(User? user) => user == null || user.isAnonymous;
-
-  final _googleAuthService = GoogleAuthService();
-  final _appleAuthService = AppleAuthService();
-  bool _isAuthLoading = false;
 
   WorkerQualityScore? _qualityScore;
   bool _loadingScore = true;
@@ -65,49 +53,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
     } catch (_) {
       if (mounted) setState(() => _loadingScore = false);
-    }
-  }
-
-  void _openEmailAuthDialog() {
-    showEmailAuthDialog(
-      context: context,
-      onAuthStateChanged: () {
-        if (mounted) setState(() {});
-      },
-    );
-  }
-
-  Future<void> _signInWithGoogle() async {
-    setState(() => _isAuthLoading = true);
-    try {
-      final result = await _googleAuthService.signInWithGoogle();
-      if (result == null) return;
-      if (!mounted) return;
-      setState(() {});
-      ErrorHandler.showSuccess(context, context.l10n.guestHome_googleLoginSuccess);
-    } catch (e) {
-      Logger.error('Google sign in failed', tag: 'ProfilePage', error: e);
-      if (!mounted) return;
-      ErrorHandler.showError(context, e);
-    } finally {
-      if (mounted) setState(() => _isAuthLoading = false);
-    }
-  }
-
-  Future<void> _signInWithApple() async {
-    setState(() => _isAuthLoading = true);
-    try {
-      final result = await _appleAuthService.signInWithApple();
-      if (result == null) return;
-      if (!mounted) return;
-      setState(() {});
-      ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
-    } catch (e) {
-      Logger.error('Apple sign in failed', tag: 'ProfilePage', error: e);
-      if (!mounted) return;
-      ErrorHandler.showError(context, e);
-    } finally {
-      if (mounted) setState(() => _isAuthLoading = false);
     }
   }
 
@@ -175,96 +120,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 title: context.l10n.profile_loginRequired,
                 message: context.l10n.profile_loginRequiredMessage,
                 buttonText: context.l10n.profile_loginButton,
-                onPressed: _openEmailAuthDialog,
+                onPressed: () => context.push(RoutePaths.guestHome),
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.lineGreen.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Semantics(
-                button: true,
-                label: context.l10n.profile_lineLoginSemanticsLabel,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      LineAuthService().startLineLogin();
-                    },
-                    icon: const Icon(Icons.chat_bubble, size: 20),
-                    label: Text(
-                      context.l10n.profile_lineLoginButton,
-                      style: AppTextStyles.button.copyWith(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lineGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                      ),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Google ログインボタン
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: _isAuthLoading ? null : _signInWithGoogle,
-                icon: const Icon(Icons.g_mobiledata, size: 24),
-                label: Text(
-                  context.l10n.guestHome_googleLogin,
-                  style: AppTextStyles.button.copyWith(color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4285F4),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ),
-            // Apple Sign In (iOS/macOS のみ表示)
-            if (!kIsWeb &&
-                (Theme.of(context).platform == TargetPlatform.iOS ||
-                    Theme.of(context).platform == TargetPlatform.macOS)) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: _isAuthLoading ? null : _signInWithApple,
-                  icon: const Icon(Icons.apple, size: 24),
-                  label: Text(
-                    context.l10n.signInWithApple,
-                    style: AppTextStyles.button.copyWith(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
-            ],
             const SizedBox(height: 20),
           ],
 
