@@ -2177,5 +2177,16 @@
   "adminDrafts_published": "Job published",
   "adminDrafts_publishFailed": "Failed to publish",
   "adminDrafts_deleted": "Draft deleted",
-  "adminDrafts_deleteFailed": "Failed to delete"
+  "adminDrafts_deleteFailed": "Failed to delete",
+
+  "adminKpi_avgJobPrice": "Avg Job Price",
+  "adminKpi_workerAnalysis": "Worker Analysis",
+  "adminKpi_activeWorkerRate": "Active Rate",
+  "adminKpi_repeatWorkerRate": "Repeat Rate",
+  "adminKpi_regionDistribution": "Regional Distribution",
+
+  "notifications_filterAll": "All",
+  "notifications_filterApplications": "Applications",
+  "notifications_filterReports": "Reports",
+  "notifications_filterInspections": "Inspections"
 }

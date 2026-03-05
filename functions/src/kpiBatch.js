@@ -79,6 +79,21 @@ exports.dailyKpiAggregation = onSchedule(
         ["updatedAt", "<", endTs],
       ]);
 
+      // 平均案件単価（当日作成ジョブのprice平均）
+      let avgJobPrice = 0;
+      const newJobsSnap = await admin.firestore().collection("jobs")
+        .where("createdAt", ">=", startTs)
+        .where("createdAt", "<", endTs)
+        .select("price")
+        .get();
+      if (newJobsSnap.docs.length > 0) {
+        const total = newJobsSnap.docs.reduce((sum, doc) => {
+          const p = doc.data().price;
+          return sum + (Number.isInteger(p) ? p : 0);
+        }, 0);
+        avgJobPrice = Math.round(total / newJobsSnap.docs.length);
+      }
+
       const kpiData = {
         dateKey,
         newUsers,
@@ -86,6 +101,7 @@ exports.dailyKpiAggregation = onSchedule(
         newApplications,
         dailyEarnings,
         activeChats,
+        avgJobPrice,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 
@@ -151,6 +167,41 @@ exports.monthlyKpiAggregation = onSchedule(
       const uniqueJobIds = new Set(appsSnap.docs.map((d) => d.data().jobId));
       const jobFillRate = totalJobs > 0 ? Math.round((uniqueJobIds.size / totalJobs) * 100) : 0;
 
+      // アクティブワーカー率: 当月に応募があるユーザー / 全ユーザー
+      const activeWorkerUids = new Set(appsSnap.docs.map((d) => d.data().applicantUid).filter(Boolean));
+      const activeWorkerRate = totalUsers > 0 ? Math.round((activeWorkerUids.size / totalUsers) * 100) : 0;
+
+      // リピートワーカー率: 当月2件以上応募のユーザー / 応募したユーザー
+      const workerAppCounts = {};
+      appsSnap.docs.forEach((d) => {
+        const uid = d.data().applicantUid;
+        if (uid) workerAppCounts[uid] = (workerAppCounts[uid] || 0) + 1;
+      });
+      const repeatWorkers = Object.values(workerAppCounts).filter((c) => c >= 2).length;
+      const repeatWorkerRate = activeWorkerUids.size > 0 ? Math.round((repeatWorkers / activeWorkerUids.size) * 100) : 0;
+
+      // 平均案件単価
+      const allJobsSnap = await admin.firestore().collection("jobs").select("price").get();
+      let avgJobPrice = 0;
+      if (allJobsSnap.docs.length > 0) {
+        const totalPrice = allJobsSnap.docs.reduce((sum, doc) => {
+          const p = doc.data().price;
+          return sum + (Number.isInteger(p) ? p : 0);
+        }, 0);
+        avgJobPrice = Math.round(totalPrice / allJobsSnap.docs.length);
+      }
+
+      // 地域分布（都道府県別ジョブ数 上位5件）
+      const prefCounts = {};
+      allJobsSnap.docs.forEach((doc) => {
+        const pref = doc.data().prefecture;
+        if (pref) prefCounts[pref] = (prefCounts[pref] || 0) + 1;
+      });
+      const regionDistribution = Object.entries(prefCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+
       const kpiData = {
         monthKey,
         mau,
@@ -159,6 +210,10 @@ exports.monthlyKpiAggregation = onSchedule(
         totalJobs,
         totalUsers,
         totalApplications: monthlyApplications,
+        activeWorkerRate,
+        repeatWorkerRate,
+        avgJobPrice,
+        regionDistribution,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       };
 

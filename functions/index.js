@@ -91,6 +91,14 @@ exports.onVerificationStatusChanged = identityVerification.onVerificationStatusC
 const stripeTestHelper = require("./src/stripeTestHelper");
 exports.simulateStripeWebhook = stripeTestHelper.simulateStripeWebhook;
 
+// --- 管理者通知 (Phase 23) ---
+const adminNotifications = require("./src/adminNotifications");
+exports.onApplicationCreatedNotify = adminNotifications.onApplicationCreatedNotify;
+exports.onWorkReportCreatedNotify = adminNotifications.onWorkReportCreatedNotify;
+exports.onInspectionCreatedNotify = adminNotifications.onInspectionCreatedNotify;
+exports.sendDailySummary = adminNotifications.sendDailySummary;
+exports.sendChatUnreadReminder = adminNotifications.sendChatUnreadReminder;
+
 // --- 監査ログ (Phase 9) ---
 const auditLog = require("./src/auditLog");
 exports.onAuditJobWrite = auditLog.onAuditJobWrite;

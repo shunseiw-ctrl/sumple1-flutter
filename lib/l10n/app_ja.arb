@@ -2948,5 +2948,16 @@
   "adminDrafts_published": "案件を公開しました",
   "adminDrafts_publishFailed": "公開に失敗しました",
   "adminDrafts_deleted": "下書きを削除しました",
-  "adminDrafts_deleteFailed": "削除に失敗しました"
+  "adminDrafts_deleteFailed": "削除に失敗しました",
+
+  "adminKpi_avgJobPrice": "平均案件単価",
+  "adminKpi_workerAnalysis": "ワーカー分析",
+  "adminKpi_activeWorkerRate": "アクティブ率",
+  "adminKpi_repeatWorkerRate": "リピート率",
+  "adminKpi_regionDistribution": "地域分布",
+
+  "notifications_filterAll": "すべて",
+  "notifications_filterApplications": "応募",
+  "notifications_filterReports": "日報",
+  "notifications_filterInspections": "検査"
 }

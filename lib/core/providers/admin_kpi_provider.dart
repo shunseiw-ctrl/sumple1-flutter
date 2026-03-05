@@ -25,9 +25,24 @@ class AdminKpiData {
   int get monthlyEarnings => (currentMonthKpi?['monthlyEarnings'] as num?)?.toInt() ?? 0;
   double get jobFillRate => (currentMonthKpi?['jobFillRate'] as num?)?.toDouble() ?? 0.0;
 
+  // 月次KPI拡張
+  int get activeWorkerRate => (currentMonthKpi?['activeWorkerRate'] as num?)?.toInt() ?? 0;
+  int get repeatWorkerRate => (currentMonthKpi?['repeatWorkerRate'] as num?)?.toInt() ?? 0;
+  int get avgJobPrice => (currentMonthKpi?['avgJobPrice'] as num?)?.toInt() ?? 0;
+  List<Map<String, dynamic>> get regionDistribution {
+    final raw = currentMonthKpi?['regionDistribution'];
+    if (raw is List) {
+      return raw.map((e) => e is Map<String, dynamic> ? e : <String, dynamic>{}).toList();
+    }
+    return [];
+  }
+
   int get prevMau => (previousMonthKpi?['mau'] as num?)?.toInt() ?? 0;
   int get prevMonthlyEarnings => (previousMonthKpi?['monthlyEarnings'] as num?)?.toInt() ?? 0;
   double get prevJobFillRate => (previousMonthKpi?['jobFillRate'] as num?)?.toDouble() ?? 0.0;
+  int get prevActiveWorkerRate => (previousMonthKpi?['activeWorkerRate'] as num?)?.toInt() ?? 0;
+  int get prevRepeatWorkerRate => (previousMonthKpi?['repeatWorkerRate'] as num?)?.toInt() ?? 0;
+  int get prevAvgJobPrice => (previousMonthKpi?['avgJobPrice'] as num?)?.toInt() ?? 0;
 }
 
 /// KPIデータプロバイダー

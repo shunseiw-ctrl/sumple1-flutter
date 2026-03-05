@@ -1,5 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../utils/logger.dart';
+
+/// 通知タイプ定義
+enum NotificationType {
+  general('general', Icons.notifications, Colors.grey),
+  application('application', Icons.person_add, Colors.blue),
+  statusUpdate('status_update', Icons.update, Colors.orange),
+  newApplication('new_application', Icons.group_add, Colors.indigo),
+  workReport('work_report', Icons.description, Colors.teal),
+  inspectionFailed('inspection_failed', Icons.warning, Colors.red),
+  inspectionResult('inspection_result', Icons.fact_check, Colors.deepOrange),
+  dailySummary('daily_summary', Icons.summarize, Colors.purple),
+  earningConfirmed('earning_confirmed', Icons.payments, Colors.green),
+  verification('verification', Icons.verified_user, Colors.cyan);
+
+  final String value;
+  final IconData icon;
+  final Color color;
+  const NotificationType(this.value, this.icon, this.color);
+
+  static NotificationType fromString(String type) {
+    return NotificationType.values.firstWhere(
+      (e) => e.value == type,
+      orElse: () => NotificationType.general,
+    );
+  }
+}
 
 class NotificationService {
   final FirebaseFirestore _db;

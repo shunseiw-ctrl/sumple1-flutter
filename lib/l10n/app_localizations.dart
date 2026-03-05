@@ -8266,6 +8266,60 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'削除に失敗しました'**
   String get adminDrafts_deleteFailed;
+
+  /// No description provided for @adminKpi_avgJobPrice.
+  ///
+  /// In ja, this message translates to:
+  /// **'平均案件単価'**
+  String get adminKpi_avgJobPrice;
+
+  /// No description provided for @adminKpi_workerAnalysis.
+  ///
+  /// In ja, this message translates to:
+  /// **'ワーカー分析'**
+  String get adminKpi_workerAnalysis;
+
+  /// No description provided for @adminKpi_activeWorkerRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'アクティブ率'**
+  String get adminKpi_activeWorkerRate;
+
+  /// No description provided for @adminKpi_repeatWorkerRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'リピート率'**
+  String get adminKpi_repeatWorkerRate;
+
+  /// No description provided for @adminKpi_regionDistribution.
+  ///
+  /// In ja, this message translates to:
+  /// **'地域分布'**
+  String get adminKpi_regionDistribution;
+
+  /// No description provided for @notifications_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get notifications_filterAll;
+
+  /// No description provided for @notifications_filterApplications.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募'**
+  String get notifications_filterApplications;
+
+  /// No description provided for @notifications_filterReports.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報'**
+  String get notifications_filterReports;
+
+  /// No description provided for @notifications_filterInspections.
+  ///
+  /// In ja, this message translates to:
+  /// **'検査'**
+  String get notifications_filterInspections;
 }
 
 class _AppLocalizationsDelegate

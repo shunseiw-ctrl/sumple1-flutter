@@ -4329,4 +4329,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminDrafts_deleteFailed => '削除に失敗しました';
+
+  @override
+  String get adminKpi_avgJobPrice => '平均案件単価';
+
+  @override
+  String get adminKpi_workerAnalysis => 'ワーカー分析';
+
+  @override
+  String get adminKpi_activeWorkerRate => 'アクティブ率';
+
+  @override
+  String get adminKpi_repeatWorkerRate => 'リピート率';
+
+  @override
+  String get adminKpi_regionDistribution => '地域分布';
+
+  @override
+  String get notifications_filterAll => 'すべて';
+
+  @override
+  String get notifications_filterApplications => '応募';
+
+  @override
+  String get notifications_filterReports => '日報';
+
+  @override
+  String get notifications_filterInspections => '検査';
 }

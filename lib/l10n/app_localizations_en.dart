@@ -4434,4 +4434,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminDrafts_deleteFailed => 'Failed to delete';
+
+  @override
+  String get adminKpi_avgJobPrice => 'Avg Job Price';
+
+  @override
+  String get adminKpi_workerAnalysis => 'Worker Analysis';
+
+  @override
+  String get adminKpi_activeWorkerRate => 'Active Rate';
+
+  @override
+  String get adminKpi_repeatWorkerRate => 'Repeat Rate';
+
+  @override
+  String get adminKpi_regionDistribution => 'Regional Distribution';
+
+  @override
+  String get notifications_filterAll => 'All';
+
+  @override
+  String get notifications_filterApplications => 'Applications';
+
+  @override
+  String get notifications_filterReports => 'Reports';
+
+  @override
+  String get notifications_filterInspections => 'Inspections';
 }
