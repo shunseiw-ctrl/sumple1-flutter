@@ -28,6 +28,7 @@ import '../../pages/my_profile_page.dart';
 import '../../pages/account_settings_page.dart';
 import '../../pages/identity_verification_page.dart';
 import '../../pages/stripe_onboarding_page.dart';
+import '../../pages/bank_account_settings_page.dart';
 import '../../pages/notifications_page.dart';
 import '../../pages/contact_page.dart';
 import '../../pages/faq_page.dart';
@@ -43,6 +44,7 @@ import '../../pages/statement_detail_page.dart';
 import '../../pages/favorites_page.dart';
 import '../../pages/phone_auth_page.dart';
 import '../../pages/admin/admin_worker_detail_page.dart';
+import '../../pages/admin/admin_drafts_page.dart';
 import '../../pages/referral_page.dart';
 
 /// GoRouter インスタンスプロバイダー
@@ -125,6 +127,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: AdminWorkerDetailPage(workerUid: uid),
           );
         },
+      ),
+      GoRoute(
+        path: RoutePaths.adminDrafts,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const AdminDraftsPage(),
+        ),
       ),
 
       // --- 案件系 ---
@@ -238,6 +247,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: StripeOnboardingPage(email: email),
           );
         },
+      ),
+
+      GoRoute(
+        path: RoutePaths.bankAccountSettings,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const BankAccountSettingsPage(),
+        ),
       ),
 
       // --- 通知 ---

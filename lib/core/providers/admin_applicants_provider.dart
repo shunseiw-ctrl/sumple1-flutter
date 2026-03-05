@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../services/worker_name_resolver.dart';
 import 'admin_list_state.dart';
 
 /// 応募データモデル（プロバイダー用）
@@ -19,6 +20,10 @@ class ApplicantItem {
   final String locationSnapshot;
   final String dateSnapshot;
   final int? priceSnapshot;
+  final String photoUrl;
+  final int verifiedQualificationCount;
+  final int completedJobCount;
+  final String ekycStatus; // 'none' | 'pending' | 'approved' | 'rejected'
 
   const ApplicantItem({
     required this.id,
@@ -33,7 +38,50 @@ class ApplicantItem {
     this.locationSnapshot = '',
     this.dateSnapshot = '',
     this.priceSnapshot,
+    this.photoUrl = '',
+    this.verifiedQualificationCount = 0,
+    this.completedJobCount = 0,
+    this.ekycStatus = 'none',
   });
+
+  ApplicantItem copyWith({
+    String? id,
+    String? jobTitle,
+    String? status,
+    String? applicantUid,
+    DateTime? createdAt,
+    String? workerName,
+    double? ratingAverage,
+    int? ratingCount,
+    double? qualityScore,
+    String? locationSnapshot,
+    String? dateSnapshot,
+    int? priceSnapshot,
+    String? photoUrl,
+    int? verifiedQualificationCount,
+    int? completedJobCount,
+    String? ekycStatus,
+  }) {
+    return ApplicantItem(
+      id: id ?? this.id,
+      jobTitle: jobTitle ?? this.jobTitle,
+      status: status ?? this.status,
+      applicantUid: applicantUid ?? this.applicantUid,
+      createdAt: createdAt ?? this.createdAt,
+      workerName: workerName ?? this.workerName,
+      ratingAverage: ratingAverage ?? this.ratingAverage,
+      ratingCount: ratingCount ?? this.ratingCount,
+      qualityScore: qualityScore ?? this.qualityScore,
+      locationSnapshot: locationSnapshot ?? this.locationSnapshot,
+      dateSnapshot: dateSnapshot ?? this.dateSnapshot,
+      priceSnapshot: priceSnapshot ?? this.priceSnapshot,
+      photoUrl: photoUrl ?? this.photoUrl,
+      verifiedQualificationCount:
+          verifiedQualificationCount ?? this.verifiedQualificationCount,
+      completedJobCount: completedJobCount ?? this.completedJobCount,
+      ekycStatus: ekycStatus ?? this.ekycStatus,
+    );
+  }
 }
 
 /// 応募者リスト AsyncNotifier
@@ -42,9 +90,11 @@ class AdminApplicantsNotifier
   static const int _pageSize = 20;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
   final FirebaseFirestore _db;
+  final WorkerNameResolver _resolver;
 
-  AdminApplicantsNotifier({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
+  AdminApplicantsNotifier({FirebaseFirestore? firestore, WorkerNameResolver? resolver})
+      : _db = firestore ?? FirebaseFirestore.instance,
+        _resolver = resolver ?? WorkerNameResolver(firestore: firestore);
 
   @override
   FutureOr<AdminListState<ApplicantItem>> build() async {
@@ -78,11 +128,11 @@ class AdminApplicantsNotifier
         .orderBy('createdAt', descending: true)
         .limit(_pageSize)
         .snapshots()
-        .listen((snap) {
+        .listen((snap) async {
       final current = state.valueOrNull;
       if (current == null) return;
 
-      final freshItems = _docsToItems(snap.docs);
+      final freshItems = await _docsToItems(snap.docs);
       // マージ: 初回ページのみリアルタイム更新、それ以降は維持
       final existingIds = freshItems.map((e) => e.id).toSet();
       final olderItems =
@@ -94,9 +144,9 @@ class AdminApplicantsNotifier
     });
   }
 
-  List<ApplicantItem> _docsToItems(
-      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
-    return docs.map((doc) {
+  Future<List<ApplicantItem>> _docsToItems(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) async {
+    final items = docs.map((doc) {
       final data = doc.data();
       final createdAt = data['createdAt'];
       DateTime? dt;
@@ -115,12 +165,73 @@ class AdminApplicantsNotifier
         createdAt: dt,
         workerName: (data['workerNameSnapshot'] ?? '').toString(),
         ratingAverage: (data['ratingAverageSnapshot'] ?? 0).toDouble(),
-        ratingCount: (data['ratingCountSnapshot'] ?? 0) as int,
+        ratingCount: (data['ratingCountSnapshot'] as num?)?.toInt() ?? 0,
         locationSnapshot: (data['locationSnapshot'] ?? '').toString(),
         dateSnapshot: (data['dateSnapshot'] ?? '').toString(),
         priceSnapshot: priceInt,
       );
     }).toList();
+
+    // 空名のUIDを収集してバッチ解決 + プロフィール情報取得
+    final uidsNeedingInfo = items
+        .map((i) => i.applicantUid)
+        .where((uid) => uid.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (uidsNeedingInfo.isEmpty) return items;
+
+    try {
+      final profiles = await _resolver.resolveProfiles(uidsNeedingInfo);
+
+      // 資格数バッチ取得（承認済み）
+      final qualCounts = <String, int>{};
+      final completedCounts = <String, int>{};
+      for (var i = 0; i < uidsNeedingInfo.length; i += 10) {
+        final batch = uidsNeedingInfo.skip(i).take(10).toList();
+        for (final uid in batch) {
+          try {
+            final qualSnap = await _db
+                .collection('profiles')
+                .doc(uid)
+                .collection('qualifications_v2')
+                .where('verificationStatus', isEqualTo: 'approved')
+                .get();
+            qualCounts[uid] = qualSnap.docs.length;
+          } catch (_) {
+            qualCounts[uid] = 0;
+          }
+
+          try {
+            final completedSnap = await _db
+                .collection('applications')
+                .where('applicantUid', isEqualTo: uid)
+                .where('status', isEqualTo: 'done')
+                .get();
+            completedCounts[uid] = completedSnap.docs.length;
+          } catch (_) {
+            completedCounts[uid] = 0;
+          }
+        }
+      }
+
+      return items.map((item) {
+        final profile = profiles[item.applicantUid];
+        final resolvedName = (item.workerName.isEmpty && profile != null)
+            ? profile.name
+            : item.workerName;
+
+        return item.copyWith(
+          workerName: resolvedName,
+          photoUrl: profile?.photoUrl ?? '',
+          ekycStatus: profile?.ekycStatus ?? 'none',
+          verifiedQualificationCount: qualCounts[item.applicantUid] ?? 0,
+          completedJobCount: completedCounts[item.applicantUid] ?? 0,
+        );
+      }).toList();
+    } catch (_) {
+      return items;
+    }
   }
 
   /// ページネーション: 追加取得
@@ -146,7 +257,7 @@ class AdminApplicantsNotifier
       }
 
       final snap = await query.get();
-      final newItems = _docsToItems(snap.docs);
+      final newItems = await _docsToItems(snap.docs);
 
       state = AsyncData(current.copyWith(
         items: [...current.items, ...newItems],

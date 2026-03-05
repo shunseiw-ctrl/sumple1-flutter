@@ -19,6 +19,8 @@ class JobModel {
   final String? category;
   final int? slots;
   final int? applicantCount;
+  final String status; // 'draft' | 'published'
+  final List<String>? customInspectionItems; // カスタム検査項目
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -40,9 +42,14 @@ class JobModel {
     this.category,
     this.slots,
     this.applicantCount,
+    this.status = 'published',
+    this.customInspectionItems,
     this.createdAt,
     this.updatedAt,
   });
+
+  bool get isDraft => status == 'draft';
+  bool get isPublished => status == 'published';
 
   /// Firestoreドキュメントからモデルを生成
   factory JobModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -75,6 +82,8 @@ class JobModel {
       category: data['category']?.toString(),
       slots: _parseInt(data['slots']),
       applicantCount: _parseInt(data['applicantCount']),
+      status: data['status']?.toString() ?? 'published',
+      customInspectionItems: _parseStringList(data['customInspectionItems']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -106,6 +115,8 @@ class JobModel {
       category: data['category']?.toString(),
       slots: _parseInt(data['slots']),
       applicantCount: _parseInt(data['applicantCount']),
+      status: data['status']?.toString() ?? 'published',
+      customInspectionItems: _parseStringList(data['customInspectionItems']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -131,6 +142,8 @@ class JobModel {
       if (category != null) 'category': category,
       if (slots != null) 'slots': slots,
       if (applicantCount != null) 'applicantCount': applicantCount,
+      'status': status,
+      if (customInspectionItems != null) 'customInspectionItems': customInspectionItems,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -170,6 +183,8 @@ class JobModel {
     String? category,
     int? slots,
     int? applicantCount,
+    String? status,
+    List<String>? customInspectionItems,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -192,6 +207,9 @@ class JobModel {
       category: category ?? this.category,
       slots: slots ?? this.slots,
       applicantCount: applicantCount ?? this.applicantCount,
+      status: status ?? this.status,
+      customInspectionItems:
+          customInspectionItems ?? this.customInspectionItems,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

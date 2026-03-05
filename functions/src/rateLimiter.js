@@ -80,6 +80,7 @@ const PRESETS = {
   auth: { maxRequests: 5, windowMs: 60 * 1000 },           // 5 req/min
   api: { maxRequests: 20, windowMs: 60 * 1000 },           // 20 req/min
   deletion: { maxRequests: 1, windowMs: 60 * 60 * 1000 },  // 1 req/hour
+  merge: { maxRequests: 1, windowMs: 60 * 60 * 1000 },     // 1 req/hour
   payment: { maxRequests: 5, windowMs: 60 * 1000 },        // 5 req/min
 };
 

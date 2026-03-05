@@ -640,7 +640,7 @@ class _AdminStatusGroup extends StatelessWidget {
 }
 
 // ────────────────────────────────────
-// 応募カード（全応募ステータスビュー用）
+// 応募カード（全応募ステータスビュー用・チャットボタン付き）
 // ────────────────────────────────────
 class _ApplicationCard extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> doc;
@@ -656,6 +656,14 @@ class _ApplicationCard extends StatelessWidget {
     final locationSnap = (data['locationSnapshot'] ?? '').toString();
     final dateSnap = (data['dateSnapshot'] ?? '').toString();
     final workerName = (data['workerNameSnapshot'] ?? '').toString();
+    final applicantUid = (data['applicantUid'] ?? '').toString();
+
+    // 名前が空の場合のフォールバック表示
+    final displayName = workerName.isNotEmpty
+        ? workerName
+        : (applicantUid.isNotEmpty
+            ? 'UID: ${applicantUid.substring(0, applicantUid.length.clamp(0, 8))}...'
+            : '');
 
     return Container(
       decoration: BoxDecoration(
@@ -683,14 +691,24 @@ class _ApplicationCard extends StatelessWidget {
           child: Row(
             children: [
               StatusBadge.fromStatus(context, statusKey),
-              if (workerName.isNotEmpty) ...[
+              if (displayName.isNotEmpty) ...[
                 const SizedBox(width: AppSpacing.sm),
                 Flexible(
-                  child: Text(workerName,
-                      style: AppTextStyles.caption
-                          .copyWith(fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
+                  child: GestureDetector(
+                    onTap: applicantUid.isNotEmpty
+                        ? () => context.push(
+                            RoutePaths.adminWorkerDetailPath(applicantUid))
+                        : null,
+                    child: Text(displayName,
+                        style: AppTextStyles.caption.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: applicantUid.isNotEmpty
+                              ? context.appColors.primary
+                              : null,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ),
                 ),
               ],
               if (dateSnap.isNotEmpty) ...[
@@ -712,7 +730,24 @@ class _ApplicationCard extends StatelessWidget {
             ],
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, size: 20),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(Icons.chat_bubble_outline,
+                    size: 16, color: context.appColors.primary),
+                tooltip: context.l10n.adminApplicants_openChat,
+                onPressed: () =>
+                    context.push(RoutePaths.chatRoomPath(doc.id)),
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 20),
+          ],
+        ),
         onTap: () => context.push(RoutePaths.workDetailPath(doc.id)),
       ),
     );

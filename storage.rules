@@ -72,6 +72,13 @@ service firebase.storage {
       allow write: if isOwner(userId) && isUnder10MB();
     }
 
+    // === 検査写真 ===
+    // パス: inspection_photos/{applicationId}/...
+    match /inspection_photos/{applicationId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageType() && isUnder10MB();
+    }
+
     // === デフォルト: 全拒否 ===
     match /{allPaths=**} {
       allow read, write: if false;

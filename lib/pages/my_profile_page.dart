@@ -442,7 +442,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 16),
 
-              _SectionTitle(context.l10n.myProfile_stripeIntegration),
+              _SectionTitle(context.l10n.myProfile_bankAccountStatus),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
                     .collection('profiles')
@@ -450,8 +450,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     .snapshots(),
                 builder: (context, snap) {
                   final data = snap.data?.data();
-                  final stripeStatus = (data?['stripeAccountStatus'] ?? '').toString();
-                  final hasAccount = (data?['stripeAccountId'] ?? '').toString().isNotEmpty;
+                  final bankAccount = data?['bankAccount'];
+                  final hasAccount = bankAccount is Map && (bankAccount['accountNumber'] ?? '').toString().isNotEmpty;
 
                   IconData icon;
                   Color color;
@@ -460,15 +460,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   if (!hasAccount) {
                     icon = Icons.account_balance_outlined;
                     color = context.appColors.textHint;
-                    label = context.l10n.myProfile_stripeNotConfigured;
-                  } else if (stripeStatus == 'active') {
+                    label = context.l10n.myProfile_bankNotConfigured;
+                  } else {
                     icon = Icons.check_circle;
                     color = context.appColors.success;
-                    label = context.l10n.myProfile_stripeActive;
-                  } else {
-                    icon = Icons.pending;
-                    color = context.appColors.warning;
-                    label = context.l10n.myProfile_stripePending;
+                    final accountNum = (bankAccount['accountNumber'] ?? '').toString();
+                    final maskedNum = accountNum.length >= 4
+                        ? '***${accountNum.substring(accountNum.length - 4)}'
+                        : accountNum;
+                    final bankName = (bankAccount['bankName'] ?? '').toString();
+                    label = context.l10n.myProfile_bankConfigured(bankName, maskedNum);
                   }
 
                   return Container(

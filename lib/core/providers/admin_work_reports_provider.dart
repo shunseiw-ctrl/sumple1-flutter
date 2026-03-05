@@ -13,6 +13,8 @@ class WorkReportItem {
   final String workContent;
   final double hoursWorked;
   final List<String> photoUrls;
+  final String reviewStatus; // 'pending' | 'reviewed'
+  final String? adminComment;
   final DateTime? createdAt;
 
   const WorkReportItem({
@@ -25,10 +27,15 @@ class WorkReportItem {
     required this.workContent,
     required this.hoursWorked,
     this.photoUrls = const [],
+    this.reviewStatus = 'pending',
+    this.adminComment,
     this.createdAt,
   });
 
-  WorkReportItem copyWith({String? workerName, String? jobTitle}) {
+  bool get isReviewed => reviewStatus == 'reviewed';
+  bool get isPending => reviewStatus == 'pending';
+
+  WorkReportItem copyWith({String? workerName, String? jobTitle, String? reviewStatus, String? adminComment}) {
     return WorkReportItem(
       id: id,
       applicationId: applicationId,
@@ -39,6 +46,8 @@ class WorkReportItem {
       workContent: workContent,
       hoursWorked: hoursWorked,
       photoUrls: photoUrls,
+      reviewStatus: reviewStatus ?? this.reviewStatus,
+      adminComment: adminComment ?? this.adminComment,
       createdAt: createdAt,
     );
   }
@@ -85,6 +94,8 @@ class AdminWorkReportsNotifier
                 ?.map((e) => e.toString())
                 .toList() ??
             [],
+        reviewStatus: (data['reviewStatus'] ?? 'pending').toString(),
+        adminComment: data['adminComment']?.toString(),
         createdAt: ts is Timestamp ? ts.toDate() : null,
       );
     }).toList();

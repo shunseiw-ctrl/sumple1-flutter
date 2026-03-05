@@ -10,6 +10,10 @@ class WorkReportModel {
   final double hoursWorked; // 作業時間（例: 8.0）
   final List<String> photoUrls; // 現場写真（最大10枚）
   final String? notes; // 備考（max 1000文字）
+  final String reviewStatus; // 'pending' | 'reviewed'
+  final String? adminComment; // 管理者コメント（max 2000文字）
+  final String? reviewedBy; // レビュー管理者UID
+  final DateTime? reviewedAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -22,9 +26,16 @@ class WorkReportModel {
     required this.hoursWorked,
     this.photoUrls = const [],
     this.notes,
+    this.reviewStatus = 'pending',
+    this.adminComment,
+    this.reviewedBy,
+    this.reviewedAt,
     this.createdAt,
     this.updatedAt,
   });
+
+  bool get isReviewed => reviewStatus == 'reviewed';
+  bool get isPending => reviewStatus == 'pending';
 
   factory WorkReportModel.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -45,6 +56,10 @@ class WorkReportModel {
       hoursWorked: _parseDouble(data['hoursWorked']) ?? 0.0,
       photoUrls: _parseStringList(data['photoUrls']),
       notes: data['notes']?.toString(),
+      reviewStatus: data['reviewStatus']?.toString() ?? 'pending',
+      adminComment: data['adminComment']?.toString(),
+      reviewedBy: data['reviewedBy']?.toString(),
+      reviewedAt: _toDateTime(data['reviewedAt']),
       createdAt: _toDateTime(data['createdAt']),
       updatedAt: _toDateTime(data['updatedAt']),
     );
@@ -59,6 +74,9 @@ class WorkReportModel {
       'hoursWorked': hoursWorked,
       'photoUrls': photoUrls,
       if (notes != null) 'notes': notes,
+      'reviewStatus': reviewStatus,
+      if (adminComment != null) 'adminComment': adminComment,
+      if (reviewedBy != null) 'reviewedBy': reviewedBy,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -79,6 +97,10 @@ class WorkReportModel {
     double? hoursWorked,
     List<String>? photoUrls,
     String? notes,
+    String? reviewStatus,
+    String? adminComment,
+    String? reviewedBy,
+    DateTime? reviewedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -91,6 +113,10 @@ class WorkReportModel {
       hoursWorked: hoursWorked ?? this.hoursWorked,
       photoUrls: photoUrls ?? this.photoUrls,
       notes: notes ?? this.notes,
+      reviewStatus: reviewStatus ?? this.reviewStatus,
+      adminComment: adminComment ?? this.adminComment,
+      reviewedBy: reviewedBy ?? this.reviewedBy,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

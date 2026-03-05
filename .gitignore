@@ -49,6 +49,10 @@ app.*.map.json
 node_modules/
 functions/node_modules/
 
+# 環境変数（秘密情報）
+functions/.env
+functions/.env.local
+
 # Dart/Flutter additional
 .flutter-plugins
 .packages

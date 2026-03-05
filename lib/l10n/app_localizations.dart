@@ -7930,6 +7930,690 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日報管理'**
   String get adminDashboard_workReports;
+
+  /// No description provided for @adminApplicants_qualCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'資格{count}'**
+  String adminApplicants_qualCount(String count);
+
+  /// No description provided for @adminApplicants_completedCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了{count}'**
+  String adminApplicants_completedCount(String count);
+
+  /// No description provided for @adminApplicants_openChat.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャットを開く'**
+  String get adminApplicants_openChat;
+
+  /// No description provided for @adminSettings_accountSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント設定'**
+  String get adminSettings_accountSettings;
+
+  /// No description provided for @adminSettings_language.
+  ///
+  /// In ja, this message translates to:
+  /// **'言語'**
+  String get adminSettings_language;
+
+  /// No description provided for @adminSettings_dataExport.
+  ///
+  /// In ja, this message translates to:
+  /// **'データエクスポート'**
+  String get adminSettings_dataExport;
+
+  /// No description provided for @adminWorker_statistics.
+  ///
+  /// In ja, this message translates to:
+  /// **'統計'**
+  String get adminWorker_statistics;
+
+  /// No description provided for @adminWorker_statCompleted.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了数'**
+  String get adminWorker_statCompleted;
+
+  /// No description provided for @adminWorker_statTotalEarnings.
+  ///
+  /// In ja, this message translates to:
+  /// **'総報酬'**
+  String get adminWorker_statTotalEarnings;
+
+  /// No description provided for @adminWorker_statCompletionRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了率'**
+  String get adminWorker_statCompletionRate;
+
+  /// No description provided for @adminWorker_memoTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'管理者メモ'**
+  String get adminWorker_memoTitle;
+
+  /// No description provided for @adminWorker_memoHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'このワーカーに関するメモを入力…'**
+  String get adminWorker_memoHint;
+
+  /// No description provided for @adminWorker_memoSave.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモを保存'**
+  String get adminWorker_memoSave;
+
+  /// No description provided for @adminWorker_memoSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモを保存しました'**
+  String get adminWorker_memoSaved;
+
+  /// No description provided for @adminWorker_memoSaveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'メモの保存に失敗しました'**
+  String get adminWorker_memoSaveFailed;
+
+  /// No description provided for @adminWorker_openChat.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャットを開く'**
+  String get adminWorker_openChat;
+
+  /// No description provided for @adminWorker_noChatAvailable.
+  ///
+  /// In ja, this message translates to:
+  /// **'チャット可能な応募がありません'**
+  String get adminWorker_noChatAvailable;
+
+  /// No description provided for @adminWorker_ekycApproved.
+  ///
+  /// In ja, this message translates to:
+  /// **'本人確認済'**
+  String get adminWorker_ekycApproved;
+
+  /// No description provided for @adminWorker_ekycPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認中'**
+  String get adminWorker_ekycPending;
+
+  /// No description provided for @adminWorker_ekycRejected.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認否認'**
+  String get adminWorker_ekycRejected;
+
+  /// No description provided for @post_saveDraft.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書き'**
+  String get post_saveDraft;
+
+  /// No description provided for @post_draftSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きを保存しました'**
+  String get post_draftSaved;
+
+  /// No description provided for @post_draftSaveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きの保存に失敗しました'**
+  String get post_draftSaveFailed;
+
+  /// No description provided for @post_draftNeedTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'タイトルを入力してください'**
+  String get post_draftNeedTitle;
+
+  /// No description provided for @adminWorkReports_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get adminWorkReports_filterAll;
+
+  /// No description provided for @adminWorkReports_filterPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'未レビュー'**
+  String get adminWorkReports_filterPending;
+
+  /// No description provided for @adminWorkReports_filterReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済'**
+  String get adminWorkReports_filterReviewed;
+
+  /// No description provided for @adminWorkReports_reviewPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'未レビュー'**
+  String get adminWorkReports_reviewPending;
+
+  /// No description provided for @adminWorkReports_reviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済'**
+  String get adminWorkReports_reviewed;
+
+  /// No description provided for @adminWorkReports_addFeedback.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメント追加'**
+  String get adminWorkReports_addFeedback;
+
+  /// No description provided for @adminWorkReports_markReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'確認済みにする'**
+  String get adminWorkReports_markReviewed;
+
+  /// No description provided for @adminWorkReports_feedbackTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報フィードバック'**
+  String get adminWorkReports_feedbackTitle;
+
+  /// No description provided for @adminWorkReports_feedbackHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを入力…'**
+  String get adminWorkReports_feedbackHint;
+
+  /// No description provided for @adminWorkReports_feedbackSubmit.
+  ///
+  /// In ja, this message translates to:
+  /// **'送信'**
+  String get adminWorkReports_feedbackSubmit;
+
+  /// No description provided for @adminWorkReports_feedbackCancel.
+  ///
+  /// In ja, this message translates to:
+  /// **'キャンセル'**
+  String get adminWorkReports_feedbackCancel;
+
+  /// No description provided for @adminWorkReports_feedbackSent.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックを送信しました'**
+  String get adminWorkReports_feedbackSent;
+
+  /// No description provided for @adminWorkReports_feedbackFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックの送信に失敗しました'**
+  String get adminWorkReports_feedbackFailed;
+
+  /// No description provided for @adminWorkReports_markedReviewed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー済みにしました'**
+  String get adminWorkReports_markedReviewed;
+
+  /// No description provided for @adminWorkReports_markFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'レビュー更新に失敗しました'**
+  String get adminWorkReports_markFailed;
+
+  /// No description provided for @inspection_customItems.
+  ///
+  /// In ja, this message translates to:
+  /// **'カスタム検査項目'**
+  String get inspection_customItems;
+
+  /// No description provided for @inspection_customItemsHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目名を入力'**
+  String get inspection_customItemsHint;
+
+  /// No description provided for @inspection_addItem.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目を追加'**
+  String get inspection_addItem;
+
+  /// No description provided for @inspection_removeItem.
+  ///
+  /// In ja, this message translates to:
+  /// **'項目を削除'**
+  String get inspection_removeItem;
+
+  /// No description provided for @inspection_defaultItems.
+  ///
+  /// In ja, this message translates to:
+  /// **'デフォルト項目を使用'**
+  String get inspection_defaultItems;
+
+  /// No description provided for @inspection_customItemsHelp.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件ごとにカスタム検査項目を設定できます'**
+  String get inspection_customItemsHelp;
+
+  /// No description provided for @inspection_itemPhotoAttach.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を添付'**
+  String get inspection_itemPhotoAttach;
+
+  /// No description provided for @inspection_itemPhotoCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'{count}枚'**
+  String inspection_itemPhotoCount(String count);
+
+  /// No description provided for @adminDrafts_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書き一覧'**
+  String get adminDrafts_title;
+
+  /// No description provided for @adminDrafts_empty.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きはありません'**
+  String get adminDrafts_empty;
+
+  /// No description provided for @adminDrafts_publish.
+  ///
+  /// In ja, this message translates to:
+  /// **'公開する'**
+  String get adminDrafts_publish;
+
+  /// No description provided for @adminDrafts_delete.
+  ///
+  /// In ja, this message translates to:
+  /// **'削除する'**
+  String get adminDrafts_delete;
+
+  /// No description provided for @adminDrafts_deleteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'この下書きを削除しますか？'**
+  String get adminDrafts_deleteConfirm;
+
+  /// No description provided for @adminDrafts_published.
+  ///
+  /// In ja, this message translates to:
+  /// **'案件を公開しました'**
+  String get adminDrafts_published;
+
+  /// No description provided for @adminDrafts_publishFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'公開に失敗しました'**
+  String get adminDrafts_publishFailed;
+
+  /// No description provided for @adminDrafts_deleted.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きを削除しました'**
+  String get adminDrafts_deleted;
+
+  /// No description provided for @adminDrafts_deleteFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'削除に失敗しました'**
+  String get adminDrafts_deleteFailed;
+
+  /// No description provided for @adminKpi_avgJobPrice.
+  ///
+  /// In ja, this message translates to:
+  /// **'平均案件単価'**
+  String get adminKpi_avgJobPrice;
+
+  /// No description provided for @adminKpi_workerAnalysis.
+  ///
+  /// In ja, this message translates to:
+  /// **'ワーカー分析'**
+  String get adminKpi_workerAnalysis;
+
+  /// No description provided for @adminKpi_activeWorkerRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'アクティブ率'**
+  String get adminKpi_activeWorkerRate;
+
+  /// No description provided for @adminKpi_repeatWorkerRate.
+  ///
+  /// In ja, this message translates to:
+  /// **'リピート率'**
+  String get adminKpi_repeatWorkerRate;
+
+  /// No description provided for @adminKpi_regionDistribution.
+  ///
+  /// In ja, this message translates to:
+  /// **'地域分布'**
+  String get adminKpi_regionDistribution;
+
+  /// No description provided for @notifications_filterAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて'**
+  String get notifications_filterAll;
+
+  /// No description provided for @notifications_filterApplications.
+  ///
+  /// In ja, this message translates to:
+  /// **'応募'**
+  String get notifications_filterApplications;
+
+  /// No description provided for @notifications_filterReports.
+  ///
+  /// In ja, this message translates to:
+  /// **'日報'**
+  String get notifications_filterReports;
+
+  /// No description provided for @notifications_filterInspections.
+  ///
+  /// In ja, this message translates to:
+  /// **'検査'**
+  String get notifications_filterInspections;
+
+  /// No description provided for @guestHome_googleLogin.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでログイン'**
+  String get guestHome_googleLogin;
+
+  /// No description provided for @guestHome_googleLoginSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでログインしました'**
+  String get guestHome_googleLoginSuccess;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでサインイン'**
+  String get signInWithGoogle;
+
+  /// No description provided for @profile_bankAccount.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座設定'**
+  String get profile_bankAccount;
+
+  /// No description provided for @profile_bankAccountSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'報酬の受取口座を設定'**
+  String get profile_bankAccountSubtitle;
+
+  /// No description provided for @myProfile_bankAccountStatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座'**
+  String get myProfile_bankAccountStatus;
+
+  /// No description provided for @myProfile_bankNotConfigured.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座未設定 — 報酬の受け取りには口座設定が必要です'**
+  String get myProfile_bankNotConfigured;
+
+  /// No description provided for @myProfile_bankConfigured.
+  ///
+  /// In ja, this message translates to:
+  /// **'{bankName} 口座番号: {maskedNum}'**
+  String myProfile_bankConfigured(String bankName, String maskedNum);
+
+  /// No description provided for @bankAccount_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座設定'**
+  String get bankAccount_title;
+
+  /// No description provided for @bankAccount_bankName.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行名'**
+  String get bankAccount_bankName;
+
+  /// No description provided for @bankAccount_bankNameHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'例: みずほ銀行'**
+  String get bankAccount_bankNameHint;
+
+  /// No description provided for @bankAccount_branchName.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店名'**
+  String get bankAccount_branchName;
+
+  /// No description provided for @bankAccount_branchCode.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店コード（3桁）'**
+  String get bankAccount_branchCode;
+
+  /// No description provided for @bankAccount_branchCodeInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店コードは3桁の数字で入力してください'**
+  String get bankAccount_branchCodeInvalid;
+
+  /// No description provided for @bankAccount_accountType.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座種別'**
+  String get bankAccount_accountType;
+
+  /// No description provided for @bankAccount_accountTypeOrdinary.
+  ///
+  /// In ja, this message translates to:
+  /// **'普通'**
+  String get bankAccount_accountTypeOrdinary;
+
+  /// No description provided for @bankAccount_accountTypeCurrent.
+  ///
+  /// In ja, this message translates to:
+  /// **'当座'**
+  String get bankAccount_accountTypeCurrent;
+
+  /// No description provided for @bankAccount_accountNumber.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座番号（7桁）'**
+  String get bankAccount_accountNumber;
+
+  /// No description provided for @bankAccount_accountNumberInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座番号は7桁の数字で入力してください'**
+  String get bankAccount_accountNumberInvalid;
+
+  /// No description provided for @bankAccount_accountHolderName.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座名義（カタカナ）'**
+  String get bankAccount_accountHolderName;
+
+  /// No description provided for @bankAccount_accountHolderHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'例: ヤマダ タロウ'**
+  String get bankAccount_accountHolderHint;
+
+  /// No description provided for @bankAccount_accountHolderInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座名義はカタカナで入力してください'**
+  String get bankAccount_accountHolderInvalid;
+
+  /// No description provided for @bankAccount_save.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存'**
+  String get bankAccount_save;
+
+  /// No description provided for @bankAccount_saved.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座情報を保存しました'**
+  String get bankAccount_saved;
+
+  /// No description provided for @bankAccount_saveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座情報の保存に失敗しました'**
+  String get bankAccount_saveFailed;
+
+  /// No description provided for @bankAccount_required.
+  ///
+  /// In ja, this message translates to:
+  /// **'この項目は必須です'**
+  String get bankAccount_required;
+
+  /// No description provided for @guestHome_lineLoginLoading.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEでログイン中...'**
+  String get guestHome_lineLoginLoading;
+
+  /// No description provided for @guestHome_lineLoginFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEログインに失敗しました'**
+  String get guestHome_lineLoginFailed;
+
+  /// No description provided for @guestHome_lineLoginSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEでログインしました'**
+  String get guestHome_lineLoginSuccess;
+
+  /// No description provided for @accountLinking_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント連携'**
+  String get accountLinking_title;
+
+  /// No description provided for @accountLinking_linked.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携済み'**
+  String get accountLinking_linked;
+
+  /// No description provided for @accountLinking_linkGoogle.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleを連携'**
+  String get accountLinking_linkGoogle;
+
+  /// No description provided for @accountLinking_linkApple.
+  ///
+  /// In ja, this message translates to:
+  /// **'Appleを連携'**
+  String get accountLinking_linkApple;
+
+  /// No description provided for @accountLinking_linkLine.
+  ///
+  /// In ja, this message translates to:
+  /// **'LINEを連携'**
+  String get accountLinking_linkLine;
+
+  /// No description provided for @accountLinking_unlink.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携解除'**
+  String get accountLinking_unlink;
+
+  /// No description provided for @accountLinking_unlinkConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'連携を解除しますか？'**
+  String get accountLinking_unlinkConfirm;
+
+  /// No description provided for @accountLinking_cannotUnlinkLast.
+  ///
+  /// In ja, this message translates to:
+  /// **'最低1つのログイン方法が必要です'**
+  String get accountLinking_cannotUnlinkLast;
+
+  /// No description provided for @accountLinking_alreadyInUse.
+  ///
+  /// In ja, this message translates to:
+  /// **'このアカウントは既に別のユーザーに連携されています'**
+  String get accountLinking_alreadyInUse;
+
+  /// No description provided for @accountMerge_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント統合'**
+  String get accountMerge_title;
+
+  /// No description provided for @accountMerge_description.
+  ///
+  /// In ja, this message translates to:
+  /// **'{email}に紐づいた別のアカウントが存在します。統合しますか？'**
+  String accountMerge_description(String email);
+
+  /// No description provided for @accountMerge_warning.
+  ///
+  /// In ja, this message translates to:
+  /// **'この操作は取り消せません。統合元のアカウントは削除されます。'**
+  String get accountMerge_warning;
+
+  /// No description provided for @accountMerge_confirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'統合する'**
+  String get accountMerge_confirm;
+
+  /// No description provided for @accountMerge_success.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウントを統合しました'**
+  String get accountMerge_success;
+
+  /// No description provided for @accountMerge_failed.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント統合に失敗しました'**
+  String get accountMerge_failed;
+
+  /// No description provided for @accountMerge_rateLimited.
+  ///
+  /// In ja, this message translates to:
+  /// **'統合は1時間に1回までです'**
+  String get accountMerge_rateLimited;
+
+  /// No description provided for @accountLinking_linkEmail.
+  ///
+  /// In ja, this message translates to:
+  /// **'Emailを連携'**
+  String get accountLinking_linkEmail;
+
+  /// No description provided for @accountLinking_linkPhone.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携'**
+  String get accountLinking_linkPhone;
+
+  /// No description provided for @phoneLinking_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携'**
+  String get phoneLinking_title;
+
+  /// No description provided for @phoneLinking_success.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携しました'**
+  String get phoneLinking_success;
 }
 
 class _AppLocalizationsDelegate

@@ -7,7 +7,7 @@ import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
-import 'package:sumple1/core/services/notification_service.dart';
+import 'package:sumple1/core/services/notification_service.dart' show NotificationService, NotificationType;
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/providers/auth_provider.dart';
 import 'package:sumple1/core/providers/notification_providers.dart';
@@ -25,6 +25,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   static const _pageSize = 20;
   int _currentLimit = _pageSize;
   final _scrollController = ScrollController();
+  String _filterType = 'all'; // 'all' or NotificationType.value
+
   @override
   void initState() {
     super.initState();
@@ -79,14 +81,41 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           ),
         ],
       ),
-      body: Consumer(
+      body: Column(
+        children: [
+          // フィルタチップ
+          SizedBox(
+            height: 48,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 8),
+              children: [
+                _buildFilterChip(context.l10n.notifications_filterAll, 'all'),
+                const SizedBox(width: 6),
+                _buildFilterChip(context.l10n.notifications_filterApplications, 'new_application'),
+                const SizedBox(width: 6),
+                _buildFilterChip(context.l10n.notifications_filterReports, 'work_report'),
+                const SizedBox(width: 6),
+                _buildFilterChip(context.l10n.notifications_filterInspections, 'inspection_failed'),
+              ],
+            ),
+          ),
+          Expanded(
+        child: Consumer(
         builder: (context, ref, _) {
           final snapAsync = ref.watch(notificationsStreamProvider(_currentLimit));
           return snapAsync.when(
             loading: () => SkeletonList(itemBuilder: (_) => const SkeletonNotificationCard()),
             error: (error, _) => Center(child: Text(context.l10n.notifications_error(error.toString()))),
             data: (snap) {
-          final docs = snap.docs;
+          var docs = snap.docs;
+          // フィルタ適用
+          if (_filterType != 'all') {
+            docs = docs.where((doc) {
+              final type = (doc.data()['type'] ?? '').toString();
+              return type == _filterType;
+            }).toList();
+          }
           if (docs.isEmpty) {
             return EmptyState(
               icon: Icons.notifications_none,
@@ -121,21 +150,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 timeText = '${dt.month}/${dt.day} ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
               }
 
-              IconData icon;
-              Color iconColor;
-              switch (type) {
-                case 'application':
-                  icon = Icons.person_add;
-                  iconColor = context.appColors.primary;
-                  break;
-                case 'status_update':
-                  icon = Icons.update;
-                  iconColor = Colors.orange;
-                  break;
-                default:
-                  icon = Icons.notifications;
-                  iconColor = context.appColors.textSecondary;
-              }
+              final notifType = NotificationType.fromString(type);
+              final IconData icon = notifType.icon;
+              final Color iconColor = notifType.color;
 
               return Container(
                 decoration: BoxDecoration(
@@ -208,6 +225,29 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           );
         },
       ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, String type) {
+    final selected = _filterType == type;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: selected ? Colors.white : context.appColors.textPrimary,
+        ),
+      ),
+      selected: selected,
+      onSelected: (_) => setState(() => _filterType = type),
+      selectedColor: context.appColors.primary,
+      backgroundColor: context.appColors.surface,
+      side: BorderSide(color: context.appColors.divider),
+      visualDensity: VisualDensity.compact,
     );
   }
 }

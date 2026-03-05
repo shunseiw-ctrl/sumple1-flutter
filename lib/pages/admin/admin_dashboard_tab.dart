@@ -238,18 +238,132 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
                         Expanded(
                           child: AdminKpiCard(
                             label: context.l10n.adminKpi_jobFillRate,
-                            value: '${(kpi.jobFillRate * 100).toStringAsFixed(1)}%',
+                            value: '${kpi.jobFillRate.toStringAsFixed(1)}%',
                             previousValue: kpi.prevJobFillRate > 0
-                                ? '${(kpi.prevJobFillRate * 100).toStringAsFixed(1)}%'
+                                ? '${kpi.prevJobFillRate.toStringAsFixed(1)}%'
                                 : null,
                             icon: Icons.assignment_turned_in,
                             iconColor: context.appColors.warning,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Expanded(child: SizedBox()),
+                        Expanded(
+                          child: AdminKpiCard(
+                            label: context.l10n.adminKpi_avgJobPrice,
+                            value: CurrencyUtils.formatYen(kpi.avgJobPrice),
+                            previousValue: kpi.prevAvgJobPrice > 0
+                                ? CurrencyUtils.formatYen(kpi.prevAvgJobPrice)
+                                : null,
+                            icon: Icons.price_change,
+                            iconColor: context.appColors.info,
+                          ),
+                        ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+
+                    // ワーカー分析
+                    Text(
+                      context.l10n.adminKpi_workerAnalysis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: context.appColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AdminKpiCard(
+                            label: context.l10n.adminKpi_activeWorkerRate,
+                            value: '${kpi.activeWorkerRate}%',
+                            previousValue: kpi.prevActiveWorkerRate > 0
+                                ? '${kpi.prevActiveWorkerRate}%'
+                                : null,
+                            icon: Icons.engineering,
+                            iconColor: context.appColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AdminKpiCard(
+                            label: context.l10n.adminKpi_repeatWorkerRate,
+                            value: '${kpi.repeatWorkerRate}%',
+                            previousValue: kpi.prevRepeatWorkerRate > 0
+                                ? '${kpi.prevRepeatWorkerRate}%'
+                                : null,
+                            icon: Icons.repeat,
+                            iconColor: context.appColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // 地域分布
+                    if (kpi.regionDistribution.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        context.l10n.adminKpi_regionDistribution,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: context.appColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: context.appColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: context.appColors.divider),
+                        ),
+                        child: Column(
+                          children: kpi.regionDistribution.map((r) {
+                            final name = (r['name'] ?? '').toString();
+                            final count = (r['count'] as num?)?.toInt() ?? 0;
+                            final maxCount = (kpi.regionDistribution.first['count'] as num?)?.toInt() ?? 1;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 60,
+                                    child: Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: context.appColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: LinearProgressIndicator(
+                                      value: maxCount > 0 ? count / maxCount : 0,
+                                      backgroundColor: context.appColors.divider,
+                                      valueColor: AlwaysStoppedAnimation(context.appColors.primary),
+                                      minHeight: 8,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '$count',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: context.appColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                   ],
                 ],

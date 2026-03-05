@@ -38,6 +38,7 @@ const lineAuth = require("./src/lineAuth");
 exports.lineAuthStart = lineAuth.lineAuthStart;
 exports.lineAuthCallback = lineAuth.lineAuthCallback;
 exports.lineAuthExchange = lineAuth.lineAuthExchange;
+exports.lineAuthVerifyToken = lineAuth.lineAuthVerifyToken;
 exports.cleanupExpiredLineAuthDocs = lineAuth.cleanupExpiredLineAuthDocs;
 
 // --- KPIバッチ (Cloud Scheduler) ---
@@ -62,6 +63,10 @@ exports.getExpressDashboardLink = stripe.getExpressDashboardLink;
 // --- アカウント削除 (Phase 9) ---
 const { deleteUserData } = require("./src/accountDeletion");
 exports.deleteUserData = deleteUserData;
+
+// --- アカウント統合 ---
+const { mergeAccounts } = require("./src/accountMerge");
+exports.mergeAccounts = mergeAccounts;
 
 // --- データエクスポート (Phase 9) ---
 const { exportUserData } = require("./src/dataExport");
@@ -90,6 +95,14 @@ exports.onVerificationStatusChanged = identityVerification.onVerificationStatusC
 // --- Stripe テストヘルパー (Phase 20) ---
 const stripeTestHelper = require("./src/stripeTestHelper");
 exports.simulateStripeWebhook = stripeTestHelper.simulateStripeWebhook;
+
+// --- 管理者通知 (Phase 23) ---
+const adminNotifications = require("./src/adminNotifications");
+exports.onApplicationCreatedNotify = adminNotifications.onApplicationCreatedNotify;
+exports.onWorkReportCreatedNotify = adminNotifications.onWorkReportCreatedNotify;
+exports.onInspectionCreatedNotify = adminNotifications.onInspectionCreatedNotify;
+exports.sendDailySummary = adminNotifications.sendDailySummary;
+exports.sendChatUnreadReminder = adminNotifications.sendChatUnreadReminder;
 
 // --- 監査ログ (Phase 9) ---
 const auditLog = require("./src/auditLog");

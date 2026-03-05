@@ -544,7 +544,7 @@ class _ApplicantStatusGroup extends StatelessWidget {
 }
 
 // ────────────────────────────────────
-// 応募者カード（コンパクト版・アクション削除）
+// 応募者カード（写真・eKYC・資格・完了数・チャット対応）
 // ────────────────────────────────────
 class _ApplicantCard extends StatelessWidget {
   final ApplicantItem item;
@@ -561,6 +561,11 @@ class _ApplicantCard extends StatelessWidget {
 
     // 「要対応」ハイライト: applied ステータスに左ボーダー
     final isApplied = item.status == 'applied';
+    final displayName = item.workerName.isNotEmpty
+        ? item.workerName
+        : (item.applicantUid.isNotEmpty
+            ? 'UID: ${item.applicantUid.substring(0, item.applicantUid.length.clamp(0, 8))}...'
+            : '');
 
     return Container(
       decoration: BoxDecoration(
@@ -579,23 +584,51 @@ class _ApplicantCard extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.base, vertical: AppSpacing.xs),
-        title: Text(
-          item.jobTitle,
-          style: AppTextStyles.labelLarge
-              .copyWith(fontWeight: FontWeight.w700, fontSize: 14),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.xs),
-          child: Row(
-            children: [
-              StatusBadge.fromStatus(context, item.status),
-              if (item.workerName.isNotEmpty) ...[
-                const SizedBox(width: AppSpacing.sm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.base, vertical: AppSpacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 上段: 案件名 + チャットボタン
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.jobTitle,
+                    style: AppTextStyles.labelLarge
+                        .copyWith(fontWeight: FontWeight.w700, fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // チャットボタン
+                SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.chat_bubble_outline,
+                        size: 18, color: context.appColors.primary),
+                    tooltip: context.l10n.adminApplicants_openChat,
+                    onPressed: () =>
+                        context.push(RoutePaths.chatRoomPath(item.id)),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () =>
+                      context.push(RoutePaths.workDetailPath(item.id)),
+                  child: Icon(Icons.chevron_right,
+                      size: 20, color: context.appColors.textHint),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            // 下段: ワーカー情報
+            Row(
+              children: [
+                // プロフィール写真
                 GestureDetector(
                   onTap: () {
                     if (item.applicantUid.isNotEmpty) {
@@ -603,35 +636,129 @@ class _ApplicantCard extends StatelessWidget {
                           item.applicantUid));
                     }
                   },
-                  child: Text(
-                    item.workerName,
-                    style: AppTextStyles.caption.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: context.appColors.primary,
-                    ),
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: context.appColors.primaryPale,
+                    backgroundImage: item.photoUrl.isNotEmpty
+                        ? NetworkImage(item.photoUrl)
+                        : null,
+                    child: item.photoUrl.isEmpty
+                        ? Icon(Icons.person, size: 18,
+                            color: context.appColors.primary)
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 名前 + eKYCバッジ
+                      Row(
+                        children: [
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (item.applicantUid.isNotEmpty) {
+                                  context.push(RoutePaths.adminWorkerDetailPath(
+                                      item.applicantUid));
+                                }
+                              },
+                              child: Text(
+                                displayName,
+                                style: AppTextStyles.caption.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: context.appColors.primary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          if (item.ekycStatus == 'approved') ...[
+                            const SizedBox(width: 4),
+                            Icon(Icons.verified,
+                                size: 14, color: context.appColors.success),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      // ステータス + 情報チップ
+                      Row(
+                        children: [
+                          StatusBadge.fromStatus(context, item.status),
+                          if (item.verifiedQualificationCount > 0) ...[
+                            const SizedBox(width: AppSpacing.xs),
+                            _InfoChip(
+                              icon: Icons.verified_outlined,
+                              label: context.l10n.adminApplicants_qualCount(
+                                  item.verifiedQualificationCount.toString()),
+                              color: context.appColors.info,
+                            ),
+                          ],
+                          if (item.completedJobCount > 0) ...[
+                            const SizedBox(width: AppSpacing.xs),
+                            _InfoChip(
+                              icon: Icons.check_circle_outline,
+                              label: context.l10n.adminApplicants_completedCount(
+                                  item.completedJobCount.toString()),
+                              color: context.appColors.success,
+                            ),
+                          ],
+                          if (item.ratingCount > 0) ...[
+                            const SizedBox(width: AppSpacing.xs),
+                            RatingStarsDisplay(
+                              average: item.ratingAverage,
+                              count: item.ratingCount,
+                              starSize: 10,
+                              fontSize: 9,
+                            ),
+                          ],
+                          if (dateStr.isNotEmpty) ...[
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(dateStr,
+                                style: AppTextStyles.caption.copyWith(fontSize: 10)),
+                          ],
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
-              if (item.ratingCount > 0) ...[
-                const SizedBox(width: AppSpacing.sm),
-                RatingStarsDisplay(
-                  average: item.ratingAverage,
-                  count: item.ratingCount,
-                  starSize: 12,
-                  fontSize: 10,
-                ),
-              ],
-              if (dateStr.isNotEmpty) ...[
-                const SizedBox(width: AppSpacing.sm),
-                Text(dateStr, style: AppTextStyles.caption),
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
-        trailing: Icon(Icons.chevron_right,
-            size: 20, color: context.appColors.textHint),
-        onTap: () =>
-            context.push(RoutePaths.workDetailPath(item.id)),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────
+// 情報チップ（資格数・完了数表示用）
+// ────────────────────────────────────
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  const _InfoChip({required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 2),
+          Text(label,
+              style: AppTextStyles.caption
+                  .copyWith(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
+        ],
       ),
     );
   }

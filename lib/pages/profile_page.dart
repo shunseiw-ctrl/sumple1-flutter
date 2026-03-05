@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/services/line_auth_service.dart';
-import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -18,7 +16,7 @@ import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
 import 'profile/profile_widgets.dart';
-import 'profile/email_auth_dialog.dart';
+import 'profile/account_linking_section.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -57,15 +55,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     } catch (_) {
       if (mounted) setState(() => _loadingScore = false);
     }
-  }
-
-  void _openEmailAuthDialog() {
-    showEmailAuthDialog(
-      context: context,
-      onAuthStateChanged: () {
-        if (mounted) setState(() {});
-      },
-    );
   }
 
   bool get _isAdmin {
@@ -132,46 +121,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 title: context.l10n.profile_loginRequired,
                 message: context.l10n.profile_loginRequiredMessage,
                 buttonText: context.l10n.profile_loginButton,
-                onPressed: _openEmailAuthDialog,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.lineGreen.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Semantics(
-                button: true,
-                label: context.l10n.profile_lineLoginSemanticsLabel,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      LineAuthService().startLineLogin();
-                    },
-                    icon: const Icon(Icons.chat_bubble, size: 20),
-                    label: Text(
-                      context.l10n.profile_lineLoginButton,
-                      style: AppTextStyles.button.copyWith(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lineGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                      ),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
+                onPressed: () => context.push(RoutePaths.guestHome),
               ),
             ),
             const SizedBox(height: 20),
@@ -221,13 +171,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     ProfileMenuTile(
                       icon: Icons.account_balance_outlined,
-                      iconColor: const Color(0xFF635BFF),
-                      title: context.l10n.profile_stripeAccount,
-                      subtitle: context.l10n.profile_stripeAccountSubtitle,
+                      iconColor: context.appColors.primary,
+                      title: context.l10n.profile_bankAccount,
+                      subtitle: context.l10n.profile_bankAccountSubtitle,
                       onTap: () {
-                        context.push(RoutePaths.stripeOnboarding, extra: {
-                          'email': user?.email,
-                        });
+                        context.push(RoutePaths.bankAccountSettings);
                       },
                     ),
                     ProfileMenuTile(
@@ -255,9 +203,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
 
+          // アカウント連携セクション
+          if (!isAnon) ...[
+            const SizedBox(height: 20),
+            StaggeredFadeSlide(
+              index: 2,
+              child: const AccountLinkingSection(),
+            ),
+          ],
+
           const SizedBox(height: 20),
           StaggeredFadeSlide(
-            index: isAnon ? 4 : 2,
+            index: isAnon ? 4 : 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -289,7 +246,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
           const SizedBox(height: 20),
           StaggeredFadeSlide(
-            index: isAnon ? 5 : 3,
+            index: isAnon ? 5 : 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -378,7 +335,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const SizedBox(height: 20),
           if (_isAdmin)
             StaggeredFadeSlide(
-              index: isAnon ? 6 : 5,
+              index: isAnon ? 6 : 6,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -404,7 +361,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           // ログアウトボタン（全ユーザーに表示）
           if (!isAnon)
             StaggeredFadeSlide(
-              index: isAnon ? 7 : 6,
+              index: isAnon ? 7 : 7,
               child: ProfileMenuGroup(
                 children: [
                   ProfileMenuTile(

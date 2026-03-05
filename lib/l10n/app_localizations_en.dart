@@ -4258,4 +4258,367 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminDashboard_workReports => 'Reports';
+
+  @override
+  String adminApplicants_qualCount(String count) {
+    return '$count quals';
+  }
+
+  @override
+  String adminApplicants_completedCount(String count) {
+    return '$count done';
+  }
+
+  @override
+  String get adminApplicants_openChat => 'Open Chat';
+
+  @override
+  String get adminSettings_accountSettings => 'Account Settings';
+
+  @override
+  String get adminSettings_language => 'Language';
+
+  @override
+  String get adminSettings_dataExport => 'Data Export';
+
+  @override
+  String get adminWorker_statistics => 'Statistics';
+
+  @override
+  String get adminWorker_statCompleted => 'Completed';
+
+  @override
+  String get adminWorker_statTotalEarnings => 'Total Earnings';
+
+  @override
+  String get adminWorker_statCompletionRate => 'Completion Rate';
+
+  @override
+  String get adminWorker_memoTitle => 'Admin Notes';
+
+  @override
+  String get adminWorker_memoHint => 'Enter notes about this worker...';
+
+  @override
+  String get adminWorker_memoSave => 'Save Notes';
+
+  @override
+  String get adminWorker_memoSaved => 'Notes saved';
+
+  @override
+  String get adminWorker_memoSaveFailed => 'Failed to save notes';
+
+  @override
+  String get adminWorker_openChat => 'Open Chat';
+
+  @override
+  String get adminWorker_noChatAvailable =>
+      'No applications available for chat';
+
+  @override
+  String get adminWorker_ekycApproved => 'Verified';
+
+  @override
+  String get adminWorker_ekycPending => 'Pending';
+
+  @override
+  String get adminWorker_ekycRejected => 'Rejected';
+
+  @override
+  String get post_saveDraft => 'Draft';
+
+  @override
+  String get post_draftSaved => 'Draft saved';
+
+  @override
+  String get post_draftSaveFailed => 'Failed to save draft';
+
+  @override
+  String get post_draftNeedTitle => 'Please enter a title';
+
+  @override
+  String get adminWorkReports_filterAll => 'All';
+
+  @override
+  String get adminWorkReports_filterPending => 'Pending';
+
+  @override
+  String get adminWorkReports_filterReviewed => 'Reviewed';
+
+  @override
+  String get adminWorkReports_reviewPending => 'Pending';
+
+  @override
+  String get adminWorkReports_reviewed => 'Reviewed';
+
+  @override
+  String get adminWorkReports_addFeedback => 'Add Comment';
+
+  @override
+  String get adminWorkReports_markReviewed => 'Mark Reviewed';
+
+  @override
+  String get adminWorkReports_feedbackTitle => 'Report Feedback';
+
+  @override
+  String get adminWorkReports_feedbackHint => 'Enter comment...';
+
+  @override
+  String get adminWorkReports_feedbackSubmit => 'Submit';
+
+  @override
+  String get adminWorkReports_feedbackCancel => 'Cancel';
+
+  @override
+  String get adminWorkReports_feedbackSent => 'Feedback sent';
+
+  @override
+  String get adminWorkReports_feedbackFailed => 'Failed to send feedback';
+
+  @override
+  String get adminWorkReports_markedReviewed => 'Marked as reviewed';
+
+  @override
+  String get adminWorkReports_markFailed => 'Failed to update review status';
+
+  @override
+  String get inspection_customItems => 'Custom Inspection Items';
+
+  @override
+  String get inspection_customItemsHint => 'Enter item name';
+
+  @override
+  String get inspection_addItem => 'Add Item';
+
+  @override
+  String get inspection_removeItem => 'Remove Item';
+
+  @override
+  String get inspection_defaultItems => 'Use Default Items';
+
+  @override
+  String get inspection_customItemsHelp =>
+      'Set custom inspection items per job';
+
+  @override
+  String get inspection_itemPhotoAttach => 'Attach Photo';
+
+  @override
+  String inspection_itemPhotoCount(String count) {
+    return '$count photos';
+  }
+
+  @override
+  String get adminDrafts_title => 'Drafts';
+
+  @override
+  String get adminDrafts_empty => 'No drafts';
+
+  @override
+  String get adminDrafts_publish => 'Publish';
+
+  @override
+  String get adminDrafts_delete => 'Delete';
+
+  @override
+  String get adminDrafts_deleteConfirm => 'Delete this draft?';
+
+  @override
+  String get adminDrafts_published => 'Job published';
+
+  @override
+  String get adminDrafts_publishFailed => 'Failed to publish';
+
+  @override
+  String get adminDrafts_deleted => 'Draft deleted';
+
+  @override
+  String get adminDrafts_deleteFailed => 'Failed to delete';
+
+  @override
+  String get adminKpi_avgJobPrice => 'Avg Job Price';
+
+  @override
+  String get adminKpi_workerAnalysis => 'Worker Analysis';
+
+  @override
+  String get adminKpi_activeWorkerRate => 'Active Rate';
+
+  @override
+  String get adminKpi_repeatWorkerRate => 'Repeat Rate';
+
+  @override
+  String get adminKpi_regionDistribution => 'Regional Distribution';
+
+  @override
+  String get notifications_filterAll => 'All';
+
+  @override
+  String get notifications_filterApplications => 'Applications';
+
+  @override
+  String get notifications_filterReports => 'Reports';
+
+  @override
+  String get notifications_filterInspections => 'Inspections';
+
+  @override
+  String get guestHome_googleLogin => 'Sign in with Google';
+
+  @override
+  String get guestHome_googleLoginSuccess => 'Signed in with Google';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get profile_bankAccount => 'Bank Account';
+
+  @override
+  String get profile_bankAccountSubtitle => 'Set up your payment account';
+
+  @override
+  String get myProfile_bankAccountStatus => 'Bank Account';
+
+  @override
+  String get myProfile_bankNotConfigured =>
+      'No bank account — Set up your account to receive payments';
+
+  @override
+  String myProfile_bankConfigured(String bankName, String maskedNum) {
+    return '$bankName Account: $maskedNum';
+  }
+
+  @override
+  String get bankAccount_title => 'Bank Account Settings';
+
+  @override
+  String get bankAccount_bankName => 'Bank Name';
+
+  @override
+  String get bankAccount_bankNameHint => 'e.g. Mizuho Bank';
+
+  @override
+  String get bankAccount_branchName => 'Branch Name';
+
+  @override
+  String get bankAccount_branchCode => 'Branch Code (3 digits)';
+
+  @override
+  String get bankAccount_branchCodeInvalid =>
+      'Please enter a 3-digit branch code';
+
+  @override
+  String get bankAccount_accountType => 'Account Type';
+
+  @override
+  String get bankAccount_accountTypeOrdinary => 'Savings';
+
+  @override
+  String get bankAccount_accountTypeCurrent => 'Checking';
+
+  @override
+  String get bankAccount_accountNumber => 'Account Number (7 digits)';
+
+  @override
+  String get bankAccount_accountNumberInvalid =>
+      'Please enter a 7-digit account number';
+
+  @override
+  String get bankAccount_accountHolderName => 'Account Holder Name (Katakana)';
+
+  @override
+  String get bankAccount_accountHolderHint => 'e.g. Yamada Taro';
+
+  @override
+  String get bankAccount_accountHolderInvalid =>
+      'Please enter the name in Katakana';
+
+  @override
+  String get bankAccount_save => 'Save';
+
+  @override
+  String get bankAccount_saved => 'Bank account information saved';
+
+  @override
+  String get bankAccount_saveFailed =>
+      'Failed to save bank account information';
+
+  @override
+  String get bankAccount_required => 'This field is required';
+
+  @override
+  String get guestHome_lineLoginLoading => 'Signing in with LINE...';
+
+  @override
+  String get guestHome_lineLoginFailed => 'LINE sign in failed';
+
+  @override
+  String get guestHome_lineLoginSuccess => 'Signed in with LINE';
+
+  @override
+  String get accountLinking_title => 'Account Linking';
+
+  @override
+  String get accountLinking_linked => 'Linked';
+
+  @override
+  String get accountLinking_linkGoogle => 'Link Google';
+
+  @override
+  String get accountLinking_linkApple => 'Link Apple';
+
+  @override
+  String get accountLinking_linkLine => 'Link LINE';
+
+  @override
+  String get accountLinking_unlink => 'Unlink';
+
+  @override
+  String get accountLinking_unlinkConfirm =>
+      'Are you sure you want to unlink this account?';
+
+  @override
+  String get accountLinking_cannotUnlinkLast =>
+      'You must keep at least one login method';
+
+  @override
+  String get accountLinking_alreadyInUse =>
+      'This account is already linked to another user';
+
+  @override
+  String get accountMerge_title => 'Merge Accounts';
+
+  @override
+  String accountMerge_description(String email) {
+    return 'Another account is linked to $email. Would you like to merge?';
+  }
+
+  @override
+  String get accountMerge_warning =>
+      'This action cannot be undone. The merged account will be deleted.';
+
+  @override
+  String get accountMerge_confirm => 'Merge';
+
+  @override
+  String get accountMerge_success => 'Accounts merged successfully';
+
+  @override
+  String get accountMerge_failed => 'Account merge failed';
+
+  @override
+  String get accountMerge_rateLimited => 'Merge is limited to once per hour';
+
+  @override
+  String get accountLinking_linkEmail => 'Link Email';
+
+  @override
+  String get accountLinking_linkPhone => 'Link Phone';
+
+  @override
+  String get phoneLinking_title => 'Link Phone Number';
+
+  @override
+  String get phoneLinking_success => 'Phone number linked';
 }

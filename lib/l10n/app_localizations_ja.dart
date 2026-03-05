@@ -4155,4 +4155,356 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminDashboard_workReports => '日報管理';
+
+  @override
+  String adminApplicants_qualCount(String count) {
+    return '資格$count';
+  }
+
+  @override
+  String adminApplicants_completedCount(String count) {
+    return '完了$count';
+  }
+
+  @override
+  String get adminApplicants_openChat => 'チャットを開く';
+
+  @override
+  String get adminSettings_accountSettings => 'アカウント設定';
+
+  @override
+  String get adminSettings_language => '言語';
+
+  @override
+  String get adminSettings_dataExport => 'データエクスポート';
+
+  @override
+  String get adminWorker_statistics => '統計';
+
+  @override
+  String get adminWorker_statCompleted => '完了数';
+
+  @override
+  String get adminWorker_statTotalEarnings => '総報酬';
+
+  @override
+  String get adminWorker_statCompletionRate => '完了率';
+
+  @override
+  String get adminWorker_memoTitle => '管理者メモ';
+
+  @override
+  String get adminWorker_memoHint => 'このワーカーに関するメモを入力…';
+
+  @override
+  String get adminWorker_memoSave => 'メモを保存';
+
+  @override
+  String get adminWorker_memoSaved => 'メモを保存しました';
+
+  @override
+  String get adminWorker_memoSaveFailed => 'メモの保存に失敗しました';
+
+  @override
+  String get adminWorker_openChat => 'チャットを開く';
+
+  @override
+  String get adminWorker_noChatAvailable => 'チャット可能な応募がありません';
+
+  @override
+  String get adminWorker_ekycApproved => '本人確認済';
+
+  @override
+  String get adminWorker_ekycPending => '確認中';
+
+  @override
+  String get adminWorker_ekycRejected => '確認否認';
+
+  @override
+  String get post_saveDraft => '下書き';
+
+  @override
+  String get post_draftSaved => '下書きを保存しました';
+
+  @override
+  String get post_draftSaveFailed => '下書きの保存に失敗しました';
+
+  @override
+  String get post_draftNeedTitle => 'タイトルを入力してください';
+
+  @override
+  String get adminWorkReports_filterAll => 'すべて';
+
+  @override
+  String get adminWorkReports_filterPending => '未レビュー';
+
+  @override
+  String get adminWorkReports_filterReviewed => 'レビュー済';
+
+  @override
+  String get adminWorkReports_reviewPending => '未レビュー';
+
+  @override
+  String get adminWorkReports_reviewed => 'レビュー済';
+
+  @override
+  String get adminWorkReports_addFeedback => 'コメント追加';
+
+  @override
+  String get adminWorkReports_markReviewed => '確認済みにする';
+
+  @override
+  String get adminWorkReports_feedbackTitle => '日報フィードバック';
+
+  @override
+  String get adminWorkReports_feedbackHint => 'コメントを入力…';
+
+  @override
+  String get adminWorkReports_feedbackSubmit => '送信';
+
+  @override
+  String get adminWorkReports_feedbackCancel => 'キャンセル';
+
+  @override
+  String get adminWorkReports_feedbackSent => 'フィードバックを送信しました';
+
+  @override
+  String get adminWorkReports_feedbackFailed => 'フィードバックの送信に失敗しました';
+
+  @override
+  String get adminWorkReports_markedReviewed => 'レビュー済みにしました';
+
+  @override
+  String get adminWorkReports_markFailed => 'レビュー更新に失敗しました';
+
+  @override
+  String get inspection_customItems => 'カスタム検査項目';
+
+  @override
+  String get inspection_customItemsHint => '項目名を入力';
+
+  @override
+  String get inspection_addItem => '項目を追加';
+
+  @override
+  String get inspection_removeItem => '項目を削除';
+
+  @override
+  String get inspection_defaultItems => 'デフォルト項目を使用';
+
+  @override
+  String get inspection_customItemsHelp => '案件ごとにカスタム検査項目を設定できます';
+
+  @override
+  String get inspection_itemPhotoAttach => '写真を添付';
+
+  @override
+  String inspection_itemPhotoCount(String count) {
+    return '$count枚';
+  }
+
+  @override
+  String get adminDrafts_title => '下書き一覧';
+
+  @override
+  String get adminDrafts_empty => '下書きはありません';
+
+  @override
+  String get adminDrafts_publish => '公開する';
+
+  @override
+  String get adminDrafts_delete => '削除する';
+
+  @override
+  String get adminDrafts_deleteConfirm => 'この下書きを削除しますか？';
+
+  @override
+  String get adminDrafts_published => '案件を公開しました';
+
+  @override
+  String get adminDrafts_publishFailed => '公開に失敗しました';
+
+  @override
+  String get adminDrafts_deleted => '下書きを削除しました';
+
+  @override
+  String get adminDrafts_deleteFailed => '削除に失敗しました';
+
+  @override
+  String get adminKpi_avgJobPrice => '平均案件単価';
+
+  @override
+  String get adminKpi_workerAnalysis => 'ワーカー分析';
+
+  @override
+  String get adminKpi_activeWorkerRate => 'アクティブ率';
+
+  @override
+  String get adminKpi_repeatWorkerRate => 'リピート率';
+
+  @override
+  String get adminKpi_regionDistribution => '地域分布';
+
+  @override
+  String get notifications_filterAll => 'すべて';
+
+  @override
+  String get notifications_filterApplications => '応募';
+
+  @override
+  String get notifications_filterReports => '日報';
+
+  @override
+  String get notifications_filterInspections => '検査';
+
+  @override
+  String get guestHome_googleLogin => 'Googleでログイン';
+
+  @override
+  String get guestHome_googleLoginSuccess => 'Googleでログインしました';
+
+  @override
+  String get signInWithGoogle => 'Googleでサインイン';
+
+  @override
+  String get profile_bankAccount => '銀行口座設定';
+
+  @override
+  String get profile_bankAccountSubtitle => '報酬の受取口座を設定';
+
+  @override
+  String get myProfile_bankAccountStatus => '銀行口座';
+
+  @override
+  String get myProfile_bankNotConfigured => '銀行口座未設定 — 報酬の受け取りには口座設定が必要です';
+
+  @override
+  String myProfile_bankConfigured(String bankName, String maskedNum) {
+    return '$bankName 口座番号: $maskedNum';
+  }
+
+  @override
+  String get bankAccount_title => '銀行口座設定';
+
+  @override
+  String get bankAccount_bankName => '銀行名';
+
+  @override
+  String get bankAccount_bankNameHint => '例: みずほ銀行';
+
+  @override
+  String get bankAccount_branchName => '支店名';
+
+  @override
+  String get bankAccount_branchCode => '支店コード（3桁）';
+
+  @override
+  String get bankAccount_branchCodeInvalid => '支店コードは3桁の数字で入力してください';
+
+  @override
+  String get bankAccount_accountType => '口座種別';
+
+  @override
+  String get bankAccount_accountTypeOrdinary => '普通';
+
+  @override
+  String get bankAccount_accountTypeCurrent => '当座';
+
+  @override
+  String get bankAccount_accountNumber => '口座番号（7桁）';
+
+  @override
+  String get bankAccount_accountNumberInvalid => '口座番号は7桁の数字で入力してください';
+
+  @override
+  String get bankAccount_accountHolderName => '口座名義（カタカナ）';
+
+  @override
+  String get bankAccount_accountHolderHint => '例: ヤマダ タロウ';
+
+  @override
+  String get bankAccount_accountHolderInvalid => '口座名義はカタカナで入力してください';
+
+  @override
+  String get bankAccount_save => '保存';
+
+  @override
+  String get bankAccount_saved => '銀行口座情報を保存しました';
+
+  @override
+  String get bankAccount_saveFailed => '口座情報の保存に失敗しました';
+
+  @override
+  String get bankAccount_required => 'この項目は必須です';
+
+  @override
+  String get guestHome_lineLoginLoading => 'LINEでログイン中...';
+
+  @override
+  String get guestHome_lineLoginFailed => 'LINEログインに失敗しました';
+
+  @override
+  String get guestHome_lineLoginSuccess => 'LINEでログインしました';
+
+  @override
+  String get accountLinking_title => 'アカウント連携';
+
+  @override
+  String get accountLinking_linked => '連携済み';
+
+  @override
+  String get accountLinking_linkGoogle => 'Googleを連携';
+
+  @override
+  String get accountLinking_linkApple => 'Appleを連携';
+
+  @override
+  String get accountLinking_linkLine => 'LINEを連携';
+
+  @override
+  String get accountLinking_unlink => '連携解除';
+
+  @override
+  String get accountLinking_unlinkConfirm => '連携を解除しますか？';
+
+  @override
+  String get accountLinking_cannotUnlinkLast => '最低1つのログイン方法が必要です';
+
+  @override
+  String get accountLinking_alreadyInUse => 'このアカウントは既に別のユーザーに連携されています';
+
+  @override
+  String get accountMerge_title => 'アカウント統合';
+
+  @override
+  String accountMerge_description(String email) {
+    return '$emailに紐づいた別のアカウントが存在します。統合しますか？';
+  }
+
+  @override
+  String get accountMerge_warning => 'この操作は取り消せません。統合元のアカウントは削除されます。';
+
+  @override
+  String get accountMerge_confirm => '統合する';
+
+  @override
+  String get accountMerge_success => 'アカウントを統合しました';
+
+  @override
+  String get accountMerge_failed => 'アカウント統合に失敗しました';
+
+  @override
+  String get accountMerge_rateLimited => '統合は1時間に1回までです';
+
+  @override
+  String get accountLinking_linkEmail => 'Emailを連携';
+
+  @override
+  String get accountLinking_linkPhone => '電話番号を連携';
+
+  @override
+  String get phoneLinking_title => '電話番号を連携';
+
+  @override
+  String get phoneLinking_success => '電話番号を連携しました';
 }

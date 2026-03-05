@@ -2099,5 +2099,164 @@
   "adminSettings_logoutTitle": "Logout",
   "adminSettings_logoutConfirm": "Are you sure you want to log out?",
 
-  "adminDashboard_workReports": "Reports"
+  "adminDashboard_workReports": "Reports",
+
+  "adminApplicants_qualCount": "{count} quals",
+  "@adminApplicants_qualCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_completedCount": "{count} done",
+  "@adminApplicants_completedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_openChat": "Open Chat",
+
+  "adminSettings_accountSettings": "Account Settings",
+  "adminSettings_language": "Language",
+  "adminSettings_dataExport": "Data Export",
+
+  "adminWorker_statistics": "Statistics",
+  "adminWorker_statCompleted": "Completed",
+  "adminWorker_statTotalEarnings": "Total Earnings",
+  "adminWorker_statCompletionRate": "Completion Rate",
+  "adminWorker_memoTitle": "Admin Notes",
+  "adminWorker_memoHint": "Enter notes about this worker...",
+  "adminWorker_memoSave": "Save Notes",
+  "adminWorker_memoSaved": "Notes saved",
+  "adminWorker_memoSaveFailed": "Failed to save notes",
+  "adminWorker_openChat": "Open Chat",
+  "adminWorker_noChatAvailable": "No applications available for chat",
+  "adminWorker_ekycApproved": "Verified",
+  "adminWorker_ekycPending": "Pending",
+  "adminWorker_ekycRejected": "Rejected",
+
+  "post_saveDraft": "Draft",
+  "post_draftSaved": "Draft saved",
+  "post_draftSaveFailed": "Failed to save draft",
+  "post_draftNeedTitle": "Please enter a title",
+
+  "adminWorkReports_filterAll": "All",
+  "adminWorkReports_filterPending": "Pending",
+  "adminWorkReports_filterReviewed": "Reviewed",
+  "adminWorkReports_reviewPending": "Pending",
+  "adminWorkReports_reviewed": "Reviewed",
+  "adminWorkReports_addFeedback": "Add Comment",
+  "adminWorkReports_markReviewed": "Mark Reviewed",
+  "adminWorkReports_feedbackTitle": "Report Feedback",
+  "adminWorkReports_feedbackHint": "Enter comment...",
+  "adminWorkReports_feedbackSubmit": "Submit",
+  "adminWorkReports_feedbackCancel": "Cancel",
+  "adminWorkReports_feedbackSent": "Feedback sent",
+  "adminWorkReports_feedbackFailed": "Failed to send feedback",
+  "adminWorkReports_markedReviewed": "Marked as reviewed",
+  "adminWorkReports_markFailed": "Failed to update review status",
+
+  "inspection_customItems": "Custom Inspection Items",
+  "inspection_customItemsHint": "Enter item name",
+  "inspection_addItem": "Add Item",
+  "inspection_removeItem": "Remove Item",
+  "inspection_defaultItems": "Use Default Items",
+  "inspection_customItemsHelp": "Set custom inspection items per job",
+  "inspection_itemPhotoAttach": "Attach Photo",
+  "inspection_itemPhotoCount": "{count} photos",
+  "@inspection_itemPhotoCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+
+  "adminDrafts_title": "Drafts",
+  "adminDrafts_empty": "No drafts",
+  "adminDrafts_publish": "Publish",
+  "adminDrafts_delete": "Delete",
+  "adminDrafts_deleteConfirm": "Delete this draft?",
+  "adminDrafts_published": "Job published",
+  "adminDrafts_publishFailed": "Failed to publish",
+  "adminDrafts_deleted": "Draft deleted",
+  "adminDrafts_deleteFailed": "Failed to delete",
+
+  "adminKpi_avgJobPrice": "Avg Job Price",
+  "adminKpi_workerAnalysis": "Worker Analysis",
+  "adminKpi_activeWorkerRate": "Active Rate",
+  "adminKpi_repeatWorkerRate": "Repeat Rate",
+  "adminKpi_regionDistribution": "Regional Distribution",
+
+  "notifications_filterAll": "All",
+  "notifications_filterApplications": "Applications",
+  "notifications_filterReports": "Reports",
+  "notifications_filterInspections": "Inspections",
+
+  "guestHome_googleLogin": "Sign in with Google",
+  "guestHome_googleLoginSuccess": "Signed in with Google",
+  "signInWithGoogle": "Sign in with Google",
+
+  "profile_bankAccount": "Bank Account",
+  "profile_bankAccountSubtitle": "Set up your payment account",
+
+  "myProfile_bankAccountStatus": "Bank Account",
+  "myProfile_bankNotConfigured": "No bank account — Set up your account to receive payments",
+  "myProfile_bankConfigured": "{bankName} Account: {maskedNum}",
+  "@myProfile_bankConfigured": {
+    "placeholders": {
+      "bankName": { "type": "String" },
+      "maskedNum": { "type": "String" }
+    }
+  },
+
+  "bankAccount_title": "Bank Account Settings",
+  "bankAccount_bankName": "Bank Name",
+  "bankAccount_bankNameHint": "e.g. Mizuho Bank",
+  "bankAccount_branchName": "Branch Name",
+  "bankAccount_branchCode": "Branch Code (3 digits)",
+  "bankAccount_branchCodeInvalid": "Please enter a 3-digit branch code",
+  "bankAccount_accountType": "Account Type",
+  "bankAccount_accountTypeOrdinary": "Savings",
+  "bankAccount_accountTypeCurrent": "Checking",
+  "bankAccount_accountNumber": "Account Number (7 digits)",
+  "bankAccount_accountNumberInvalid": "Please enter a 7-digit account number",
+  "bankAccount_accountHolderName": "Account Holder Name (Katakana)",
+  "bankAccount_accountHolderHint": "e.g. Yamada Taro",
+  "bankAccount_accountHolderInvalid": "Please enter the name in Katakana",
+  "bankAccount_save": "Save",
+  "bankAccount_saved": "Bank account information saved",
+  "bankAccount_saveFailed": "Failed to save bank account information",
+  "bankAccount_required": "This field is required",
+
+  "guestHome_lineLoginLoading": "Signing in with LINE...",
+  "guestHome_lineLoginFailed": "LINE sign in failed",
+  "guestHome_lineLoginSuccess": "Signed in with LINE",
+
+  "accountLinking_title": "Account Linking",
+  "accountLinking_linked": "Linked",
+  "accountLinking_linkGoogle": "Link Google",
+  "accountLinking_linkApple": "Link Apple",
+  "accountLinking_linkLine": "Link LINE",
+  "accountLinking_unlink": "Unlink",
+  "accountLinking_unlinkConfirm": "Are you sure you want to unlink this account?",
+  "accountLinking_cannotUnlinkLast": "You must keep at least one login method",
+  "accountLinking_alreadyInUse": "This account is already linked to another user",
+
+  "accountMerge_title": "Merge Accounts",
+  "accountMerge_description": "Another account is linked to {email}. Would you like to merge?",
+  "@accountMerge_description": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMerge_warning": "This action cannot be undone. The merged account will be deleted.",
+  "accountMerge_confirm": "Merge",
+  "accountMerge_success": "Accounts merged successfully",
+  "accountMerge_failed": "Account merge failed",
+  "accountMerge_rateLimited": "Merge is limited to once per hour",
+
+  "accountLinking_linkEmail": "Link Email",
+  "accountLinking_linkPhone": "Link Phone",
+  "phoneLinking_title": "Link Phone Number",
+  "phoneLinking_success": "Phone number linked"
 }

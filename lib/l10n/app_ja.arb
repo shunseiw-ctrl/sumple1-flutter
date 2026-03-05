@@ -2870,5 +2870,164 @@
   "adminSettings_logoutTitle": "ログアウト",
   "adminSettings_logoutConfirm": "ログアウトしますか？",
 
-  "adminDashboard_workReports": "日報管理"
+  "adminDashboard_workReports": "日報管理",
+
+  "adminApplicants_qualCount": "資格{count}",
+  "@adminApplicants_qualCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_completedCount": "完了{count}",
+  "@adminApplicants_completedCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "adminApplicants_openChat": "チャットを開く",
+
+  "adminSettings_accountSettings": "アカウント設定",
+  "adminSettings_language": "言語",
+  "adminSettings_dataExport": "データエクスポート",
+
+  "adminWorker_statistics": "統計",
+  "adminWorker_statCompleted": "完了数",
+  "adminWorker_statTotalEarnings": "総報酬",
+  "adminWorker_statCompletionRate": "完了率",
+  "adminWorker_memoTitle": "管理者メモ",
+  "adminWorker_memoHint": "このワーカーに関するメモを入力…",
+  "adminWorker_memoSave": "メモを保存",
+  "adminWorker_memoSaved": "メモを保存しました",
+  "adminWorker_memoSaveFailed": "メモの保存に失敗しました",
+  "adminWorker_openChat": "チャットを開く",
+  "adminWorker_noChatAvailable": "チャット可能な応募がありません",
+  "adminWorker_ekycApproved": "本人確認済",
+  "adminWorker_ekycPending": "確認中",
+  "adminWorker_ekycRejected": "確認否認",
+
+  "post_saveDraft": "下書き",
+  "post_draftSaved": "下書きを保存しました",
+  "post_draftSaveFailed": "下書きの保存に失敗しました",
+  "post_draftNeedTitle": "タイトルを入力してください",
+
+  "adminWorkReports_filterAll": "すべて",
+  "adminWorkReports_filterPending": "未レビュー",
+  "adminWorkReports_filterReviewed": "レビュー済",
+  "adminWorkReports_reviewPending": "未レビュー",
+  "adminWorkReports_reviewed": "レビュー済",
+  "adminWorkReports_addFeedback": "コメント追加",
+  "adminWorkReports_markReviewed": "確認済みにする",
+  "adminWorkReports_feedbackTitle": "日報フィードバック",
+  "adminWorkReports_feedbackHint": "コメントを入力…",
+  "adminWorkReports_feedbackSubmit": "送信",
+  "adminWorkReports_feedbackCancel": "キャンセル",
+  "adminWorkReports_feedbackSent": "フィードバックを送信しました",
+  "adminWorkReports_feedbackFailed": "フィードバックの送信に失敗しました",
+  "adminWorkReports_markedReviewed": "レビュー済みにしました",
+  "adminWorkReports_markFailed": "レビュー更新に失敗しました",
+
+  "inspection_customItems": "カスタム検査項目",
+  "inspection_customItemsHint": "項目名を入力",
+  "inspection_addItem": "項目を追加",
+  "inspection_removeItem": "項目を削除",
+  "inspection_defaultItems": "デフォルト項目を使用",
+  "inspection_customItemsHelp": "案件ごとにカスタム検査項目を設定できます",
+  "inspection_itemPhotoAttach": "写真を添付",
+  "inspection_itemPhotoCount": "{count}枚",
+  "@inspection_itemPhotoCount": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+
+  "adminDrafts_title": "下書き一覧",
+  "adminDrafts_empty": "下書きはありません",
+  "adminDrafts_publish": "公開する",
+  "adminDrafts_delete": "削除する",
+  "adminDrafts_deleteConfirm": "この下書きを削除しますか？",
+  "adminDrafts_published": "案件を公開しました",
+  "adminDrafts_publishFailed": "公開に失敗しました",
+  "adminDrafts_deleted": "下書きを削除しました",
+  "adminDrafts_deleteFailed": "削除に失敗しました",
+
+  "adminKpi_avgJobPrice": "平均案件単価",
+  "adminKpi_workerAnalysis": "ワーカー分析",
+  "adminKpi_activeWorkerRate": "アクティブ率",
+  "adminKpi_repeatWorkerRate": "リピート率",
+  "adminKpi_regionDistribution": "地域分布",
+
+  "notifications_filterAll": "すべて",
+  "notifications_filterApplications": "応募",
+  "notifications_filterReports": "日報",
+  "notifications_filterInspections": "検査",
+
+  "guestHome_googleLogin": "Googleでログイン",
+  "guestHome_googleLoginSuccess": "Googleでログインしました",
+  "signInWithGoogle": "Googleでサインイン",
+
+  "profile_bankAccount": "銀行口座設定",
+  "profile_bankAccountSubtitle": "報酬の受取口座を設定",
+
+  "myProfile_bankAccountStatus": "銀行口座",
+  "myProfile_bankNotConfigured": "銀行口座未設定 — 報酬の受け取りには口座設定が必要です",
+  "myProfile_bankConfigured": "{bankName} 口座番号: {maskedNum}",
+  "@myProfile_bankConfigured": {
+    "placeholders": {
+      "bankName": { "type": "String" },
+      "maskedNum": { "type": "String" }
+    }
+  },
+
+  "bankAccount_title": "銀行口座設定",
+  "bankAccount_bankName": "銀行名",
+  "bankAccount_bankNameHint": "例: みずほ銀行",
+  "bankAccount_branchName": "支店名",
+  "bankAccount_branchCode": "支店コード（3桁）",
+  "bankAccount_branchCodeInvalid": "支店コードは3桁の数字で入力してください",
+  "bankAccount_accountType": "口座種別",
+  "bankAccount_accountTypeOrdinary": "普通",
+  "bankAccount_accountTypeCurrent": "当座",
+  "bankAccount_accountNumber": "口座番号（7桁）",
+  "bankAccount_accountNumberInvalid": "口座番号は7桁の数字で入力してください",
+  "bankAccount_accountHolderName": "口座名義（カタカナ）",
+  "bankAccount_accountHolderHint": "例: ヤマダ タロウ",
+  "bankAccount_accountHolderInvalid": "口座名義はカタカナで入力してください",
+  "bankAccount_save": "保存",
+  "bankAccount_saved": "銀行口座情報を保存しました",
+  "bankAccount_saveFailed": "口座情報の保存に失敗しました",
+  "bankAccount_required": "この項目は必須です",
+
+  "guestHome_lineLoginLoading": "LINEでログイン中...",
+  "guestHome_lineLoginFailed": "LINEログインに失敗しました",
+  "guestHome_lineLoginSuccess": "LINEでログインしました",
+
+  "accountLinking_title": "アカウント連携",
+  "accountLinking_linked": "連携済み",
+  "accountLinking_linkGoogle": "Googleを連携",
+  "accountLinking_linkApple": "Appleを連携",
+  "accountLinking_linkLine": "LINEを連携",
+  "accountLinking_unlink": "連携解除",
+  "accountLinking_unlinkConfirm": "連携を解除しますか？",
+  "accountLinking_cannotUnlinkLast": "最低1つのログイン方法が必要です",
+  "accountLinking_alreadyInUse": "このアカウントは既に別のユーザーに連携されています",
+
+  "accountMerge_title": "アカウント統合",
+  "accountMerge_description": "{email}に紐づいた別のアカウントが存在します。統合しますか？",
+  "@accountMerge_description": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMerge_warning": "この操作は取り消せません。統合元のアカウントは削除されます。",
+  "accountMerge_confirm": "統合する",
+  "accountMerge_success": "アカウントを統合しました",
+  "accountMerge_failed": "アカウント統合に失敗しました",
+  "accountMerge_rateLimited": "統合は1時間に1回までです",
+
+  "accountLinking_linkEmail": "Emailを連携",
+  "accountLinking_linkPhone": "電話番号を連携",
+  "phoneLinking_title": "電話番号を連携",
+  "phoneLinking_success": "電話番号を連携しました"
 }

@@ -17,6 +17,8 @@ import 'package:sumple1/presentation/widgets/form_divider.dart';
 import 'package:sumple1/presentation/widgets/labeled_field.dart';
 import 'package:sumple1/presentation/widgets/hint_card.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
+import 'package:sumple1/data/models/inspection_model.dart';
+import 'package:sumple1/presentation/widgets/inspection_item_editor.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -38,6 +40,8 @@ class _PostPageState extends State<PostPage> {
   final _picker = ImagePicker();
 
   bool _isLoading = false;
+  bool _isSavingDraft = false;
+  List<String> _customInspectionItems = List.from(InspectionModel.defaultCheckItems);
 
   bool _checkedAdmin = false;
   bool _isAdminUser = false;
@@ -157,6 +161,66 @@ class _PostPageState extends State<PostPage> {
     super.dispose();
   }
 
+  Future<void> _saveDraft() async {
+    if (_isSavingDraft) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.post_draftNeedTitle)),
+      );
+      return;
+    }
+
+    setState(() => _isSavingDraft = true);
+
+    try {
+      final location = _locationController.text.trim();
+      final priceText = _priceController.text.trim();
+      final dateKey = _dateController.text.trim();
+      final prefecture = guessPrefecture(location);
+      final lat = double.tryParse(_latitudeController.text.trim());
+      final lng = double.tryParse(_longitudeController.text.trim());
+      final monthKey = dateKey.isNotEmpty ? date_utils.monthKeyFromDateKey(dateKey) : null;
+
+      await FirebaseFirestore.instance.collection('jobs').add({
+        'title': title,
+        'location': location,
+        'prefecture': prefecture,
+        'price': int.tryParse(priceText) ?? 0,
+        'status': 'draft',
+        'date': dateKey,
+        if (dateKey.isNotEmpty) 'workDateKey': dateKey,
+        if (monthKey != null) 'workMonthKey': monthKey,
+        'ownerId': user.uid,
+        if (lat != null) 'latitude': lat,
+        if (lng != null) 'longitude': lng,
+        if (_customInspectionItems.isNotEmpty) 'customInspectionItems': _customInspectionItems,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'description': '',
+        'notes': '',
+      });
+
+      if (!mounted) return;
+      AppHaptics.success();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.post_draftSaved)),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.post_draftSaveFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isSavingDraft = false);
+    }
+  }
+
   Future<void> _submit() async {
     if (_isLoading) return;
 
@@ -223,6 +287,7 @@ class _PostPageState extends State<PostPage> {
         'location': location,
         'prefecture': prefecture,
         'price': price,
+        'status': 'published',
 
         'date': dateKey,
         'workDateKey': dateKey,
@@ -232,6 +297,8 @@ class _PostPageState extends State<PostPage> {
 
         if (lat != null) 'latitude': lat,
         if (lng != null) 'longitude': lng,
+
+        if (_customInspectionItems.isNotEmpty) 'customInspectionItems': _customInspectionItems,
 
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
@@ -277,6 +344,15 @@ class _PostPageState extends State<PostPage> {
           context.l10n.post_title,
           style: TextStyle(color: context.appColors.textPrimary, fontWeight: FontWeight.w800),
         ),
+        actions: [
+          TextButton.icon(
+            onPressed: (_isSavingDraft || _isLoading) ? null : _saveDraft,
+            icon: _isSavingDraft
+                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.save_outlined, size: 18),
+            label: Text(context.l10n.post_saveDraft),
+          ),
+        ],
       ),
       bottomNavigationBar: SafeArea(
         top: false,
@@ -451,6 +527,18 @@ class _PostPageState extends State<PostPage> {
                       label: Text(context.l10n.post_addImages(_selectedImages.length.toString(), _maxImages.toString())),
                     ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            SectionTitle(
+              title: context.l10n.inspection_customItems,
+              subtitle: context.l10n.inspection_customItemsHelp,
+            ),
+            const SizedBox(height: 10),
+            WhiteCard(
+              child: InspectionItemEditor(
+                items: _customInspectionItems,
+                onChanged: (items) => setState(() => _customInspectionItems = items),
               ),
             ),
             const SizedBox(height: 10),

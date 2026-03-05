@@ -6,6 +6,7 @@ import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/services/line_auth_service.dart';
 import 'package:sumple1/core/services/apple_auth_service.dart';
+import 'package:sumple1/core/services/google_auth_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
@@ -28,6 +29,7 @@ class GuestHomePage extends StatefulWidget {
 class _GuestHomePageState extends State<GuestHomePage> {
   final _authService = AuthService();
   final _appleAuthService = AppleAuthService();
+  final _googleAuthService = GoogleAuthService();
   bool _isLoading = false;
   double _opacity = 0.0;
 
@@ -62,6 +64,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_guestLoginSuccess);
+      context.go('/');
     } catch (e) {
       Logger.error('Guest sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
@@ -87,10 +90,64 @@ class _GuestHomePageState extends State<GuestHomePage> {
       Logger.info('Apple sign in successful', tag: 'GuestHomePage');
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.guestHome_appleLoginSuccess);
+      context.go('/');
     } catch (e) {
-      Logger.error('Apple sign in failed', tag: 'GuestHomePage', error: e);
+      Logger.error('Apple sign in failed: $e', tag: 'GuestHomePage', error: e);
+      if (!mounted) return;
+      // デバッグ用に具体的なエラーメッセージを表示
+      ErrorHandler.showError(context, e, customMessage: 'Apple: ${e.runtimeType}: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await _googleAuthService.signInWithGoogle();
+      if (result == null) {
+        // ユーザーがキャンセル
+        Logger.info('Google sign in cancelled', tag: 'GuestHomePage');
+        return;
+      }
+      await _recordTermsAcceptance();
+      Logger.info('Google sign in successful', tag: 'GuestHomePage');
+      if (!mounted) return;
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_googleLoginSuccess);
+      context.go('/');
+    } catch (e) {
+      Logger.error('Google sign in failed', tag: 'GuestHomePage', error: e);
       if (!mounted) return;
       ErrorHandler.showError(context, e);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _signInWithLine() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await LineAuthService().startLineLogin();
+      if (result == null) {
+        // Web: リダイレクトフロー or キャンセル
+        Logger.info('LINE sign in cancelled or redirecting', tag: 'GuestHomePage');
+        return;
+      }
+      await _recordTermsAcceptance();
+      Logger.info('LINE sign in successful', tag: 'GuestHomePage');
+      if (!mounted) return;
+      ErrorHandler.showSuccess(context, context.l10n.guestHome_lineLoginSuccess);
+      context.go('/');
+    } catch (e) {
+      Logger.error('LINE sign in failed', tag: 'GuestHomePage', error: e);
+      if (!mounted) return;
+      ErrorHandler.showError(context, e, customMessage: context.l10n.guestHome_lineLoginFailed);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -298,12 +355,47 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 ],
                               ),
                               child: ElevatedButton.icon(
-                                onPressed: _isLoading ? null : () {
-                                  LineAuthService().startLineLogin();
-                                },
+                                onPressed: _isLoading ? null : _signInWithLine,
                                 icon: const Icon(Icons.chat_bubble, size: 22),
                                 label: Text(
                                   context.l10n.guestHome_lineLogin,
+                                  style: AppTextStyles.button.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4285F4),
+                                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF4285F4).withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: _isLoading ? null : _signInWithGoogle,
+                                icon: const Icon(Icons.g_mobiledata, size: 28),
+                                label: Text(
+                                  context.l10n.guestHome_googleLogin,
                                   style: AppTextStyles.button.copyWith(
                                     color: Colors.white,
                                     fontSize: 16,

@@ -52,6 +52,25 @@ class InspectionService {
     }
   }
 
+  /// ジョブのカスタム検査項目を取得（なければデフォルト）
+  Future<List<String>> getInspectionItems(String jobId) async {
+    try {
+      final doc = await _db.collection('jobs').doc(jobId).get();
+      final data = doc.data();
+      if (data != null && data['customInspectionItems'] is List) {
+        final items = (data['customInspectionItems'] as List)
+            .map((e) => e.toString())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        if (items.isNotEmpty) return items;
+      }
+    } catch (e) {
+      Logger.error('Failed to get inspection items',
+          tag: 'InspectionService', error: e);
+    }
+    return InspectionModel.defaultCheckItems;
+  }
+
   Stream<InspectionModel?> watchLatestInspection(String applicationId) {
     return _inspectionsRef(applicationId)
         .orderBy('createdAt', descending: true)

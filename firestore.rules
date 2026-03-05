@@ -32,7 +32,7 @@ service cloud.firestore {
         && request.resource.data.title.size() <= 100
         && isString(request.resource.data.location)
         && request.resource.data.location.size() <= 200
-        && isString(request.resource.data.price)
+        && (isString(request.resource.data.price) || request.resource.data.price is int)
         && isString(request.resource.data.date)
         && (!("description" in request.resource.data.keys()) || request.resource.data.description.size() <= 5000)
         && (!("notes" in request.resource.data.keys()) || request.resource.data.notes.size() <= 2000);
@@ -47,7 +47,9 @@ service cloud.firestore {
           "updatedAt",
           "projectName",
           "latitude","longitude",
-          "requiredQualifications"
+          "requiredQualifications",
+          "status",
+          "customInspectionItems"
         ])
         && (!("title" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.title.size() <= 100)
         && (!("location" in request.resource.data.diff(resource.data).changedKeys()) || request.resource.data.location.size() <= 200)
@@ -97,7 +99,14 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/applications/$(appId)).data.applicantUid == uid()
           && isString(request.resource.data.workContent)
           && request.resource.data.workContent.size() <= 2000;
-        allow update, delete: if false;
+        // 管理者のみフィードバック関連フィールドを更新可能
+        allow update: if isAdminUid()
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            "adminComment", "reviewStatus", "reviewedBy", "reviewedAt", "updatedAt"
+          ])
+          && (!("adminComment" in request.resource.data.diff(resource.data).changedKeys())
+              || request.resource.data.adminComment.size() <= 2000);
+        allow delete: if false;
       }
 
       // --- 活動ログ (activity_logs) ---
@@ -134,11 +143,24 @@ service cloud.firestore {
           "familyName","givenName","familyNameKana","givenNameKana",
           "birthDate","gender","postalCode","address",
           "introduction","experienceYears","qualifications",
-          "termsAcceptedAt","privacyAcceptedAt"
+          "termsAcceptedAt","privacyAcceptedAt",
+          "bankAccount",
+          "linkedProviders"
         ])
         && request.resource.data.displayName.size() <= 50
         && (!("introduction" in request.resource.data.diff(resource.data).changedKeys())
-            || request.resource.data.introduction.size() <= 2000);
+            || request.resource.data.introduction.size() <= 2000)
+        && (!("bankAccount" in request.resource.data.diff(resource.data).changedKeys())
+            || (request.resource.data.bankAccount is map
+                && request.resource.data.bankAccount.keys().hasOnly([
+                  "bankName","branchName","branchCode","accountType","accountNumber","accountHolder"
+                ])
+                && request.resource.data.bankAccount.bankName is string
+                && request.resource.data.bankAccount.bankName.size() <= 50
+                && request.resource.data.bankAccount.branchCode is string
+                && request.resource.data.bankAccount.branchCode.size() == 3
+                && request.resource.data.bankAccount.accountNumber is string
+                && request.resource.data.bankAccount.accountNumber.size() == 7));
 
       allow delete: if false;
 
@@ -394,6 +416,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // --- LINE アカウントリンキング (Cloud Functions のみ管理) ---
+    match /line_linked_accounts/{lineUserId} {
+      allow read, write: if false;
+    }
+
     // --- 本人確認 (identity_verification) ---
     match /identity_verification/{verifyUid} {
       // ユーザーは自分のドキュメントのみ読み取り可能、管理者は全件
@@ -438,6 +465,21 @@ service cloud.firestore {
         && isString(request.resource.data.referrerUid)
         && request.resource.data.referrerUid != uid();
       allow update, delete: if false;
+    }
+
+    // --- 管理者メモ ---
+    match /admin_memos/{workerUid} {
+      allow read: if signedIn() && isAdminUid();
+      allow create: if signedIn() && isAdminUid()
+        && isString(request.resource.data.memo)
+        && request.resource.data.memo.size() <= 2000;
+      allow update: if signedIn() && isAdminUid()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "memo", "updatedAt", "updatedBy"
+        ])
+        && isString(request.resource.data.memo)
+        && request.resource.data.memo.size() <= 2000;
+      allow delete: if false;
     }
 
     // --- collectionGroup: 資格 (admin読み取り) ---

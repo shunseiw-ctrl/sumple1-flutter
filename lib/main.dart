@@ -26,6 +26,7 @@ import 'core/services/auth_service.dart';
 import 'core/enums/user_role.dart';
 import 'core/services/firestore_setup.dart';
 import 'core/services/line_auth_service.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 
@@ -128,16 +129,20 @@ Future<void> main() async {
   Logger.info('Environment: ${AppConfig.environmentName}', tag: 'main');
 
   // --- App Check ---
-  if (kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-    );
-  } else {
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.deviceCheck,
-    );
+  try {
+    if (kDebugMode) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      ).timeout(const Duration(seconds: 10));
+    } else {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      ).timeout(const Duration(seconds: 10));
+    }
+  } catch (e) {
+    Logger.error('App Check activation failed', tag: 'main', error: e);
   }
 
   // --- Crashlytics ---
@@ -149,7 +154,11 @@ Future<void> main() async {
     };
   }
 
-  await FirestoreSetup.initialize();
+  try {
+    await FirestoreSetup.initialize().timeout(const Duration(seconds: 10));
+  } catch (e) {
+    Logger.error('Firestore setup failed', tag: 'main', error: e);
+  }
 
   Logger.info('Firebase initialized', tag: 'main');
 
@@ -161,7 +170,22 @@ Future<void> main() async {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeFCM());
   }
 
-  await LineAuthService().handleLineCallbackIfNeeded();
+  // LINE SDK 初期化（モバイルのみ）
+  if (!kIsWeb) {
+    try {
+      await LineSDK.instance.setup('2009209066')
+          .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      Logger.error('LINE SDK setup failed', tag: 'main', error: e);
+    }
+  }
+
+  try {
+    await LineAuthService().handleLineCallbackIfNeeded()
+        .timeout(const Duration(seconds: 10));
+  } catch (e) {
+    Logger.error('LINE callback handling failed', tag: 'main', error: e);
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 
