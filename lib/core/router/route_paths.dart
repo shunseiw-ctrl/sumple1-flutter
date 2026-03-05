@@ -31,6 +31,7 @@ class RoutePaths {
   static const String accountSettings = '/account-settings';
   static const String identityVerification = '/identity-verification';
   static const String stripeOnboarding = '/stripe-onboarding';
+  static const String bankAccountSettings = '/bank-account-settings';
 
   // --- 通知 ---
   static const String notifications = '/notifications';

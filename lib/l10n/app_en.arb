@@ -2188,5 +2188,41 @@
   "notifications_filterAll": "All",
   "notifications_filterApplications": "Applications",
   "notifications_filterReports": "Reports",
-  "notifications_filterInspections": "Inspections"
+  "notifications_filterInspections": "Inspections",
+
+  "guestHome_googleLogin": "Sign in with Google",
+  "guestHome_googleLoginSuccess": "Signed in with Google",
+  "signInWithGoogle": "Sign in with Google",
+
+  "profile_bankAccount": "Bank Account",
+  "profile_bankAccountSubtitle": "Set up your payment account",
+
+  "myProfile_bankAccountStatus": "Bank Account",
+  "myProfile_bankNotConfigured": "No bank account — Set up your account to receive payments",
+  "myProfile_bankConfigured": "{bankName} Account: {maskedNum}",
+  "@myProfile_bankConfigured": {
+    "placeholders": {
+      "bankName": { "type": "String" },
+      "maskedNum": { "type": "String" }
+    }
+  },
+
+  "bankAccount_title": "Bank Account Settings",
+  "bankAccount_bankName": "Bank Name",
+  "bankAccount_bankNameHint": "e.g. Mizuho Bank",
+  "bankAccount_branchName": "Branch Name",
+  "bankAccount_branchCode": "Branch Code (3 digits)",
+  "bankAccount_branchCodeInvalid": "Please enter a 3-digit branch code",
+  "bankAccount_accountType": "Account Type",
+  "bankAccount_accountTypeOrdinary": "Savings",
+  "bankAccount_accountTypeCurrent": "Checking",
+  "bankAccount_accountNumber": "Account Number (7 digits)",
+  "bankAccount_accountNumberInvalid": "Please enter a 7-digit account number",
+  "bankAccount_accountHolderName": "Account Holder Name (Katakana)",
+  "bankAccount_accountHolderHint": "e.g. Yamada Taro",
+  "bankAccount_accountHolderInvalid": "Please enter the name in Katakana",
+  "bankAccount_save": "Save",
+  "bankAccount_saved": "Bank account information saved",
+  "bankAccount_saveFailed": "Failed to save bank account information",
+  "bankAccount_required": "This field is required"
 }

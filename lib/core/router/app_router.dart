@@ -28,6 +28,7 @@ import '../../pages/my_profile_page.dart';
 import '../../pages/account_settings_page.dart';
 import '../../pages/identity_verification_page.dart';
 import '../../pages/stripe_onboarding_page.dart';
+import '../../pages/bank_account_settings_page.dart';
 import '../../pages/notifications_page.dart';
 import '../../pages/contact_page.dart';
 import '../../pages/faq_page.dart';
@@ -246,6 +247,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: StripeOnboardingPage(email: email),
           );
         },
+      ),
+
+      GoRoute(
+        path: RoutePaths.bankAccountSettings,
+        pageBuilder: (context, state) => slideRightTransition(
+          key: state.pageKey,
+          child: const BankAccountSettingsPage(),
+        ),
       ),
 
       // --- 通知 ---

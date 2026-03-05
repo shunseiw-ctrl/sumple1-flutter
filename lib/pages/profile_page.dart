@@ -221,13 +221,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     ProfileMenuTile(
                       icon: Icons.account_balance_outlined,
-                      iconColor: const Color(0xFF635BFF),
-                      title: context.l10n.profile_stripeAccount,
-                      subtitle: context.l10n.profile_stripeAccountSubtitle,
+                      iconColor: context.appColors.primary,
+                      title: context.l10n.profile_bankAccount,
+                      subtitle: context.l10n.profile_bankAccountSubtitle,
                       onTap: () {
-                        context.push(RoutePaths.stripeOnboarding, extra: {
-                          'email': user?.email,
-                        });
+                        context.push(RoutePaths.bankAccountSettings);
                       },
                     ),
                     ProfileMenuTile(

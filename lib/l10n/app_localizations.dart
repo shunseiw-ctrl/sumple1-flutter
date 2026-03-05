@@ -8320,6 +8320,162 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'検査'**
   String get notifications_filterInspections;
+
+  /// No description provided for @guestHome_googleLogin.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでログイン'**
+  String get guestHome_googleLogin;
+
+  /// No description provided for @guestHome_googleLoginSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでログインしました'**
+  String get guestHome_googleLoginSuccess;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In ja, this message translates to:
+  /// **'Googleでサインイン'**
+  String get signInWithGoogle;
+
+  /// No description provided for @profile_bankAccount.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座設定'**
+  String get profile_bankAccount;
+
+  /// No description provided for @profile_bankAccountSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'報酬の受取口座を設定'**
+  String get profile_bankAccountSubtitle;
+
+  /// No description provided for @myProfile_bankAccountStatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座'**
+  String get myProfile_bankAccountStatus;
+
+  /// No description provided for @myProfile_bankNotConfigured.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座未設定 — 報酬の受け取りには口座設定が必要です'**
+  String get myProfile_bankNotConfigured;
+
+  /// No description provided for @myProfile_bankConfigured.
+  ///
+  /// In ja, this message translates to:
+  /// **'{bankName} 口座番号: {maskedNum}'**
+  String myProfile_bankConfigured(String bankName, String maskedNum);
+
+  /// No description provided for @bankAccount_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座設定'**
+  String get bankAccount_title;
+
+  /// No description provided for @bankAccount_bankName.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行名'**
+  String get bankAccount_bankName;
+
+  /// No description provided for @bankAccount_bankNameHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'例: みずほ銀行'**
+  String get bankAccount_bankNameHint;
+
+  /// No description provided for @bankAccount_branchName.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店名'**
+  String get bankAccount_branchName;
+
+  /// No description provided for @bankAccount_branchCode.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店コード（3桁）'**
+  String get bankAccount_branchCode;
+
+  /// No description provided for @bankAccount_branchCodeInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'支店コードは3桁の数字で入力してください'**
+  String get bankAccount_branchCodeInvalid;
+
+  /// No description provided for @bankAccount_accountType.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座種別'**
+  String get bankAccount_accountType;
+
+  /// No description provided for @bankAccount_accountTypeOrdinary.
+  ///
+  /// In ja, this message translates to:
+  /// **'普通'**
+  String get bankAccount_accountTypeOrdinary;
+
+  /// No description provided for @bankAccount_accountTypeCurrent.
+  ///
+  /// In ja, this message translates to:
+  /// **'当座'**
+  String get bankAccount_accountTypeCurrent;
+
+  /// No description provided for @bankAccount_accountNumber.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座番号（7桁）'**
+  String get bankAccount_accountNumber;
+
+  /// No description provided for @bankAccount_accountNumberInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座番号は7桁の数字で入力してください'**
+  String get bankAccount_accountNumberInvalid;
+
+  /// No description provided for @bankAccount_accountHolderName.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座名義（カタカナ）'**
+  String get bankAccount_accountHolderName;
+
+  /// No description provided for @bankAccount_accountHolderHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'例: ヤマダ タロウ'**
+  String get bankAccount_accountHolderHint;
+
+  /// No description provided for @bankAccount_accountHolderInvalid.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座名義はカタカナで入力してください'**
+  String get bankAccount_accountHolderInvalid;
+
+  /// No description provided for @bankAccount_save.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存'**
+  String get bankAccount_save;
+
+  /// No description provided for @bankAccount_saved.
+  ///
+  /// In ja, this message translates to:
+  /// **'銀行口座情報を保存しました'**
+  String get bankAccount_saved;
+
+  /// No description provided for @bankAccount_saveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'口座情報の保存に失敗しました'**
+  String get bankAccount_saveFailed;
+
+  /// No description provided for @bankAccount_required.
+  ///
+  /// In ja, this message translates to:
+  /// **'この項目は必須です'**
+  String get bankAccount_required;
 }
 
 class _AppLocalizationsDelegate

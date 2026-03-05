@@ -4461,4 +4461,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifications_filterInspections => 'Inspections';
+
+  @override
+  String get guestHome_googleLogin => 'Sign in with Google';
+
+  @override
+  String get guestHome_googleLoginSuccess => 'Signed in with Google';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get profile_bankAccount => 'Bank Account';
+
+  @override
+  String get profile_bankAccountSubtitle => 'Set up your payment account';
+
+  @override
+  String get myProfile_bankAccountStatus => 'Bank Account';
+
+  @override
+  String get myProfile_bankNotConfigured =>
+      'No bank account — Set up your account to receive payments';
+
+  @override
+  String myProfile_bankConfigured(String bankName, String maskedNum) {
+    return '$bankName Account: $maskedNum';
+  }
+
+  @override
+  String get bankAccount_title => 'Bank Account Settings';
+
+  @override
+  String get bankAccount_bankName => 'Bank Name';
+
+  @override
+  String get bankAccount_bankNameHint => 'e.g. Mizuho Bank';
+
+  @override
+  String get bankAccount_branchName => 'Branch Name';
+
+  @override
+  String get bankAccount_branchCode => 'Branch Code (3 digits)';
+
+  @override
+  String get bankAccount_branchCodeInvalid =>
+      'Please enter a 3-digit branch code';
+
+  @override
+  String get bankAccount_accountType => 'Account Type';
+
+  @override
+  String get bankAccount_accountTypeOrdinary => 'Savings';
+
+  @override
+  String get bankAccount_accountTypeCurrent => 'Checking';
+
+  @override
+  String get bankAccount_accountNumber => 'Account Number (7 digits)';
+
+  @override
+  String get bankAccount_accountNumberInvalid =>
+      'Please enter a 7-digit account number';
+
+  @override
+  String get bankAccount_accountHolderName => 'Account Holder Name (Katakana)';
+
+  @override
+  String get bankAccount_accountHolderHint => 'e.g. Yamada Taro';
+
+  @override
+  String get bankAccount_accountHolderInvalid =>
+      'Please enter the name in Katakana';
+
+  @override
+  String get bankAccount_save => 'Save';
+
+  @override
+  String get bankAccount_saved => 'Bank account information saved';
+
+  @override
+  String get bankAccount_saveFailed =>
+      'Failed to save bank account information';
+
+  @override
+  String get bankAccount_required => 'This field is required';
 }

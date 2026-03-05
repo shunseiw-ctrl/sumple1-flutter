@@ -47,6 +47,7 @@ exports.lineAuthStart = onRequest(
       }
 
       const state = crypto.randomBytes(32).toString("hex");
+      const platform = req.query.platform || "web";
       const callbackUrl = `${req.protocol}://${req.hostname}/auth/line/callback`;
 
       // Firestore に state を保存
@@ -54,6 +55,7 @@ exports.lineAuthStart = onRequest(
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         expiresAt: new Date(Date.now() + STATE_TTL_MS),
         callbackUrl,
+        platform,
       });
 
       const params = new URLSearchParams({
@@ -206,7 +208,14 @@ exports.lineAuthCallback = onRequest(
       });
 
       logger.info("LINE login successful", { uid: firebaseUid });
-      res.redirect(302, `${baseUrl}/#line_code=${exchangeCode}`);
+
+      // モバイルの場合はUniversal Linkパスにリダイレクト
+      const statePlatform = stateData.platform || "web";
+      if (statePlatform === "mobile") {
+        res.redirect(302, `${baseUrl}/line-callback?code=${exchangeCode}`);
+      } else {
+        res.redirect(302, `${baseUrl}/#line_code=${exchangeCode}`);
+      }
     } catch (e) {
       logger.error("lineAuthCallback failed", e);
       const baseUrl = `${req.protocol}://${req.hostname}`;

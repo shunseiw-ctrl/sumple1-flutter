@@ -4356,4 +4356,84 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notifications_filterInspections => '検査';
+
+  @override
+  String get guestHome_googleLogin => 'Googleでログイン';
+
+  @override
+  String get guestHome_googleLoginSuccess => 'Googleでログインしました';
+
+  @override
+  String get signInWithGoogle => 'Googleでサインイン';
+
+  @override
+  String get profile_bankAccount => '銀行口座設定';
+
+  @override
+  String get profile_bankAccountSubtitle => '報酬の受取口座を設定';
+
+  @override
+  String get myProfile_bankAccountStatus => '銀行口座';
+
+  @override
+  String get myProfile_bankNotConfigured => '銀行口座未設定 — 報酬の受け取りには口座設定が必要です';
+
+  @override
+  String myProfile_bankConfigured(String bankName, String maskedNum) {
+    return '$bankName 口座番号: $maskedNum';
+  }
+
+  @override
+  String get bankAccount_title => '銀行口座設定';
+
+  @override
+  String get bankAccount_bankName => '銀行名';
+
+  @override
+  String get bankAccount_bankNameHint => '例: みずほ銀行';
+
+  @override
+  String get bankAccount_branchName => '支店名';
+
+  @override
+  String get bankAccount_branchCode => '支店コード（3桁）';
+
+  @override
+  String get bankAccount_branchCodeInvalid => '支店コードは3桁の数字で入力してください';
+
+  @override
+  String get bankAccount_accountType => '口座種別';
+
+  @override
+  String get bankAccount_accountTypeOrdinary => '普通';
+
+  @override
+  String get bankAccount_accountTypeCurrent => '当座';
+
+  @override
+  String get bankAccount_accountNumber => '口座番号（7桁）';
+
+  @override
+  String get bankAccount_accountNumberInvalid => '口座番号は7桁の数字で入力してください';
+
+  @override
+  String get bankAccount_accountHolderName => '口座名義（カタカナ）';
+
+  @override
+  String get bankAccount_accountHolderHint => '例: ヤマダ タロウ';
+
+  @override
+  String get bankAccount_accountHolderInvalid => '口座名義はカタカナで入力してください';
+
+  @override
+  String get bankAccount_save => '保存';
+
+  @override
+  String get bankAccount_saved => '銀行口座情報を保存しました';
+
+  @override
+  String get bankAccount_saveFailed => '口座情報の保存に失敗しました';
+
+  @override
+  String get bankAccount_required => 'この項目は必須です';
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/logger.dart';
 import '../router/route_paths.dart';
+import 'line_auth_service.dart';
 
 /// Deep Link ルート情報
 class DeepLinkRoute {
@@ -72,6 +73,9 @@ class DeepLinkService {
         return const DeepLinkRoute(path: '/notifications');
       case 'profile':
         return const DeepLinkRoute(path: '/profile');
+      case 'line-callback':
+        // LINE OAuthコールバック — _handleUri で直接処理するため null 返却
+        return null;
       default:
         Logger.warning('Unknown deep link path: ${uri.path}',
             tag: 'DeepLinkService');
@@ -168,6 +172,15 @@ class DeepLinkService {
 
   void _handleUri(Uri uri) {
     Logger.info('Deep link received: $uri', tag: 'DeepLinkService');
+
+    // LINE OAuth モバイルコールバック処理
+    final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+    if (segments.isNotEmpty && segments[0] == 'line-callback') {
+      Logger.info('LINE mobile callback detected', tag: 'DeepLinkService');
+      LineAuthService().handleMobileLineCallback(uri);
+      return;
+    }
+
     final route = parseUri(uri);
     if (route != null) {
       _navigateTo(route);

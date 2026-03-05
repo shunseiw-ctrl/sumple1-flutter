@@ -50,6 +50,22 @@
       {
         "source": "/referral/**",
         "destination": "/index.html"
+      },
+      {
+        "source": "/line-callback",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/auth/line",
+        "function": "lineAuthStart"
+      },
+      {
+        "source": "/auth/line/callback",
+        "function": "lineAuthCallback"
+      },
+      {
+        "source": "/auth/line/exchange",
+        "function": "lineAuthExchange"
       }
     ]
   },

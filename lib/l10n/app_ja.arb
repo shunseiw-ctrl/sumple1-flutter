@@ -2959,5 +2959,41 @@
   "notifications_filterAll": "すべて",
   "notifications_filterApplications": "応募",
   "notifications_filterReports": "日報",
-  "notifications_filterInspections": "検査"
+  "notifications_filterInspections": "検査",
+
+  "guestHome_googleLogin": "Googleでログイン",
+  "guestHome_googleLoginSuccess": "Googleでログインしました",
+  "signInWithGoogle": "Googleでサインイン",
+
+  "profile_bankAccount": "銀行口座設定",
+  "profile_bankAccountSubtitle": "報酬の受取口座を設定",
+
+  "myProfile_bankAccountStatus": "銀行口座",
+  "myProfile_bankNotConfigured": "銀行口座未設定 — 報酬の受け取りには口座設定が必要です",
+  "myProfile_bankConfigured": "{bankName} 口座番号: {maskedNum}",
+  "@myProfile_bankConfigured": {
+    "placeholders": {
+      "bankName": { "type": "String" },
+      "maskedNum": { "type": "String" }
+    }
+  },
+
+  "bankAccount_title": "銀行口座設定",
+  "bankAccount_bankName": "銀行名",
+  "bankAccount_bankNameHint": "例: みずほ銀行",
+  "bankAccount_branchName": "支店名",
+  "bankAccount_branchCode": "支店コード（3桁）",
+  "bankAccount_branchCodeInvalid": "支店コードは3桁の数字で入力してください",
+  "bankAccount_accountType": "口座種別",
+  "bankAccount_accountTypeOrdinary": "普通",
+  "bankAccount_accountTypeCurrent": "当座",
+  "bankAccount_accountNumber": "口座番号（7桁）",
+  "bankAccount_accountNumberInvalid": "口座番号は7桁の数字で入力してください",
+  "bankAccount_accountHolderName": "口座名義（カタカナ）",
+  "bankAccount_accountHolderHint": "例: ヤマダ タロウ",
+  "bankAccount_accountHolderInvalid": "口座名義はカタカナで入力してください",
+  "bankAccount_save": "保存",
+  "bankAccount_saved": "銀行口座情報を保存しました",
+  "bankAccount_saveFailed": "口座情報の保存に失敗しました",
+  "bankAccount_required": "この項目は必須です"
 }

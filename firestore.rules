@@ -143,11 +143,23 @@ service cloud.firestore {
           "familyName","givenName","familyNameKana","givenNameKana",
           "birthDate","gender","postalCode","address",
           "introduction","experienceYears","qualifications",
-          "termsAcceptedAt","privacyAcceptedAt"
+          "termsAcceptedAt","privacyAcceptedAt",
+          "bankAccount"
         ])
         && request.resource.data.displayName.size() <= 50
         && (!("introduction" in request.resource.data.diff(resource.data).changedKeys())
-            || request.resource.data.introduction.size() <= 2000);
+            || request.resource.data.introduction.size() <= 2000)
+        && (!("bankAccount" in request.resource.data.diff(resource.data).changedKeys())
+            || (request.resource.data.bankAccount is map
+                && request.resource.data.bankAccount.keys().hasOnly([
+                  "bankName","branchName","branchCode","accountType","accountNumber","accountHolder"
+                ])
+                && request.resource.data.bankAccount.bankName is string
+                && request.resource.data.bankAccount.bankName.size() <= 50
+                && request.resource.data.bankAccount.branchCode is string
+                && request.resource.data.bankAccount.branchCode.size() == 3
+                && request.resource.data.bankAccount.accountNumber is string
+                && request.resource.data.bankAccount.accountNumber.size() == 7));
 
       allow delete: if false;
 
