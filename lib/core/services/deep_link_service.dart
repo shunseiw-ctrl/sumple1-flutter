@@ -30,6 +30,12 @@ class DeepLinkService {
     // アプリがリンクから起動された場合の初回処理
     _appLinks.getInitialLink().then((uri) {
       if (uri != null) {
+        // Firebase Auth コールバックはSDKが自動処理するのでスキップ
+        if (uri.scheme.startsWith('com.googleusercontent.apps')) {
+          Logger.info('Firebase Auth initial link, skipping',
+              tag: 'DeepLinkService');
+          return;
+        }
         _handleUri(uri);
       }
     });
@@ -172,6 +178,12 @@ class DeepLinkService {
 
   void _handleUri(Uri uri) {
     Logger.info('Deep link received: $uri', tag: 'DeepLinkService');
+
+    // Firebase Auth コールバック（reCAPTCHA等）はSDKに委譲してスキップ
+    if (uri.scheme.startsWith('com.googleusercontent.apps')) {
+      Logger.info('Firebase Auth callback, skipping', tag: 'DeepLinkService');
+      return;
+    }
 
     // LINE OAuth モバイルコールバック処理
     final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
