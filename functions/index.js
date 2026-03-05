@@ -64,6 +64,10 @@ exports.getExpressDashboardLink = stripe.getExpressDashboardLink;
 const { deleteUserData } = require("./src/accountDeletion");
 exports.deleteUserData = deleteUserData;
 
+// --- アカウント統合 ---
+const { mergeAccounts } = require("./src/accountMerge");
+exports.mergeAccounts = mergeAccounts;
+
 // --- データエクスポート (Phase 9) ---
 const { exportUserData } = require("./src/dataExport");
 exports.exportUserData = exportUserData;

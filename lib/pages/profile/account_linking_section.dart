@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sumple1/core/services/account_linking_service.dart';
@@ -28,11 +29,20 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
   Future<void> _linkGoogle() async {
     setState(() => _isLoading = true);
     try {
-      await _linkingService.linkGoogle();
-      if (mounted) {
+      final result = await _linkingService.linkGoogle();
+      if (!mounted) return;
+
+      if (result.needsMerge) {
+        await _showMergeConfirmation(
+          result.credential!,
+          result.conflictingEmail!,
+        );
+      } else if (result.success) {
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.accountLinking_linked)),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.accountLinking_linked)),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -42,7 +52,8 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
             : e.message ?? '');
       }
     } catch (e) {
-      Logger.error('Link Google failed', tag: 'AccountLinkingSection', error: e);
+      Logger.error('Link Google failed',
+          tag: 'AccountLinkingSection', error: e);
       if (mounted) _showError('Google連携エラー: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -52,11 +63,20 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
   Future<void> _linkApple() async {
     setState(() => _isLoading = true);
     try {
-      await _linkingService.linkApple();
-      if (mounted) {
+      final result = await _linkingService.linkApple();
+      if (!mounted) return;
+
+      if (result.needsMerge) {
+        await _showMergeConfirmation(
+          result.credential!,
+          result.conflictingEmail!,
+        );
+      } else if (result.success) {
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.accountLinking_linked)),
+          SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.accountLinking_linked)),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -66,8 +86,97 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
             : e.message ?? '');
       }
     } catch (e) {
-      Logger.error('Link Apple failed', tag: 'AccountLinkingSection', error: e);
+      Logger.error('Link Apple failed',
+          tag: 'AccountLinkingSection', error: e);
       if (mounted) _showError('Apple連携エラー: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  /// マージ確認ダイアログ表示
+  Future<void> _showMergeConfirmation(
+    AuthCredential credential,
+    String conflictingEmail,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.accountMerge_title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.accountMerge_description(conflictingEmail)),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded,
+                      color: Colors.orange, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.accountMerge_warning,
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: Colors.orange.shade800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.common_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.orange,
+            ),
+            child: Text(l10n.accountMerge_confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await _linkingService.mergeAndLink(credential, conflictingEmail);
+      if (mounted) {
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.accountMerge_success),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } on FirebaseFunctionsException catch (e) {
+      if (mounted) {
+        final msg = e.code == 'resource-exhausted'
+            ? l10n.accountMerge_rateLimited
+            : l10n.accountMerge_failed;
+        _showError(msg);
+      }
+    } catch (e) {
+      Logger.error('Merge failed', tag: 'AccountLinkingSection', error: e);
+      if (mounted) _showError(l10n.accountMerge_failed);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -152,7 +261,8 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
                 isLinked: _isLinked('google.com'),
                 linkLabel: l10n.accountLinking_linkGoogle,
                 onLink: _isLoading ? null : _linkGoogle,
-                onUnlink: _isLoading ? null : () => _unlinkProvider('google.com'),
+                onUnlink:
+                    _isLoading ? null : () => _unlinkProvider('google.com'),
                 canUnlink: _linkedProviders.length > 1,
               ),
               Divider(height: 1, color: context.appColors.divider),
@@ -164,7 +274,8 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
                 isLinked: _isLinked('apple.com'),
                 linkLabel: l10n.accountLinking_linkApple,
                 onLink: _isLoading ? null : _linkApple,
-                onUnlink: _isLoading ? null : () => _unlinkProvider('apple.com'),
+                onUnlink:
+                    _isLoading ? null : () => _unlinkProvider('apple.com'),
                 canUnlink: _linkedProviders.length > 1,
               ),
               Divider(height: 1, color: context.appColors.divider),
@@ -283,7 +394,8 @@ class _ProviderTile extends StatelessWidget {
             TextButton(
               onPressed: onLink,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 minimumSize: Size.zero,
               ),
               child: Text(

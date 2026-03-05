@@ -8548,6 +8548,48 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'このアカウントは既に別のユーザーに連携されています'**
   String get accountLinking_alreadyInUse;
+
+  /// No description provided for @accountMerge_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント統合'**
+  String get accountMerge_title;
+
+  /// No description provided for @accountMerge_description.
+  ///
+  /// In ja, this message translates to:
+  /// **'{email}に紐づいた別のアカウントが存在します。統合しますか？'**
+  String accountMerge_description(String email);
+
+  /// No description provided for @accountMerge_warning.
+  ///
+  /// In ja, this message translates to:
+  /// **'この操作は取り消せません。統合元のアカウントは削除されます。'**
+  String get accountMerge_warning;
+
+  /// No description provided for @accountMerge_confirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'統合する'**
+  String get accountMerge_confirm;
+
+  /// No description provided for @accountMerge_success.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウントを統合しました'**
+  String get accountMerge_success;
+
+  /// No description provided for @accountMerge_failed.
+  ///
+  /// In ja, this message translates to:
+  /// **'アカウント統合に失敗しました'**
+  String get accountMerge_failed;
+
+  /// No description provided for @accountMerge_rateLimited.
+  ///
+  /// In ja, this message translates to:
+  /// **'統合は1時間に1回までです'**
+  String get accountMerge_rateLimited;
 }
 
 class _AppLocalizationsDelegate

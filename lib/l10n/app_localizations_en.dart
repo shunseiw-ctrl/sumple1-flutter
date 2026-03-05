@@ -4585,4 +4585,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountLinking_alreadyInUse =>
       'This account is already linked to another user';
+
+  @override
+  String get accountMerge_title => 'Merge Accounts';
+
+  @override
+  String accountMerge_description(String email) {
+    return 'Another account is linked to $email. Would you like to merge?';
+  }
+
+  @override
+  String get accountMerge_warning =>
+      'This action cannot be undone. The merged account will be deleted.';
+
+  @override
+  String get accountMerge_confirm => 'Merge';
+
+  @override
+  String get accountMerge_success => 'Accounts merged successfully';
+
+  @override
+  String get accountMerge_failed => 'Account merge failed';
+
+  @override
+  String get accountMerge_rateLimited => 'Merge is limited to once per hour';
 }

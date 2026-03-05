@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:sumple1/core/services/line_auth_service.dart';
@@ -15,6 +17,8 @@ class MockHttpClient extends Mock implements http.Client {}
 class MockLineSDKWrapper extends Mock implements LineSDKWrapper {}
 
 class MockGoogleSignIn extends Mock {}
+
+class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
 
 void main() {
   group('LineSDKWrapper', () {
@@ -224,6 +228,7 @@ void main() {
   group('AccountLinkingService', () {
     late MockFirebaseAuth mockAuth;
     late FakeFirebaseFirestore fakeFirestore;
+    late MockFirebaseFunctions mockFunctions;
 
     setUp(() {
       mockAuth = MockFirebaseAuth(
@@ -235,12 +240,14 @@ void main() {
         ),
       );
       fakeFirestore = FakeFirebaseFirestore();
+      mockFunctions = MockFirebaseFunctions();
     });
 
     test('getLinkedProviders が providerData を返す', () {
       final service = AccountLinkingService(
         auth: mockAuth,
         firestore: fakeFirestore,
+        functions: mockFunctions,
       );
 
       final providers = service.getLinkedProviders();
@@ -252,6 +259,7 @@ void main() {
       final service = AccountLinkingService(
         auth: mockAuth,
         firestore: fakeFirestore,
+        functions: mockFunctions,
       );
 
       // providerData が空なので getLinkedProviders() は0〜1
@@ -274,10 +282,44 @@ void main() {
       final service = AccountLinkingService(
         auth: lineAuth,
         firestore: fakeFirestore,
+        functions: mockFunctions,
       );
 
       final providers = service.getLinkedProviders();
       expect(providers.contains('line'), isTrue);
+    });
+  });
+
+  group('LinkResult', () {
+    test('LinkResult.success は success=true, needsMerge=false', () {
+      const result = LinkResult.success();
+      expect(result.success, isTrue);
+      expect(result.needsMerge, isFalse);
+      expect(result.credential, isNull);
+      expect(result.conflictingEmail, isNull);
+    });
+
+    test('LinkResult.cancelled は success=false, needsMerge=false', () {
+      const result = LinkResult.cancelled();
+      expect(result.success, isFalse);
+      expect(result.needsMerge, isFalse);
+      expect(result.credential, isNull);
+      expect(result.conflictingEmail, isNull);
+    });
+
+    test('LinkResult.merge は needsMerge=true でcredentialとemailを保持する', () {
+      final credential = GoogleAuthProvider.credential(
+        accessToken: 'test_access',
+        idToken: 'test_id',
+      );
+      final result = LinkResult.merge(
+        credential: credential,
+        conflictingEmail: 'old@example.com',
+      );
+      expect(result.success, isFalse);
+      expect(result.needsMerge, isTrue);
+      expect(result.credential, isNotNull);
+      expect(result.conflictingEmail, 'old@example.com');
     });
   });
 }

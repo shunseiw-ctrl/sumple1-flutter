@@ -2238,5 +2238,20 @@
   "accountLinking_unlink": "Unlink",
   "accountLinking_unlinkConfirm": "Are you sure you want to unlink this account?",
   "accountLinking_cannotUnlinkLast": "You must keep at least one login method",
-  "accountLinking_alreadyInUse": "This account is already linked to another user"
+  "accountLinking_alreadyInUse": "This account is already linked to another user",
+
+  "accountMerge_title": "Merge Accounts",
+  "accountMerge_description": "Another account is linked to {email}. Would you like to merge?",
+  "@accountMerge_description": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMerge_warning": "This action cannot be undone. The merged account will be deleted.",
+  "accountMerge_confirm": "Merge",
+  "accountMerge_success": "Accounts merged successfully",
+  "accountMerge_failed": "Account merge failed",
+  "accountMerge_rateLimited": "Merge is limited to once per hour"
 }

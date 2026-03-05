@@ -3009,5 +3009,20 @@
   "accountLinking_unlink": "連携解除",
   "accountLinking_unlinkConfirm": "連携を解除しますか？",
   "accountLinking_cannotUnlinkLast": "最低1つのログイン方法が必要です",
-  "accountLinking_alreadyInUse": "このアカウントは既に別のユーザーに連携されています"
+  "accountLinking_alreadyInUse": "このアカウントは既に別のユーザーに連携されています",
+
+  "accountMerge_title": "アカウント統合",
+  "accountMerge_description": "{email}に紐づいた別のアカウントが存在します。統合しますか？",
+  "@accountMerge_description": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMerge_warning": "この操作は取り消せません。統合元のアカウントは削除されます。",
+  "accountMerge_confirm": "統合する",
+  "accountMerge_success": "アカウントを統合しました",
+  "accountMerge_failed": "アカウント統合に失敗しました",
+  "accountMerge_rateLimited": "統合は1時間に1回までです"
 }

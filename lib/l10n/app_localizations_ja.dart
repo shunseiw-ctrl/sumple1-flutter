@@ -4472,4 +4472,27 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get accountLinking_alreadyInUse => 'このアカウントは既に別のユーザーに連携されています';
+
+  @override
+  String get accountMerge_title => 'アカウント統合';
+
+  @override
+  String accountMerge_description(String email) {
+    return '$emailに紐づいた別のアカウントが存在します。統合しますか？';
+  }
+
+  @override
+  String get accountMerge_warning => 'この操作は取り消せません。統合元のアカウントは削除されます。';
+
+  @override
+  String get accountMerge_confirm => '統合する';
+
+  @override
+  String get accountMerge_success => 'アカウントを統合しました';
+
+  @override
+  String get accountMerge_failed => 'アカウント統合に失敗しました';
+
+  @override
+  String get accountMerge_rateLimited => '統合は1時間に1回までです';
 }
