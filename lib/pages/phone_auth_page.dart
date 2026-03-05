@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -11,8 +12,9 @@ import 'package:sumple1/core/utils/error_handler.dart';
 
 class PhoneAuthPage extends StatefulWidget {
   final PhoneAuthService? phoneAuthService;
+  final bool linkMode;
 
-  const PhoneAuthPage({super.key, this.phoneAuthService});
+  const PhoneAuthPage({super.key, this.phoneAuthService, this.linkMode = false});
 
   @override
   State<PhoneAuthPage> createState() => _PhoneAuthPageState();
@@ -100,10 +102,19 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
       onAutoVerified: (credential) async {
         // 自動検証（Android）
         try {
-          await _phoneAuthService.signInWithCredential(credential);
-          if (!mounted) return;
-          ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
-          context.go(RoutePaths.home);
+          if (widget.linkMode) {
+            final user = FirebaseAuth.instance.currentUser;
+            if (user == null) throw Exception('Not signed in');
+            await user.linkWithCredential(credential);
+            if (!mounted) return;
+            ErrorHandler.showSuccess(context, context.l10n.phoneLinking_success);
+            Navigator.pop(context, true);
+          } else {
+            await _phoneAuthService.signInWithCredential(credential);
+            if (!mounted) return;
+            ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
+            context.go(RoutePaths.home);
+          }
         } catch (e) {
           if (!mounted) return;
           ErrorHandler.showError(context, e);
@@ -144,10 +155,19 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
         verificationId: _verificationId!,
         smsCode: code,
       );
-      await _phoneAuthService.signInWithCredential(credential);
-      if (!mounted) return;
-      ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
-      context.go(RoutePaths.home);
+      if (widget.linkMode) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) throw Exception('Not signed in');
+        await user.linkWithCredential(credential);
+        if (!mounted) return;
+        ErrorHandler.showSuccess(context, context.l10n.phoneLinking_success);
+        Navigator.pop(context, true);
+      } else {
+        await _phoneAuthService.signInWithCredential(credential);
+        if (!mounted) return;
+        ErrorHandler.showSuccess(context, context.l10n.phoneAuth_loginSuccess);
+        context.go(RoutePaths.home);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -160,7 +180,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
     return Scaffold(
       backgroundColor: context.appColors.background,
       appBar: AppBar(
-        title: Text(context.l10n.phoneAuth_title),
+        title: Text(widget.linkMode
+            ? context.l10n.phoneLinking_title
+            : context.l10n.phoneAuth_title),
         centerTitle: true,
       ),
       body: SafeArea(

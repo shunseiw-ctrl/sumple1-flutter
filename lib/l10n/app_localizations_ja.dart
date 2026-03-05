@@ -4495,4 +4495,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get accountMerge_rateLimited => '統合は1時間に1回までです';
+
+  @override
+  String get accountLinking_linkEmail => 'Emailを連携';
+
+  @override
+  String get accountLinking_linkPhone => '電話番号を連携';
+
+  @override
+  String get phoneLinking_title => '電話番号を連携';
+
+  @override
+  String get phoneLinking_success => '電話番号を連携しました';
 }

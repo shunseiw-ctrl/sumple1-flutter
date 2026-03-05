@@ -290,6 +290,62 @@ void main() {
     });
   });
 
+  group('AccountLinkingService linkEmail/linkPhone', () {
+    late MockFirebaseAuth mockAuth;
+    late FakeFirebaseFirestore fakeFirestore;
+    late MockFirebaseFunctions mockFunctions;
+
+    setUp(() {
+      mockAuth = MockFirebaseAuth(
+        signedIn: true,
+        mockUser: MockUser(
+          uid: 'test_user_456',
+          displayName: 'テストユーザー',
+          email: 'test@example.com',
+        ),
+      );
+      fakeFirestore = FakeFirebaseFirestore();
+      mockFunctions = MockFirebaseFunctions();
+    });
+
+    test('linkEmail 成功時 LinkResult.success を返す', () async {
+      final service = AccountLinkingService(
+        auth: mockAuth,
+        firestore: fakeFirestore,
+        functions: mockFunctions,
+      );
+
+      // MockFirebaseAuth の linkWithCredential はデフォルトで成功する
+      final result = await service.linkEmail(
+        email: 'new@example.com',
+        password: 'password123',
+      );
+
+      expect(result.success, isTrue);
+      expect(result.needsMerge, isFalse);
+    });
+
+    test('linkPhone 成功時 LinkResult.success を返す', () async {
+      final service = AccountLinkingService(
+        auth: mockAuth,
+        firestore: fakeFirestore,
+        functions: mockFunctions,
+      );
+
+      // PhoneAuthCredential を作成
+      final credential = PhoneAuthProvider.credential(
+        verificationId: 'test_verification_id',
+        smsCode: '123456',
+      );
+
+      // MockFirebaseAuth の linkWithCredential はデフォルトで成功する
+      final result = await service.linkPhone(credential: credential);
+
+      expect(result.success, isTrue);
+      expect(result.needsMerge, isFalse);
+    });
+  });
+
   group('LinkResult', () {
     test('LinkResult.success は success=true, needsMerge=false', () {
       const result = LinkResult.success();

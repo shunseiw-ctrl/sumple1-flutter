@@ -8590,6 +8590,30 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'統合は1時間に1回までです'**
   String get accountMerge_rateLimited;
+
+  /// No description provided for @accountLinking_linkEmail.
+  ///
+  /// In ja, this message translates to:
+  /// **'Emailを連携'**
+  String get accountLinking_linkEmail;
+
+  /// No description provided for @accountLinking_linkPhone.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携'**
+  String get accountLinking_linkPhone;
+
+  /// No description provided for @phoneLinking_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携'**
+  String get phoneLinking_title;
+
+  /// No description provided for @phoneLinking_success.
+  ///
+  /// In ja, this message translates to:
+  /// **'電話番号を連携しました'**
+  String get phoneLinking_success;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,8 @@ import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/l10n/app_localizations.dart';
+import 'package:sumple1/pages/profile/email_auth_dialog.dart';
+import 'package:sumple1/pages/phone_auth_page.dart';
 
 /// アカウント連携セクション（プロフィール設定ページ内）
 class AccountLinkingSection extends StatefulWidget {
@@ -91,6 +93,38 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
       if (mounted) _showError('Apple連携エラー: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _linkEmail() async {
+    await showEmailAuthDialog(
+      context: context,
+      linkMode: true,
+      onAuthStateChanged: () {
+        if (mounted) setState(() {});
+      },
+      onCredentialConflict: (credential, email) async {
+        if (!mounted) return;
+        await _showMergeConfirmation(credential, email);
+      },
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _linkPhone() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const PhoneAuthPage(linkMode: true),
+      ),
+    );
+    if (result == true && mounted) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.accountLinking_linked)),
+      );
     }
   }
 
@@ -297,10 +331,11 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
                 iconColor: context.appColors.primary,
                 label: 'Email',
                 isLinked: _isLinked('password'),
-                linkLabel: null,
-                onLink: null,
-                onUnlink: null,
-                canUnlink: false,
+                linkLabel: l10n.accountLinking_linkEmail,
+                onLink: _isLoading ? null : _linkEmail,
+                onUnlink:
+                    _isLoading ? null : () => _unlinkProvider('password'),
+                canUnlink: _linkedProviders.length > 1,
               ),
               Divider(height: 1, color: context.appColors.divider),
               // Phone
@@ -309,10 +344,11 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
                 iconColor: context.appColors.primary,
                 label: 'Phone',
                 isLinked: _isLinked('phone'),
-                linkLabel: null,
-                onLink: null,
-                onUnlink: null,
-                canUnlink: false,
+                linkLabel: l10n.accountLinking_linkPhone,
+                onLink: _isLoading ? null : _linkPhone,
+                onUnlink:
+                    _isLoading ? null : () => _unlinkProvider('phone'),
+                canUnlink: _linkedProviders.length > 1,
                 isLast: true,
               ),
             ],

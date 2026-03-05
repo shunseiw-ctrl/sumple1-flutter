@@ -4609,4 +4609,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountMerge_rateLimited => 'Merge is limited to once per hour';
+
+  @override
+  String get accountLinking_linkEmail => 'Link Email';
+
+  @override
+  String get accountLinking_linkPhone => 'Link Phone';
+
+  @override
+  String get phoneLinking_title => 'Link Phone Number';
+
+  @override
+  String get phoneLinking_success => 'Phone number linked';
 }
