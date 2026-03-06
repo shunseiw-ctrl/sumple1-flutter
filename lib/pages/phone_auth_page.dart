@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -9,6 +10,7 @@ import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/phone_auth_service.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 class PhoneAuthPage extends StatefulWidget {
   final PhoneAuthService? phoneAuthService;
@@ -86,6 +88,24 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
     });
   }
 
+  /// APNsトークンを確保してreCAPTCHAフォールバックを回避
+  Future<void> _ensureApnsToken() async {
+    try {
+      final messaging = FirebaseMessaging.instance;
+      final settings = await messaging.getNotificationSettings();
+      if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+        await messaging.requestPermission(alert: false, sound: false, badge: false);
+      }
+      // APNsトークン取得を待機（iOSのPhone認証に必要）
+      await messaging.getAPNSToken().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => null,
+      );
+    } catch (e) {
+      Logger.warning('APNs token fetch failed: $e', tag: 'PhoneAuth');
+    }
+  }
+
   Future<void> _sendCode() async {
     final raw = _phoneController.text.trim();
     if (!_isValidPhone(raw)) {
@@ -93,8 +113,16 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
       return;
     }
 
+    // キーボードを閉じる（SFSafariViewController表示の競合回避）
+    FocusScope.of(context).unfocus();
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+
     setState(() => _isLoading = true);
     final phoneNumber = _formatPhoneNumber(raw);
+
+    // APNsトークンを事前取得（サイレントプッシュ検証に必要）
+    await _ensureApnsToken();
 
     try {
       await _phoneAuthService.verifyPhoneNumber(

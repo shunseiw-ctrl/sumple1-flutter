@@ -59,6 +59,10 @@
 		<false/>
 		<key>LineSDKChannelID</key>
 		<string>2009209066</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+		</array>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
@@ -67,6 +71,14 @@
 				<key>CFBundleURLSchemes</key>
 				<array>
 					<string>com.googleusercontent.apps.319960355608-svkte1q6p25mv675qqf8a0di89mi85lk</string>
+				</array>
+			</dict>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>app-1-319960355608-ios-2711963242d7cf778c846d</string>
 				</array>
 			</dict>
 			<dict>
