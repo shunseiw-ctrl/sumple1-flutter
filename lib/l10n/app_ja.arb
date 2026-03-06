@@ -3010,6 +3010,22 @@
   "accountLinking_unlinkConfirm": "連携を解除しますか？",
   "accountLinking_cannotUnlinkLast": "最低1つのログイン方法が必要です",
   "accountLinking_alreadyInUse": "このアカウントは既に別のユーザーに連携されています",
+  "accountLinking_googleLinkError": "Google連携エラー: {error}",
+  "@accountLinking_googleLinkError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountLinking_appleLinkError": "Apple連携エラー: {error}",
+  "@accountLinking_appleLinkError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
 
   "accountMerge_title": "アカウント統合",
   "accountMerge_description": "{email}に紐づいた別のアカウントが存在します。統合しますか？",

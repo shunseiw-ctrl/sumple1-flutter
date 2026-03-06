@@ -4587,6 +4587,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'This account is already linked to another user';
 
   @override
+  String accountLinking_googleLinkError(String error) {
+    return 'Google link error: $error';
+  }
+
+  @override
+  String accountLinking_appleLinkError(String error) {
+    return 'Apple link error: $error';
+  }
+
+  @override
   String get accountMerge_title => 'Merge Accounts';
 
   @override

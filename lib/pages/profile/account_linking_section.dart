@@ -56,7 +56,7 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
     } catch (e) {
       Logger.error('Link Google failed',
           tag: 'AccountLinkingSection', error: e);
-      if (mounted) _showError('Google連携エラー: $e');
+      if (mounted) _showError(AppLocalizations.of(context)!.accountLinking_googleLinkError(e.toString()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -90,7 +90,7 @@ class _AccountLinkingSectionState extends State<AccountLinkingSection> {
     } catch (e) {
       Logger.error('Link Apple failed',
           tag: 'AccountLinkingSection', error: e);
-      if (mounted) _showError('Apple連携エラー: $e');
+      if (mounted) _showError(AppLocalizations.of(context)!.accountLinking_appleLinkError(e.toString()));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

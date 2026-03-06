@@ -111,7 +111,7 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
                         child: _SummaryCard(
                           icon: Icons.people,
                           iconColor: context.appColors.success,
-                          iconBgColor: const Color(0xFFD1FAE5),
+                          iconBgColor: context.appColors.successLight,
                           label: context.l10n.adminDashboard_applicationCount,
                           count: totalApplications,
                         ),
@@ -125,7 +125,7 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
                         child: _SummaryCard(
                           icon: Icons.person,
                           iconColor: context.appColors.warning,
-                          iconBgColor: const Color(0xFFFEF3C7),
+                          iconBgColor: context.appColors.warningLight,
                           label: context.l10n.adminDashboard_registeredUsers,
                           count: totalUsers,
                         ),
@@ -135,7 +135,7 @@ class _AdminDashboardTabState extends ConsumerState<AdminDashboardTab> {
                         child: _SummaryCard(
                           icon: Icons.pending_actions,
                           iconColor: context.appColors.error,
-                          iconBgColor: const Color(0xFFFEE2E2),
+                          iconBgColor: context.appColors.errorLight,
                           label: context.l10n.adminDashboard_pendingApplications,
                           count: pendingApplications,
                         ),

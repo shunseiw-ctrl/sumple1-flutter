@@ -4474,6 +4474,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountLinking_alreadyInUse => 'このアカウントは既に別のユーザーに連携されています';
 
   @override
+  String accountLinking_googleLinkError(String error) {
+    return 'Google連携エラー: $error';
+  }
+
+  @override
+  String accountLinking_appleLinkError(String error) {
+    return 'Apple連携エラー: $error';
+  }
+
+  @override
   String get accountMerge_title => 'アカウント統合';
 
   @override

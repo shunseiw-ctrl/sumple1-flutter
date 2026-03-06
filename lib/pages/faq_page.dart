@@ -58,7 +58,7 @@ class FaqPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: context.appColors.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE6E8EB)),
+              border: Border.all(color: context.appColors.border),
             ),
             child: ExpansionTile(
               tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

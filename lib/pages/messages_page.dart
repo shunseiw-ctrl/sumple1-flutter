@@ -18,6 +18,7 @@ import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/registration_prompt.dart';
 import 'package:sumple1/core/providers/connectivity_provider.dart';
 import 'package:sumple1/presentation/widgets/offline_banner.dart';
+import 'package:sumple1/presentation/widgets/status_badge.dart';
 import 'package:sumple1/presentation/widgets/skeleton_loader.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/debouncer.dart';
@@ -427,10 +428,11 @@ class _MessagesPageState extends ConsumerState<MessagesPage> {
 
                       final ymdText = _formatYmd(lastAt);
 
+                      final statusLabel = StatusBadge.labelFor(status, context);
                       final sub1 = lastText.isNotEmpty
                           ? lastText
-                          : (status.isEmpty ? ' ' : context.l10n.messages_statusLabel(status));
-                      final sub2 = lastText.isNotEmpty && status.isNotEmpty ? context.l10n.messages_statusLabel(status) : '';
+                          : (status.isEmpty ? ' ' : context.l10n.messages_statusLabel(statusLabel));
+                      final sub2 = lastText.isNotEmpty && status.isNotEmpty ? context.l10n.messages_statusLabel(statusLabel) : '';
                       final jobImageUrl = (app['jobImageUrlSnapshot'] ?? '').toString();
 
                       return StaggeredFadeSlide(

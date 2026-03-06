@@ -201,11 +201,11 @@ class _WorkDetailPageState extends ConsumerState<WorkDetailPage>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF1F4),
+                        color: context.appColors.borderLight,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        StatusBadge.labelFor(status),
+                        StatusBadge.labelFor(status, context),
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -565,10 +565,10 @@ class _PaymentInfoCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: context.appColors.borderLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.payments_outlined, size: 22, color: Colors.grey.shade500),
+                child: Icon(Icons.payments_outlined, size: 22, color: context.appColors.textHint),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -577,7 +577,7 @@ class _PaymentInfoCard extends StatelessWidget {
                   children: [
                     Text(context.l10n.workDetail_payment, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                     const SizedBox(height: 2),
-                    Text(context.l10n.workDetail_paymentUnconfirmed, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
+                    Text(context.l10n.workDetail_paymentUnconfirmed, style: TextStyle(color: context.appColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 14)),
                   ],
                 ),
               ),
@@ -644,7 +644,7 @@ class _PaymentInfoCard extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE6E8EB)),
+                border: Border.all(color: context.appColors.border),
               ),
               child: content,
             ),

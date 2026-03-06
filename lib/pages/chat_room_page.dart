@@ -226,7 +226,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     final myUid = _uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF8CABD9),
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
         backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
@@ -284,10 +284,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.black26,
+                              color: context.appColors.textHint.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(context.l10n.chatRoom_startConversation, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                            child: Text(context.l10n.chatRoom_startConversation, style: TextStyle(color: context.appColors.textSecondary, fontSize: 13)),
                           ),
                         );
                       }
@@ -316,12 +316,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                                     decoration: BoxDecoration(
-                                      color: Colors.black26,
+                                      color: context.appColors.textHint.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       _formatDate(context, createdAt),
-                                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                      style: TextStyle(color: context.appColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
                                     ),
                                   ),
                                 ),
@@ -351,11 +351,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 createdAt.compareTo(peerLastReadAt) <= 0)
                                               Text(
                                                 context.l10n.chatRoom_read,
-                                                style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),
+                                                style: TextStyle(fontSize: 10, color: context.appColors.textSecondary, fontWeight: FontWeight.w600),
                                               ),
                                             Text(
                                               _formatTime(createdAt),
-                                              style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                              style: TextStyle(fontSize: 10, color: context.appColors.textHint),
                                             ),
                                           ],
                                         ),
@@ -371,7 +371,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                               decoration: BoxDecoration(
-                                                color: mine ? const Color(0xFF7BC67E) : context.appColors.surface,
+                                                color: mine ? context.appColors.primary : context.appColors.surface,
                                                 borderRadius: BorderRadius.only(
                                                   topLeft: const Radius.circular(18),
                                                   topRight: const Radius.circular(18),
@@ -390,7 +390,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 text,
                                                 style: TextStyle(
                                                   fontSize: 15,
-                                                  color: mine ? Colors.white : context.appColors.textPrimary,
+                                                  color: mine ? context.appColors.textOnPrimary : context.appColors.textPrimary,
                                                   height: 1.4,
                                                 ),
                                               ),
@@ -401,7 +401,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         padding: const EdgeInsets.only(left: 4, bottom: 2),
                                         child: Text(
                                           _formatTime(createdAt),
-                                          style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                          style: TextStyle(fontSize: 10, color: context.appColors.textHint),
                                         ),
                                       ),
                                   ],

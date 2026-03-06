@@ -176,7 +176,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                       decoration: BoxDecoration(
                         color: context.appColors.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE6E8EB)),
+                        border: Border.all(color: context.appColors.border),
                       ),
                       child: Column(
                         children: [
@@ -210,7 +210,7 @@ class _ShiftQrPageState extends State<ShiftQrPage> {
                             decoration: BoxDecoration(
                               color: context.appColors.surface,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFE6E8EB)),
+                              border: Border.all(color: context.appColors.border),
                             ),
                             child: QrImageView(
                               data: qrData,

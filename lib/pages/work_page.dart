@@ -179,6 +179,9 @@ class _WorkPageState extends State<WorkPage>
               child: TabBar(
                 controller: _statusTabController,
                 isScrollable: true,
+                tabAlignment: TabAlignment.start,
+                padding: EdgeInsets.zero,
+                labelPadding: const EdgeInsets.symmetric(horizontal: 12),
                 labelColor: context.appColors.primary,
                 unselectedLabelColor: context.appColors.textSecondary,
                 indicatorColor: context.appColors.primary,

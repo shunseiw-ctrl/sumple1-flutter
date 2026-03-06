@@ -2239,6 +2239,22 @@
   "accountLinking_unlinkConfirm": "Are you sure you want to unlink this account?",
   "accountLinking_cannotUnlinkLast": "You must keep at least one login method",
   "accountLinking_alreadyInUse": "This account is already linked to another user",
+  "accountLinking_googleLinkError": "Google link error: {error}",
+  "@accountLinking_googleLinkError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountLinking_appleLinkError": "Apple link error: {error}",
+  "@accountLinking_appleLinkError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
 
   "accountMerge_title": "Merge Accounts",
   "accountMerge_description": "Another account is linked to {email}. Would you like to merge?",

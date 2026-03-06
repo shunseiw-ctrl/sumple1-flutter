@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -69,7 +70,7 @@ class ProfileHeaderCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: isLoggedIn ? context.appColors.successLight : Colors.grey.shade100,
+                color: isLoggedIn ? context.appColors.successLight : context.appColors.borderLight,
                 borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
               ),
               child: Row(
@@ -230,7 +231,7 @@ class ProfileMenuTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.onTap,
-    this.iconColor = const Color(0xFF6B7280),
+    this.iconColor = AppColors.textSecondary,
     this.subtitle,
     this.isLast = false,
   });

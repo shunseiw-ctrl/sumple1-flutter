@@ -8549,6 +8549,18 @@ abstract class AppLocalizations {
   /// **'このアカウントは既に別のユーザーに連携されています'**
   String get accountLinking_alreadyInUse;
 
+  /// No description provided for @accountLinking_googleLinkError.
+  ///
+  /// In ja, this message translates to:
+  /// **'Google連携エラー: {error}'**
+  String accountLinking_googleLinkError(String error);
+
+  /// No description provided for @accountLinking_appleLinkError.
+  ///
+  /// In ja, this message translates to:
+  /// **'Apple連携エラー: {error}'**
+  String accountLinking_appleLinkError(String error);
+
   /// No description provided for @accountMerge_title.
   ///
   /// In ja, this message translates to:
