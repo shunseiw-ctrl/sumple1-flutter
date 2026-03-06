@@ -333,7 +333,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
 
           const SizedBox(height: 20),
-          if (_isAdmin)
+          if (!isAnon)
             StaggeredFadeSlide(
               index: isAnon ? 6 : 6,
               child: Column(

@@ -1,9 +1,7 @@
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
-import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/logger.dart';
 
@@ -80,15 +78,12 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
       final xFile = await _controller!.takePicture();
       final bytes = await xFile.readAsBytes();
 
-      // 1MB以下に圧縮
-      final compressed = ImageUploadService.compressImageBytes(
-        bytes,
-        maxSizeBytes: 1024 * 1024,
-      );
+      Logger.info('撮影完了', tag: 'IdDocumentCapture',
+          data: {'size': '${(bytes.length / 1024).toStringAsFixed(0)} KB', 'path': xFile.path});
 
       AppHaptics.success();
       if (mounted) {
-        context.pop(compressed);
+        context.pop(bytes);
       }
     } catch (e) {
       Logger.error('撮影に失敗', tag: 'IdDocumentCapture', error: e);

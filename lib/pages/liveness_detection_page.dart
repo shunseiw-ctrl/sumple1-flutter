@@ -4,7 +4,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
-import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/services/liveness_detection_service.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/logger.dart';
@@ -111,19 +110,6 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
 
         if (!mounted) return;
 
-        // ベストフレーム候補の更新
-        if (result.faceDetected && result.frameScore > 0.6) {
-          try {
-            final xFile = await _cameraController?.takePicture();
-            if (xFile != null) {
-              final bytes = await xFile.readAsBytes();
-              _livenessService.updateBestFrame(result.frameScore, bytes);
-            }
-          } catch (_) {
-            // takePicture中にストリームが続く場合のエラーは無視
-          }
-        }
-
         if (result.challengeCompleted) {
           _onChallengeCompleted();
         }
@@ -135,33 +121,34 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
     });
   }
 
-  void _onChallengeCompleted() {
+  Future<void> _onChallengeCompleted() async {
     if (!mounted || _completed) return;
 
     AppHaptics.success();
     setState(() => _completed = true);
     _stepTimer?.cancel();
-    _stopProcessing();
-    _returnBestFrame();
+
+    // ストリームを停止してからtakePictureを呼ぶ
+    await _stopProcessing();
+    // ストリーム完全停止を待つ
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    await _returnBestFrame();
   }
 
   Future<void> _returnBestFrame() async {
-    // ベストフレームがない場合は最後に1枚撮影
-    Uint8List? bestFrame = _livenessService.getBestFrame();
-    if (bestFrame == null && _cameraController != null) {
+    Uint8List? bestFrame;
+
+    // ストリーム停止後に1枚撮影
+    if (_cameraController != null && _cameraController!.value.isInitialized) {
       try {
         final xFile = await _cameraController!.takePicture();
         bestFrame = await xFile.readAsBytes();
+        Logger.info('自撮り撮影成功', tag: 'LivenessDetection',
+            data: {'size': '${(bestFrame.length / 1024).toStringAsFixed(0)} KB'});
       } catch (e) {
-        Logger.warning('最終フレーム撮影に失敗', tag: 'LivenessDetection');
+        Logger.warning('自撮り撮影に失敗', tag: 'LivenessDetection', data: {'error': '$e'});
       }
-    }
-
-    if (bestFrame != null) {
-      bestFrame = ImageUploadService.compressImageBytes(
-        bestFrame,
-        maxDimension: 1080,
-      );
     }
 
     await Future.delayed(const Duration(milliseconds: 800));
@@ -170,13 +157,13 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
     }
   }
 
-  void _stopProcessing() {
+  Future<void> _stopProcessing() async {
     try {
-      _cameraController?.stopImageStream();
+      await _cameraController?.stopImageStream();
     } catch (_) {}
   }
 
-  void _retry() {
+  Future<void> _retry() async {
     _stepTimer?.cancel();
     setState(() {
       _timedOut = false;

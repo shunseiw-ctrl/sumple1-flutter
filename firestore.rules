@@ -135,8 +135,15 @@ service cloud.firestore {
       allow read: if signedIn() && (uid() == profileUid || isAdminUid());
       allow create: if signedIn() && uid() == profileUid;
 
-      allow update: if signedIn()
-        && uid() == profileUid
+      allow update: if signedIn() && (
+        // 管理者: identityVerified等の管理フィールドを更新可能
+        (isAdminUid()
+          && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            "identityVerified","updatedAt"
+          ]))
+        ||
+        // 本人: プロフィール情報の更新
+        (uid() == profileUid
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
           "displayName","name","email","photoUrl","phone",
           "fcmToken","updatedAt",
@@ -160,7 +167,8 @@ service cloud.firestore {
                 && request.resource.data.bankAccount.branchCode is string
                 && request.resource.data.bankAccount.branchCode.size() == 3
                 && request.resource.data.bankAccount.accountNumber is string
-                && request.resource.data.bankAccount.accountNumber.size() == 7));
+                && request.resource.data.bankAccount.accountNumber.size() == 7)))
+      );
 
       allow delete: if false;
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sumple1/core/services/auth_service.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -87,7 +89,8 @@ class _EmailAuthPageState extends State<EmailAuthPage>
         password: _loginPasswordController.text,
       );
       Logger.info('Email login successful', tag: 'EmailAuthPage');
-      // AuthGate が authStateChanges で自動遷移
+      // AuthGate に遷移（ロール判定 → 管理者/一般ユーザー画面へ）
+      if (mounted) context.go(RoutePaths.home);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +117,8 @@ class _EmailAuthPageState extends State<EmailAuthPage>
         password: _registerPasswordController.text,
       );
       Logger.info('Email registration successful', tag: 'EmailAuthPage');
-      // AuthGate が authStateChanges で自動遷移
+      // AuthGate に遷移（ロール判定 → 管理者/一般ユーザー画面へ）
+      if (mounted) context.go(RoutePaths.home);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

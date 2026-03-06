@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
@@ -13,7 +15,6 @@ import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/ekyc_service.dart';
 import 'package:sumple1/core/services/ekyc_manual_service.dart';
 import 'package:sumple1/data/models/identity_verification_model.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
 
 class IdentityVerificationPage extends StatefulWidget {
   final EkycService? ekycService;
@@ -31,6 +32,10 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   String? _idPhotoUrl;
   String? _idPhotoBackUrl;
   String? _selfieUrl;
+  // ローカルバイト（即座にプレビュー表示用）
+  Uint8List? _idPhotoFrontBytes;
+  Uint8List? _idPhotoBackBytes;
+  Uint8List? _selfieBytes;
   bool _uploading = false;
   String? _verificationStatus;
   String _documentType = 'drivers_license';
@@ -69,6 +74,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           _rejectionReason = data['rejectionReason']?.toString();
           _livenessVerified = data['livenessVerified'] == true;
         });
+
+        // URLからバイトデータをダウンロード（プレビュー表示用）
+        _downloadImageBytes();
       }
     } catch (e) {
       Logger.warning('本人確認ステータスの読み込みに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
@@ -77,6 +85,50 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           SnackBar(content: Text(context.l10n.identityVerification_loadStatusFailed)),
         );
       }
+    }
+  }
+
+  /// Firebase Storage URLからバイトデータをダウンロード
+  Future<void> _downloadImageBytes() async {
+    final storage = FirebaseStorage.instance;
+    final futures = <Future>[];
+
+    if (_idPhotoUrl != null && _idPhotoFrontBytes == null) {
+      futures.add(_downloadFromUrl(storage, _idPhotoUrl!).then((bytes) {
+        if (bytes != null && mounted) {
+          setState(() => _idPhotoFrontBytes = bytes);
+        }
+      }));
+    }
+    if (_idPhotoBackUrl != null && _idPhotoBackBytes == null) {
+      futures.add(_downloadFromUrl(storage, _idPhotoBackUrl!).then((bytes) {
+        if (bytes != null && mounted) {
+          setState(() => _idPhotoBackBytes = bytes);
+        }
+      }));
+    }
+    if (_selfieUrl != null && _selfieBytes == null) {
+      futures.add(_downloadFromUrl(storage, _selfieUrl!).then((bytes) {
+        if (bytes != null && mounted) {
+          setState(() => _selfieBytes = bytes);
+        }
+      }));
+    }
+
+    await Future.wait(futures);
+  }
+
+  /// URLからStorageバイトデータを取得
+  Future<Uint8List?> _downloadFromUrl(FirebaseStorage storage, String url) async {
+    try {
+      final ref = storage.refFromURL(url);
+      final bytes = await ref.getData(10 * 1024 * 1024); // 10MB上限
+      Logger.info('画像DL成功', tag: 'IdentityVerification',
+          data: {'size': '${((bytes?.length ?? 0) / 1024).toStringAsFixed(0)} KB'});
+      return bytes;
+    } catch (e) {
+      Logger.warning('画像DLに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
+      return null;
     }
   }
 
@@ -131,49 +183,53 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   /// ギャラリーから選択
   Future<void> _pickFromGallery({required String side, required String documentId}) async {
     if (_uploading || _uid.isEmpty) return;
-    setState(() => _uploading = true);
     try {
-      final result = await _imageService.pickAndUploadImage(
-        userId: _uid,
-        folder: 'identity_verification',
-        documentId: documentId,
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
         maxWidth: 1920,
         maxHeight: 1080,
-        quality: 90,
+        imageQuality: 90,
       );
-      if (result.isSuccess && result.downloadUrl != null) {
-        setState(() {
-          if (side == 'front') {
-            _idPhotoUrl = result.downloadUrl;
-          } else if (side == 'back') {
-            _idPhotoBackUrl = result.downloadUrl;
-          } else {
-            _selfieUrl = result.downloadUrl;
-          }
-        });
-      } else if (!result.cancelled && result.errorMessage != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result.errorMessage!)),
-          );
-        }
+      if (pickedFile == null) return;
+      final bytes = await pickedFile.readAsBytes();
+      if (mounted) {
+        await _uploadImageBytes(bytes, documentId: documentId, side: side);
       }
-    } finally {
-      if (mounted) setState(() => _uploading = false);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.identityVerification_submitFailed('$e'))),
+        );
+      }
     }
   }
 
   /// バイトデータをアップロード
   Future<void> _uploadImageBytes(Uint8List bytes, {required String documentId, required String side}) async {
     if (_uid.isEmpty) return;
-    setState(() => _uploading = true);
+
+    // ローカルバイトを即座に保持（プレビュー表示用）
+    setState(() {
+      _uploading = true;
+      if (side == 'front') {
+        _idPhotoFrontBytes = bytes;
+      } else if (side == 'back') {
+        _idPhotoBackBytes = bytes;
+      } else {
+        _selfieBytes = bytes;
+      }
+    });
+
     try {
       final result = await _imageService.uploadImageBytes(
         bytes: bytes,
         userId: _uid,
         folder: 'identity_verification',
         documentId: documentId,
+        compress: false,
       );
+
       if (result.isSuccess && result.downloadUrl != null) {
         setState(() {
           if (side == 'front') {
@@ -184,9 +240,16 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             _selfieUrl = result.downloadUrl;
           }
         });
-      } else if (result.errorMessage != null && mounted) {
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.errorMessage!)),
+          SnackBar(content: Text(result.errorMessage ?? context.l10n.identityVerification_submitFailed(''))),
+        );
+      }
+    } catch (e) {
+      Logger.error('アップロード例外', tag: 'IdentityVerification', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.identityVerification_submitFailed('$e'))),
         );
       }
     } finally {
@@ -202,6 +265,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
       setState(() => _livenessVerified = true);
       // 自撮り画像をアップロード
       await _uploadImageBytes(result, documentId: 'selfie', side: 'selfie');
+    } else if (mounted && result == null) {
+      // Livenessは完了したが自撮り撮影に失敗した場合
+      // キャンセルした場合もここに来るので、何もしない
     }
   }
 
@@ -331,6 +397,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               // 写真をリセットして再撮影を促す
               setState(() {
                 _selfieUrl = null;
+                _selfieBytes = null;
                 _livenessVerified = false;
               });
             },
@@ -345,9 +412,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   // --- UI構築 ---
 
   int get _currentStep {
-    if (_idPhotoUrl == null) return 0;
-    if (_idPhotoBackUrl == null) return 1;
-    if (!_livenessVerified || _selfieUrl == null) return 2;
+    if (_idPhotoUrl == null && _idPhotoFrontBytes == null) return 0;
+    if (_idPhotoBackUrl == null && _idPhotoBackBytes == null) return 1;
+    if (!_livenessVerified || (_selfieUrl == null && _selfieBytes == null)) return 2;
     return 3;
   }
 
@@ -393,8 +460,11 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     required String subtitle,
     required IconData icon,
     required String? photoUrl,
+    Uint8List? localBytes,
     required VoidCallback onTap,
   }) {
+    final hasImage = localBytes != null || photoUrl != null;
+
     return Material(
       color: context.appColors.surface,
       borderRadius: BorderRadius.circular(16),
@@ -405,22 +475,34 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: photoUrl != null ? context.appColors.success : context.appColors.divider, width: photoUrl != null ? 2 : 1),
+            border: Border.all(
+              color: hasImage ? context.appColors.success : context.appColors.divider,
+              width: hasImage ? 2 : 1,
+            ),
           ),
           child: Column(
             children: [
-              if (photoUrl != null)
-                AppCachedImage(
-                  imageUrl: photoUrl,
+              if (localBytes != null)
+                // ローカルバイトがある場合はImage.memoryで即座に表示
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.memory(
+                    localBytes,
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              else if (photoUrl != null)
+                // URLあり・バイト未ダウンロード → ローディング表示
+                Container(
                   height: 160,
                   width: double.infinity,
-                  fit: BoxFit.cover,
-                  borderRadius: 12,
-                  errorWidget: Container(
-                    height: 160,
+                  decoration: BoxDecoration(
                     color: context.appColors.chipUnselected,
-                    child: Icon(icon, size: 48, color: context.appColors.textHint),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  child: const Center(child: CircularProgressIndicator()),
                 )
               else
                 Container(
@@ -442,7 +524,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  if (photoUrl != null)
+                  if (hasImage)
                     Icon(Icons.check_circle, color: context.appColors.success, size: 20)
                   else
                     Icon(Icons.upload_file, color: context.appColors.primary, size: 20),
@@ -594,12 +676,12 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             margin: const EdgeInsets.only(bottom: 20),
             child: Row(
               children: [
-                _buildStep(1, context.l10n.identityVerification_stepIdFront, _idPhotoUrl != null, _currentStep == 0),
-                _buildStepConnector(_idPhotoUrl != null),
-                _buildStep(2, context.l10n.identityVerification_stepIdBack, _idPhotoBackUrl != null, _currentStep == 1),
-                _buildStepConnector(_idPhotoBackUrl != null),
-                _buildStep(3, context.l10n.identityVerification_stepLiveness, _livenessVerified && _selfieUrl != null, _currentStep == 2),
-                _buildStepConnector(_livenessVerified && _selfieUrl != null),
+                _buildStep(1, context.l10n.identityVerification_stepIdFront, _idPhotoUrl != null || _idPhotoFrontBytes != null, _currentStep == 0),
+                _buildStepConnector(_idPhotoUrl != null || _idPhotoFrontBytes != null),
+                _buildStep(2, context.l10n.identityVerification_stepIdBack, _idPhotoBackUrl != null || _idPhotoBackBytes != null, _currentStep == 1),
+                _buildStepConnector(_idPhotoBackUrl != null || _idPhotoBackBytes != null),
+                _buildStep(3, context.l10n.identityVerification_stepLiveness, _livenessVerified && (_selfieUrl != null || _selfieBytes != null), _currentStep == 2),
+                _buildStepConnector(_livenessVerified && (_selfieUrl != null || _selfieBytes != null)),
                 _buildStep(4, context.l10n.identityVerification_stepSubmit, isPending || isApproved, _currentStep == 3),
               ],
             ),
@@ -682,6 +764,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             subtitle: context.l10n.identityVerification_idDocumentSubtitle,
             icon: Icons.credit_card,
             photoUrl: _idPhotoUrl,
+            localBytes: _idPhotoFrontBytes,
             onTap: isEditable
                 ? () => _showPickerSheet(side: 'front', folder: 'identity_verification', documentId: 'id_front')
                 : () {},
@@ -693,6 +776,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             subtitle: context.l10n.identityVerification_idDocumentBackSubtitle,
             icon: Icons.credit_card,
             photoUrl: _idPhotoBackUrl,
+            localBytes: _idPhotoBackBytes,
             onTap: isEditable
                 ? () => _showPickerSheet(side: 'back', folder: 'identity_verification', documentId: 'id_back')
                 : () {},
@@ -700,7 +784,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           const SizedBox(height: 16),
           // Liveness Detection
           _buildLivenessCard(),
-          if (_selfieUrl != null) ...[
+          if (_selfieUrl != null || _selfieBytes != null) ...[
             const SizedBox(height: 12),
             // 自撮りプレビュー
             _buildPhotoUploadCard(
@@ -708,6 +792,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               subtitle: context.l10n.identityVerification_selfieSubtitle,
               icon: Icons.face,
               photoUrl: _selfieUrl,
+              localBytes: _selfieBytes,
               onTap: () {}, // Livenessで自動撮影のため手動選択不可
             ),
           ],
@@ -758,6 +843,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                       _idPhotoUrl = null;
                       _idPhotoBackUrl = null;
                       _selfieUrl = null;
+                      _idPhotoFrontBytes = null;
+                      _idPhotoBackBytes = null;
+                      _selfieBytes = null;
                       _rejectionReason = null;
                       _documentType = 'drivers_license';
                       _livenessVerified = false;

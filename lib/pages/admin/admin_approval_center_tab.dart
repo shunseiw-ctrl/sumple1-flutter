@@ -16,7 +16,6 @@ import 'package:sumple1/core/utils/currency_utils.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/data/models/identity_verification_model.dart';
 import 'package:sumple1/presentation/widgets/admin_approval_card.dart';
-import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/load_more_button.dart';
 import 'package:sumple1/presentation/widgets/reject_reason_dialog.dart';
@@ -250,14 +249,58 @@ class _AdminApprovalCenterTabState
                 ),
               ],
             ),
-            AppCachedImage(
-              imageUrl: imageUrl,
+            SizedBox(
               width: double.infinity,
               height: 400,
-              fit: BoxFit.contain,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+                errorBuilder: (context, error, _) => Center(
+                  child: Icon(Icons.broken_image, size: 48, color: context.appColors.textHint),
+                ),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// 写真サムネイル（タップで拡大表示）
+  Widget _buildPhotoThumbnail({required String url, required String label}) {
+    return GestureDetector(
+      onTap: () => _showPhotoDialog(url, label),
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 100,
+              width: double.infinity,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    color: context.appColors.chipUnselected,
+                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  );
+                },
+                errorBuilder: (context, error, _) => Container(
+                  color: context.appColors.chipUnselected,
+                  child: Icon(Icons.broken_image, color: context.appColors.textHint),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary), textAlign: TextAlign.center),
+        ],
       ),
     );
   }
@@ -466,11 +509,24 @@ class _AdminApprovalCenterTabState
             const SizedBox(height: AppSpacing.sm),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: AppCachedImage(
-                imageUrl: certPhotoUrl,
+              child: SizedBox(
                 height: 160,
                 width: double.infinity,
-                fit: BoxFit.cover,
+                child: Image.network(
+                  certPhotoUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Container(
+                      color: context.appColors.chipUnselected,
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    );
+                  },
+                  errorBuilder: (context, error, _) => Container(
+                    color: context.appColors.chipUnselected,
+                    child: Icon(Icons.broken_image, color: context.appColors.textHint),
+                  ),
+                ),
               ),
             ),
           ],
@@ -615,47 +671,29 @@ class _AdminApprovalCenterTabState
             ],
           ),
           const SizedBox(height: 12),
+          // 写真グリッド（表面 / 裏面 / 自撮り）
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: () => _showPhotoDialog(model.idPhotoUrl, context.l10n.adminIdentityVerification_idDocumentPhoto),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AppCachedImage(
-                          imageUrl: model.idPhotoUrl,
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(context.l10n.adminIdentityVerification_idDocumentPhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
-                    ],
-                  ),
+                child: _buildPhotoThumbnail(
+                  url: model.idPhotoUrl,
+                  label: context.l10n.adminIdentityVerification_idDocumentPhoto,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _showPhotoDialog(model.selfieUrl, context.l10n.adminIdentityVerification_selfiePhoto),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AppCachedImage(
-                          imageUrl: model.selfieUrl,
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(context.l10n.adminIdentityVerification_selfiePhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
-                    ],
+              if (model.idPhotoBackUrl != null && model.idPhotoBackUrl!.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildPhotoThumbnail(
+                    url: model.idPhotoBackUrl!,
+                    label: context.l10n.identityVerification_idDocumentBack,
                   ),
+                ),
+              ],
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildPhotoThumbnail(
+                  url: model.selfieUrl,
+                  label: context.l10n.adminIdentityVerification_selfiePhoto,
                 ),
               ),
             ],
