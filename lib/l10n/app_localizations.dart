@@ -107,19 +107,19 @@ abstract class AppLocalizations {
   /// No description provided for @accountSettings_cancel.
   ///
   /// In ja, this message translates to:
-  /// **'・チャット履歴\\n'**
+  /// **'キャンセル'**
   String get accountSettings_cancel;
 
   /// No description provided for @accountSettings_changePasswordButton.
   ///
   /// In ja, this message translates to:
-  /// **'新しいパスワード（6文字以上）'**
+  /// **'パスワードを変更'**
   String get accountSettings_changePasswordButton;
 
   /// No description provided for @accountSettings_changePasswordLabel.
   ///
   /// In ja, this message translates to:
-  /// **'名前を入力'**
+  /// **'パスワード変更'**
   String get accountSettings_changePasswordLabel;
 
   /// No description provided for @accountSettings_confirm.
@@ -287,7 +287,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountSettings_title.
   ///
   /// In ja, this message translates to:
-  /// **'未設定'**
+  /// **'アカウント設定'**
   String get accountSettings_title;
 
   /// 住所ラベル
@@ -899,7 +899,7 @@ abstract class AppLocalizations {
   /// No description provided for @adminJobManagement_checkNetwork.
   ///
   /// In ja, this message translates to:
-  /// **'権限がありません'**
+  /// **'ネットワーク接続を確認してください'**
   String get adminJobManagement_checkNetwork;
 
   /// No description provided for @adminJobManagement_dateTbd.
@@ -911,7 +911,7 @@ abstract class AppLocalizations {
   /// No description provided for @adminJobManagement_filterActive.
   ///
   /// In ja, this message translates to:
-  /// **'すべて'**
+  /// **'公開中'**
   String get adminJobManagement_filterActive;
 
   /// No description provided for @adminJobManagement_filterAll.
@@ -923,13 +923,13 @@ abstract class AppLocalizations {
   /// No description provided for @adminJobManagement_filterCompleted.
   ///
   /// In ja, this message translates to:
-  /// **'すべて'**
+  /// **'完了'**
   String get adminJobManagement_filterCompleted;
 
   /// No description provided for @adminJobManagement_filterDraft.
   ///
   /// In ja, this message translates to:
-  /// **'公開中'**
+  /// **'下書き'**
   String get adminJobManagement_filterDraft;
 
   /// No description provided for @adminJobManagement_loadFailed.
@@ -1379,13 +1379,13 @@ abstract class AppLocalizations {
   /// No description provided for @asyncValue_networkError.
   ///
   /// In ja, this message translates to:
-  /// **'権限がありません'**
+  /// **'ネットワークエラー'**
   String get asyncValue_networkError;
 
   /// No description provided for @asyncValue_permissionDenied.
   ///
   /// In ja, this message translates to:
-  /// **'エラーが発生しました'**
+  /// **'権限がありません'**
   String get asyncValue_permissionDenied;
 
   /// 認証エラー
@@ -1535,7 +1535,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatRoom_yesterday.
   ///
   /// In ja, this message translates to:
-  /// **'今日'**
+  /// **'昨日'**
   String get chatRoom_yesterday;
 
   /// チャットタイトル
@@ -1829,7 +1829,7 @@ abstract class AppLocalizations {
   /// No description provided for @contact_bodyLabel.
   ///
   /// In ja, this message translates to:
-  /// **'送信する'**
+  /// **'お問い合わせ内容'**
   String get contact_bodyLabel;
 
   /// No description provided for @contact_categoryAccount.
@@ -1859,7 +1859,7 @@ abstract class AppLocalizations {
   /// No description provided for @contact_categoryLabel.
   ///
   /// In ja, this message translates to:
-  /// **'件名を入力'**
+  /// **'カテゴリ'**
   String get contact_categoryLabel;
 
   /// No description provided for @contact_categoryOther.
@@ -1877,25 +1877,25 @@ abstract class AppLocalizations {
   /// No description provided for @contact_sendError.
   ///
   /// In ja, this message translates to:
-  /// **'カテゴリ'**
+  /// **'送信に失敗しました'**
   String get contact_sendError;
 
   /// No description provided for @contact_sendSuccess.
   ///
   /// In ja, this message translates to:
-  /// **'お問い合わせ'**
+  /// **'お問い合わせを送信しました。ご回答までお待ちください。'**
   String get contact_sendSuccess;
 
   /// No description provided for @contact_subjectHint.
   ///
   /// In ja, this message translates to:
-  /// **'送信する'**
+  /// **'件名を入力'**
   String get contact_subjectHint;
 
   /// No description provided for @contact_subjectLabel.
   ///
   /// In ja, this message translates to:
-  /// **'お問い合わせ内容を入力してください'**
+  /// **'件名'**
   String get contact_subjectLabel;
 
   /// No description provided for @contact_submitButton.
@@ -1907,13 +1907,13 @@ abstract class AppLocalizations {
   /// No description provided for @contact_title.
   ///
   /// In ja, this message translates to:
-  /// **'件名'**
+  /// **'お問い合わせ'**
   String get contact_title;
 
   /// No description provided for @contact_validationError.
   ///
   /// In ja, this message translates to:
-  /// **'お問い合わせを送信しました。ご回答までお待ちください。'**
+  /// **'必須項目をすべて入力してください'**
   String get contact_validationError;
 
   /// 売上登録ボタン
@@ -2693,49 +2693,49 @@ abstract class AppLocalizations {
   /// No description provided for @faq_a1.
   ///
   /// In ja, this message translates to:
-  /// **'ALBAWORKとは何ですか？'**
+  /// **'ALBAWORKは建設・内装業界向けの求人マッチングアプリです。案件の検索・応募・出退勤管理・報酬受取まで、すべてアプリで完結します。'**
   String get faq_a1;
 
   /// No description provided for @faq_a2.
   ///
   /// In ja, this message translates to:
-  /// **'ALBAWORKとは何ですか？'**
+  /// **'アプリをダウンロードし、メール・LINE・電話番号でアカウントを作成してください。'**
   String get faq_a2;
 
   /// No description provided for @faq_a3.
   ///
   /// In ja, this message translates to:
-  /// **'利用料金はかかりますか？'**
+  /// **'職人の方は無料でご利用いただけます。報酬からプラットフォーム手数料が差し引かれます。'**
   String get faq_a3;
 
   /// No description provided for @faq_a4.
   ///
   /// In ja, this message translates to:
-  /// **'応募するにはどうすればいいですか？'**
+  /// **'検索ページで案件を閲覧し、「応募する」ボタンをタップしてください。'**
   String get faq_a4;
 
   /// No description provided for @faq_a5.
   ///
   /// In ja, this message translates to:
-  /// **'出退勤はどのように記録しますか？'**
+  /// **'現場でQRコードをスキャンして出退勤を記録します。管理者が提示するQRコードをスキャンしてください。'**
   String get faq_a5;
 
   /// No description provided for @faq_a6.
   ///
   /// In ja, this message translates to:
-  /// **'報酬はどのように受け取れますか？'**
+  /// **'前月の勤務分が翌月10日に振り込まれます。Stripe口座の設定が必要です。'**
   String get faq_a6;
 
   /// No description provided for @faq_a7.
   ///
   /// In ja, this message translates to:
-  /// **'本人確認は必要ですか？'**
+  /// **'はい。応募には本人確認が必要です。プロフィール → 本人確認から、身分証明書と自撮り写真をアップロードしてください。'**
   String get faq_a7;
 
   /// No description provided for @faq_a8.
   ///
   /// In ja, this message translates to:
-  /// **'退会するにはどうすればいいですか？'**
+  /// **'プロフィール → アカウント設定 → アカウント削除から退会できます。退会すると全データが削除されます。'**
   String get faq_a8;
 
   /// No description provided for @faq_q1.
@@ -2747,7 +2747,7 @@ abstract class AppLocalizations {
   /// No description provided for @faq_q2.
   ///
   /// In ja, this message translates to:
-  /// **'ALBAWORKとは何ですか？'**
+  /// **'どのように始めればいいですか？'**
   String get faq_q2;
 
   /// No description provided for @faq_q3.
@@ -3335,13 +3335,13 @@ abstract class AppLocalizations {
   /// No description provided for @inspection_fail.
   ///
   /// In ja, this message translates to:
-  /// **'検査合格 → 完了'**
+  /// **'不合格'**
   String get inspection_fail;
 
   /// No description provided for @inspection_failedFixRequest.
   ///
   /// In ja, this message translates to:
-  /// **'検査合格 → 完了'**
+  /// **'検査不合格 — 是正依頼を送信しました'**
   String get inspection_failedFixRequest;
 
   /// No description provided for @inspection_needsFix.
@@ -3431,13 +3431,13 @@ abstract class AppLocalizations {
   /// No description provided for @jobCard_addFavorite.
   ///
   /// In ja, this message translates to:
-  /// **'お気に入りから削除'**
+  /// **'お気に入りに追加'**
   String get jobCard_addFavorite;
 
   /// No description provided for @jobCard_delete.
   ///
   /// In ja, this message translates to:
-  /// **'編集'**
+  /// **'削除'**
   String get jobCard_delete;
 
   /// No description provided for @jobCard_edit.
@@ -4048,7 +4048,7 @@ abstract class AppLocalizations {
   /// No description provided for @jobList_monthLabel.
   ///
   /// In ja, this message translates to:
-  /// **'すべて'**
+  /// **'月'**
   String get jobList_monthLabel;
 
   /// No description provided for @jobList_nextMonth.
@@ -4366,7 +4366,7 @@ abstract class AppLocalizations {
   /// No description provided for @mapSearch_notSet.
   ///
   /// In ja, this message translates to:
-  /// **'タイトルなし'**
+  /// **'未設定'**
   String get mapSearch_notSet;
 
   /// No description provided for @mapSearch_pricePerDay.
@@ -5086,7 +5086,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboarding_nextPage.
   ///
   /// In ja, this message translates to:
-  /// **'アプリを始める'**
+  /// **'次へ'**
   String get onboarding_nextPage;
 
   /// No description provided for @onboarding_pageIndicator.
@@ -5182,25 +5182,25 @@ abstract class AppLocalizations {
   /// No description provided for @paymentDetail_paymentAmount.
   ///
   /// In ja, this message translates to:
-  /// **'案件名'**
+  /// **'支払い金額'**
   String get paymentDetail_paymentAmount;
 
   /// No description provided for @paymentDetail_paymentStatus.
   ///
   /// In ja, this message translates to:
-  /// **'受取金額'**
+  /// **'決済ステータス'**
   String get paymentDetail_paymentStatus;
 
   /// No description provided for @paymentDetail_payoutStatus.
   ///
   /// In ja, this message translates to:
-  /// **'決済ステータス'**
+  /// **'振込ステータス'**
   String get paymentDetail_payoutStatus;
 
   /// No description provided for @paymentDetail_platformFee.
   ///
   /// In ja, this message translates to:
-  /// **'支払い金額'**
+  /// **'プラットフォーム手数料'**
   String get paymentDetail_platformFee;
 
   /// No description provided for @paymentDetail_projectName.
@@ -5590,19 +5590,19 @@ abstract class AppLocalizations {
   /// No description provided for @profileWidgets_guest.
   ///
   /// In ja, this message translates to:
-  /// **'Guest'**
+  /// **'ゲスト'**
   String get profileWidgets_guest;
 
   /// No description provided for @profileWidgets_loggedIn.
   ///
   /// In ja, this message translates to:
-  /// **'Logged in'**
+  /// **'ログイン済み'**
   String get profileWidgets_loggedIn;
 
   /// No description provided for @profileWidgets_status.
   ///
   /// In ja, this message translates to:
-  /// **'Status'**
+  /// **'ステータス'**
   String get profileWidgets_status;
 
   /// No description provided for @profile_accountSettings.
@@ -5866,7 +5866,7 @@ abstract class AppLocalizations {
   /// No description provided for @qrCheckin_clockIn.
   ///
   /// In ja, this message translates to:
-  /// **'退勤'**
+  /// **'出勤'**
   String get qrCheckin_clockIn;
 
   /// No description provided for @qrCheckin_clockOut.
@@ -5938,7 +5938,7 @@ abstract class AppLocalizations {
   /// No description provided for @qualificationAdd_noExpiry.
   ///
   /// In ja, this message translates to:
-  /// **'有効期限'**
+  /// **'有効期限なし'**
   String get qualificationAdd_noExpiry;
 
   /// No description provided for @qualificationAdd_register.
@@ -6016,13 +6016,13 @@ abstract class AppLocalizations {
   /// No description provided for @qualifications_pending.
   ///
   /// In ja, this message translates to:
-  /// **'承認済み'**
+  /// **'審査中'**
   String get qualifications_pending;
 
   /// No description provided for @qualifications_rejected.
   ///
   /// In ja, this message translates to:
-  /// **'審査中'**
+  /// **'却下'**
   String get qualifications_rejected;
 
   /// No description provided for @qualifications_title.
@@ -6034,7 +6034,7 @@ abstract class AppLocalizations {
   /// No description provided for @ratingDialog_average.
   ///
   /// In ja, this message translates to:
-  /// **'不満'**
+  /// **'普通'**
   String get ratingDialog_average;
 
   /// No description provided for @ratingDialog_commentHint.
@@ -6052,13 +6052,13 @@ abstract class AppLocalizations {
   /// No description provided for @ratingDialog_excellent.
   ///
   /// In ja, this message translates to:
-  /// **'コメント（任意）'**
+  /// **'最高'**
   String get ratingDialog_excellent;
 
   /// No description provided for @ratingDialog_good.
   ///
   /// In ja, this message translates to:
-  /// **'コメント（任意）'**
+  /// **'良い'**
   String get ratingDialog_good;
 
   /// No description provided for @ratingDialog_later.
@@ -6076,13 +6076,13 @@ abstract class AppLocalizations {
   /// No description provided for @ratingDialog_somewhatDissatisfied.
   ///
   /// In ja, this message translates to:
-  /// **'不満'**
+  /// **'やや不満'**
   String get ratingDialog_somewhatDissatisfied;
 
   /// No description provided for @ratingDialog_submit.
   ///
   /// In ja, this message translates to:
-  /// **'評価を送信しました'**
+  /// **'送信'**
   String get ratingDialog_submit;
 
   /// No description provided for @ratingDialog_submitFailed.
@@ -6580,7 +6580,7 @@ abstract class AppLocalizations {
   /// No description provided for @shiftQr_generateNew.
   ///
   /// In ja, this message translates to:
-  /// **'生成中...'**
+  /// **'新しいQRを生成'**
   String get shiftQr_generateNew;
 
   /// No description provided for @shiftQr_generated.
@@ -6670,7 +6670,7 @@ abstract class AppLocalizations {
   /// No description provided for @statementDetail_applyButton.
   ///
   /// In ja, this message translates to:
-  /// **'キャンセル'**
+  /// **'即金申請する'**
   String get statementDetail_applyButton;
 
   /// No description provided for @statementDetail_completedDate.
@@ -6698,7 +6698,7 @@ abstract class AppLocalizations {
   /// No description provided for @statementDetail_earlyPaymentError.
   ///
   /// In ja, this message translates to:
-  /// **'即金申請を送信しました'**
+  /// **'即金申請に失敗しました'**
   String get statementDetail_earlyPaymentError;
 
   /// No description provided for @statementDetail_earlyPaymentPending.
@@ -7262,7 +7262,7 @@ abstract class AppLocalizations {
   /// No description provided for @workReportCreate_contentRequired.
   ///
   /// In ja, this message translates to:
-  /// **'作業内容 *'**
+  /// **'作業内容を入力してください'**
   String get workReportCreate_contentRequired;
 
   /// No description provided for @workReportCreate_date.
@@ -7280,13 +7280,13 @@ abstract class AppLocalizations {
   /// No description provided for @workReportCreate_hoursSuffix.
   ///
   /// In ja, this message translates to:
-  /// **'作業時間（時間）'**
+  /// **'時間'**
   String get workReportCreate_hoursSuffix;
 
   /// No description provided for @workReportCreate_hoursValidation.
   ///
   /// In ja, this message translates to:
-  /// **'時間'**
+  /// **'作業時間を入力してください'**
   String get workReportCreate_hoursValidation;
 
   /// No description provided for @workReportCreate_logSubmitted.

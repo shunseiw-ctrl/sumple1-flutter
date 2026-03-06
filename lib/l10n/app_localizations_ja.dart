@@ -12,13 +12,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountSettings => 'アカウント設定';
 
   @override
-  String get accountSettings_cancel => '・チャット履歴\\n';
+  String get accountSettings_cancel => 'キャンセル';
 
   @override
-  String get accountSettings_changePasswordButton => '新しいパスワード（6文字以上）';
+  String get accountSettings_changePasswordButton => 'パスワードを変更';
 
   @override
-  String get accountSettings_changePasswordLabel => '名前を入力';
+  String get accountSettings_changePasswordLabel => 'パスワード変更';
 
   @override
   String get accountSettings_confirm => '確認';
@@ -117,7 +117,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountSettings_snackWrongPassword => '現在のパスワードが正しくありません';
 
   @override
-  String get accountSettings_title => '未設定';
+  String get accountSettings_title => 'アカウント設定';
 
   @override
   String get address => '住所';
@@ -463,22 +463,22 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get adminJobManagement_checkNetwork => '権限がありません';
+  String get adminJobManagement_checkNetwork => 'ネットワーク接続を確認してください';
 
   @override
   String get adminJobManagement_dateTbd => '未定';
 
   @override
-  String get adminJobManagement_filterActive => 'すべて';
+  String get adminJobManagement_filterActive => '公開中';
 
   @override
   String get adminJobManagement_filterAll => 'すべて';
 
   @override
-  String get adminJobManagement_filterCompleted => 'すべて';
+  String get adminJobManagement_filterCompleted => '完了';
 
   @override
-  String get adminJobManagement_filterDraft => '公開中';
+  String get adminJobManagement_filterDraft => '下書き';
 
   @override
   String get adminJobManagement_loadFailed => 'データの読み込みに失敗しました';
@@ -725,10 +725,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get asyncValue_loadFailed => 'ネットワークエラーが発生しました';
 
   @override
-  String get asyncValue_networkError => '権限がありません';
+  String get asyncValue_networkError => 'ネットワークエラー';
 
   @override
-  String get asyncValue_permissionDenied => 'エラーが発生しました';
+  String get asyncValue_permissionDenied => '権限がありません';
 
   @override
   String get authError => '認証エラーが発生しました';
@@ -803,7 +803,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chatRoom_uploadFailed => '画像のアップロードに失敗しました';
 
   @override
-  String get chatRoom_yesterday => '今日';
+  String get chatRoom_yesterday => '昨日';
 
   @override
   String get chatWith => 'チャット';
@@ -952,7 +952,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get contact_bodyHint => 'お問い合わせ内容を入力してください';
 
   @override
-  String get contact_bodyLabel => '送信する';
+  String get contact_bodyLabel => 'お問い合わせ内容';
 
   @override
   String get contact_categoryAccount => 'アカウントについて';
@@ -967,7 +967,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get contact_categoryJobs => '案件について';
 
   @override
-  String get contact_categoryLabel => '件名を入力';
+  String get contact_categoryLabel => 'カテゴリ';
 
   @override
   String get contact_categoryOther => 'その他';
@@ -976,25 +976,25 @@ class AppLocalizationsJa extends AppLocalizations {
   String get contact_categoryPayment => '報酬・支払いについて';
 
   @override
-  String get contact_sendError => 'カテゴリ';
+  String get contact_sendError => '送信に失敗しました';
 
   @override
-  String get contact_sendSuccess => 'お問い合わせ';
+  String get contact_sendSuccess => 'お問い合わせを送信しました。ご回答までお待ちください。';
 
   @override
-  String get contact_subjectHint => '送信する';
+  String get contact_subjectHint => '件名を入力';
 
   @override
-  String get contact_subjectLabel => 'お問い合わせ内容を入力してください';
+  String get contact_subjectLabel => '件名';
 
   @override
   String get contact_submitButton => '送信する';
 
   @override
-  String get contact_title => '件名';
+  String get contact_title => 'お問い合わせ';
 
   @override
-  String get contact_validationError => 'お問い合わせを送信しました。ご回答までお待ちください。';
+  String get contact_validationError => '必須項目をすべて入力してください';
 
   @override
   String get createEarnings => '売上を登録';
@@ -1394,34 +1394,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String get faqTitle => 'よくある質問';
 
   @override
-  String get faq_a1 => 'ALBAWORKとは何ですか？';
+  String get faq_a1 =>
+      'ALBAWORKは建設・内装業界向けの求人マッチングアプリです。案件の検索・応募・出退勤管理・報酬受取まで、すべてアプリで完結します。';
 
   @override
-  String get faq_a2 => 'ALBAWORKとは何ですか？';
+  String get faq_a2 => 'アプリをダウンロードし、メール・LINE・電話番号でアカウントを作成してください。';
 
   @override
-  String get faq_a3 => '利用料金はかかりますか？';
+  String get faq_a3 => '職人の方は無料でご利用いただけます。報酬からプラットフォーム手数料が差し引かれます。';
 
   @override
-  String get faq_a4 => '応募するにはどうすればいいですか？';
+  String get faq_a4 => '検索ページで案件を閲覧し、「応募する」ボタンをタップしてください。';
 
   @override
-  String get faq_a5 => '出退勤はどのように記録しますか？';
+  String get faq_a5 => '現場でQRコードをスキャンして出退勤を記録します。管理者が提示するQRコードをスキャンしてください。';
 
   @override
-  String get faq_a6 => '報酬はどのように受け取れますか？';
+  String get faq_a6 => '前月の勤務分が翌月10日に振り込まれます。Stripe口座の設定が必要です。';
 
   @override
-  String get faq_a7 => '本人確認は必要ですか？';
+  String get faq_a7 =>
+      'はい。応募には本人確認が必要です。プロフィール → 本人確認から、身分証明書と自撮り写真をアップロードしてください。';
 
   @override
-  String get faq_a8 => '退会するにはどうすればいいですか？';
+  String get faq_a8 => 'プロフィール → アカウント設定 → アカウント削除から退会できます。退会すると全データが削除されます。';
 
   @override
   String get faq_q1 => 'ALBAWORKとは何ですか？';
 
   @override
-  String get faq_q2 => 'ALBAWORKとは何ですか？';
+  String get faq_q2 => 'どのように始めればいいですか？';
 
   @override
   String get faq_q3 => '利用料金はかかりますか？';
@@ -1733,10 +1735,10 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get inspection_fail => '検査合格 → 完了';
+  String get inspection_fail => '不合格';
 
   @override
-  String get inspection_failedFixRequest => '検査合格 → 完了';
+  String get inspection_failedFixRequest => '検査不合格 — 是正依頼を送信しました';
 
   @override
   String get inspection_needsFix => '要是正';
@@ -1785,10 +1787,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get jobCard_actions => '操作';
 
   @override
-  String get jobCard_addFavorite => 'お気に入りから削除';
+  String get jobCard_addFavorite => 'お気に入りに追加';
 
   @override
-  String get jobCard_delete => '編集';
+  String get jobCard_delete => '削除';
 
   @override
   String get jobCard_edit => '編集';
@@ -2105,7 +2107,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get jobList_locationError => '位置情報の取得に失敗しました';
 
   @override
-  String get jobList_monthLabel => 'すべて';
+  String get jobList_monthLabel => '月';
 
   @override
   String get jobList_nextMonth => '来月';
@@ -2264,7 +2266,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapSearch_noTitle => 'タイトルなし';
 
   @override
-  String get mapSearch_notSet => 'タイトルなし';
+  String get mapSearch_notSet => '未設定';
 
   @override
   String mapSearch_pricePerDay(String price) {
@@ -2635,7 +2637,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboarding_getStarted => 'アプリを始める';
 
   @override
-  String get onboarding_nextPage => 'アプリを始める';
+  String get onboarding_nextPage => '次へ';
 
   @override
   String onboarding_pageIndicator(String current, String total) {
@@ -2685,16 +2687,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get paymentDetail_notFound => '支払い情報が見つかりません';
 
   @override
-  String get paymentDetail_paymentAmount => '案件名';
+  String get paymentDetail_paymentAmount => '支払い金額';
 
   @override
-  String get paymentDetail_paymentStatus => '受取金額';
+  String get paymentDetail_paymentStatus => '決済ステータス';
 
   @override
-  String get paymentDetail_payoutStatus => '決済ステータス';
+  String get paymentDetail_payoutStatus => '振込ステータス';
 
   @override
-  String get paymentDetail_platformFee => '支払い金額';
+  String get paymentDetail_platformFee => 'プラットフォーム手数料';
 
   @override
   String get paymentDetail_projectName => '案件名';
@@ -2896,13 +2898,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileTitle => 'マイページ';
 
   @override
-  String get profileWidgets_guest => 'Guest';
+  String get profileWidgets_guest => 'ゲスト';
 
   @override
-  String get profileWidgets_loggedIn => 'Logged in';
+  String get profileWidgets_loggedIn => 'ログイン済み';
 
   @override
-  String get profileWidgets_status => 'Status';
+  String get profileWidgets_status => 'ステータス';
 
   @override
   String get profile_accountSettings => 'アカウント設定';
@@ -3035,7 +3037,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get qrCheckIn => 'QR出勤';
 
   @override
-  String get qrCheckin_clockIn => '退勤';
+  String get qrCheckin_clockIn => '出勤';
 
   @override
   String get qrCheckin_clockOut => '退勤';
@@ -3077,7 +3079,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get qualificationAdd_nameRequired => '資格名を入力してください';
 
   @override
-  String get qualificationAdd_noExpiry => '有効期限';
+  String get qualificationAdd_noExpiry => '有効期限なし';
 
   @override
   String get qualificationAdd_register => '資格を登録しました（審査待ち）';
@@ -3122,16 +3124,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get qualifications_loginRequired => 'ログインが必要です';
 
   @override
-  String get qualifications_pending => '承認済み';
+  String get qualifications_pending => '審査中';
 
   @override
-  String get qualifications_rejected => '審査中';
+  String get qualifications_rejected => '却下';
 
   @override
   String get qualifications_title => '資格管理';
 
   @override
-  String get ratingDialog_average => '不満';
+  String get ratingDialog_average => '普通';
 
   @override
   String get ratingDialog_commentHint => 'コメント（任意）';
@@ -3140,10 +3142,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ratingDialog_dissatisfied => '不満';
 
   @override
-  String get ratingDialog_excellent => 'コメント（任意）';
+  String get ratingDialog_excellent => '最高';
 
   @override
-  String get ratingDialog_good => 'コメント（任意）';
+  String get ratingDialog_good => '良い';
 
   @override
   String get ratingDialog_later => '後で';
@@ -3152,10 +3154,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ratingDialog_selectStars => '星を選択してください';
 
   @override
-  String get ratingDialog_somewhatDissatisfied => '不満';
+  String get ratingDialog_somewhatDissatisfied => 'やや不満';
 
   @override
-  String get ratingDialog_submit => '評価を送信しました';
+  String get ratingDialog_submit => '送信';
 
   @override
   String ratingDialog_submitFailed(String error) {
@@ -3427,7 +3429,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get shiftQr_generateNew => '生成中...';
+  String get shiftQr_generateNew => '新しいQRを生成';
 
   @override
   String get shiftQr_generated => 'QRコードを生成しました';
@@ -3472,7 +3474,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get startOnboarding => '口座設定を開始';
 
   @override
-  String get statementDetail_applyButton => 'キャンセル';
+  String get statementDetail_applyButton => '即金申請する';
 
   @override
   String statementDetail_completedDate(String date) {
@@ -3492,7 +3494,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get statementDetail_earlyPaymentError => '即金申請を送信しました';
+  String get statementDetail_earlyPaymentError => '即金申請に失敗しました';
 
   @override
   String get statementDetail_earlyPaymentPending => '即金申請済み（審査中）';
@@ -3796,7 +3798,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get workReportCreate_contentLabel => '作業内容 *';
 
   @override
-  String get workReportCreate_contentRequired => '作業内容 *';
+  String get workReportCreate_contentRequired => '作業内容を入力してください';
 
   @override
   String get workReportCreate_date => '日付';
@@ -3805,10 +3807,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get workReportCreate_hoursLabel => '作業時間（時間）';
 
   @override
-  String get workReportCreate_hoursSuffix => '作業時間（時間）';
+  String get workReportCreate_hoursSuffix => '時間';
 
   @override
-  String get workReportCreate_hoursValidation => '時間';
+  String get workReportCreate_hoursValidation => '作業時間を入力してください';
 
   @override
   String workReportCreate_logSubmitted(String title) {
