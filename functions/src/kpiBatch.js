@@ -162,7 +162,7 @@ exports.monthlyKpiAggregation = onSchedule(
       const appsSnap = await admin.firestore().collection("applications")
         .where("createdAt", ">=", startTs)
         .where("createdAt", "<", endTs)
-        .select("jobId")
+        .select("jobId", "applicantUid")
         .get();
       const uniqueJobIds = new Set(appsSnap.docs.map((d) => d.data().jobId));
       const jobFillRate = totalJobs > 0 ? Math.round((uniqueJobIds.size / totalJobs) * 100) : 0;
@@ -181,7 +181,7 @@ exports.monthlyKpiAggregation = onSchedule(
       const repeatWorkerRate = activeWorkerUids.size > 0 ? Math.round((repeatWorkers / activeWorkerUids.size) * 100) : 0;
 
       // 平均案件単価
-      const allJobsSnap = await admin.firestore().collection("jobs").select("price").get();
+      const allJobsSnap = await admin.firestore().collection("jobs").select("price", "prefecture").get();
       let avgJobPrice = 0;
       if (allJobsSnap.docs.length > 0) {
         const totalPrice = allJobsSnap.docs.reduce((sum, doc) => {

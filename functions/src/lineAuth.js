@@ -76,6 +76,68 @@ exports.lineAuthStart = onRequest(
 );
 
 /**
+ * LINE ユーザーの Firebase Auth ユーザーを解決（リンク済みチェック → 作成/更新）
+ * lineAuthCallback と lineAuthVerifyToken で共有
+ * @returns {{ firebaseUid: string }}
+ */
+async function resolveFirebaseUser(lineUser) {
+  let firebaseUid = `line:${lineUser.userId}`;
+
+  const linkedDoc = await admin.firestore()
+    .collection("line_linked_accounts")
+    .doc(lineUser.userId)
+    .get();
+
+  if (linkedDoc.exists) {
+    firebaseUid = linkedDoc.data().firebaseUid;
+    logger.info("Using linked account", { lineUserId: lineUser.userId, firebaseUid });
+  } else {
+    // Firebase Auth ユーザー作成/更新
+    try {
+      await admin.auth().getUser(firebaseUid);
+    } catch (e) {
+      if (e.code === "auth/user-not-found") {
+        await admin.auth().createUser({
+          uid: firebaseUid,
+          displayName: lineUser.displayName || "LINEユーザー",
+          photoURL: lineUser.pictureUrl || undefined,
+        });
+        logger.info("Created new Firebase user for LINE", { uid: firebaseUid });
+      } else {
+        throw e;
+      }
+    }
+
+    await admin.auth().updateUser(firebaseUid, {
+      displayName: lineUser.displayName || "LINEユーザー",
+      photoURL: lineUser.pictureUrl || undefined,
+    });
+  }
+
+  return { firebaseUid };
+}
+
+/**
+ * LINE ユーザー用のカスタムトークンとプロフィールを生成
+ */
+async function createLineTokenAndProfile(lineUser) {
+  const { firebaseUid } = await resolveFirebaseUser(lineUser);
+
+  const customToken = await admin.auth().createCustomToken(firebaseUid, {
+    provider: "line",
+    lineUserId: lineUser.userId,
+  });
+
+  const profile = {
+    displayName: lineUser.displayName || "",
+    photoUrl: lineUser.pictureUrl || "",
+    provider: "line",
+  };
+
+  return { firebaseUid, customToken, profile };
+}
+
+/**
  * LINE OAuth コールバック — token取得→Firebase カスタムトークン生成→交換コード発行
  */
 exports.lineAuthCallback = onRequest(
@@ -166,55 +228,14 @@ exports.lineAuthCallback = onRequest(
 
       const lineUser = profileRes.data;
 
-      // アカウントリンキング対応: リンク済みアカウントチェック
-      let firebaseUid = `line:${lineUser.userId}`;
-
-      const linkedDoc = await admin.firestore()
-        .collection("line_linked_accounts")
-        .doc(lineUser.userId)
-        .get();
-
-      if (linkedDoc.exists) {
-        firebaseUid = linkedDoc.data().firebaseUid;
-        logger.info("Using linked account for callback", { lineUserId: lineUser.userId, firebaseUid });
-      } else {
-        // Firebase Auth ユーザー作成/更新
-        try {
-          await admin.auth().getUser(firebaseUid);
-        } catch (e) {
-          if (e.code === "auth/user-not-found") {
-            await admin.auth().createUser({
-              uid: firebaseUid,
-              displayName: lineUser.displayName || "LINEユーザー",
-              photoURL: lineUser.pictureUrl || undefined,
-            });
-            logger.info("Created new Firebase user for LINE", { uid: firebaseUid });
-          } else {
-            throw e;
-          }
-        }
-
-        await admin.auth().updateUser(firebaseUid, {
-          displayName: lineUser.displayName || "LINEユーザー",
-          photoURL: lineUser.pictureUrl || undefined,
-        });
-      }
-
-      // カスタムトークン生成
-      const customToken = await admin.auth().createCustomToken(firebaseUid, {
-        provider: "line",
-        lineUserId: lineUser.userId,
-      });
+      // ヘルパーでユーザー解決 + カスタムトークン生成
+      const { firebaseUid, customToken, profile } = await createLineTokenAndProfile(lineUser);
 
       // 交換コードを Firestore に保存
       const exchangeCode = crypto.randomBytes(32).toString("hex");
       await admin.firestore().collection("line_auth_tokens").doc(exchangeCode).set({
         customToken,
-        profile: {
-          displayName: lineUser.displayName || "",
-          photoUrl: lineUser.pictureUrl || "",
-          provider: "line",
-        },
+        profile,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         expiresAt: new Date(Date.now() + TOKEN_TTL_MS),
       });
@@ -370,57 +391,12 @@ exports.lineAuthVerifyToken = onRequest(
 
       const lineUser = profileRes.data;
 
-      // アカウントリンキング: 同一メールの既存ユーザーチェック
-      let firebaseUid = `line:${lineUser.userId}`;
-
-      // line_linked_accounts にマッピングがあるか確認
-      const linkedDoc = await admin.firestore()
-        .collection("line_linked_accounts")
-        .doc(lineUser.userId)
-        .get();
-
-      if (linkedDoc.exists) {
-        firebaseUid = linkedDoc.data().firebaseUid;
-        logger.info("Using linked account", { lineUserId: lineUser.userId, firebaseUid });
-      } else {
-        // Firebase Auth ユーザー作成/更新
-        try {
-          await admin.auth().getUser(firebaseUid);
-        } catch (e) {
-          if (e.code === "auth/user-not-found") {
-            await admin.auth().createUser({
-              uid: firebaseUid,
-              displayName: lineUser.displayName || "LINEユーザー",
-              photoURL: lineUser.pictureUrl || undefined,
-            });
-            logger.info("Created new Firebase user for LINE SDK", { uid: firebaseUid });
-          } else {
-            throw e;
-          }
-        }
-
-        await admin.auth().updateUser(firebaseUid, {
-          displayName: lineUser.displayName || "LINEユーザー",
-          photoURL: lineUser.pictureUrl || undefined,
-        });
-      }
-
-      // カスタムトークン生成
-      const customToken = await admin.auth().createCustomToken(firebaseUid, {
-        provider: "line",
-        lineUserId: lineUser.userId,
-      });
+      // ヘルパーでユーザー解決 + カスタムトークン生成
+      const { firebaseUid, customToken, profile } = await createLineTokenAndProfile(lineUser);
 
       logger.info("LINE SDK verify-token successful", { uid: firebaseUid });
 
-      res.status(200).json({
-        customToken,
-        profile: {
-          displayName: lineUser.displayName || "",
-          photoUrl: lineUser.pictureUrl || "",
-          provider: "line",
-        },
-      });
+      res.status(200).json({ customToken, profile });
     } catch (e) {
       logger.error("lineAuthVerifyToken failed", e);
       res.status(500).json({ error: "server_error" });

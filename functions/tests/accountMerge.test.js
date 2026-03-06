@@ -188,7 +188,7 @@ describe("mergeAccounts", () => {
         return {
           doc: jest.fn().mockReturnValue({
             get: jest.fn().mockResolvedValue(
-              createDocSnapshot(true, { uids: [deprecatedUid] }),
+              createDocSnapshot(true, { adminUids: [deprecatedUid] }),
             ),
           }),
         };

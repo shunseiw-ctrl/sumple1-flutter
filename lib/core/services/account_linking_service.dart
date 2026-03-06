@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import '../utils/logger.dart';
+import '../constants/google_auth_constants.dart';
 
 /// リンク操作の結果
 class LinkResult {
@@ -40,11 +41,6 @@ class LinkResult {
 /// アカウントリンキングサービス
 /// Google/Apple/LINE プロバイダーのリンク・リンク解除を管理
 class AccountLinkingService {
-  static const String _iosClientId =
-      '319960355608-svkte1q6p25mv675qqf8a0di89mi85lk.apps.googleusercontent.com';
-  static const String _webClientId =
-      '319960355608-pfuh6qe42hqtbm372ti9egv3r99bbh0k.apps.googleusercontent.com';
-
   AccountLinkingService({
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
@@ -54,8 +50,8 @@ class AccountLinkingService {
         _db = firestore ?? FirebaseFirestore.instance,
         _googleSignIn = googleSignIn ??
             GoogleSignIn(
-              clientId: _iosClientId,
-              serverClientId: _webClientId,
+              clientId: GoogleAuthConstants.iosClientId,
+              serverClientId: GoogleAuthConstants.webClientId,
             ),
         _functions = functions ??
             FirebaseFunctions.instanceFor(region: 'asia-northeast1');

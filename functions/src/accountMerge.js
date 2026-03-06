@@ -62,7 +62,7 @@ exports.mergeAccounts = onCall(
     // 安全チェック: 管理者アカウント拒否
     const adminDoc = await db.collection("config").doc("admins").get();
     if (adminDoc.exists) {
-      const adminUids = adminDoc.data().uids || [];
+      const adminUids = adminDoc.data().adminUids || [];
       if (adminUids.includes(deprecatedUid) || adminUids.includes(primaryUid)) {
         throw new HttpsError(
           "permission-denied",
@@ -408,49 +408,20 @@ exports.mergeAccounts = onCall(
       // 7. チャットマージ
       await mergeChats(primaryUid, deprecatedUid);
 
-      // 8. コレクション別 UID 更新
-      await updateByQuery("earnings", "uid", deprecatedUid, primaryUid);
-      await updateByQuery(
-        "monthly_statements",
-        "workerUid",
-        deprecatedUid,
-        primaryUid,
-      );
-      await updateByQuery(
-        "early_payment_requests",
-        "workerUid",
-        deprecatedUid,
-        primaryUid,
-      );
-      await updateByQuery("payments", "workerUid", deprecatedUid, primaryUid);
-      await updateByQuery(
-        "notifications",
-        "targetUid",
-        deprecatedUid,
-        primaryUid,
-      );
-      await updateByQuery("contacts", "uid", deprecatedUid, primaryUid);
-
-      // 9. ratings — targetUid と raterUid の両方を更新
-      await updateByQuery("ratings", "targetUid", deprecatedUid, primaryUid);
-      await updateByQuery("ratings", "raterUid", deprecatedUid, primaryUid);
-
-      // 10. referrals — referrerUid と refereeUid の両方を更新
-      await updateByQuery(
-        "referrals",
-        "referrerUid",
-        deprecatedUid,
-        primaryUid,
-      );
-      await updateByQuery(
-        "referrals",
-        "refereeUid",
-        deprecatedUid,
-        primaryUid,
-      );
-
-      // 11. LINE連携アカウント更新
-      await mergeLineLinkedAccounts(primaryUid, deprecatedUid);
+      // 8-11. コレクション別 UID 更新（独立したコレクションを並列処理）
+      await Promise.all([
+        updateByQuery("earnings", "uid", deprecatedUid, primaryUid),
+        updateByQuery("monthly_statements", "workerUid", deprecatedUid, primaryUid),
+        updateByQuery("early_payment_requests", "workerUid", deprecatedUid, primaryUid),
+        updateByQuery("payments", "workerUid", deprecatedUid, primaryUid),
+        updateByQuery("notifications", "targetUid", deprecatedUid, primaryUid),
+        updateByQuery("contacts", "uid", deprecatedUid, primaryUid),
+        updateByQuery("ratings", "targetUid", deprecatedUid, primaryUid),
+        updateByQuery("ratings", "raterUid", deprecatedUid, primaryUid),
+        updateByQuery("referrals", "referrerUid", deprecatedUid, primaryUid),
+        updateByQuery("referrals", "refereeUid", deprecatedUid, primaryUid),
+        mergeLineLinkedAccounts(primaryUid, deprecatedUid),
+      ]);
 
       // 12. 旧 Firebase Auth ユーザー削除
       await admin.auth().deleteUser(deprecatedUid);

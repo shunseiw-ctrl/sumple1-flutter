@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 
 /// 検査チェック項目
 class InspectionCheckItem {
@@ -45,18 +46,10 @@ class InspectionCheckItem {
           other.label == label &&
           other.result == result &&
           other.comment == comment &&
-          _listEquals(other.photoUrls, photoUrls));
+          listEquals(other.photoUrls, photoUrls));
 
   @override
   int get hashCode => Object.hash(label, result, comment, Object.hashAll(photoUrls));
-
-  static bool _listEquals(List<String> a, List<String> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
 }
 
 /// 検査（Inspection）のデータモデル
