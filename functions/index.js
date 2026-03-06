@@ -92,6 +92,10 @@ exports.sendReengagementNotifications = reengagement.sendReengagementNotificatio
 const identityVerification = require("./src/identityVerification");
 exports.onVerificationStatusChanged = identityVerification.onVerificationStatusChanged;
 
+// --- eKYC 顔照合 (Phase 24) ---
+const faceMatch = require("./src/faceMatch");
+exports.verifyFaceMatch = faceMatch.verifyFaceMatch;
+
 // --- Stripe テストヘルパー (Phase 20) ---
 const stripeTestHelper = require("./src/stripeTestHelper");
 exports.simulateStripeWebhook = stripeTestHelper.simulateStripeWebhook;

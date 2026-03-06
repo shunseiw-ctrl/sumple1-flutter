@@ -3029,5 +3029,52 @@
   "accountLinking_linkEmail": "Emailを連携",
   "accountLinking_linkPhone": "電話番号を連携",
   "phoneLinking_title": "電話番号を連携",
-  "phoneLinking_success": "電話番号を連携しました"
+  "phoneLinking_success": "電話番号を連携しました",
+
+  "liveness_title": "生体認証",
+  "liveness_turnRight": "ゆっくり右を向いてください",
+  "liveness_turnLeft": "ゆっくり左を向いてください",
+  "liveness_blink": "まばたきしてください",
+  "liveness_noFaceDetected": "顔が検出されません",
+  "liveness_multipleFaces": "一人だけ映るようにしてください",
+  "liveness_completed": "生体認証が完了しました",
+  "liveness_timeout": "時間切れです。もう一度お試しください",
+
+  "idCapture_title": "身分証撮影",
+  "idCapture_instruction": "身分証明書の表面を枠内に合わせてください",
+  "idCapture_backInstruction": "身分証明書の裏面を撮影してください",
+  "idCapture_noCameraAvailable": "カメラが利用できません",
+  "idCapture_cameraInitFailed": "カメラの初期化に失敗しました",
+  "idCapture_captureFailed": "撮影に失敗しました",
+  "idCapture_cameraCapture": "カメラで撮影",
+  "idCapture_gallerySelect": "ギャラリーから選択",
+
+  "identityVerification_stepIdFront": "表面",
+  "identityVerification_stepIdBack": "裏面",
+  "identityVerification_stepLiveness": "生体認証",
+  "identityVerification_idDocumentBack": "身分証明書（裏面）",
+  "identityVerification_idDocumentBackSubtitle": "裏面を撮影してください",
+  "identityVerification_livenessSubtitle": "首振り・まばたきで本人確認",
+  "identityVerification_submitWithFaceMatch": "顔照合して申請する",
+  "identityVerification_faceMatching": "顔照合中...",
+  "identityVerification_uploading": "画像をアップロード中...",
+  "identityVerification_settingProfile": "プロフィールを設定中...",
+  "identityVerification_faceMatchSuccess": "顔照合に成功しました。審査をお待ちください",
+  "identityVerification_faceMatchFailedTitle": "顔照合に失敗しました",
+  "identityVerification_faceMatchFailedMessage": "身分証の写真と自撮り写真の顔が一致しませんでした。写真を撮り直してください。",
+  "identityVerification_faceMatchScoreLabel": "一致度: {score}点",
+  "@identityVerification_faceMatchScoreLabel": {
+    "placeholders": {
+      "score": { "type": "String" }
+    }
+  },
+  "identityVerification_retakePhoto": "写真を撮り直す",
+
+  "adminIdentityVerification_faceMatchScore": "顔照合スコア",
+  "adminIdentityVerification_livenessVerified": "生体認証済み",
+  "adminIdentityVerification_idDocumentBackPhoto": "身分証明書（裏面）",
+  "adminIdentityVerification_noBackPhoto": "裏面\nなし",
+
+  "common_retry": "リトライ",
+  "common_close": "閉じる"
 }

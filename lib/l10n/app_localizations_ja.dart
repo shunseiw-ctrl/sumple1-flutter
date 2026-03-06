@@ -4507,4 +4507,118 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get phoneLinking_success => '電話番号を連携しました';
+
+  @override
+  String get liveness_title => '生体認証';
+
+  @override
+  String get liveness_turnRight => 'ゆっくり右を向いてください';
+
+  @override
+  String get liveness_turnLeft => 'ゆっくり左を向いてください';
+
+  @override
+  String get liveness_blink => 'まばたきしてください';
+
+  @override
+  String get liveness_noFaceDetected => '顔が検出されません';
+
+  @override
+  String get liveness_multipleFaces => '一人だけ映るようにしてください';
+
+  @override
+  String get liveness_completed => '生体認証が完了しました';
+
+  @override
+  String get liveness_timeout => '時間切れです。もう一度お試しください';
+
+  @override
+  String get idCapture_title => '身分証撮影';
+
+  @override
+  String get idCapture_instruction => '身分証明書の表面を枠内に合わせてください';
+
+  @override
+  String get idCapture_backInstruction => '身分証明書の裏面を撮影してください';
+
+  @override
+  String get idCapture_noCameraAvailable => 'カメラが利用できません';
+
+  @override
+  String get idCapture_cameraInitFailed => 'カメラの初期化に失敗しました';
+
+  @override
+  String get idCapture_captureFailed => '撮影に失敗しました';
+
+  @override
+  String get idCapture_cameraCapture => 'カメラで撮影';
+
+  @override
+  String get idCapture_gallerySelect => 'ギャラリーから選択';
+
+  @override
+  String get identityVerification_stepIdFront => '表面';
+
+  @override
+  String get identityVerification_stepIdBack => '裏面';
+
+  @override
+  String get identityVerification_stepLiveness => '生体認証';
+
+  @override
+  String get identityVerification_idDocumentBack => '身分証明書（裏面）';
+
+  @override
+  String get identityVerification_idDocumentBackSubtitle => '裏面を撮影してください';
+
+  @override
+  String get identityVerification_livenessSubtitle => '首振り・まばたきで本人確認';
+
+  @override
+  String get identityVerification_submitWithFaceMatch => '顔照合して申請する';
+
+  @override
+  String get identityVerification_faceMatching => '顔照合中...';
+
+  @override
+  String get identityVerification_uploading => '画像をアップロード中...';
+
+  @override
+  String get identityVerification_settingProfile => 'プロフィールを設定中...';
+
+  @override
+  String get identityVerification_faceMatchSuccess => '顔照合に成功しました。審査をお待ちください';
+
+  @override
+  String get identityVerification_faceMatchFailedTitle => '顔照合に失敗しました';
+
+  @override
+  String get identityVerification_faceMatchFailedMessage =>
+      '身分証の写真と自撮り写真の顔が一致しませんでした。写真を撮り直してください。';
+
+  @override
+  String identityVerification_faceMatchScoreLabel(String score) {
+    return '一致度: $score点';
+  }
+
+  @override
+  String get identityVerification_retakePhoto => '写真を撮り直す';
+
+  @override
+  String get adminIdentityVerification_faceMatchScore => '顔照合スコア';
+
+  @override
+  String get adminIdentityVerification_livenessVerified => '生体認証済み';
+
+  @override
+  String get adminIdentityVerification_idDocumentBackPhoto => '身分証明書（裏面）';
+
+  @override
+  String get adminIdentityVerification_noBackPhoto => '裏面\nなし';
+
+  @override
+  String get common_retry => 'リトライ';
+
+  @override
+  String get common_close => '閉じる';
 }

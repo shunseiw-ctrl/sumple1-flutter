@@ -1,8 +1,13 @@
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
+import 'package:sumple1/core/services/face_match_service.dart';
+import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/ekyc_service.dart';
@@ -20,14 +25,18 @@ class IdentityVerificationPage extends StatefulWidget {
 
 class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   final _imageService = ImageUploadService();
+  final _faceMatchService = FaceMatchService();
   // ignore: unused_field
   late final EkycService _ekycService;
   String? _idPhotoUrl;
+  String? _idPhotoBackUrl;
   String? _selfieUrl;
   bool _uploading = false;
   String? _verificationStatus;
   String _documentType = 'drivers_license';
   String? _rejectionReason;
+  bool _livenessVerified = false;
+  String? _loadingMessage;
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -51,11 +60,14 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
         setState(() {
           _verificationStatus = (data['status'] ?? '').toString();
           _idPhotoUrl = (data['idPhotoUrl'] ?? '').toString();
-          _selfieUrl = (data['selfieUrl'] ?? '').toString();
           if (_idPhotoUrl!.isEmpty) _idPhotoUrl = null;
+          _idPhotoBackUrl = data['idPhotoBackUrl']?.toString();
+          if (_idPhotoBackUrl != null && _idPhotoBackUrl!.isEmpty) _idPhotoBackUrl = null;
+          _selfieUrl = (data['selfieUrl'] ?? '').toString();
           if (_selfieUrl!.isEmpty) _selfieUrl = null;
           _documentType = (data['documentType'] ?? 'drivers_license').toString();
           _rejectionReason = data['rejectionReason']?.toString();
+          _livenessVerified = data['livenessVerified'] == true;
         });
       }
     } catch (e) {
@@ -68,20 +80,77 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     }
   }
 
-  Future<void> _pickIdPhoto() async {
+  /// カメラ撮影 or ギャラリー選択のボトムシート
+  Future<void> _showPickerSheet({
+    required String side,
+    required String folder,
+    required String documentId,
+  }) async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(context.l10n.idCapture_cameraCapture),
+              onTap: () => Navigator.pop(ctx, 'camera'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(context.l10n.idCapture_gallerySelect),
+              onTap: () => Navigator.pop(ctx, 'gallery'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (choice == null) return;
+
+    if (choice == 'camera') {
+      await _captureWithCamera(side: side, documentId: documentId);
+    } else {
+      await _pickFromGallery(side: side, documentId: documentId);
+    }
+  }
+
+  /// カメラ撮影（IdDocumentCapturePageに遷移）
+  Future<void> _captureWithCamera({required String side, required String documentId}) async {
+    final result = await context.push<Uint8List>(
+      RoutePaths.idDocumentCapture,
+      extra: {'side': side},
+    );
+
+    if (result != null && mounted) {
+      await _uploadImageBytes(result, documentId: documentId, side: side);
+    }
+  }
+
+  /// ギャラリーから選択
+  Future<void> _pickFromGallery({required String side, required String documentId}) async {
     if (_uploading || _uid.isEmpty) return;
     setState(() => _uploading = true);
     try {
       final result = await _imageService.pickAndUploadImage(
         userId: _uid,
         folder: 'identity_verification',
-        documentId: 'id_photo',
+        documentId: documentId,
         maxWidth: 1920,
         maxHeight: 1080,
         quality: 90,
       );
       if (result.isSuccess && result.downloadUrl != null) {
-        setState(() => _idPhotoUrl = result.downloadUrl);
+        setState(() {
+          if (side == 'front') {
+            _idPhotoUrl = result.downloadUrl;
+          } else if (side == 'back') {
+            _idPhotoBackUrl = result.downloadUrl;
+          } else {
+            _selfieUrl = result.downloadUrl;
+          }
+        });
       } else if (!result.cancelled && result.errorMessage != null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -94,33 +163,50 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     }
   }
 
-  Future<void> _pickSelfie() async {
-    if (_uploading || _uid.isEmpty) return;
+  /// バイトデータをアップロード
+  Future<void> _uploadImageBytes(Uint8List bytes, {required String documentId, required String side}) async {
+    if (_uid.isEmpty) return;
     setState(() => _uploading = true);
     try {
-      final result = await _imageService.pickAndUploadImage(
+      final result = await _imageService.uploadImageBytes(
+        bytes: bytes,
         userId: _uid,
         folder: 'identity_verification',
-        documentId: 'selfie',
-        maxWidth: 1080,
-        maxHeight: 1080,
-        quality: 90,
+        documentId: documentId,
       );
       if (result.isSuccess && result.downloadUrl != null) {
-        setState(() => _selfieUrl = result.downloadUrl);
-      } else if (!result.cancelled && result.errorMessage != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result.errorMessage!)),
-          );
-        }
+        setState(() {
+          if (side == 'front') {
+            _idPhotoUrl = result.downloadUrl;
+          } else if (side == 'back') {
+            _idPhotoBackUrl = result.downloadUrl;
+          } else {
+            _selfieUrl = result.downloadUrl;
+          }
+        });
+      } else if (result.errorMessage != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.errorMessage!)),
+        );
       }
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
   }
 
-  Future<void> _submit() async {
+  /// Liveness Detection 実行
+  Future<void> _startLivenessDetection() async {
+    final result = await context.push<Uint8List>(RoutePaths.livenessDetection);
+
+    if (result != null && mounted) {
+      setState(() => _livenessVerified = true);
+      // 自撮り画像をアップロード
+      await _uploadImageBytes(result, documentId: 'selfie', side: 'selfie');
+    }
+  }
+
+  /// 顔照合して申請
+  Future<void> _submitWithFaceMatch() async {
     if (_idPhotoUrl == null || _selfieUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.identityVerification_uploadBoth)),
@@ -128,32 +214,54 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
       return;
     }
 
-    setState(() => _uploading = true);
+    setState(() {
+      _uploading = true;
+      _loadingMessage = context.l10n.identityVerification_uploading;
+    });
+
     try {
+      // まずFirestoreに書き込み（顔照合用のデータ準備）
       await FirebaseFirestore.instance
           .collection('identity_verification')
           .doc(_uid)
           .set({
         'idPhotoUrl': _idPhotoUrl,
+        if (_idPhotoBackUrl != null) 'idPhotoBackUrl': _idPhotoBackUrl,
         'selfieUrl': _selfieUrl,
         'documentType': _documentType,
         'status': 'pending',
+        'livenessVerified': _livenessVerified,
+        if (_livenessVerified) 'livenessCompletedAt': FieldValue.serverTimestamp(),
         'submittedAt': FieldValue.serverTimestamp(),
         'uid': _uid,
       }, SetOptions(merge: true));
 
-      await FirebaseFirestore.instance.collection('profiles').doc(_uid).set({
-        'profilePhotoUrl': _selfieUrl,
-        'profilePhotoLocked': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      // 顔照合実行
+      setState(() => _loadingMessage = context.l10n.identityVerification_faceMatching);
+      final faceResult = await _faceMatchService.verifyFaceMatch(_uid);
 
-      setState(() => _verificationStatus = 'pending');
+      if (!mounted) return;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.identityVerification_submitted)),
-        );
+      if (faceResult.matched) {
+        // 顔照合成功 → プロフィールアイコン自動設定
+        setState(() => _loadingMessage = context.l10n.identityVerification_settingProfile);
+        await _setProfilePhoto();
+
+        setState(() => _verificationStatus = 'pending');
+        AppHaptics.success();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.l10n.identityVerification_faceMatchSuccess),
+              backgroundColor: context.appColors.success,
+            ),
+          );
+        }
+      } else {
+        // 顔照合失敗
+        if (mounted) {
+          _showFaceMatchFailedDialog(faceResult.score);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -162,11 +270,88 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
         );
       }
     } finally {
-      if (mounted) setState(() => _uploading = false);
+      if (mounted) {
+        setState(() {
+          _uploading = false;
+          _loadingMessage = null;
+        });
+      }
     }
   }
 
-  Widget _buildStep(int number, String label, bool completed) {
+  /// プロフィールアイコン自動設定
+  Future<void> _setProfilePhoto() async {
+    try {
+      if (_selfieUrl == null) return;
+
+      await FirebaseFirestore.instance.collection('profiles').doc(_uid).set({
+        'profilePhotoUrl': _selfieUrl,
+        'profilePhotoLocked': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // ノンブロッキング: 失敗しても本人確認の送信は続行
+      Logger.warning('プロフィール写真設定に失敗', tag: 'IdentityVerification', data: {'error': '$e'});
+    }
+  }
+
+  /// 顔照合失敗ダイアログ
+  void _showFaceMatchFailedDialog(double score) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.l10n.identityVerification_faceMatchFailedTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning_amber_rounded, size: 48, color: context.appColors.warning),
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.identityVerification_faceMatchFailedMessage,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              context.l10n.identityVerification_faceMatchScoreLabel(score.toStringAsFixed(0)),
+              style: TextStyle(
+                fontSize: 13,
+                color: context.appColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(context.l10n.common_close),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              // 写真をリセットして再撮影を促す
+              setState(() {
+                _selfieUrl = null;
+                _livenessVerified = false;
+              });
+            },
+            icon: const Icon(Icons.camera_alt, size: 18),
+            label: Text(context.l10n.identityVerification_retakePhoto),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- UI構築 ---
+
+  int get _currentStep {
+    if (_idPhotoUrl == null) return 0;
+    if (_idPhotoBackUrl == null) return 1;
+    if (!_livenessVerified || _selfieUrl == null) return 2;
+    return 3;
+  }
+
+  Widget _buildStep(int number, String label, bool completed, bool isCurrent) {
     return Expanded(
       child: Column(
         children: [
@@ -175,7 +360,11 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: completed ? context.appColors.success : context.appColors.divider,
+              color: completed
+                  ? context.appColors.success
+                  : isCurrent
+                      ? context.appColors.primary
+                      : context.appColors.divider,
             ),
             child: Center(
               child: completed
@@ -276,6 +465,71 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     );
   }
 
+  Widget _buildLivenessCard() {
+    return Material(
+      color: context.appColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: _uploading ? null : _startLivenessDetection,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _livenessVerified ? context.appColors.success : context.appColors.divider,
+              width: _livenessVerified ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _livenessVerified
+                      ? context.appColors.success.withValues(alpha: 0.1)
+                      : context.appColors.primaryPale,
+                ),
+                child: Icon(
+                  _livenessVerified ? Icons.check_circle : Icons.face_retouching_natural,
+                  color: _livenessVerified ? context.appColors.success : context.appColors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.liveness_title,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                    ),
+                    Text(
+                      _livenessVerified
+                          ? context.l10n.liveness_completed
+                          : context.l10n.identityVerification_livenessSubtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _livenessVerified
+                            ? context.appColors.success
+                            : context.appColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!_livenessVerified)
+                Icon(Icons.arrow_forward_ios, size: 16, color: context.appColors.textHint),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusBanner() {
     if (_verificationStatus == null || _verificationStatus!.isEmpty) return const SizedBox.shrink();
 
@@ -328,26 +582,30 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   Widget build(BuildContext context) {
     final isApproved = _verificationStatus == 'approved';
     final isPending = _verificationStatus == 'pending';
+    final isEditable = !isApproved && !isPending;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.identityVerification_title)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         children: [
-          // Step indicator
+          // 4ステップインジケーター
           Container(
             margin: const EdgeInsets.only(bottom: 20),
             child: Row(
               children: [
-                _buildStep(1, context.l10n.identityVerification_stepUploadId, _idPhotoUrl != null),
+                _buildStep(1, context.l10n.identityVerification_stepIdFront, _idPhotoUrl != null, _currentStep == 0),
                 _buildStepConnector(_idPhotoUrl != null),
-                _buildStep(2, context.l10n.identityVerification_stepSelfie, _selfieUrl != null),
-                _buildStepConnector(_selfieUrl != null),
-                _buildStep(3, context.l10n.identityVerification_stepSubmit, _verificationStatus == 'pending' || _verificationStatus == 'approved'),
+                _buildStep(2, context.l10n.identityVerification_stepIdBack, _idPhotoBackUrl != null, _currentStep == 1),
+                _buildStepConnector(_idPhotoBackUrl != null),
+                _buildStep(3, context.l10n.identityVerification_stepLiveness, _livenessVerified && _selfieUrl != null, _currentStep == 2),
+                _buildStepConnector(_livenessVerified && _selfieUrl != null),
+                _buildStep(4, context.l10n.identityVerification_stepSubmit, isPending || isApproved, _currentStep == 3),
               ],
             ),
           ),
           _buildStatusBanner(),
+          // 説明バナー
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -368,7 +626,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
           ),
           const SizedBox(height: 12),
-          // eKYC banner
+          // eKYC バナー
           Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(14),
@@ -391,7 +649,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
           ),
           const SizedBox(height: 8),
-          if (!isApproved && !isPending)
+          // 書類の種類選択
+          if (isEditable)
             Container(
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -413,40 +672,79 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                         ))
                     .toList(),
                 onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _documentType = value);
-                  }
+                  if (value != null) setState(() => _documentType = value);
                 },
               ),
             ),
+          // 身分証表面
           _buildPhotoUploadCard(
             title: context.l10n.identityVerification_idDocumentTitle,
             subtitle: context.l10n.identityVerification_idDocumentSubtitle,
             icon: Icons.credit_card,
             photoUrl: _idPhotoUrl,
-            onTap: (isApproved || isPending) ? () {} : _pickIdPhoto,
+            onTap: isEditable
+                ? () => _showPickerSheet(side: 'front', folder: 'identity_verification', documentId: 'id_front')
+                : () {},
           ),
           const SizedBox(height: 16),
+          // 身分証裏面
           _buildPhotoUploadCard(
-            title: context.l10n.identityVerification_selfieTitle,
-            subtitle: context.l10n.identityVerification_selfieSubtitle,
-            icon: Icons.face,
-            photoUrl: _selfieUrl,
-            onTap: (isApproved || isPending) ? () {} : _pickSelfie,
+            title: context.l10n.identityVerification_idDocumentBack,
+            subtitle: context.l10n.identityVerification_idDocumentBackSubtitle,
+            icon: Icons.credit_card,
+            photoUrl: _idPhotoBackUrl,
+            onTap: isEditable
+                ? () => _showPickerSheet(side: 'back', folder: 'identity_verification', documentId: 'id_back')
+                : () {},
           ),
+          const SizedBox(height: 16),
+          // Liveness Detection
+          _buildLivenessCard(),
+          if (_selfieUrl != null) ...[
+            const SizedBox(height: 12),
+            // 自撮りプレビュー
+            _buildPhotoUploadCard(
+              title: context.l10n.identityVerification_selfieTitle,
+              subtitle: context.l10n.identityVerification_selfieSubtitle,
+              icon: Icons.face,
+              photoUrl: _selfieUrl,
+              onTap: () {}, // Livenessで自動撮影のため手動選択不可
+            ),
+          ],
           const SizedBox(height: 24),
+          // ローディング表示
           if (_uploading)
-            const Center(child: CircularProgressIndicator())
-          else if (!isApproved && !isPending)
+            Center(
+              child: Column(
+                children: [
+                  const CircularProgressIndicator(),
+                  if (_loadingMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _loadingMessage!,
+                      style: TextStyle(fontSize: 13, color: context.appColors.textSecondary),
+                    ),
+                  ],
+                ],
+              ),
+            )
+          // 送信ボタン
+          else if (isEditable)
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: (_idPhotoUrl != null && _selfieUrl != null) ? _submit : null,
-                icon: const Icon(Icons.send),
-                label: Text(context.l10n.identityVerification_submitButton, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                onPressed: (_idPhotoUrl != null && _selfieUrl != null && _livenessVerified)
+                    ? _submitWithFaceMatch
+                    : null,
+                icon: const Icon(Icons.verified_user),
+                label: Text(
+                  context.l10n.identityVerification_submitWithFaceMatch,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
               ),
             ),
+          // 再申請ボタン
           if (_verificationStatus == 'rejected' && !_uploading)
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -458,9 +756,11 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                     setState(() {
                       _verificationStatus = null;
                       _idPhotoUrl = null;
+                      _idPhotoBackUrl = null;
                       _selfieUrl = null;
                       _rejectionReason = null;
                       _documentType = 'drivers_license';
+                      _livenessVerified = false;
                     });
                   },
                   icon: const Icon(Icons.refresh),

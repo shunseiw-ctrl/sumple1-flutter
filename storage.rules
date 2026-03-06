@@ -72,6 +72,13 @@ service firebase.storage {
       allow write: if isOwner(userId) && isUnder10MB();
     }
 
+    // === 本人確認写真（eKYC：表面/裏面/自撮り） ===
+    // パス: identity_verification/{userId}/...
+    match /identity_verification/{userId}/{allPaths=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isImageType() && isUnder10MB();
+    }
+
     // === 検査写真 ===
     // パス: inspection_photos/{applicationId}/...
     match /inspection_photos/{applicationId}/{allPaths=**} {

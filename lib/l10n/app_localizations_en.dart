@@ -4621,4 +4621,124 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneLinking_success => 'Phone number linked';
+
+  @override
+  String get liveness_title => 'Liveness Detection';
+
+  @override
+  String get liveness_turnRight => 'Slowly turn your head to the right';
+
+  @override
+  String get liveness_turnLeft => 'Slowly turn your head to the left';
+
+  @override
+  String get liveness_blink => 'Please blink';
+
+  @override
+  String get liveness_noFaceDetected => 'No face detected';
+
+  @override
+  String get liveness_multipleFaces => 'Only one person should be visible';
+
+  @override
+  String get liveness_completed => 'Liveness verification completed';
+
+  @override
+  String get liveness_timeout => 'Timed out. Please try again';
+
+  @override
+  String get idCapture_title => 'ID Document Capture';
+
+  @override
+  String get idCapture_instruction =>
+      'Align the front of your ID within the frame';
+
+  @override
+  String get idCapture_backInstruction =>
+      'Capture the back of your ID document';
+
+  @override
+  String get idCapture_noCameraAvailable => 'Camera not available';
+
+  @override
+  String get idCapture_cameraInitFailed => 'Failed to initialize camera';
+
+  @override
+  String get idCapture_captureFailed => 'Failed to capture photo';
+
+  @override
+  String get idCapture_cameraCapture => 'Take photo';
+
+  @override
+  String get idCapture_gallerySelect => 'Choose from gallery';
+
+  @override
+  String get identityVerification_stepIdFront => 'Front';
+
+  @override
+  String get identityVerification_stepIdBack => 'Back';
+
+  @override
+  String get identityVerification_stepLiveness => 'Liveness';
+
+  @override
+  String get identityVerification_idDocumentBack => 'ID Document (Back)';
+
+  @override
+  String get identityVerification_idDocumentBackSubtitle =>
+      'Capture the back of your ID';
+
+  @override
+  String get identityVerification_livenessSubtitle =>
+      'Verify with head turn & blink';
+
+  @override
+  String get identityVerification_submitWithFaceMatch => 'Verify & Submit';
+
+  @override
+  String get identityVerification_faceMatching => 'Matching faces...';
+
+  @override
+  String get identityVerification_uploading => 'Uploading images...';
+
+  @override
+  String get identityVerification_settingProfile => 'Setting up profile...';
+
+  @override
+  String get identityVerification_faceMatchSuccess =>
+      'Face match successful. Please wait for review';
+
+  @override
+  String get identityVerification_faceMatchFailedTitle => 'Face Match Failed';
+
+  @override
+  String get identityVerification_faceMatchFailedMessage =>
+      'The face on your ID does not match your selfie. Please retake your photos.';
+
+  @override
+  String identityVerification_faceMatchScoreLabel(String score) {
+    return 'Match score: $score';
+  }
+
+  @override
+  String get identityVerification_retakePhoto => 'Retake photo';
+
+  @override
+  String get adminIdentityVerification_faceMatchScore => 'Face Match Score';
+
+  @override
+  String get adminIdentityVerification_livenessVerified => 'Liveness Verified';
+
+  @override
+  String get adminIdentityVerification_idDocumentBackPhoto =>
+      'ID Document (Back)';
+
+  @override
+  String get adminIdentityVerification_noBackPhoto => 'No back\nphoto';
+
+  @override
+  String get common_retry => 'Retry';
+
+  @override
+  String get common_close => 'Close';
 }

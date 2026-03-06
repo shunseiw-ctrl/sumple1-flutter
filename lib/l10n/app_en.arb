@@ -2258,5 +2258,52 @@
   "accountLinking_linkEmail": "Link Email",
   "accountLinking_linkPhone": "Link Phone",
   "phoneLinking_title": "Link Phone Number",
-  "phoneLinking_success": "Phone number linked"
+  "phoneLinking_success": "Phone number linked",
+
+  "liveness_title": "Liveness Detection",
+  "liveness_turnRight": "Slowly turn your head to the right",
+  "liveness_turnLeft": "Slowly turn your head to the left",
+  "liveness_blink": "Please blink",
+  "liveness_noFaceDetected": "No face detected",
+  "liveness_multipleFaces": "Only one person should be visible",
+  "liveness_completed": "Liveness verification completed",
+  "liveness_timeout": "Timed out. Please try again",
+
+  "idCapture_title": "ID Document Capture",
+  "idCapture_instruction": "Align the front of your ID within the frame",
+  "idCapture_backInstruction": "Capture the back of your ID document",
+  "idCapture_noCameraAvailable": "Camera not available",
+  "idCapture_cameraInitFailed": "Failed to initialize camera",
+  "idCapture_captureFailed": "Failed to capture photo",
+  "idCapture_cameraCapture": "Take photo",
+  "idCapture_gallerySelect": "Choose from gallery",
+
+  "identityVerification_stepIdFront": "Front",
+  "identityVerification_stepIdBack": "Back",
+  "identityVerification_stepLiveness": "Liveness",
+  "identityVerification_idDocumentBack": "ID Document (Back)",
+  "identityVerification_idDocumentBackSubtitle": "Capture the back of your ID",
+  "identityVerification_livenessSubtitle": "Verify with head turn & blink",
+  "identityVerification_submitWithFaceMatch": "Verify & Submit",
+  "identityVerification_faceMatching": "Matching faces...",
+  "identityVerification_uploading": "Uploading images...",
+  "identityVerification_settingProfile": "Setting up profile...",
+  "identityVerification_faceMatchSuccess": "Face match successful. Please wait for review",
+  "identityVerification_faceMatchFailedTitle": "Face Match Failed",
+  "identityVerification_faceMatchFailedMessage": "The face on your ID does not match your selfie. Please retake your photos.",
+  "identityVerification_faceMatchScoreLabel": "Match score: {score}",
+  "@identityVerification_faceMatchScoreLabel": {
+    "placeholders": {
+      "score": { "type": "String" }
+    }
+  },
+  "identityVerification_retakePhoto": "Retake photo",
+
+  "adminIdentityVerification_faceMatchScore": "Face Match Score",
+  "adminIdentityVerification_livenessVerified": "Liveness Verified",
+  "adminIdentityVerification_idDocumentBackPhoto": "ID Document (Back)",
+  "adminIdentityVerification_noBackPhoto": "No back\nphoto",
+
+  "common_retry": "Retry",
+  "common_close": "Close"
 }

@@ -8614,6 +8614,228 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'電話番号を連携しました'**
   String get phoneLinking_success;
+
+  /// No description provided for @liveness_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'生体認証'**
+  String get liveness_title;
+
+  /// No description provided for @liveness_turnRight.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゆっくり右を向いてください'**
+  String get liveness_turnRight;
+
+  /// No description provided for @liveness_turnLeft.
+  ///
+  /// In ja, this message translates to:
+  /// **'ゆっくり左を向いてください'**
+  String get liveness_turnLeft;
+
+  /// No description provided for @liveness_blink.
+  ///
+  /// In ja, this message translates to:
+  /// **'まばたきしてください'**
+  String get liveness_blink;
+
+  /// No description provided for @liveness_noFaceDetected.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔が検出されません'**
+  String get liveness_noFaceDetected;
+
+  /// No description provided for @liveness_multipleFaces.
+  ///
+  /// In ja, this message translates to:
+  /// **'一人だけ映るようにしてください'**
+  String get liveness_multipleFaces;
+
+  /// No description provided for @liveness_completed.
+  ///
+  /// In ja, this message translates to:
+  /// **'生体認証が完了しました'**
+  String get liveness_completed;
+
+  /// No description provided for @liveness_timeout.
+  ///
+  /// In ja, this message translates to:
+  /// **'時間切れです。もう一度お試しください'**
+  String get liveness_timeout;
+
+  /// No description provided for @idCapture_title.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証撮影'**
+  String get idCapture_title;
+
+  /// No description provided for @idCapture_instruction.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証明書の表面を枠内に合わせてください'**
+  String get idCapture_instruction;
+
+  /// No description provided for @idCapture_backInstruction.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証明書の裏面を撮影してください'**
+  String get idCapture_backInstruction;
+
+  /// No description provided for @idCapture_noCameraAvailable.
+  ///
+  /// In ja, this message translates to:
+  /// **'カメラが利用できません'**
+  String get idCapture_noCameraAvailable;
+
+  /// No description provided for @idCapture_cameraInitFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'カメラの初期化に失敗しました'**
+  String get idCapture_cameraInitFailed;
+
+  /// No description provided for @idCapture_captureFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'撮影に失敗しました'**
+  String get idCapture_captureFailed;
+
+  /// No description provided for @idCapture_cameraCapture.
+  ///
+  /// In ja, this message translates to:
+  /// **'カメラで撮影'**
+  String get idCapture_cameraCapture;
+
+  /// No description provided for @idCapture_gallerySelect.
+  ///
+  /// In ja, this message translates to:
+  /// **'ギャラリーから選択'**
+  String get idCapture_gallerySelect;
+
+  /// No description provided for @identityVerification_stepIdFront.
+  ///
+  /// In ja, this message translates to:
+  /// **'表面'**
+  String get identityVerification_stepIdFront;
+
+  /// No description provided for @identityVerification_stepIdBack.
+  ///
+  /// In ja, this message translates to:
+  /// **'裏面'**
+  String get identityVerification_stepIdBack;
+
+  /// No description provided for @identityVerification_stepLiveness.
+  ///
+  /// In ja, this message translates to:
+  /// **'生体認証'**
+  String get identityVerification_stepLiveness;
+
+  /// No description provided for @identityVerification_idDocumentBack.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証明書（裏面）'**
+  String get identityVerification_idDocumentBack;
+
+  /// No description provided for @identityVerification_idDocumentBackSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'裏面を撮影してください'**
+  String get identityVerification_idDocumentBackSubtitle;
+
+  /// No description provided for @identityVerification_livenessSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'首振り・まばたきで本人確認'**
+  String get identityVerification_livenessSubtitle;
+
+  /// No description provided for @identityVerification_submitWithFaceMatch.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔照合して申請する'**
+  String get identityVerification_submitWithFaceMatch;
+
+  /// No description provided for @identityVerification_faceMatching.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔照合中...'**
+  String get identityVerification_faceMatching;
+
+  /// No description provided for @identityVerification_uploading.
+  ///
+  /// In ja, this message translates to:
+  /// **'画像をアップロード中...'**
+  String get identityVerification_uploading;
+
+  /// No description provided for @identityVerification_settingProfile.
+  ///
+  /// In ja, this message translates to:
+  /// **'プロフィールを設定中...'**
+  String get identityVerification_settingProfile;
+
+  /// No description provided for @identityVerification_faceMatchSuccess.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔照合に成功しました。審査をお待ちください'**
+  String get identityVerification_faceMatchSuccess;
+
+  /// No description provided for @identityVerification_faceMatchFailedTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔照合に失敗しました'**
+  String get identityVerification_faceMatchFailedTitle;
+
+  /// No description provided for @identityVerification_faceMatchFailedMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証の写真と自撮り写真の顔が一致しませんでした。写真を撮り直してください。'**
+  String get identityVerification_faceMatchFailedMessage;
+
+  /// No description provided for @identityVerification_faceMatchScoreLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'一致度: {score}点'**
+  String identityVerification_faceMatchScoreLabel(String score);
+
+  /// No description provided for @identityVerification_retakePhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を撮り直す'**
+  String get identityVerification_retakePhoto;
+
+  /// No description provided for @adminIdentityVerification_faceMatchScore.
+  ///
+  /// In ja, this message translates to:
+  /// **'顔照合スコア'**
+  String get adminIdentityVerification_faceMatchScore;
+
+  /// No description provided for @adminIdentityVerification_livenessVerified.
+  ///
+  /// In ja, this message translates to:
+  /// **'生体認証済み'**
+  String get adminIdentityVerification_livenessVerified;
+
+  /// No description provided for @adminIdentityVerification_idDocumentBackPhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'身分証明書（裏面）'**
+  String get adminIdentityVerification_idDocumentBackPhoto;
+
+  /// No description provided for @adminIdentityVerification_noBackPhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'裏面\nなし'**
+  String get adminIdentityVerification_noBackPhoto;
+
+  /// No description provided for @common_retry.
+  ///
+  /// In ja, this message translates to:
+  /// **'リトライ'**
+  String get common_retry;
+
+  /// No description provided for @common_close.
+  ///
+  /// In ja, this message translates to:
+  /// **'閉じる'**
+  String get common_close;
 }
 
 class _AppLocalizationsDelegate

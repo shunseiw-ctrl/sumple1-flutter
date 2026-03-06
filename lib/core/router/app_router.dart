@@ -46,6 +46,8 @@ import '../../pages/phone_auth_page.dart';
 import '../../pages/admin/admin_worker_detail_page.dart';
 import '../../pages/admin/admin_drafts_page.dart';
 import '../../pages/referral_page.dart';
+import '../../pages/id_document_capture_page.dart';
+import '../../pages/liveness_detection_page.dart';
 
 /// GoRouter インスタンスプロバイダー
 final routerProvider = Provider<GoRouter>((ref) {
@@ -235,6 +237,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => slideRightTransition(
           key: state.pageKey,
           child: const IdentityVerificationPage(),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.idDocumentCapture,
+        pageBuilder: (context, state) {
+          final extra = state.extra;
+          final side = extra is Map ? (extra['side'] ?? 'front').toString() : 'front';
+          return slideUpTransition(
+            key: state.pageKey,
+            child: IdDocumentCapturePage(side: side),
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.livenessDetection,
+        pageBuilder: (context, state) => slideUpTransition(
+          key: state.pageKey,
+          child: const LivenessDetectionPage(),
         ),
       ),
       GoRoute(

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class IdentityVerificationModel {
   final String uid;
   final String idPhotoUrl;
+  final String? idPhotoBackUrl;
   final String selfieUrl;
   final String documentType;
   final String status;
@@ -10,10 +11,15 @@ class IdentityVerificationModel {
   final String? reviewedBy;
   final DateTime? reviewedAt;
   final String? rejectionReason;
+  final double? faceMatchScore;
+  final bool livenessVerified;
+  final DateTime? livenessCompletedAt;
+  final DateTime? faceMatchedAt;
 
   const IdentityVerificationModel({
     required this.uid,
     required this.idPhotoUrl,
+    this.idPhotoBackUrl,
     required this.selfieUrl,
     this.documentType = 'drivers_license',
     this.status = 'pending',
@@ -21,12 +27,17 @@ class IdentityVerificationModel {
     this.reviewedBy,
     this.reviewedAt,
     this.rejectionReason,
+    this.faceMatchScore,
+    this.livenessVerified = false,
+    this.livenessCompletedAt,
+    this.faceMatchedAt,
   });
 
   factory IdentityVerificationModel.fromMap(Map<String, dynamic> map) {
     return IdentityVerificationModel(
       uid: (map['uid'] ?? '').toString(),
       idPhotoUrl: (map['idPhotoUrl'] ?? '').toString(),
+      idPhotoBackUrl: map['idPhotoBackUrl']?.toString(),
       selfieUrl: (map['selfieUrl'] ?? '').toString(),
       documentType: (map['documentType'] ?? 'drivers_license').toString(),
       status: (map['status'] ?? 'pending').toString(),
@@ -42,6 +53,18 @@ class IdentityVerificationModel {
               ? map['reviewedAt'] as DateTime
               : null,
       rejectionReason: map['rejectionReason']?.toString(),
+      faceMatchScore: (map['faceMatchScore'] as num?)?.toDouble(),
+      livenessVerified: map['livenessVerified'] == true,
+      livenessCompletedAt: map['livenessCompletedAt'] is Timestamp
+          ? (map['livenessCompletedAt'] as Timestamp).toDate()
+          : map['livenessCompletedAt'] is DateTime
+              ? map['livenessCompletedAt'] as DateTime
+              : null,
+      faceMatchedAt: map['faceMatchedAt'] is Timestamp
+          ? (map['faceMatchedAt'] as Timestamp).toDate()
+          : map['faceMatchedAt'] is DateTime
+              ? map['faceMatchedAt'] as DateTime
+              : null,
     );
   }
 
@@ -49,6 +72,7 @@ class IdentityVerificationModel {
     return {
       'uid': uid,
       'idPhotoUrl': idPhotoUrl,
+      if (idPhotoBackUrl != null) 'idPhotoBackUrl': idPhotoBackUrl,
       'selfieUrl': selfieUrl,
       'documentType': documentType,
       'status': status,
@@ -56,12 +80,19 @@ class IdentityVerificationModel {
       if (reviewedBy != null) 'reviewedBy': reviewedBy,
       if (reviewedAt != null) 'reviewedAt': Timestamp.fromDate(reviewedAt!),
       if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      if (faceMatchScore != null) 'faceMatchScore': faceMatchScore,
+      'livenessVerified': livenessVerified,
+      if (livenessCompletedAt != null)
+        'livenessCompletedAt': Timestamp.fromDate(livenessCompletedAt!),
+      if (faceMatchedAt != null)
+        'faceMatchedAt': Timestamp.fromDate(faceMatchedAt!),
     };
   }
 
   IdentityVerificationModel copyWith({
     String? uid,
     String? idPhotoUrl,
+    String? idPhotoBackUrl,
     String? selfieUrl,
     String? documentType,
     String? status,
@@ -69,10 +100,15 @@ class IdentityVerificationModel {
     String? reviewedBy,
     DateTime? reviewedAt,
     String? rejectionReason,
+    double? faceMatchScore,
+    bool? livenessVerified,
+    DateTime? livenessCompletedAt,
+    DateTime? faceMatchedAt,
   }) {
     return IdentityVerificationModel(
       uid: uid ?? this.uid,
       idPhotoUrl: idPhotoUrl ?? this.idPhotoUrl,
+      idPhotoBackUrl: idPhotoBackUrl ?? this.idPhotoBackUrl,
       selfieUrl: selfieUrl ?? this.selfieUrl,
       documentType: documentType ?? this.documentType,
       status: status ?? this.status,
@@ -80,6 +116,10 @@ class IdentityVerificationModel {
       reviewedBy: reviewedBy ?? this.reviewedBy,
       reviewedAt: reviewedAt ?? this.reviewedAt,
       rejectionReason: rejectionReason ?? this.rejectionReason,
+      faceMatchScore: faceMatchScore ?? this.faceMatchScore,
+      livenessVerified: livenessVerified ?? this.livenessVerified,
+      livenessCompletedAt: livenessCompletedAt ?? this.livenessCompletedAt,
+      faceMatchedAt: faceMatchedAt ?? this.faceMatchedAt,
     );
   }
 
@@ -89,14 +129,28 @@ class IdentityVerificationModel {
       other is IdentityVerificationModel &&
           uid == other.uid &&
           idPhotoUrl == other.idPhotoUrl &&
+          idPhotoBackUrl == other.idPhotoBackUrl &&
           selfieUrl == other.selfieUrl &&
           documentType == other.documentType &&
           status == other.status &&
           reviewedBy == other.reviewedBy &&
-          rejectionReason == other.rejectionReason;
+          rejectionReason == other.rejectionReason &&
+          faceMatchScore == other.faceMatchScore &&
+          livenessVerified == other.livenessVerified;
 
   @override
-  int get hashCode => Object.hash(uid, idPhotoUrl, selfieUrl, documentType, status, reviewedBy, rejectionReason);
+  int get hashCode => Object.hash(
+        uid,
+        idPhotoUrl,
+        idPhotoBackUrl,
+        selfieUrl,
+        documentType,
+        status,
+        reviewedBy,
+        rejectionReason,
+        faceMatchScore,
+        livenessVerified,
+      );
 
   static const documentTypes = {
     'drivers_license': '運転免許証',

@@ -226,8 +226,20 @@ class _AdminIdentityVerificationPageState
                   model: model,
                   onApprove: () => _approve(model.uid),
                   onReject: () => _reject(model.uid),
-                  onTapIdPhoto: () => _showPhotoDialog(model.idPhotoUrl, context.l10n.adminIdentityVerification_idDocumentPhoto),
-                  onTapSelfie: () => _showPhotoDialog(model.selfieUrl, context.l10n.adminIdentityVerification_selfiePhoto),
+                  onTapIdPhoto: () => _showPhotoDialog(
+                    model.idPhotoUrl,
+                    context.l10n.adminIdentityVerification_idDocumentPhoto,
+                  ),
+                  onTapIdBackPhoto: model.idPhotoBackUrl != null
+                      ? () => _showPhotoDialog(
+                            model.idPhotoBackUrl!,
+                            context.l10n.adminIdentityVerification_idDocumentBackPhoto,
+                          )
+                      : null,
+                  onTapSelfie: () => _showPhotoDialog(
+                    model.selfieUrl,
+                    context.l10n.adminIdentityVerification_selfiePhoto,
+                  ),
                 );
               },
             );
@@ -243,6 +255,7 @@ class _VerificationCard extends StatelessWidget {
   final VoidCallback onApprove;
   final VoidCallback onReject;
   final VoidCallback onTapIdPhoto;
+  final VoidCallback? onTapIdBackPhoto;
   final VoidCallback onTapSelfie;
 
   const _VerificationCard({
@@ -250,8 +263,15 @@ class _VerificationCard extends StatelessWidget {
     required this.onApprove,
     required this.onReject,
     required this.onTapIdPhoto,
+    this.onTapIdBackPhoto,
     required this.onTapSelfie,
   });
+
+  Color _scoreColor(BuildContext context, double score) {
+    if (score >= 80) return context.appColors.success;
+    if (score >= 60) return Colors.orange;
+    return context.appColors.error;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -277,6 +297,7 @@ class _VerificationCard extends StatelessWidget {
         children: [
           _WorkerInfo(uid: model.uid),
           const SizedBox(height: 8),
+          // メタ情報行
           Row(
             children: [
               Icon(Icons.badge, size: 16, color: context.appColors.textHint),
@@ -294,9 +315,53 @@ class _VerificationCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          // eKYCバッジ行
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              // Livenessバッジ
+              if (model.livenessVerified)
+                Chip(
+                  avatar: Icon(Icons.check_circle, size: 16, color: context.appColors.success),
+                  label: Text(
+                    context.l10n.adminIdentityVerification_livenessVerified,
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  backgroundColor: context.appColors.success.withValues(alpha: 0.1),
+                  side: BorderSide.none,
+                ),
+              // faceMatchScoreバッジ
+              if (model.faceMatchScore != null)
+                Chip(
+                  avatar: Icon(
+                    Icons.face,
+                    size: 16,
+                    color: _scoreColor(context, model.faceMatchScore!),
+                  ),
+                  label: Text(
+                    '${context.l10n.adminIdentityVerification_faceMatchScore}: ${model.faceMatchScore!.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: _scoreColor(context, model.faceMatchScore!),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  backgroundColor: _scoreColor(context, model.faceMatchScore!).withValues(alpha: 0.1),
+                  side: BorderSide.none,
+                ),
+            ],
+          ),
           const SizedBox(height: 12),
+          // 写真3列グリッド（表面/裏面/自撮り）
           Row(
             children: [
+              // 表面
               Expanded(
                 child: GestureDetector(
                   onTap: onTapIdPhoto,
@@ -306,18 +371,62 @@ class _VerificationCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         child: AppCachedImage(
                           imageUrl: model.idPhotoUrl,
-                          height: 100,
+                          height: 80,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(context.l10n.adminIdentityVerification_idDocumentPhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
+                      Text(
+                        context.l10n.adminIdentityVerification_idDocumentPhoto,
+                        style: TextStyle(fontSize: 10, color: context.appColors.textSecondary),
+                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
+              // 裏面
+              Expanded(
+                child: model.idPhotoBackUrl != null
+                    ? GestureDetector(
+                        onTap: onTapIdBackPhoto,
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: AppCachedImage(
+                                imageUrl: model.idPhotoBackUrl!,
+                                height: 80,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              context.l10n.adminIdentityVerification_idDocumentBackPhoto,
+                              style: TextStyle(fontSize: 10, color: context.appColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: context.appColors.chipUnselected,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            context.l10n.adminIdentityVerification_noBackPhoto,
+                            style: TextStyle(fontSize: 10, color: context.appColors.textHint),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 8),
+              // 自撮り
               Expanded(
                 child: GestureDetector(
                   onTap: onTapSelfie,
@@ -327,13 +436,16 @@ class _VerificationCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         child: AppCachedImage(
                           imageUrl: model.selfieUrl,
-                          height: 100,
+                          height: 80,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(context.l10n.adminIdentityVerification_selfiePhoto, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary)),
+                      Text(
+                        context.l10n.adminIdentityVerification_selfiePhoto,
+                        style: TextStyle(fontSize: 10, color: context.appColors.textSecondary),
+                      ),
                     ],
                   ),
                 ),
@@ -341,6 +453,7 @@ class _VerificationCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+          // 承認/却下ボタン
           Row(
             children: [
               Expanded(

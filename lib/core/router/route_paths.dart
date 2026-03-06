@@ -73,6 +73,10 @@ class RoutePaths {
   // --- 法的情報 ---
   static const String legalIndex = '/legal-index';
 
+  // --- eKYC ---
+  static const String idDocumentCapture = '/identity-verification/capture';
+  static const String livenessDetection = '/identity-verification/liveness';
+
   // --- 管理者 ---
   static const String adminHome = '/admin';
   static const String adminQualifications = '/admin/qualifications';

@@ -430,12 +430,15 @@ service cloud.firestore {
       allow create: if signedIn() && uid() == verifyUid
         && request.resource.data.status == 'pending'
         && isString(request.resource.data.idPhotoUrl)
-        && isString(request.resource.data.selfieUrl);
+        && isString(request.resource.data.selfieUrl)
+        && request.resource.data.livenessVerified is bool;
 
-      // ユーザー: 再申請（rejected→pending）、管理者: ステータス変更
+      // ユーザー: 再申請（rejected→pending）、faceMatchScoreはCFのみ書き込み可
+      // 管理者: ステータス変更（承認/却下）
       allow update: if signedIn() && (
         (uid() == verifyUid
-          && request.resource.data.status == 'pending')
+          && request.resource.data.status == 'pending'
+          && !('faceMatchScore' in request.resource.data.diff(resource.data).changedKeys()))
         ||
         (isAdminUid()
           && request.resource.data.status in ['approved', 'rejected'])
