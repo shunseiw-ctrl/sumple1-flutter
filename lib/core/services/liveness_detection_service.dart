@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' show Size;
 import 'package:camera/camera.dart';
@@ -19,18 +18,9 @@ class LivenessChallengeResult {
   });
 }
 
-/// ベストフレームのスコアリング結果
-class FrameScore {
-  final double score;
-  final Uint8List? imageBytes;
-
-  const FrameScore({required this.score, this.imageBytes});
-}
-
 /// ML Kit ベースの Liveness Detection サービス
 class LivenessDetectionService {
   final FaceDetector _faceDetector;
-  final Random _random = Random();
 
   // まばたき検出用の状態
   bool _eyesWereOpen = true;
@@ -49,15 +39,9 @@ class LivenessDetectionService {
               ),
             );
 
-  /// 3つのチャレンジをランダム順で生成
+  /// まばたきチャレンジを生成
   List<LivenessChallenge> generateChallenges() {
-    final challenges = [
-      LivenessChallenge.turnRight,
-      LivenessChallenge.turnLeft,
-      LivenessChallenge.blink,
-    ];
-    challenges.shuffle(_random);
-    return challenges;
+    return [LivenessChallenge.blink];
   }
 
   /// CameraImage を InputImage に変換

@@ -322,12 +322,12 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => ctx.pop(),
             child: Text(context.l10n.common_close),
           ),
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.pop(ctx);
+              ctx.pop();
               // 写真をリセットして再撮影を促す
               setState(() {
                 _selfieUrl = null;

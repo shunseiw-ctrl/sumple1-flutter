@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
+import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/services/liveness_detection_service.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/logger.dart';
 
 /// Liveness Detection 全画面ページ
-/// 3チャレンジ完了後、ベストフレームを [context.pop(Uint8List)] で返却
+/// まばたき検出完了後、ベストフレームを [context.pop(Uint8List)] で返却
 class LivenessDetectionPage extends StatefulWidget {
   const LivenessDetectionPage({super.key});
 
@@ -23,21 +24,17 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
   bool _isInitialized = false;
   bool _isProcessing = false;
 
-  late List<LivenessChallenge> _challenges;
-  int _currentChallengeIndex = 0;
-  final List<bool> _completedChallenges = [false, false, false];
-
   Timer? _stepTimer;
-  Timer? _globalTimer;
-  int _stepTimeLeft = 10;
+  int _stepTimeLeft = 15;
   bool _timedOut = false;
-  bool _allCompleted = false;
+  bool _completed = false;
+
+  static const _faceGuidePainter = _FaceGuidePainter();
 
   @override
   void initState() {
     super.initState();
     _livenessService = LivenessDetectionService();
-    _challenges = _livenessService.generateChallenges();
     _initCamera();
   }
 
@@ -45,7 +42,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
-        if (mounted) Navigator.pop(context);
+        if (mounted) context.pop();
         return;
       }
 
@@ -66,16 +63,16 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
       if (mounted) {
         setState(() => _isInitialized = true);
         _startProcessing(frontCamera);
-        _startTimers();
+        _startTimer();
       }
     } catch (e) {
       Logger.error('カメラ初期化に失敗', tag: 'LivenessDetection', error: e);
-      if (mounted) Navigator.pop(context);
+      if (mounted) context.pop();
     }
   }
 
-  void _startTimers() {
-    // 各ステップ10秒
+  void _startTimer() {
+    _stepTimer?.cancel();
     _stepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
@@ -87,24 +84,17 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
         _onTimeout();
       }
     });
-
-    // 全体30秒タイムアウト
-    _globalTimer = Timer(const Duration(seconds: 30), () {
-      if (mounted && !_allCompleted) {
-        _onTimeout();
-      }
-    });
   }
 
   void _onTimeout() {
-    if (_allCompleted) return;
+    if (_completed) return;
     setState(() => _timedOut = true);
     _stopProcessing();
   }
 
   void _startProcessing(CameraDescription camera) {
     _cameraController?.startImageStream((cameraImage) async {
-      if (_isProcessing || _allCompleted || _timedOut) return;
+      if (_isProcessing || _completed || _timedOut) return;
       _isProcessing = true;
 
       try {
@@ -116,7 +106,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
 
         final result = await _livenessService.processFrame(
           inputImage,
-          _challenges[_currentChallengeIndex],
+          LivenessChallenge.blink,
         );
 
         if (!mounted) return;
@@ -137,11 +127,6 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
         if (result.challengeCompleted) {
           _onChallengeCompleted();
         }
-
-        // UIメッセージ更新
-        if (result.message != null && mounted) {
-          setState(() {}); // メッセージ表示のためにリビルド
-        }
       } catch (e) {
         Logger.warning('フレーム処理エラー', tag: 'LivenessDetection');
       } finally {
@@ -151,43 +136,13 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
   }
 
   void _onChallengeCompleted() {
-    if (!mounted) return;
+    if (!mounted || _completed) return;
 
     AppHaptics.success();
-    setState(() {
-      _completedChallenges[_currentChallengeIndex] = true;
-    });
-
-    if (_currentChallengeIndex < 2) {
-      // 次のチャレンジへ
-      _stepTimer?.cancel();
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (!mounted) return;
-        setState(() {
-          _currentChallengeIndex++;
-          _stepTimeLeft = 10;
-          _livenessService.resetBlinkState();
-        });
-        _stepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          if (!mounted) {
-            timer.cancel();
-            return;
-          }
-          setState(() => _stepTimeLeft--);
-          if (_stepTimeLeft <= 0) {
-            timer.cancel();
-            _onTimeout();
-          }
-        });
-      });
-    } else {
-      // 全チャレンジ完了
-      _allCompleted = true;
-      _stepTimer?.cancel();
-      _globalTimer?.cancel();
-      _stopProcessing();
-      _returnBestFrame();
-    }
+    setState(() => _completed = true);
+    _stepTimer?.cancel();
+    _stopProcessing();
+    _returnBestFrame();
   }
 
   Future<void> _returnBestFrame() async {
@@ -203,21 +158,15 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
     }
 
     if (bestFrame != null) {
-      // 圧縮
-      try {
-        final image = img.decodeImage(bestFrame);
-        if (image != null) {
-          final resized = image.width > 1080
-              ? img.copyResize(image, width: 1080)
-              : image;
-          bestFrame = Uint8List.fromList(img.encodeJpg(resized, quality: 85));
-        }
-      } catch (_) {}
+      bestFrame = ImageUploadService.compressImageBytes(
+        bestFrame,
+        maxDimension: 1080,
+      );
     }
 
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) {
-      Navigator.pop(context, bestFrame);
+      context.pop(bestFrame);
     }
   }
 
@@ -228,49 +177,24 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
   }
 
   void _retry() {
+    _stepTimer?.cancel();
     setState(() {
       _timedOut = false;
-      _currentChallengeIndex = 0;
-      _completedChallenges.fillRange(0, 3, false);
-      _stepTimeLeft = 10;
-      _allCompleted = false;
+      _stepTimeLeft = 15;
+      _completed = false;
     });
     _livenessService.reset();
-    _challenges = _livenessService.generateChallenges();
 
     if (_cameraController != null) {
       final camera = _cameraController!.description;
       _startProcessing(camera);
-      _startTimers();
-    }
-  }
-
-  String _getChallengeText(LivenessChallenge challenge) {
-    switch (challenge) {
-      case LivenessChallenge.turnRight:
-        return context.l10n.liveness_turnRight;
-      case LivenessChallenge.turnLeft:
-        return context.l10n.liveness_turnLeft;
-      case LivenessChallenge.blink:
-        return context.l10n.liveness_blink;
-    }
-  }
-
-  IconData _getChallengeIcon(LivenessChallenge challenge) {
-    switch (challenge) {
-      case LivenessChallenge.turnRight:
-        return Icons.turn_right;
-      case LivenessChallenge.turnLeft:
-        return Icons.turn_left;
-      case LivenessChallenge.blink:
-        return Icons.visibility;
+      _startTimer();
     }
   }
 
   @override
   void dispose() {
     _stepTimer?.cancel();
-    _globalTimer?.cancel();
     _livenessService.dispose();
     _cameraController?.dispose();
     super.dispose();
@@ -284,7 +208,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : _timedOut
               ? _buildTimeoutScreen()
-              : _allCompleted
+              : _completed
                   ? _buildCompletedScreen()
                   : _buildCameraScreen(),
     );
@@ -298,10 +222,10 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
         Center(child: CameraPreview(_cameraController!)),
         // 楕円形の顔ガイド
         CustomPaint(
-          painter: _FaceGuidePainter(),
+          painter: _faceGuidePainter,
           size: Size.infinite,
         ),
-        // 上部：タイトルと進捗
+        // 上部：タイトル
         SafeArea(
           child: Column(
             children: [
@@ -313,31 +237,6 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
-              ),
-              const SizedBox(height: 12),
-              // 進捗ドット
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (i) {
-                  final isCompleted = _completedChallenges[i];
-                  final isCurrent = i == _currentChallengeIndex;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isCompleted
-                          ? Colors.green
-                          : isCurrent
-                              ? Colors.white
-                              : Colors.white30,
-                    ),
-                    child: isCompleted
-                        ? const Icon(Icons.check, size: 8, color: Colors.white)
-                        : null,
-                  );
-                }),
               ),
             ],
           ),
@@ -359,7 +258,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              // チャレンジアイコンとテキスト
+              // チャレンジテキスト
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
@@ -370,15 +269,15 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      _getChallengeIcon(_challenges[_currentChallengeIndex]),
+                    const Icon(
+                      Icons.visibility,
                       color: Colors.white,
                       size: 28,
                     ),
                     const SizedBox(width: 12),
                     Flexible(
                       child: Text(
-                        _getChallengeText(_challenges[_currentChallengeIndex]),
+                        context.l10n.liveness_blink,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -397,7 +296,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
           top: MediaQuery.of(context).padding.top + 8,
           right: 16,
           child: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             icon: const Icon(Icons.close, color: Colors.white, size: 28),
           ),
         ),
@@ -456,7 +355,7 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
               ),
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 child: Text(
                   context.l10n.common_cancel,
                   style: const TextStyle(color: Colors.white70),
@@ -472,6 +371,8 @@ class _LivenessDetectionPageState extends State<LivenessDetectionPage> {
 
 /// 楕円形の顔ガイド描画
 class _FaceGuidePainter extends CustomPainter {
+  const _FaceGuidePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final bgPaint = Paint()..color = Colors.black54;

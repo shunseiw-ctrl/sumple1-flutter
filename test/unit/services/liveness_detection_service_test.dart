@@ -7,27 +7,12 @@ void main() {
     // FaceDetectorはネイティブプラットフォームに依存するため、
     // dispose()を呼ばずにロジックのみテスト
 
-    test('generateChallenges returns 3 challenges', () {
+    test('generateChallenges returns blink only', () {
       final service = LivenessDetectionService();
       final challenges = service.generateChallenges();
 
-      expect(challenges.length, 3);
-      expect(challenges.contains(LivenessChallenge.turnRight), true);
-      expect(challenges.contains(LivenessChallenge.turnLeft), true);
-      expect(challenges.contains(LivenessChallenge.blink), true);
-    });
-
-    test('generateChallenges shuffles order', () {
-      final service = LivenessDetectionService();
-      // 複数回生成して、少なくとも1回は異なる順序であることを確認
-      final orders = <String>[];
-      for (int i = 0; i < 20; i++) {
-        final challenges = service.generateChallenges();
-        orders.add(challenges.map((c) => c.name).join(','));
-      }
-      // 20回中すべて同じ順序は極めて低確率
-      final uniqueOrders = orders.toSet();
-      expect(uniqueOrders.length, greaterThan(1));
+      expect(challenges.length, 1);
+      expect(challenges.first, LivenessChallenge.blink);
     });
 
     test('updateBestFrame keeps highest score', () {

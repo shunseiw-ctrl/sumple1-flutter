@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
+import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/utils/logger.dart';
 
@@ -22,6 +23,7 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
   bool _isInitialized = false;
   bool _isCapturing = false;
 
+  static const _cardGuidePainter = _CardGuidePainter();
   bool get _isFront => widget.side == 'front';
 
   @override
@@ -38,7 +40,7 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(context.l10n.idCapture_noCameraAvailable)),
           );
-          Navigator.pop(context);
+          context.pop();
         }
         return;
       }
@@ -65,7 +67,7 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.idCapture_cameraInitFailed)),
         );
-        Navigator.pop(context);
+        context.pop();
       }
     }
   }
@@ -79,11 +81,14 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
       final bytes = await xFile.readAsBytes();
 
       // 1MB以下に圧縮
-      final compressed = await _compressImage(bytes);
+      final compressed = ImageUploadService.compressImageBytes(
+        bytes,
+        maxSizeBytes: 1024 * 1024,
+      );
 
       AppHaptics.success();
       if (mounted) {
-        Navigator.pop(context, compressed);
+        context.pop(compressed);
       }
     } catch (e) {
       Logger.error('撮影に失敗', tag: 'IdDocumentCapture', error: e);
@@ -93,33 +98,6 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
         );
         setState(() => _isCapturing = false);
       }
-    }
-  }
-
-  Future<Uint8List> _compressImage(Uint8List bytes) async {
-    try {
-      final image = img.decodeImage(bytes);
-      if (image == null) return bytes;
-
-      img.Image resized;
-      if (image.width > 1920 || image.height > 1920) {
-        resized = image.width > image.height
-            ? img.copyResize(image, width: 1920)
-            : img.copyResize(image, height: 1920);
-      } else {
-        resized = image;
-      }
-
-      final compressed = Uint8List.fromList(img.encodeJpg(resized, quality: 85));
-
-      // 1MB以下を確認、超えていれば更に圧縮
-      if (compressed.length > 1024 * 1024) {
-        return Uint8List.fromList(img.encodeJpg(resized, quality: 60));
-      }
-      return compressed;
-    } catch (e) {
-      Logger.warning('画像圧縮に失敗', tag: 'IdDocumentCapture');
-      return bytes;
     }
   }
 
@@ -148,7 +126,7 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
                 Center(child: CameraPreview(_controller!)),
                 // ガイドオーバーレイ
                 CustomPaint(
-                  painter: _CardGuidePainter(),
+                  painter: _cardGuidePainter,
                   size: Size.infinite,
                 ),
                 // 指示テキスト
@@ -215,6 +193,8 @@ class _IdDocumentCapturePageState extends State<IdDocumentCapturePage> {
 
 /// カードガイド枠描画（ISO CR-80比率 1.586:1）
 class _CardGuidePainter extends CustomPainter {
+  const _CardGuidePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     // 半透明黒の背景

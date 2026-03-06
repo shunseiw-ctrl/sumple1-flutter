@@ -132,14 +132,17 @@ exports.verifyFaceMatch = onCall(
       const result = { score, matched };
       await writeResult(docRef, result);
 
-      // TF.jsのメモリ解放
-      tf.disposeVariables();
-
       return result;
     } catch (e) {
       if (e instanceof HttpsError) throw e;
       logger.error("顔照合で予期せぬエラー", { uid: targetUid, error: e.message });
       throw new HttpsError("internal", "顔照合処理に失敗しました");
+    } finally {
+      // TF.jsのメモリ解放（エラー時も確実に実行）
+      try {
+        const tf = require("@tensorflow/tfjs-node");
+        tf.disposeVariables();
+      } catch (_) {}
     }
   }
 );

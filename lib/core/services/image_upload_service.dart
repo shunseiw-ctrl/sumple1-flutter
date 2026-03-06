@@ -177,7 +177,7 @@ class ImageUploadService {
     try {
       Uint8List dataToUpload = bytes;
       if (compress) {
-        dataToUpload = _compressImageBytes(bytes);
+        dataToUpload = compressImageBytes(bytes);
       }
 
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -234,7 +234,16 @@ class ImageUploadService {
     }
   }
 
-  Uint8List _compressImageBytes(Uint8List bytes) {
+  /// 画像を圧縮する（外部からも利用可能）
+  /// [maxDimension] 最大辺のピクセル数
+  /// [quality] JPEG品質 (1-100)
+  /// [maxSizeBytes] 圧縮後の最大バイト数（超えた場合はquality=60で再圧縮）
+  static Uint8List compressImageBytes(
+    Uint8List bytes, {
+    int maxDimension = 1920,
+    int quality = 85,
+    int? maxSizeBytes,
+  }) {
     try {
       Logger.debug('Compressing image', tag: 'ImageUploadService');
 
@@ -246,17 +255,31 @@ class ImageUploadService {
       }
 
       img.Image resized;
-      if (image.width > 1920 || image.height > 1920) {
+      if (image.width > maxDimension || image.height > maxDimension) {
         if (image.width > image.height) {
-          resized = img.copyResize(image, width: 1920);
+          resized = img.copyResize(image, width: maxDimension);
         } else {
-          resized = img.copyResize(image, height: 1920);
+          resized = img.copyResize(image, height: maxDimension);
         }
       } else {
         resized = image;
       }
 
-      final compressed = Uint8List.fromList(img.encodeJpg(resized, quality: 85));
+      final compressed = Uint8List.fromList(img.encodeJpg(resized, quality: quality));
+
+      // maxSizeBytes指定時、超過していればquality=60で再圧縮
+      if (maxSizeBytes != null && compressed.length > maxSizeBytes) {
+        final recompressed = Uint8List.fromList(img.encodeJpg(resized, quality: 60));
+        Logger.info(
+          'Image recompressed (exceeded maxSizeBytes)',
+          tag: 'ImageUploadService',
+          data: {
+            'original': '${(bytes.length / 1024).toStringAsFixed(1)} KB',
+            'compressed': '${(recompressed.length / 1024).toStringAsFixed(1)} KB',
+          },
+        );
+        return recompressed;
+      }
 
       Logger.info(
         'Image compressed',
