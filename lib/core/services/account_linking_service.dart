@@ -119,9 +119,14 @@ class AccountLinkingService {
         nonce: nonceSha256,
       );
 
+      if (appleCredential.identityToken == null) {
+        throw Exception('Apple identity token is null');
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
+        accessToken: appleCredential.authorizationCode,
       );
 
       await user.linkWithCredential(oauthCredential);
