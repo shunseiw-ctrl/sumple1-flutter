@@ -40,15 +40,23 @@ class _AppCachedImageState extends State<AppCachedImage> {
 
   @override
   Widget build(BuildContext context) {
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final effectiveMemCacheWidth = widget.memCacheWidth ??
+        (widget.width != null ? (widget.width! * dpr).round() : null);
+    final effectiveMemCacheHeight = widget.memCacheHeight ??
+        (widget.height != null ? (widget.height! * dpr).round() : null);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.borderRadius),
       child: _useFallback
-          ? _buildNetworkFallback()
+          ? _buildNetworkFallback(effectiveMemCacheWidth, effectiveMemCacheHeight)
           : CachedNetworkImage(
               imageUrl: widget.imageUrl,
               width: widget.width,
               height: widget.height,
               fit: widget.fit,
+              memCacheWidth: effectiveMemCacheWidth,
+              memCacheHeight: effectiveMemCacheHeight,
               placeholder: (context, url) =>
                   widget.placeholder ??
                   SkeletonLoader(
@@ -77,12 +85,14 @@ class _AppCachedImageState extends State<AppCachedImage> {
     );
   }
 
-  Widget _buildNetworkFallback() {
+  Widget _buildNetworkFallback(int? cacheWidth, int? cacheHeight) {
     return Image.network(
       widget.imageUrl,
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
         return widget.placeholder ??
@@ -107,11 +117,6 @@ class _AppCachedImageState extends State<AppCachedImage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.broken_image, color: context.appColors.textHint),
-                  const SizedBox(height: 4),
-                  Text(
-                    '画像読込失敗',
-                    style: TextStyle(fontSize: 10, color: context.appColors.textHint),
-                  ),
                 ],
               ),
             );

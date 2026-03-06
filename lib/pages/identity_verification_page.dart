@@ -75,8 +75,10 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           _livenessVerified = data['livenessVerified'] == true;
         });
 
-        // URLからバイトデータをダウンロード（プレビュー表示用）
-        _downloadImageBytes();
+        // rejected/新規のみDL（approved/pendingは閲覧のみなのでDL不要）
+        if (_verificationStatus == 'rejected' || _verificationStatus == null || _verificationStatus!.isEmpty) {
+          _downloadImageBytes();
+        }
       }
     } catch (e) {
       Logger.warning('本人確認ステータスの読み込みに失敗', tag: 'IdentityVerification', data: {'error': '$e'});
@@ -227,7 +229,6 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
         userId: _uid,
         folder: 'identity_verification',
         documentId: documentId,
-        compress: false,
       );
 
       if (result.isSuccess && result.downloadUrl != null) {
@@ -491,6 +492,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    cacheWidth: (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round(),
                   ),
                 )
               else if (photoUrl != null)

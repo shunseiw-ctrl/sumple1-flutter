@@ -9,9 +9,7 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/constants/app_shadows.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/providers/theme_mode_provider.dart';
-import 'package:sumple1/core/providers/auth_provider.dart';
 import 'package:sumple1/core/services/quality_score_service.dart';
-import 'package:sumple1/core/enums/user_role.dart';
 import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 
@@ -55,15 +53,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     } catch (_) {
       if (mounted) setState(() => _loadingScore = false);
     }
-  }
-
-  bool get _isAdmin {
-    final roleAsync = ref.watch(userRoleProvider);
-    return roleAsync.when(
-      data: (role) => role.isAdmin,
-      loading: () => false,
-      error: (_, __) => false,
-    );
   }
 
   @override

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +15,7 @@ import 'package:sumple1/core/utils/currency_utils.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 import 'package:sumple1/data/models/identity_verification_model.dart';
 import 'package:sumple1/presentation/widgets/admin_approval_card.dart';
+import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/empty_state.dart';
 import 'package:sumple1/presentation/widgets/load_more_button.dart';
 import 'package:sumple1/presentation/widgets/reject_reason_dialog.dart';
@@ -249,20 +249,11 @@ class _AdminApprovalCenterTabState
                 ),
               ],
             ),
-            SizedBox(
+            AppCachedImage(
+              imageUrl: imageUrl,
               width: double.infinity,
               height: 400,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-                errorBuilder: (context, error, _) => Center(
-                  child: Icon(Icons.broken_image, size: 48, color: context.appColors.textHint),
-                ),
-              ),
+              fit: BoxFit.contain,
             ),
           ],
         ),
@@ -276,27 +267,12 @@ class _AdminApprovalCenterTabState
       onTap: () => _showPhotoDialog(url, label),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              height: 100,
-              width: double.infinity,
-              child: Image.network(
-                url,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return Container(
-                    color: context.appColors.chipUnselected,
-                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                  );
-                },
-                errorBuilder: (context, error, _) => Container(
-                  color: context.appColors.chipUnselected,
-                  child: Icon(Icons.broken_image, color: context.appColors.textHint),
-                ),
-              ),
-            ),
+          AppCachedImage(
+            imageUrl: url,
+            height: 100,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            borderRadius: 8,
           ),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(fontSize: 11, color: context.appColors.textSecondary), textAlign: TextAlign.center),
@@ -507,27 +483,12 @@ class _AdminApprovalCenterTabState
           ),
           if (certPhotoUrl.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: SizedBox(
-                height: 160,
-                width: double.infinity,
-                child: Image.network(
-                  certPhotoUrl,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return Container(
-                      color: context.appColors.chipUnselected,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    );
-                  },
-                  errorBuilder: (context, error, _) => Container(
-                    color: context.appColors.chipUnselected,
-                    child: Icon(Icons.broken_image, color: context.appColors.textHint),
-                  ),
-                ),
-              ),
+            AppCachedImage(
+              imageUrl: certPhotoUrl,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: 10,
             ),
           ],
         ],
