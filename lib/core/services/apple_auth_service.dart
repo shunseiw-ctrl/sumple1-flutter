@@ -75,7 +75,8 @@ class AppleAuthService {
       Logger.info('Apple sign in successful', tag: 'AppleAuthService');
       return userCredential;
     } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code == AuthorizationErrorCode.canceled) {
+      if (e.code == AuthorizationErrorCode.canceled ||
+          e.code == AuthorizationErrorCode.unknown) {
         Logger.info('Apple sign in cancelled by user',
             tag: 'AppleAuthService');
         return null;

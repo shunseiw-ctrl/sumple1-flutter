@@ -130,7 +130,8 @@ class AccountLinkingService {
       Logger.info('Apple account linked', tag: 'AccountLinkingService');
       return const LinkResult.success();
     } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code == AuthorizationErrorCode.canceled) {
+      if (e.code == AuthorizationErrorCode.canceled ||
+          e.code == AuthorizationErrorCode.unknown) {
         return const LinkResult.cancelled();
       }
       rethrow;

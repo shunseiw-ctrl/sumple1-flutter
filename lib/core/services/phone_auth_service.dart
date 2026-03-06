@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 class PhoneAuthService {
   final FirebaseAuth _auth;
@@ -12,14 +13,31 @@ class PhoneAuthService {
     required void Function(FirebaseAuthException) onError,
     int? resendToken,
   }) async {
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: onAutoVerified,
-      verificationFailed: onError,
-      codeSent: onCodeSent,
-      codeAutoRetrievalTimeout: (_) {},
-      forceResendingToken: resendToken,
-    );
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (credential) {
+          // async コールバックのエラーを安全にハンドル
+          try {
+            onAutoVerified(credential);
+          } catch (e) {
+            Logger.error('Auto verification callback error',
+                tag: 'PhoneAuthService', error: e);
+          }
+        },
+        verificationFailed: onError,
+        codeSent: onCodeSent,
+        codeAutoRetrievalTimeout: (_) {},
+        forceResendingToken: resendToken,
+      );
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      // iOS reCAPTCHAフォールバックやAPNs関連のネイティブエラーをキャッチ
+      Logger.error('verifyPhoneNumber native error',
+          tag: 'PhoneAuthService', error: e);
+      rethrow;
+    }
   }
 
   PhoneAuthCredential createCredential({
