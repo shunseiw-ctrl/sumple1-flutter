@@ -39,6 +39,12 @@ class AppConfig {
     return DefaultFirebaseOptions.currentPlatform;
   }
 
+  /// LINE チャンネルID
+  ///
+  /// 環境別に分離する場合は isStaging で分岐する。
+  /// クライアント識別子のため秘匿不要。
+  static const String lineChannelId = '2009209066';
+
   /// 環境名（ログ表示用）
   static String get environmentName => _envString;
 }

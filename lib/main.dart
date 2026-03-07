@@ -173,7 +173,7 @@ Future<void> main() async {
   // LINE SDK 初期化（モバイルのみ）
   if (!kIsWeb) {
     try {
-      await LineSDK.instance.setup('2009209066')
+      await LineSDK.instance.setup(AppConfig.lineChannelId)
           .timeout(const Duration(seconds: 10));
     } catch (e) {
       Logger.error('LINE SDK setup failed', tag: 'main', error: e);
@@ -213,11 +213,13 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  late final AppLifecycleListener _lifecycleListener;
+
   @override
   void initState() {
     super.initState();
     _deepLinkService.initialize(navigatorKey);
-    AppLifecycleListener(onStateChange: _onAppLifecycleChange);
+    _lifecycleListener = AppLifecycleListener(onStateChange: _onAppLifecycleChange);
   }
 
   void _onAppLifecycleChange(AppLifecycleState state) {
@@ -228,6 +230,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     _deepLinkService.dispose();
     super.dispose();
   }
