@@ -109,6 +109,31 @@ class TestTaskManager(unittest.TestCase):
         task2 = Task(issue_number=2, title="不明なタイプ", raw_line="")
         self.assertEqual(task2.task_type, "unknown")
 
+    def test_move_to_done_from_pending(self):
+        """PENDINGから直接DONEに移動できる（ブランチ切替対策）"""
+        task = self.tm.get_next_pending()  # #8 in PENDING
+        self.assertEqual(task.issue_number, 8)
+        self.tm.move_to_done(task, 99)
+        content = self.todo_file.read_text()
+        # PENDINGから消えている
+        pending_section = content.split("## PENDING")[1].split("## IN_PROGRESS")[0]
+        self.assertNotIn("#8", pending_section)
+        # DONEに入っている
+        done_section = content.split("## DONE")[1].split("## FAILED")[0]
+        self.assertIn("#8", done_section)
+        self.assertIn("(PR #99)", done_section)
+
+    def test_move_to_failed_from_pending(self):
+        """PENDINGから直接FAILEDに移動できる"""
+        task = self.tm.get_next_pending()  # #8 in PENDING
+        self.tm.move_to_failed(task, "累計3回失敗")
+        content = self.todo_file.read_text()
+        pending_section = content.split("## PENDING")[1].split("## IN_PROGRESS")[0]
+        self.assertNotIn("#8", pending_section)
+        failed_section = content.split("## FAILED")[1]
+        self.assertIn("#8", failed_section)
+        self.assertIn("(失敗: 累計3回失敗)", failed_section)
+
     def test_concurrent_writes_atomic(self):
         """tmpfile方式でのatomic writeが正しく動作するか"""
         for i in range(100, 110):

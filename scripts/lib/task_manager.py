@@ -82,14 +82,14 @@ class TaskManager:
         self._move_task(task, self.SECTION_PENDING, self.SECTION_IN_PROGRESS, new_line)
 
     def move_to_done(self, task: Task, pr_number: int) -> None:
-        """IN_PROGRESS → DONE"""
+        """PENDING/IN_PROGRESS → DONE"""
         new_line = f"- [x] #{task.issue_number} {task.title} (PR #{pr_number})"
-        self._move_task(task, self.SECTION_IN_PROGRESS, self.SECTION_DONE, new_line)
+        self._move_task_from_any(task, self.SECTION_DONE, new_line)
 
     def move_to_failed(self, task: Task, reason: str) -> None:
-        """IN_PROGRESS → FAILED"""
+        """PENDING/IN_PROGRESS → FAILED"""
         new_line = f"- [x] #{task.issue_number} {task.title} (失敗: {reason})"
-        self._move_task(task, self.SECTION_IN_PROGRESS, self.SECTION_FAILED, new_line)
+        self._move_task_from_any(task, self.SECTION_FAILED, new_line)
 
     def move_back_to_pending(self, task: Task) -> None:
         """IN_PROGRESS → PENDING（リトライ用）"""
@@ -117,6 +117,24 @@ class TaskManager:
         ]
 
         # to_sectionにタスクを追加
+        to_lines = sections.get(to_section, [])
+        to_lines.append(new_line)
+        sections[to_section] = to_lines
+
+        self._write_sections(sections)
+
+    def _move_task_from_any(self, task: Task, to_section: str, new_line: str) -> None:
+        """PENDING/IN_PROGRESSどちらからでもタスクを移動"""
+        sections = self._read_sections()
+
+        # PENDING・IN_PROGRESS両方からタスクを削除
+        for section in [self.SECTION_PENDING, self.SECTION_IN_PROGRESS]:
+            sections[section] = [
+                line for line in sections.get(section, [])
+                if not self._matches_task(line, task.issue_number)
+            ]
+
+        # 宛先に追加
         to_lines = sections.get(to_section, [])
         to_lines.append(new_line)
         sections[to_section] = to_lines
