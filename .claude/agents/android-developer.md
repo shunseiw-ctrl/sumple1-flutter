@@ -19,6 +19,7 @@ memory: project
 - `android/fastlane/Fastfile` — Fastlane レーン（internal / promote_to_production / build_apk）
 - `android/gradle.properties` — Gradle設定プロパティ
 - `android/gradle/wrapper/gradle-wrapper.properties` — Gradleバージョン管理
+- `android/app/google-services.json` — Firebase設定（**git管理外** — .gitignoreで除外）
 
 ### ALBAWORK 固有情報
 - **パッケージ名**: `com.albawork.app`
@@ -68,15 +69,17 @@ cd .. && flutter clean && flutter pub get
 3. `android/gradle.properties` で `org.gradle.jvmargs` のメモリ確認
 4. `flutter doctor -v` で Android SDK / NDK バージョン確認
 5. multidex が必要な場合: `build.gradle.kts` で `multiDexEnabled = true`
+6. release ビルドで Firebase/Google Maps がクラッシュする場合: `android/app/proguard-rules.pro` を確認
 
 ### SDK バージョン管理
 ```kotlin
 // android/app/build.gradle.kts
+// ※ 以下は構文例。実際の値は build.gradle.kts を確認すること
 android {
-    compileSdk = 34        // コンパイル対象SDK
+    compileSdk = flutter.compileSdkVersion
     defaultConfig {
-        minSdk = 23        // 最小対応SDK
-        targetSdk = 34     // ターゲットSDK
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
     }
 }
 ```
