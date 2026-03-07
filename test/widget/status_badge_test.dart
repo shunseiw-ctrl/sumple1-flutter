@@ -6,6 +6,26 @@ import 'package:sumple1/l10n/app_localizations.dart';
 import 'package:sumple1/presentation/widgets/status_badge.dart';
 
 void main() {
+  // fromStatus用の共通ヘルパー（ライトモード）
+  Widget buildWithTheme(String statusKey) {
+    return MaterialApp(
+      theme: ThemeData(extensions: const [AppColorsExtension.light]),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('ja'),
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => StatusBadge.fromStatus(context, statusKey),
+        ),
+      ),
+    );
+  }
+
   group('StatusBadge constructor', () {
     testWidgets('renders label and icon', (tester) async {
       await tester.pumpWidget(
@@ -57,25 +77,6 @@ void main() {
   });
 
   group('StatusBadge.fromStatus', () {
-    Widget buildWithTheme(String statusKey) {
-      return MaterialApp(
-        theme: ThemeData(extensions: const [AppColorsExtension.light]),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('ja'),
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => StatusBadge.fromStatus(context, statusKey),
-          ),
-        ),
-      );
-    }
-
     testWidgets('applied shows 応募中', (tester) async {
       await tester.pumpWidget(buildWithTheme('applied'));
       await tester.pumpAndSettle();
@@ -307,31 +308,12 @@ void main() {
       // Containerの背景が半透明であることを検証
       final container = tester.widget<Container>(find.byType(Container));
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, isNot(testColor));
+      expect(decoration.color, testColor.withValues(alpha: 0.1));
       expect(decoration.border, isNotNull);
     });
   });
 
   group('StatusBadge.fromStatus filled ステータス', () {
-    Widget buildWithTheme(String statusKey) {
-      return MaterialApp(
-        theme: ThemeData(extensions: const [AppColorsExtension.light]),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('ja'),
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => StatusBadge.fromStatus(context, statusKey),
-          ),
-        ),
-      );
-    }
-
     testWidgets('in_progress は filled=true で表示される', (tester) async {
       await tester.pumpWidget(buildWithTheme('in_progress'));
       await tester.pumpAndSettle();
