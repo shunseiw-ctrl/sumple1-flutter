@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter run*)",
+      "Bash(flutter test*)",
+      "Bash(flutter analyze*)",
+      "Bash(flutter gen-l10n*)",
+      "Bash(flutter build*)",
+      "Bash(flutter pub get*)",
+      "Bash(dart format*)",
+      "Bash(dart run build_runner*)",
+      "Bash(cd functions && npm test*)",
+      "Bash(cd functions && npm run lint*)",
+      "Bash(cd functions && npm install*)",
+      "Bash(firebase use*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git switch*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git merge*)",
+      "Bash(git pull*)",
+      "Bash(git push*)",
+      "Bash(gh issue*)",
+      "Bash(gh pr*)",
+      "Bash(ls*)",
+      "Bash(cat*)",
+      "Bash(mkdir*)",
+      "Bash(maestro *)",
+      "Bash(cd ios && fastlane *)",
+      "Bash(cd android && fastlane *)",
+      "Bash(xcodebuild *)",
+      "Bash(xcrun *)",
+      "Bash(pod *)",
+      "Bash(cd android && ./gradlew *)"
+    ]
+  }
+}
