@@ -46,10 +46,7 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('ja'),
           home: const Scaffold(
-            body: StatusBadge(
-              label: 'ラベルのみ',
-              color: Colors.grey,
-            ),
+            body: StatusBadge(label: 'ラベルのみ', color: Colors.grey),
           ),
         ),
       );
@@ -62,9 +59,7 @@ void main() {
   group('StatusBadge.fromStatus', () {
     Widget buildWithTheme(String statusKey) {
       return MaterialApp(
-        theme: ThemeData(
-          extensions: const [AppColorsExtension.light],
-        ),
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -162,13 +157,13 @@ void main() {
   });
 
   group('StatusBadge.colorFor', () {
-    testWidgets('returns correct colors for all known statuses', (tester) async {
+    testWidgets('returns correct colors for all known statuses', (
+      tester,
+    ) async {
       late BuildContext capturedContext;
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(
-            extensions: const [AppColorsExtension.light],
-          ),
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -187,22 +182,41 @@ void main() {
       );
 
       // 全7ステータスの色を検証
-      expect(StatusBadge.colorFor(capturedContext, 'applied'), AppColorsExtension.light.warning);
-      expect(StatusBadge.colorFor(capturedContext, 'assigned'), AppColorsExtension.light.info);
-      expect(StatusBadge.colorFor(capturedContext, 'in_progress'), AppColorsExtension.light.primary);
-      expect(StatusBadge.colorFor(capturedContext, 'completed'), AppColorsExtension.light.success);
-      expect(StatusBadge.colorFor(capturedContext, 'inspection'), const Color(0xFF8B5CF6));
-      expect(StatusBadge.colorFor(capturedContext, 'fixing'), AppColorsExtension.light.error);
-      expect(StatusBadge.colorFor(capturedContext, 'done'), AppColorsExtension.light.success);
+      expect(
+        StatusBadge.colorFor(capturedContext, 'applied'),
+        AppColorsExtension.light.warning,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'assigned'),
+        AppColorsExtension.light.info,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'in_progress'),
+        AppColorsExtension.light.primary,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'completed'),
+        AppColorsExtension.light.success,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'inspection'),
+        const Color(0xFF8B5CF6),
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'fixing'),
+        AppColorsExtension.light.error,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'done'),
+        AppColorsExtension.light.success,
+      );
     });
 
     testWidgets('returns textSecondary for unknown status', (tester) async {
       late BuildContext capturedContext;
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData(
-            extensions: const [AppColorsExtension.light],
-          ),
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -220,7 +234,10 @@ void main() {
         ),
       );
 
-      expect(StatusBadge.colorFor(capturedContext, 'unknown'), AppColorsExtension.light.textSecondary);
+      expect(
+        StatusBadge.colorFor(capturedContext, 'unknown'),
+        AppColorsExtension.light.textSecondary,
+      );
     });
   });
 
@@ -278,10 +295,7 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('ja'),
           home: const Scaffold(
-            body: StatusBadge(
-              label: 'Outline',
-              color: testColor,
-            ),
+            body: StatusBadge(label: 'Outline', color: testColor),
           ),
         ),
       );
@@ -301,9 +315,7 @@ void main() {
   group('StatusBadge.fromStatus filled ステータス', () {
     Widget buildWithTheme(String statusKey) {
       return MaterialApp(
-        theme: ThemeData(
-          extensions: const [AppColorsExtension.light],
-        ),
+        theme: ThemeData(extensions: const [AppColorsExtension.light]),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -374,8 +386,14 @@ void main() {
         ),
       );
 
-      expect(StatusBadge.colorFor(capturedContext, 'applied'), AppColorsExtension.dark.warning);
-      expect(StatusBadge.colorFor(capturedContext, 'unknown'), AppColorsExtension.dark.textSecondary);
+      expect(
+        StatusBadge.colorFor(capturedContext, 'applied'),
+        AppColorsExtension.dark.warning,
+      );
+      expect(
+        StatusBadge.colorFor(capturedContext, 'unknown'),
+        AppColorsExtension.dark.textSecondary,
+      );
     });
 
     testWidgets('ダークモードでfromStatusが正しくレンダリングされる', (tester) async {
