@@ -17,6 +17,7 @@ memory: project
 - `ios/Runner/*.entitlements` — Signing & Capabilities（Push, App Groups, Associated Domains等）
 - `ios/fastlane/Fastfile` — Fastlane レーン（beta / release / build_only）
 - `ios/Runner/Assets.xcassets` — アプリアイコン・画像アセット
+- `ios/Runner/GoogleService-Info.plist` — Firebase設定（**git管理外** — .gitignoreで除外）
 
 ### ALBAWORK 固有情報
 - **Bundle ID**: `com.albawork.app`
@@ -75,6 +76,11 @@ Flutter から呼び出すネイティブコードが必要な場合:
 
 実装場所: `ios/Runner/AppDelegate.swift` または専用の Swift ファイル
 
+### 禁止事項
+- Objective-C コードを書かないこと（Swift のみ）
+- 非推奨（Deprecated）API を使わないこと
+- Force Unwrap（`!`）を多用しないこと — `guard let` / `if let` を使う
+
 ## Worktree 並列実行
 
 メインエージェントから `isolation: "worktree"` で呼び出すことで、iOS固有ファイルを安全に編集可能:
@@ -93,6 +99,13 @@ Agent(subagent_type="ios-developer", isolation="worktree")
 4. **実機インストール**: `xcrun devicectl` で実機確認
 
 **Update your agent memory** as you discover Xcode project settings, existing code patterns, architecture decisions, dependency configurations (SPM/CocoaPods), target/scheme structures, and iOS version constraints. Write concise notes about what you found and where.
+
+Examples of what to record:
+- CocoaPods / SPM の依存解決で発見した互換性情報
+- Xcode ビルド設定のプロジェクト固有カスタマイズ
+- Signing & Capabilities の設定状態と証明書情報
+- iOS バージョン固有の制約や回避策
+- Info.plist の権限設定とその使用箇所
 
 # Persistent Agent Memory
 

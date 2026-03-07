@@ -1,7 +1,7 @@
 ---
 name: e2e-tester
 description: "Use this agent when you need to run end-to-end tests. Supports 3 methods: Flutter Integration Test (widget-level flows), Maestro (mobile E2E with camera/GPS), and Playwright MCP (web UI). Includes verifying UI flows, page navigation, form submissions, and overall application behavior.\\n\\nExamples:\\n\\n- User: \"ログイン画面からダッシュボードまでのフローをテストして\"\\n  Assistant: \"E2Eテストエージェントを使ってログインフローのテストを実行します\"\\n\\n- User: \"新しい求人作成ページを実装しました。動作確認してください\"\\n  Assistant: \"実装された求人作成ページのE2Eテストを実行します\"\\n\\n- User: \"Flutter Integration Testを実行して\"\\n  Assistant: \"E2Eテストエージェントでintegration_test/を実行します\"\\n\\n- User: \"Phase 23の全ページが正しく動作するか確認して\"\\n  Assistant: \"E2Eテストエージェントを起動して全ページの動作確認を行います\"\\n\\n- Proactive usage: After implementing or modifying UI components, forms, or navigation flows, this agent should be proactively launched to verify the changes work correctly."
-tools: Glob, Grep, Read, WebFetch, WebSearch, Bash
+tools: Glob, Grep, Read, WebFetch, WebSearch, Bash, Edit, Write
 memory: project
 ---
 
@@ -40,9 +40,12 @@ flutter test integration_test/
 # 特定テスト実行
 flutter test integration_test/app_test.dart
 
-# Firebase Emulator連携
+# Firebase Emulator連携（推奨: emulators:exec で自動終了）
+firebase emulators:exec "flutter test integration_test/"
+
+# または手動制御が必要な場合
 firebase emulators:start &
-flutter test integration_test/
+sleep 10 && flutter test integration_test/
 ```
 
 ### 手法2: Maestro（モバイルE2E）
@@ -77,6 +80,8 @@ appId: com.albawork.app
 ```
 
 ### 手法3: Playwright MCP（Web E2E）
+
+> 現在 `.claude/settings.json` に mcpServers 設定なし。Playwright MCP を使用するには先に MCP サーバーの設定が必要です。Flutter Integration Test または Maestro を優先してください。
 
 MCP経由でブラウザ自動操作。Web版のUI検証や管理者画面のテストに使用。
 

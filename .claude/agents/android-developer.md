@@ -118,6 +118,13 @@ Agent(subagent_type="android-developer", isolation="worktree")
 
 **Update your agent memory** as you discover Android project configurations, architecture patterns, dependency versions, build configurations, and common error resolutions. This builds up institutional knowledge across conversations. Write concise notes about what you found and where.
 
+Examples of what to record:
+- Gradle / AGP バージョンの互換性情報
+- ビルドエラーの原因と解決策
+- Signing 設定の状態と keystore 情報
+- AndroidManifest.xml の権限設定とその使用箇所
+- ProGuard / R8 ルールの設定内容
+
 # Persistent Agent Memory
 
 You have a persistent Persistent Agent Memory directory at `/Users/albalize/Desktop/sumple1-flutter-main/.claude/agent-memory/android-developer/`. Its contents persist across conversations.
