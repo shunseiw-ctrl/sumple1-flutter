@@ -26,11 +26,26 @@ void main() {
     });
 
     group('isWithinRange', () {
-      test('範囲内はtrue・範囲外はfalse', () {
+      test('デフォルト50km_範囲内はtrue', () {
+        expect(DistanceUtils.isWithinRange(0), isTrue);
         expect(DistanceUtils.isWithinRange(30000), isTrue);
         expect(DistanceUtils.isWithinRange(50000), isTrue);
+      });
+
+      test('デフォルト50km_範囲外はfalse', () {
         expect(DistanceUtils.isWithinRange(50001), isFalse);
         expect(DistanceUtils.isWithinRange(100000), isFalse);
+      });
+
+      test('カスタムmaxMeters_指定範囲で判定される', () {
+        expect(DistanceUtils.isWithinRange(5000, maxMeters: 10000), isTrue);
+        expect(DistanceUtils.isWithinRange(10000, maxMeters: 10000), isTrue);
+        expect(DistanceUtils.isWithinRange(10001, maxMeters: 10000), isFalse);
+      });
+
+      test('カスタムmaxMeters_大きな範囲指定', () {
+        expect(DistanceUtils.isWithinRange(200000, maxMeters: 500000), isTrue);
+        expect(DistanceUtils.isWithinRange(500001, maxMeters: 500000), isFalse);
       });
     });
   });
