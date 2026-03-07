@@ -40,6 +40,19 @@ from lib.metrics import MetricsManager
 # PATH設定（launchd環境用）
 os.environ["PATH"] = f"/opt/homebrew/bin:/Users/albalize/flutter/bin:{os.environ.get('PATH', '')}"
 
+# ~/.zshrcからexport環境変数を補完（launchd/サブプロセスでは.zshrcが読まれないため）
+_zshrc = Path.home() / ".zshrc"
+if _zshrc.exists():
+    for _line in _zshrc.read_text().splitlines():
+        _line = _line.strip()
+        if _line.startswith("export ") and "=" in _line:
+            _kv = _line[7:]
+            _key, _, _val = _kv.partition("=")
+            _key = _key.strip()
+            _val = _val.strip().strip('"').strip("'")
+            if _key and not os.environ.get(_key):
+                os.environ[_key] = _val
+
 # ネストされたClaudeセッション防止を回避
 os.environ.pop("CLAUDECODE", None)
 
