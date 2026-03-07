@@ -1,0 +1,51 @@
+name: Auto Merge
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: >
+      github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'auto-dev')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR type
+        id: check
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if echo "$TITLE" | grep -qE "^#[0-9]+ (test|fix|refactor|chore|docs):"; then
+            echo "auto_merge=true" >> $GITHUB_OUTPUT
+          elif echo "$TITLE" | grep -qE "^(test|fix|refactor|chore|docs):"; then
+            echo "auto_merge=true" >> $GITHUB_OUTPUT
+          else
+            echo "auto_merge=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Wait for CI
+        if: steps.check.outputs.auto_merge == 'true'
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'test'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+
+      - name: Auto merge
+        if: steps.check.outputs.auto_merge == 'true'
+        run: gh pr merge ${{ github.event.pull_request.number }} --squash --auto
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label feat PRs for review
+        if: steps.check.outputs.auto_merge == 'false'
+        run: gh pr edit ${{ github.event.pull_request.number }} --add-label "needs-review"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
