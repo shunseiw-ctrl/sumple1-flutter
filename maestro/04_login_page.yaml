@@ -1,0 +1,30 @@
+appId: com.albawork.app
+name: "04 メールログイン画面遷移テスト"
+---
+# メールログイン画面への遷移確認（Firebase不要）
+- clearState: true
+- launchApp
+
+# 初期画面確認
+- assertVisible: "メールアドレスでログイン"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/04_login_before"
+
+# メールログイン画面へ遷移
+- tapOn: "メールアドレスでログイン"
+
+# ログイン画面の要素確認
+- assertVisible: "メールアドレス"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/04_login_page"
+
+# 戻る
+- pressKey: back
+
+# 初期画面に戻ったことを確認
+- assertVisible: "ゲストとして始める"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/04_login_back"

@@ -1,0 +1,30 @@
+appId: com.albawork.app
+name: "05 バックグラウンド復帰テスト"
+---
+# アプリをバックグラウンドに送り、復帰後に正常表示されるか確認
+- clearState: true
+- launchApp
+
+# 初期画面確認
+- assertVisible: "ALBAWORK"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/05_bg_before"
+
+# バックグラウンドへ
+- pressKey: home
+
+# 3秒待機
+- extendedWaitUntil:
+    visible: ".*"
+    timeout: 3000
+    optional: true
+
+# フォアグラウンド復帰
+- launchApp
+
+# 復帰後の画面確認
+- assertVisible: "ALBAWORK"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/05_bg_after"

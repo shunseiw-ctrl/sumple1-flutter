@@ -1,0 +1,25 @@
+appId: com.albawork.app
+name: "03 ゲスト案件閲覧テスト"
+---
+# ゲストログイン → 案件一覧閲覧
+# ※Firebase接続が必要。接続不可時はフロー失敗として記録
+- clearState: true
+- launchApp
+
+# ゲストとして開始
+- tapOn: "ゲストとして始める"
+
+# ホーム画面表示待機
+- assertVisible:
+    text: "仕事を探す"
+    enabled: true
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/03_guest_browse_home"
+
+# 案件一覧をスクロール
+- scroll:
+    direction: DOWN
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/03_guest_browse_scroll"

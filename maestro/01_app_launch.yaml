@@ -1,0 +1,20 @@
+appId: com.albawork.app
+name: "01 アプリ起動テスト"
+---
+# アプリ状態クリア → 起動 → 初期画面の要素確認
+- clearState: true
+- launchApp
+
+# 起動直後のスクショ
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/01_app_launch_initial"
+
+# メイン画面の要素確認
+- assertVisible: "ALBAWORK"
+- assertVisible: "ゲストとして始める"
+- assertVisible: "LINEでログイン"
+- assertVisible: "メールアドレスでログイン"
+
+# ボタン群スクショ
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/01_app_launch_buttons"

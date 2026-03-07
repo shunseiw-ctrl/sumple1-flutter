@@ -53,6 +53,9 @@ functions/node_modules/
 functions/.env
 functions/.env.local
 
+# E2Eテスト結果
+test-results/
+
 # Dart/Flutter additional
 .flutter-plugins
 .packages

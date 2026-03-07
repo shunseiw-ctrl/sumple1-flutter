@@ -1,0 +1,29 @@
+appId: com.albawork.app
+name: "02 ゲストホーム画面テスト"
+---
+# アプリ起動（クリア状態）
+- clearState: true
+- launchApp
+
+# ゲストホーム画面への遷移
+- tapOn: "ゲストとして始める"
+
+# ホーム画面の主要UI要素確認
+- assertVisible: "仕事を探す"
+
+# セクションスクショ
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/02_guest_home_top"
+
+# スクロールして下部コンテンツ確認
+- scrollUntilVisible:
+    element: "利用規約"
+    direction: DOWN
+    timeout: 10000
+
+- assertVisible: "利用規約"
+- assertVisible: "プライバシーポリシー"
+
+# 下部スクショ
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/02_guest_home_bottom"
