@@ -162,7 +162,7 @@ void main() {
   });
 
   group('StatusBadge.colorFor', () {
-    testWidgets('returns correct colors for known statuses', (tester) async {
+    testWidgets('returns correct colors for all known statuses', (tester) async {
       late BuildContext capturedContext;
       await tester.pumpWidget(
         MaterialApp(
@@ -186,10 +186,14 @@ void main() {
         ),
       );
 
+      // 全7ステータスの色を検証
       expect(StatusBadge.colorFor(capturedContext, 'applied'), AppColorsExtension.light.warning);
+      expect(StatusBadge.colorFor(capturedContext, 'assigned'), AppColorsExtension.light.info);
       expect(StatusBadge.colorFor(capturedContext, 'in_progress'), AppColorsExtension.light.primary);
-      expect(StatusBadge.colorFor(capturedContext, 'done'), AppColorsExtension.light.success);
+      expect(StatusBadge.colorFor(capturedContext, 'completed'), AppColorsExtension.light.success);
+      expect(StatusBadge.colorFor(capturedContext, 'inspection'), const Color(0xFF8B5CF6));
       expect(StatusBadge.colorFor(capturedContext, 'fixing'), AppColorsExtension.light.error);
+      expect(StatusBadge.colorFor(capturedContext, 'done'), AppColorsExtension.light.success);
     });
 
     testWidgets('returns textSecondary for unknown status', (tester) async {
@@ -217,6 +221,189 @@ void main() {
       );
 
       expect(StatusBadge.colorFor(capturedContext, 'unknown'), AppColorsExtension.light.textSecondary);
+    });
+  });
+
+  group('StatusBadge filled プロパティ', () {
+    testWidgets('filled=true のとき背景が塗りつぶし・テキストが白色', (tester) async {
+      const testColor = Colors.blue;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
+            body: StatusBadge(
+              label: 'Filled',
+              color: testColor,
+              icon: Icons.star,
+              filled: true,
+            ),
+          ),
+        ),
+      );
+
+      // テキストが白色であることを検証
+      final textWidget = tester.widget<Text>(find.text('Filled'));
+      expect(textWidget.style?.color, Colors.white);
+
+      // アイコンが白色であることを検証
+      final iconWidget = tester.widget<Icon>(find.byIcon(Icons.star));
+      expect(iconWidget.color, Colors.white);
+
+      // Containerの背景が塗りつぶしであることを検証
+      final container = tester.widget<Container>(find.byType(Container));
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.color, testColor);
+      expect(decoration.border, isNull);
+    });
+
+    testWidgets('filled=false のとき背景が半透明・テキストがcolor色', (tester) async {
+      const testColor = Colors.green;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: const [AppColorsExtension.light]),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: const Scaffold(
+            body: StatusBadge(
+              label: 'Outline',
+              color: testColor,
+            ),
+          ),
+        ),
+      );
+
+      // テキストがcolor色であることを検証
+      final textWidget = tester.widget<Text>(find.text('Outline'));
+      expect(textWidget.style?.color, testColor);
+
+      // Containerの背景が半透明であることを検証
+      final container = tester.widget<Container>(find.byType(Container));
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.color, isNot(testColor));
+      expect(decoration.border, isNotNull);
+    });
+  });
+
+  group('StatusBadge.fromStatus filled ステータス', () {
+    Widget buildWithTheme(String statusKey) {
+      return MaterialApp(
+        theme: ThemeData(
+          extensions: const [AppColorsExtension.light],
+        ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => StatusBadge.fromStatus(context, statusKey),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('in_progress は filled=true で表示される', (tester) async {
+      await tester.pumpWidget(buildWithTheme('in_progress'));
+      await tester.pumpAndSettle();
+
+      // filled=true → テキストが白色
+      final textWidget = tester.widget<Text>(find.text('着工中'));
+      expect(textWidget.style?.color, Colors.white);
+    });
+
+    testWidgets('done は filled=true で表示される', (tester) async {
+      await tester.pumpWidget(buildWithTheme('done'));
+      await tester.pumpAndSettle();
+
+      // filled=true → テキストが白色
+      final textWidget = tester.widget<Text>(find.text('完了'));
+      expect(textWidget.style?.color, Colors.white);
+    });
+
+    testWidgets('applied は filled=false で表示される', (tester) async {
+      await tester.pumpWidget(buildWithTheme('applied'));
+      await tester.pumpAndSettle();
+
+      // filled=false → テキストが白色ではない
+      final textWidget = tester.widget<Text>(find.text('応募中'));
+      expect(textWidget.style?.color, isNot(Colors.white));
+    });
+  });
+
+  group('StatusBadge ダークモード', () {
+    testWidgets('ダークモードで正しい色が適用される', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            extensions: const [AppColorsExtension.dark],
+          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      expect(StatusBadge.colorFor(capturedContext, 'applied'), AppColorsExtension.dark.warning);
+      expect(StatusBadge.colorFor(capturedContext, 'unknown'), AppColorsExtension.dark.textSecondary);
+    });
+
+    testWidgets('ダークモードでfromStatusが正しくレンダリングされる', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            extensions: const [AppColorsExtension.dark],
+          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('ja'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => StatusBadge.fromStatus(context, 'done'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('完了'), findsOneWidget);
+      expect(find.byIcon(Icons.done_all), findsOneWidget);
     });
   });
 }
