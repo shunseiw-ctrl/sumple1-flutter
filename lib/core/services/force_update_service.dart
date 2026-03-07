@@ -5,9 +5,12 @@ enum ForceUpdateResult { upToDate, recommended, forced }
 
 class ForceUpdateService {
   final FirebaseFirestore _db;
+  final String? _currentVersionOverride;
 
-  ForceUpdateService({FirebaseFirestore? db})
-      : _db = db ?? FirebaseFirestore.instance;
+  /// [currentVersion] はテスト用。指定すると PackageInfo の代わりに使用される
+  ForceUpdateService({FirebaseFirestore? db, String? currentVersion})
+      : _db = db ?? FirebaseFirestore.instance,
+        _currentVersionOverride = currentVersion;
 
   Future<ForceUpdateResult> checkForUpdate() async {
     try {
@@ -18,8 +21,8 @@ class ForceUpdateService {
       final minVersion = data['minVersion'] as String? ?? '0.0.0';
       final recommended = data['recommendedVersion'] as String? ?? '0.0.0';
 
-      final info = await PackageInfo.fromPlatform();
-      final current = info.version;
+      final current = _currentVersionOverride ??
+          (await PackageInfo.fromPlatform()).version;
 
       if (isLessThan(current, minVersion)) return ForceUpdateResult.forced;
       if (isLessThan(current, recommended)) {
