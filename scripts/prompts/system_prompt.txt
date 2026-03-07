@@ -31,8 +31,8 @@ Agent tool で `code-reviewer` を起動:
 - 変更内容のコード品質をレビューさせる
 
 ### Step 4: UI/UXレビュー
-Agent tool で `ui-ux-reviewer` を起動:
-- 変更内容のUIリグレッション・デザインシステム違反をチェックさせる
+Agent tool で `general-purpose` を起動（ui-ux-reviewerはカスタムエージェントのため）:
+- プロンプト: 「.claude/agents/ui-ux-reviewer.md を読み、その指示に従って今回の変更のUI/UXレビューを実行してください。Maestroスクショも必ず取得して視覚確認してください。」
 
 **パイプラインの注意事項:**
 - Step 1 で両プラットフォームのビルドが失敗した場合は修正してから先に進む

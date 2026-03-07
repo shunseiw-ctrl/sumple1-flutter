@@ -36,13 +36,15 @@ e2e-tester を起動し、Maestro視覚テストを実行:
 code-reviewer を起動し、コード品質をチェック
 
 ### Step 4: UI/UXレビュー
-ui-ux-reviewer を起動し、UIリグレッション・デザインシステム違反を厳しめにチェック
+general-purpose エージェントを起動し、`.claude/agents/ui-ux-reviewer.md` の指示に従ってUI/UXレビューを実行させる。
+プロンプト例: 「.claude/agents/ui-ux-reviewer.md を読み、その指示に従って今回の変更のUI/UXレビューを実行してください。」
 
 **注意:**
 - Step 1 の2つは並列実行（1つのメッセージで同時にAgent呼び出し）
 - Step 2〜4 は順次実行（前のステップの結果を踏まえて次へ）
 - 各ステップで問題が見つかった場合は修正してから次へ進む
 - テストコードのみの変更（test: タスク）では Step 2 はスキップ可
+- ui-ux-reviewer はカスタムエージェントのため `general-purpose` 型で呼び出すこと
 
 ## Git 運用（GitHub Flow）
 

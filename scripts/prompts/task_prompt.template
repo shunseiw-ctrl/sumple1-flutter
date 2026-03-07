@@ -26,6 +26,6 @@
 
 3. **コードレビュー**: code-reviewer を起動
 
-4. **UI/UXレビュー**: ui-ux-reviewer を起動
+4. **UI/UXレビュー**: general-purpose を起動し「.claude/agents/ui-ux-reviewer.md を読み、指示に従ってUI/UXレビューを実行してください。」と指示
 
 各ステップで問題が見つかったら修正してから次へ進む。全結果を最後にまとめて報告する。
