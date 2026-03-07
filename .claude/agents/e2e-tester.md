@@ -1,6 +1,6 @@
 ---
 name: e2e-tester
-description: "Use this agent when you need to run end-to-end tests using browser automation tools like Playwright MCP or Maestro. This includes verifying UI flows, checking page navigation, form submissions, and overall application behavior from a user's perspective. Examples:\\n\\n- User: \"ログイン画面からダッシュボードまでのフローをテストして\"\\n  Assistant: \"E2Eテストエージェントを使ってログインフローのテストを実行します\"\\n  <commentary>Since the user wants to verify a UI flow end-to-end, use the Agent tool to launch the e2e-tester agent to run the browser-based tests.</commentary>\\n\\n- User: \"新しい求人作成ページを実装しました。動作確認してください\"\\n  Assistant: \"実装された求人作成ページのE2Eテストを実行します\"\\n  <commentary>Since a new page was implemented and needs verification, use the Agent tool to launch the e2e-tester agent to run E2E tests against the new page.</commentary>\\n\\n- Context: A significant UI change or new page has been implemented.\\n  User: \"Phase 23の全ページが正しく動作するか確認して\"\\n  Assistant: \"E2Eテストエージェントを起動して、Phase 23で追加・変更された全ページの動作確認を行います\"\\n  <commentary>Since a major phase was completed and comprehensive UI verification is needed, use the Agent tool to launch the e2e-tester agent to systematically test all affected pages.</commentary>\\n\\n- Proactive usage: After implementing or modifying UI components, forms, or navigation flows, this agent should be proactively launched to verify the changes work correctly in a real browser environment."
+description: "Use this agent when you need to run end-to-end tests. Supports 3 methods: Flutter Integration Test (widget-level flows), Maestro (mobile E2E with camera/GPS), and Playwright MCP (web UI). Includes verifying UI flows, page navigation, form submissions, and overall application behavior.\\n\\nExamples:\\n\\n- User: \"ログイン画面からダッシュボードまでのフローをテストして\"\\n  Assistant: \"E2Eテストエージェントを使ってログインフローのテストを実行します\"\\n\\n- User: \"新しい求人作成ページを実装しました。動作確認してください\"\\n  Assistant: \"実装された求人作成ページのE2Eテストを実行します\"\\n\\n- User: \"Flutter Integration Testを実行して\"\\n  Assistant: \"E2Eテストエージェントでintegration_test/を実行します\"\\n\\n- User: \"Phase 23の全ページが正しく動作するか確認して\"\\n  Assistant: \"E2Eテストエージェントを起動して全ページの動作確認を行います\"\\n\\n- Proactive usage: After implementing or modifying UI components, forms, or navigation flows, this agent should be proactively launched to verify the changes work correctly."
 tools: Glob, Grep, Read, WebFetch, WebSearch, Bash
 ---
 
@@ -148,6 +148,20 @@ Playwright MCPツールを使用してブラウザ操作:
 ## テスト設計のベストプラクティス
 
 ### セレクタ戦略
+
+**Flutter Integration Test:**
+- `Key('widget_key')` を優先 — Dart側で `ValueKey` を設定
+- `find.byType(WidgetClass)` — ウィジェット型で検索
+- `find.text('表示テキスト')` — テキストで検索（i18n注意）
+- `find.byIcon(Icons.xxx)` — アイコンで検索
+- `find.descendant()` — 親ウィジェット内の子要素を絞り込み
+
+**Maestro:**
+- `id:` — Semantics label または Key で指定
+- テキストベースの `tapOn:` — 表示テキストでタップ
+- `index:` — 同一要素が複数ある場合のインデックス指定
+
+**Playwright MCP（Web）:**
 - `data-testid` 属性を優先的に使用
 - CSSクラスやXPathは最終手段として使用
 - テキストベースのセレクタはi18n対応を考慮
@@ -180,6 +194,38 @@ Playwright MCPツールを使用してブラウザ操作:
 - 報告は日本語で行うこと
 - コマンドやコード部分は英語のまま記載
 - エラーメッセージは原文（英語）と日本語の説明を併記
+
+## ALBAWORK 主要テストシナリオ
+
+以下のフローを優先的にテストすること。各シナリオは独立して実行可能であること。
+
+### ゲストフロー
+1. **案件閲覧**: アプリ起動 → ゲストホーム表示 → 案件一覧表示 → 案件詳細表示
+2. **案件検索**: 検索バー入力 → フィルタ適用（エリア/職種/日給） → 結果表示
+3. **地図検索**: 地図ページ表示 → マーカー表示 → マーカータップ → 詳細カード表示
+
+### ユーザーフロー
+4. **ログイン**: メール入力 → パスワード入力 → ログイン成功 → ホーム画面遷移
+5. **応募**: 案件詳細 → 応募ボタン → 確認ダイアログ → 応募完了
+6. **チャット**: メッセージ一覧 → チャットルーム → メッセージ送信 → 既読確認
+7. **QRチェックイン**: 勤務詳細 → QRスキャン → チェックイン成功（位置情報連携）
+8. **プロフィール編集**: プロフィール → 編集 → 保存 → 反映確認
+
+### 管理者フロー
+9. **案件作成**: 案件管理 → 新規作成 → フォーム入力 → 保存 → 一覧に反映
+10. **承認センター**: 承認タブ → 資格/即金/eKYC承認 → ステータス変更
+
+### 推奨テスト手法マッピング
+| シナリオ | Flutter Integration | Maestro | Playwright |
+|---------|:------------------:|:-------:|:----------:|
+| 案件閲覧/検索 | ◎ | ○ | ○ |
+| 地図検索 | △ | ◎ | × |
+| ログイン | ◎ | ◎ | ○ |
+| QRチェックイン | × | ◎ | × |
+| チャット | ◎ | ○ | ○ |
+| 管理者画面 | ◎ | ○ | ◎ |
+
+◎=最適 ○=可能 △=制限あり ×=非対応
 
 ## 品質保証チェック
 テスト完了後、以下を必ず確認：
