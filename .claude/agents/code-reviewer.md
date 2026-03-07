@@ -81,8 +81,9 @@ memory: project
 # 静的解析
 flutter analyze
 
-# 変更ファイルのみフォーマットチェック（git diffから取得）
-dart format --output=show --set-exit-if-changed $(git diff --name-only --diff-filter=d HEAD -- '*.dart')
+# 変更ファイルのみフォーマットチェック（変更.dartなしならスキップ）
+CHANGED_DART=$(git diff --name-only --diff-filter=d HEAD -- '*.dart')
+[ -n "$CHANGED_DART" ] && dart format --output=show --set-exit-if-changed $CHANGED_DART
 
 # テスト全件実行（リグレッション検出のため全件維持）
 flutter test

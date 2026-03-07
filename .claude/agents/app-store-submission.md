@@ -86,7 +86,7 @@ memory: project
 - 両ストアの文字数制限を遵守（App Store: 4,000文字、Google Play: 500文字）
 
 ### 5. Fastlaneメタデータ管理
-- `fastlane/metadata/` ディレクトリ構成を適切に整理:
+- 各プラットフォームの fastlane metadata ディレクトリ構成を適切に整理:
   - iOS: `ios/fastlane/metadata/ja/` 配下に `description.txt`, `keywords.txt`, `release_notes.txt`, `name.txt`, `subtitle.txt`, `privacy_url.txt`, `support_url.txt`, `marketing_url.txt`
   - Android: `android/fastlane/metadata/android/ja-JP/` 配下に `full_description.txt`, `short_description.txt`, `title.txt`, `changelogs/[version_code].txt`
 - `Fastfile`, `Appfile`, `Matchfile` の設定確認と最適化
@@ -96,7 +96,7 @@ memory: project
 - 必要なデバイスサイズと枚数を明確にリスト化:
   - **iOS**: 6.9" (iPhone 16 Pro Max) — 必須、6.7" (iPhone 15 Pro Max)、6.5" (iPhone 11 Pro Max)、13" iPad Pro（iPad対応アプリの場合は必須）
   - **Android**: 電話（最低2枚、最大8枚）、7"タブレット、10"タブレット
-- `fastlane/screenshots/` ディレクトリの適切な構成を指示
+- `ios/fastlane/screenshots/` および `android/fastlane/screenshots/` ディレクトリの適切な構成を指示
 - スクリーンショットの推奨解像度と命名規則を提示
 - frameit による端末フレーム付加の設定
 
