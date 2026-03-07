@@ -18,7 +18,8 @@ class AnalyzeResult:
 
     @property
     def passed(self) -> bool:
-        return self.exit_code == 0 and self.error_count == 0
+        # warningsのみでもexit_code!=0になるため、error_countだけで判定
+        return self.error_count == 0
 
 
 @dataclass

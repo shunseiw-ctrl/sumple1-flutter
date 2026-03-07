@@ -112,9 +112,10 @@ class TestAnalyzeResult(unittest.TestCase):
         r = AnalyzeResult(exit_code=0, error_count=1, warning_count=0, output="")
         self.assertFalse(r.passed)
 
-    def test_not_passed_with_nonzero_exit(self):
-        r = AnalyzeResult(exit_code=1, error_count=0, warning_count=0, output="")
-        self.assertFalse(r.passed)
+    def test_passed_with_nonzero_exit_but_no_errors(self):
+        # warnings のみで exit_code=1 でも error_count=0 なら PASS
+        r = AnalyzeResult(exit_code=1, error_count=0, warning_count=2, output="")
+        self.assertTrue(r.passed)
 
 
 class TestTestResult(unittest.TestCase):
