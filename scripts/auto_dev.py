@@ -185,11 +185,12 @@ def execute_task(
     # プロンプト構築
     prompt = build_prompt(issue_num, task_title, issue_body)
 
-    # Claude用のallowedToolsリスト
+    # Claude用のallowedToolsリスト（Agent含む — 品質パイプライン用）
     allowed_tools = (
-        "Read,Grep,Glob,Edit,Write,"
+        "Read,Grep,Glob,Edit,Write,Agent,"
         "Bash(flutter *),Bash(dart *),Bash(git add*),Bash(git commit*),"
-        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*),Bash(cat*)"
+        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*),Bash(cat*),"
+        "Bash(bash scripts/e2e_test.sh*),Bash(xcrun *),Bash(maestro *)"
     )
 
     retry_count = 0

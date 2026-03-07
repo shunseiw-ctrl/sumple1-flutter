@@ -1,0 +1,31 @@
+以下のタスクを実装してください。
+
+## タスク
+#{{ISSUE_NUM}} {{TASK_TITLE}}
+
+## 詳細仕様
+{{ISSUE_BODY}}
+
+## 実装手順
+1. 関連コードを調査し、要件を理解する
+2. 実装を行い、適切なユニットテストを追加する
+3. flutter analyzeでエラー0件を確認する
+4. flutter testで全テストPASSを確認する
+5. 変更したファイルをgit addしてコミットする（pushはしない）
+6. 不明点がある場合は実装せず、標準出力に「要確認: <内容>」と出力して終了する
+
+## 品質パイプライン（コミット後に必ず実行）
+コミットが完了したら、以下のサブエージェントを順番に実行する:
+
+1. **ビルド検証（並列）**: ios-developer と android-developer を同時に起動
+   - ios-developer: 「flutter build ios --no-codesign でビルド確認。ios/ の変更があれば妥当性チェック。」
+   - android-developer: 「flutter build apk --debug でビルド確認。android/ の変更があれば妥当性チェック。」
+
+2. **E2Eテスト**: e2e-tester を起動
+   - 「bash scripts/e2e_test.sh --skip-build --no-shutdown でMaestroテスト実行。結果報告。」
+
+3. **コードレビュー**: code-reviewer を起動
+
+4. **UI/UXレビュー**: ui-ux-reviewer を起動
+
+各ステップで問題が見つかったら修正してから次へ進む。全結果を最後にまとめて報告する。
