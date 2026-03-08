@@ -1,6 +1,6 @@
 app_identifier("com.albawork.app")
 apple_id(ENV["APPLE_ID"] || "developer@albawork.app")
-team_id(ENV["TEAM_ID"] || "XXXXXXXXXX") # Apple Developer Team ID
+team_id(ENV["TEAM_ID"] || "9548R9T2X5") # Apple Developer Team ID
 
 itc_team_id(ENV["ITC_TEAM_ID"]) # App Store Connect Team ID
 
