@@ -10,5 +10,6 @@
 - [x] #11 test: ForceUpdateServiceのユニットテスト追加 (手動実行)
 - [x] #12 test: DistanceUtilsのユニットテスト追加 (手動実行)
 - [x] #17 test: JobModelのfromMap/toMapユニットテスト追加 (PR #18)
+- [x] #16 test: ShareServiceのユニットテスト追加 (PR #19)
 
 ## FAILED
