@@ -59,3 +59,17 @@ test-results/
 # Dart/Flutter additional
 .flutter-plugins
 .packages
+
+# 一時ファイル・レポート
+REPORT.md
+i18n_*.json
+
+# 自動開発システム
+.auto_dev/
+logs/
+
+# Firebase キャッシュ
+.firebase/
+
+# Claude Code エージェントメモリ
+.claude/agent-memory/

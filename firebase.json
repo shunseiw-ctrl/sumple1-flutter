@@ -28,6 +28,7 @@
   "hosting": {
     "public": "landing",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true,
     "headers": [
       {
         "source": "/.well-known/**",
