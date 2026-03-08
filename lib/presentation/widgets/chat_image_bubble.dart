@@ -27,7 +27,7 @@ class ChatImageBubble extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
         decoration: BoxDecoration(
-          color: isMine ? const Color(0xFF7BC67E) : context.appColors.surface,
+          color: isMine ? context.appColors.chatBubbleMine : context.appColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),

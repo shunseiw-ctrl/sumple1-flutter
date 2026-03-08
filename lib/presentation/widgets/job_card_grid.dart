@@ -5,6 +5,7 @@ import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/job_card.dart';
+import 'package:sumple1/presentation/widgets/job_placeholder_image.dart';
 
 /// Compact square card for grid display (2x2 layout like Timmy).
 class JobCardGrid extends StatelessWidget {
@@ -92,10 +93,10 @@ class JobCardGrid extends StatelessWidget {
                       AppCachedImage(
                         imageUrl: effectiveUrl,
                         fit: BoxFit.cover,
-                        errorWidget: _placeholderImage(context),
+                        errorWidget: JobPlaceholderImage(category: category),
                       )
                     else
-                      _placeholderImage(context),
+                      JobPlaceholderImage(category: category),
 
                     // Gradient overlay at bottom
                     Positioned(
@@ -262,23 +263,4 @@ class JobCardGrid extends StatelessWidget {
     );
   }
 
-  Widget _placeholderImage(BuildContext context) {
-    final colors = context.appColors;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [colors.primaryPale, const Color(0xFFE0E7F2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          JobCard.categoryIcon(category),
-          size: 32,
-          color: colors.primary.withValues(alpha: 0.3),
-        ),
-      ),
-    );
-  }
 }

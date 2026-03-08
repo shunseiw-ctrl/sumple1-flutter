@@ -9,6 +9,7 @@ import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/account_service.dart';
 import 'package:sumple1/core/providers/locale_provider.dart';
 
@@ -47,7 +48,9 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
           _reengagementEnabled = prefs['reengagement'] != false;
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('通知設定の読み込みに失敗', tag: 'AccountSettings', data: {'error': '$e'});
+    }
   }
 
   Future<void> _toggleReengagement(bool value) async {
@@ -58,7 +61,9 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       await ref.read(firestoreProvider).collection('profiles').doc(user.uid).set({
         'notificationPreferences': {'reengagement': value},
       }, SetOptions(merge: true));
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('通知設定の更新に失敗', tag: 'AccountSettings', data: {'error': '$e'});
+    }
   }
 
   @override
@@ -398,7 +403,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 RadioListTile<Locale>(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('日本語', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  title: Text(context.l10n.language_japanese, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   value: const Locale('ja'),
                   groupValue: ref.watch(localeProvider),
                   activeColor: context.appColors.primary,
@@ -410,7 +415,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 RadioListTile<Locale>(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('English', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  title: Text(context.l10n.language_english, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   value: const Locale('en'),
                   groupValue: ref.watch(localeProvider),
                   activeColor: context.appColors.primary,

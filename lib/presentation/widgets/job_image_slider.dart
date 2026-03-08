@@ -3,6 +3,7 @@ import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/animated_page_indicator.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/presentation/widgets/job_card.dart';
+import 'package:sumple1/presentation/widgets/job_placeholder_image.dart';
 
 /// 案件画像スライダー
 /// 0枚→プレースホルダー、1枚→Hero付き単一画像、2枚以上→スワイプ+ドットインジケーター
@@ -38,7 +39,7 @@ class _JobImageSliderState extends State<JobImageSlider> {
         fit: StackFit.expand,
         children: [
           if (urls.isEmpty)
-            _placeholderImage(context)
+            JobPlaceholderImage(category: widget.category, iconSize: 48)
           else if (urls.length == 1)
             _singleImage(context, urls.first)
           else
@@ -86,7 +87,7 @@ class _JobImageSliderState extends State<JobImageSlider> {
     final image = AppCachedImage(
       imageUrl: url,
       fit: BoxFit.cover,
-      errorWidget: _placeholderImage(context),
+      errorWidget: JobPlaceholderImage(category: widget.category, iconSize: 48),
     );
 
     if (widget.heroTag != null) {
@@ -103,29 +104,10 @@ class _JobImageSliderState extends State<JobImageSlider> {
         return AppCachedImage(
           imageUrl: urls[index],
           fit: BoxFit.cover,
-          errorWidget: _placeholderImage(context),
+          errorWidget: JobPlaceholderImage(category: widget.category, iconSize: 48),
         );
       },
     );
   }
 
-  Widget _placeholderImage(BuildContext context) {
-    final colors = context.appColors;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [colors.primaryPale, const Color(0xFFE0E7F2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          JobCard.categoryIcon(widget.category),
-          size: 48,
-          color: colors.primary.withValues(alpha: 0.3),
-        ),
-      ),
-    );
-  }
 }

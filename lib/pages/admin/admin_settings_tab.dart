@@ -1,15 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/providers/locale_provider.dart';
 import 'package:sumple1/core/providers/theme_mode_provider.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
+import 'package:sumple1/core/utils/logger.dart';
 
 /// 管理者設定タブ
 class AdminSettingsTab extends ConsumerStatefulWidget {
@@ -35,7 +36,9 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
       if (mounted) {
         setState(() => _appVersion = '${info.version} (${info.buildNumber})');
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('アプリバージョンの取得に失敗', tag: 'AdminSettings', data: {'error': '$e'});
+    }
   }
 
   Future<void> _logout() async {
@@ -49,7 +52,7 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
     if (confirmed != true) return;
 
     try {
-      await FirebaseAuth.instance.signOut();
+      await ref.read(firebaseAuthProvider).signOut();
       if (mounted) {
         context.go(RoutePaths.home);
       }
@@ -112,7 +115,7 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<Locale>(
-              title: const Text('日本語'),
+              title: Text(context.l10n.language_japanese),
               value: const Locale('ja'),
               groupValue: currentLocale,
               onChanged: (v) {
@@ -121,7 +124,7 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
               },
             ),
             RadioListTile<Locale>(
-              title: const Text('English'),
+              title: Text(context.l10n.language_english),
               value: const Locale('en'),
               groupValue: currentLocale,
               onChanged: (v) {
@@ -137,7 +140,7 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     final currentMode = ref.watch(themeModeProvider);
     final currentLocale = ref.watch(localeProvider);
 
@@ -154,7 +157,7 @@ class _AdminSettingsTabState extends ConsumerState<AdminSettingsTab> {
         break;
     }
 
-    final languageLabel = currentLocale.languageCode == 'ja' ? '日本語' : 'English';
+    final languageLabel = currentLocale.languageCode == 'ja' ? context.l10n.language_japanese : context.l10n.language_english;
 
     return ListView(
       padding: AppSpacing.listInsets,

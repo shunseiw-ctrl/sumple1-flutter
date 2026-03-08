@@ -43,6 +43,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.skeletonHighlight,
     required this.salaryBadgeBg,
     required this.salaryBadgeBorder,
+    required this.hintCardBg,
+    required this.hintCardBorder,
+    required this.hintCardTitle,
+    required this.inspection,
+    required this.chatBubbleMine,
+    required this.placeholderGradientEnd,
+    required this.stripeColor,
   });
 
   final Color primary;
@@ -83,6 +90,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final Color skeletonHighlight;
   final Color salaryBadgeBg;
   final Color salaryBadgeBorder;
+  final Color hintCardBg;
+  final Color hintCardBorder;
+  final Color hintCardTitle;
+  final Color inspection;
+  final Color chatBubbleMine;
+  final Color placeholderGradientEnd;
+  final Color stripeColor;
 
   static const light = AppColorsExtension(
     primary: AppColors.ruri,
@@ -123,6 +137,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     skeletonHighlight: AppColors.skeletonHighlight,
     salaryBadgeBg: AppColors.salaryBadgeBg,
     salaryBadgeBorder: AppColors.salaryBadgeBorder,
+    hintCardBg: Color(0xFFFFF3E0),
+    hintCardBorder: Color(0xFFFFE0B2),
+    hintCardTitle: Color(0xFFE65100),
+    inspection: Color(0xFF8B5CF6),
+    chatBubbleMine: Color(0xFF7BC67E),
+    placeholderGradientEnd: Color(0xFFE0E7F2),
+    stripeColor: Color(0xFF635BFF),
   );
 
   static const dark = AppColorsExtension(
@@ -164,6 +185,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     skeletonHighlight: AppDarkColors.skeletonHighlight,
     salaryBadgeBg: AppDarkColors.salaryBadgeBg,
     salaryBadgeBorder: AppDarkColors.salaryBadgeBorder,
+    hintCardBg: Color(0xFF3A2A15),
+    hintCardBorder: Color(0xFF6B5030),
+    hintCardTitle: Color(0xFFFF9E80),
+    inspection: Color(0xFF8B5CF6),
+    chatBubbleMine: Color(0xFF2E7D32),
+    placeholderGradientEnd: Color(0xFF1A2D4A),
+    stripeColor: Color(0xFF635BFF),
   );
 
   @override
@@ -206,6 +234,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     Color? skeletonHighlight,
     Color? salaryBadgeBg,
     Color? salaryBadgeBorder,
+    Color? hintCardBg,
+    Color? hintCardBorder,
+    Color? hintCardTitle,
+    Color? inspection,
+    Color? chatBubbleMine,
+    Color? placeholderGradientEnd,
+    Color? stripeColor,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
@@ -246,6 +281,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       skeletonHighlight: skeletonHighlight ?? this.skeletonHighlight,
       salaryBadgeBg: salaryBadgeBg ?? this.salaryBadgeBg,
       salaryBadgeBorder: salaryBadgeBorder ?? this.salaryBadgeBorder,
+      hintCardBg: hintCardBg ?? this.hintCardBg,
+      hintCardBorder: hintCardBorder ?? this.hintCardBorder,
+      hintCardTitle: hintCardTitle ?? this.hintCardTitle,
+      inspection: inspection ?? this.inspection,
+      chatBubbleMine: chatBubbleMine ?? this.chatBubbleMine,
+      placeholderGradientEnd: placeholderGradientEnd ?? this.placeholderGradientEnd,
+      stripeColor: stripeColor ?? this.stripeColor,
     );
   }
 
@@ -291,6 +333,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       skeletonHighlight: Color.lerp(skeletonHighlight, other.skeletonHighlight, t)!,
       salaryBadgeBg: Color.lerp(salaryBadgeBg, other.salaryBadgeBg, t)!,
       salaryBadgeBorder: Color.lerp(salaryBadgeBorder, other.salaryBadgeBorder, t)!,
+      hintCardBg: Color.lerp(hintCardBg, other.hintCardBg, t)!,
+      hintCardBorder: Color.lerp(hintCardBorder, other.hintCardBorder, t)!,
+      hintCardTitle: Color.lerp(hintCardTitle, other.hintCardTitle, t)!,
+      inspection: Color.lerp(inspection, other.inspection, t)!,
+      chatBubbleMine: Color.lerp(chatBubbleMine, other.chatBubbleMine, t)!,
+      placeholderGradientEnd: Color.lerp(placeholderGradientEnd, other.placeholderGradientEnd, t)!,
+      stripeColor: Color.lerp(stripeColor, other.stripeColor, t)!,
     );
   }
 }
