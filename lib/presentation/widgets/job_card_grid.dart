@@ -205,9 +205,9 @@ class JobCardGrid extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF8F0),
+                          color: colors.salaryBadgeBg,
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: const Color(0xFFFFE0B2), width: 0.5),
+                          border: Border.all(color: colors.salaryBadgeBorder, width: 0.5),
                         ),
                         child: Text(
                           '$priceText${context.l10n.jobCard_perDay}',

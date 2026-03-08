@@ -235,9 +235,9 @@ class JobCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF8F0),
+                      color: context.appColors.salaryBadgeBg,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFFFE0B2), width: 0.5),
+                      border: Border.all(color: context.appColors.salaryBadgeBorder, width: 0.5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

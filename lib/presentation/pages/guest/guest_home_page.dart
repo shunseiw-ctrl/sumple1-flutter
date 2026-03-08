@@ -356,25 +356,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               child: ElevatedButton.icon(
                                 onPressed: _isLoading ? null : _signInWithLine,
-                                icon: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      'L',
-                                      style: TextStyle(
-                                        color: Color(0xFF06C755),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                icon: const FaIcon(FontAwesomeIcons.line, size: 24, color: Colors.white),
                                 label: Text(
                                   context.l10n.guestHome_lineLogin,
                                   style: AppTextStyles.button.copyWith(
@@ -411,7 +393,17 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               child: ElevatedButton.icon(
                                 onPressed: _isLoading ? null : _signInWithGoogle,
-                                icon: const FaIcon(FontAwesomeIcons.google, size: 20, color: Colors.white),
+                                icon: Container(
+                                  width: 26,
+                                  height: 26,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: FaIcon(FontAwesomeIcons.google, size: 14, color: Color(0xFF4285F4)),
+                                  ),
+                                ),
                                 label: Text(
                                   context.l10n.guestHome_googleLogin,
                                   style: AppTextStyles.button.copyWith(

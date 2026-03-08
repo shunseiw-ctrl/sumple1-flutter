@@ -41,6 +41,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.heroGradient,
     required this.skeletonBase,
     required this.skeletonHighlight,
+    required this.salaryBadgeBg,
+    required this.salaryBadgeBorder,
   });
 
   final Color primary;
@@ -79,6 +81,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final LinearGradient heroGradient;
   final Color skeletonBase;
   final Color skeletonHighlight;
+  final Color salaryBadgeBg;
+  final Color salaryBadgeBorder;
 
   static const light = AppColorsExtension(
     primary: AppColors.ruri,
@@ -117,6 +121,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     heroGradient: AppColors.heroGradient,
     skeletonBase: AppColors.skeletonBase,
     skeletonHighlight: AppColors.skeletonHighlight,
+    salaryBadgeBg: AppColors.salaryBadgeBg,
+    salaryBadgeBorder: AppColors.salaryBadgeBorder,
   );
 
   static const dark = AppColorsExtension(
@@ -156,6 +162,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     heroGradient: AppColors.heroGradient,
     skeletonBase: AppDarkColors.skeletonBase,
     skeletonHighlight: AppDarkColors.skeletonHighlight,
+    salaryBadgeBg: AppDarkColors.salaryBadgeBg,
+    salaryBadgeBorder: AppDarkColors.salaryBadgeBorder,
   );
 
   @override
@@ -196,6 +204,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     LinearGradient? heroGradient,
     Color? skeletonBase,
     Color? skeletonHighlight,
+    Color? salaryBadgeBg,
+    Color? salaryBadgeBorder,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
@@ -234,6 +244,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       heroGradient: heroGradient ?? this.heroGradient,
       skeletonBase: skeletonBase ?? this.skeletonBase,
       skeletonHighlight: skeletonHighlight ?? this.skeletonHighlight,
+      salaryBadgeBg: salaryBadgeBg ?? this.salaryBadgeBg,
+      salaryBadgeBorder: salaryBadgeBorder ?? this.salaryBadgeBorder,
     );
   }
 
@@ -277,6 +289,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       heroGradient: LinearGradient.lerp(heroGradient, other.heroGradient, t)!,
       skeletonBase: Color.lerp(skeletonBase, other.skeletonBase, t)!,
       skeletonHighlight: Color.lerp(skeletonHighlight, other.skeletonHighlight, t)!,
+      salaryBadgeBg: Color.lerp(salaryBadgeBg, other.salaryBadgeBg, t)!,
+      salaryBadgeBorder: Color.lerp(salaryBadgeBorder, other.salaryBadgeBorder, t)!,
     );
   }
 }
@@ -363,6 +377,10 @@ class AppColors {
   // Skeleton
   static const Color skeletonBase = Color(0xFFEEEFF1);
   static const Color skeletonHighlight = Color(0xFFF8F8FA);
+
+  // Salary badge
+  static const Color salaryBadgeBg = Color(0xFFFFF8F0);
+  static const Color salaryBadgeBorder = Color(0xFFFFE0B2);
 }
 
 class AppDarkColors {
@@ -393,6 +411,10 @@ class AppDarkColors {
   // Skeleton
   static const Color skeletonBase = Color(0xFF2A2A2A);
   static const Color skeletonHighlight = Color(0xFF363636);
+
+  // Salary badge（ダークモード用: 暖色系でコントラスト確保）
+  static const Color salaryBadgeBg = Color(0xFF3A2A15);
+  static const Color salaryBadgeBorder = Color(0xFF6B5030);
 
   static const LinearGradient cardGradient = LinearGradient(
     colors: [Color(0xFF1E1E1E), Color(0xFF252525)],
