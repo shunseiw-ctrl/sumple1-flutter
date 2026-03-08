@@ -51,6 +51,8 @@
 		<string>プロフィール写真の設定、日報への作業写真添付、チャットでの画像送信に写真ライブラリを使用します。Photo library is used for setting profile photos, attaching work photos to reports, and sending images in chat.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>出退勤時の現場位置確認（GPS打刻）および近くの求人検索に位置情報を使用します。Location is used for worksite verification during check-in/check-out and nearby job search.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>出退勤時の現場位置確認（GPS打刻）および近くの求人検索に位置情報を使用します。Location is used for worksite verification during check-in/check-out and nearby job search.</string>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>広告の最適化のためにトラッキング情報を使用します。This app uses tracking data to optimize advertisements.</string>
 		<key>ITSAppUsesNonExemptEncryption</key>
