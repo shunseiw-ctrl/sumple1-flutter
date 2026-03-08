@@ -85,6 +85,7 @@ dependencies:
   # eKYC Liveness Detection (Phase 24)
   camera: ^0.11.0+2
   google_mlkit_face_detection: ^0.12.0
+  font_awesome_flutter: ^10.12.0
 
 dev_dependencies:
   flutter_test:

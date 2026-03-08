@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/services/image_upload_service.dart';
 import 'package:sumple1/core/services/face_match_service.dart';
@@ -16,15 +17,15 @@ import 'package:sumple1/core/services/ekyc_service.dart';
 import 'package:sumple1/core/services/ekyc_manual_service.dart';
 import 'package:sumple1/data/models/identity_verification_model.dart';
 
-class IdentityVerificationPage extends StatefulWidget {
+class IdentityVerificationPage extends ConsumerStatefulWidget {
   final EkycService? ekycService;
   const IdentityVerificationPage({super.key, this.ekycService});
 
   @override
-  State<IdentityVerificationPage> createState() => _IdentityVerificationPageState();
+  ConsumerState<IdentityVerificationPage> createState() => _IdentityVerificationPageState();
 }
 
-class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
+class _IdentityVerificationPageState extends ConsumerState<IdentityVerificationPage> {
   final _imageService = ImageUploadService();
   final _faceMatchService = FaceMatchService();
   // ignore: unused_field
@@ -43,7 +44,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   bool _livenessVerified = false;
   String? _loadingMessage;
 
-  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
+  String get _uid => ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
   Future<void> _loadStatus() async {
     if (_uid.isEmpty) return;
     try {
-      final doc = await FirebaseFirestore.instance
+      final doc = await ref.read(firestoreProvider)
           .collection('identity_verification')
           .doc(_uid)
           .get();
@@ -288,7 +289,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
 
     try {
       // まずFirestoreに書き込み（顔照合用のデータ準備）
-      await FirebaseFirestore.instance
+      await ref.read(firestoreProvider)
           .collection('identity_verification')
           .doc(_uid)
           .set({
@@ -351,7 +352,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     try {
       if (_selfieUrl == null) return;
 
-      await FirebaseFirestore.instance.collection('profiles').doc(_uid).set({
+      await ref.read(firestoreProvider).collection('profiles').doc(_uid).set({
         'profilePhotoUrl': _selfieUrl,
         'profilePhotoLocked': true,
         'updatedAt': FieldValue.serverTimestamp(),

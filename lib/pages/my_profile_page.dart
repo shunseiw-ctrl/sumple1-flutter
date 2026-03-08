@@ -1,24 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/presentation/widgets/rating_stars_display.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/services/quality_score_service.dart';
 import 'package:sumple1/core/services/profile_image_service.dart';
 import 'package:sumple1/core/utils/error_handler.dart';
 
-class MyProfilePage extends StatefulWidget {
+class MyProfilePage extends ConsumerStatefulWidget {
   final ProfileImageService? profileImageService;
 
   const MyProfilePage({super.key, this.profileImageService});
 
   @override
-  State<MyProfilePage> createState() => _MyProfilePageState();
+  ConsumerState<MyProfilePage> createState() => _MyProfilePageState();
 }
 
-class _MyProfilePageState extends State<MyProfilePage> {
+class _MyProfilePageState extends ConsumerState<MyProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
   final _familyNameCtrl = TextEditingController();
@@ -42,7 +43,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   late final ProfileImageService _profileImageService;
 
   bool get _isAnonymous {
-    final u = FirebaseAuth.instance.currentUser;
+    final u = ref.read(firebaseAuthProvider).currentUser;
     return u == null || u.isAnonymous;
   }
 
@@ -77,12 +78,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
   }
 
   Future<void> _loadProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     if (user == null) return;
 
     if (mounted) setState(() => _isLoading = true);
     try {
-      final doc = await FirebaseFirestore.instance
+      final doc = await ref.read(firestoreProvider)
           .collection('profiles')
           .doc(user.uid)
           .get();
@@ -206,7 +207,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   Future<void> _save() async {
     if (_isLoading) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     if (user == null || user.isAnonymous) {
       ErrorHandler.showError(context, null, customMessage: context.l10n.myProfile_loginRequired);
       return;
@@ -239,14 +240,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
     setState(() => _isLoading = true);
     try {
-      final ref = FirebaseFirestore.instance.collection('profiles').doc(user.uid);
+      final docRef = ref.read(firestoreProvider).collection('profiles').doc(user.uid);
 
-      final existing = await ref.get();
+      final existing = await docRef.get();
       if (!existing.exists) {
         data['createdAt'] = now;
       }
 
-      await ref.set(data, SetOptions(merge: true));
+      await docRef.set(data, SetOptions(merge: true));
 
       if (!mounted) return;
       ErrorHandler.showSuccess(context, context.l10n.myProfile_saveSuccess);
@@ -331,7 +332,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
               _SectionTitle(context.l10n.myProfile_profilePhoto),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance.collection('profiles').doc(FirebaseAuth.instance.currentUser?.uid ?? '').snapshots(),
+                stream: ref.read(firestoreProvider).collection('profiles').doc(ref.read(firebaseAuthProvider).currentUser?.uid ?? '').snapshots(),
                 builder: (context, snap) {
                   final data = snap.data?.data();
                   final photoUrl = (data?['profilePhotoUrl'] ?? '').toString();
@@ -396,9 +397,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
               _SectionTitle(context.l10n.myProfile_yourRating),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
+                stream: ref.read(firestoreProvider)
                     .collection('profiles')
-                    .doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+                    .doc(ref.read(firebaseAuthProvider).currentUser?.uid ?? '')
                     .snapshots(),
                 builder: (context, snap) {
                   final data = snap.data?.data();
@@ -438,15 +439,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
               ),
               const SizedBox(height: 12),
               _QualityScoreCard(
-                uid: FirebaseAuth.instance.currentUser?.uid ?? '',
+                uid: ref.read(firebaseAuthProvider).currentUser?.uid ?? '',
               ),
               const SizedBox(height: 16),
 
               _SectionTitle(context.l10n.myProfile_bankAccountStatus),
               StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
+                stream: ref.read(firestoreProvider)
                     .collection('profiles')
-                    .doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+                    .doc(ref.read(firebaseAuthProvider).currentUser?.uid ?? '')
                     .snapshots(),
                 builder: (context, snap) {
                   final data = snap.data?.data();

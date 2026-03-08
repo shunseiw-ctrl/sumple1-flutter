@@ -113,7 +113,8 @@ class ErrorHandler {
       case 'too-many-requests':
         return 'リクエストが多すぎます。しばらく待ってから再試行してください';
       default:
-        return '認証エラーが発生しました: ${e.code}';
+        Logger.warning('Unhandled auth error code: ${e.code}', tag: 'ErrorHandler');
+        return '認証エラーが発生しました。しばらく経ってからお試しください';
     }
   }
 
@@ -151,7 +152,8 @@ class ErrorHandler {
       case 'network-request-failed':
         return 'ネットワークエラーが発生しました';
       default:
-        return 'エラーが発生しました: ${e.code}';
+        Logger.warning('Unhandled Firebase error code: ${e.code}', tag: 'ErrorHandler');
+        return 'エラーが発生しました。しばらく経ってからお試しください';
     }
   }
 

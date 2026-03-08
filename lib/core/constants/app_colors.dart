@@ -39,6 +39,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.cardGradient,
     required this.primaryGradient,
     required this.heroGradient,
+    required this.skeletonBase,
+    required this.skeletonHighlight,
   });
 
   final Color primary;
@@ -75,6 +77,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final LinearGradient cardGradient;
   final LinearGradient primaryGradient;
   final LinearGradient heroGradient;
+  final Color skeletonBase;
+  final Color skeletonHighlight;
 
   static const light = AppColorsExtension(
     primary: AppColors.ruri,
@@ -111,6 +115,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     cardGradient: AppColors.cardGradient,
     primaryGradient: AppColors.primaryGradient,
     heroGradient: AppColors.heroGradient,
+    skeletonBase: AppColors.skeletonBase,
+    skeletonHighlight: AppColors.skeletonHighlight,
   );
 
   static const dark = AppColorsExtension(
@@ -148,6 +154,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     cardGradient: AppDarkColors.cardGradient,
     primaryGradient: AppColors.primaryGradient,
     heroGradient: AppColors.heroGradient,
+    skeletonBase: AppDarkColors.skeletonBase,
+    skeletonHighlight: AppDarkColors.skeletonHighlight,
   );
 
   @override
@@ -186,6 +194,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     LinearGradient? cardGradient,
     LinearGradient? primaryGradient,
     LinearGradient? heroGradient,
+    Color? skeletonBase,
+    Color? skeletonHighlight,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
@@ -222,6 +232,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardGradient: cardGradient ?? this.cardGradient,
       primaryGradient: primaryGradient ?? this.primaryGradient,
       heroGradient: heroGradient ?? this.heroGradient,
+      skeletonBase: skeletonBase ?? this.skeletonBase,
+      skeletonHighlight: skeletonHighlight ?? this.skeletonHighlight,
     );
   }
 
@@ -263,6 +275,8 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardGradient: LinearGradient.lerp(cardGradient, other.cardGradient, t)!,
       primaryGradient: LinearGradient.lerp(primaryGradient, other.primaryGradient, t)!,
       heroGradient: LinearGradient.lerp(heroGradient, other.heroGradient, t)!,
+      skeletonBase: Color.lerp(skeletonBase, other.skeletonBase, t)!,
+      skeletonHighlight: Color.lerp(skeletonHighlight, other.skeletonHighlight, t)!,
     );
   }
 }
@@ -345,6 +359,10 @@ class AppColors {
   // Card specific
   static const Color salaryHighlight = Color(0xFF1E50A2);
   static const Color salaryBg = Color(0xFFF0F4FA);
+
+  // Skeleton
+  static const Color skeletonBase = Color(0xFFEEEFF1);
+  static const Color skeletonHighlight = Color(0xFFF8F8FA);
 }
 
 class AppDarkColors {
@@ -371,6 +389,10 @@ class AppDarkColors {
   static const Color chipTextUnselected = Color(0xFFD0D0D0);
 
   static const Color salaryBg = Color(0xFF1A2D4A);
+
+  // Skeleton
+  static const Color skeletonBase = Color(0xFF2A2A2A);
+  static const Color skeletonHighlight = Color(0xFF363636);
 
   static const LinearGradient cardGradient = LinearGradient(
     colors: [Color(0xFF1E1E1E), Color(0xFF252525)],

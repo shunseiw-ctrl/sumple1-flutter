@@ -1,18 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
-class ContactPage extends StatefulWidget {
+class ContactPage extends ConsumerStatefulWidget {
   const ContactPage({super.key});
 
   @override
-  State<ContactPage> createState() => _ContactPageState();
+  ConsumerState<ContactPage> createState() => _ContactPageState();
 }
 
-class _ContactPageState extends State<ContactPage> {
+class _ContactPageState extends ConsumerState<ContactPage> {
   final _subjectController = TextEditingController();
   final _bodyController = TextEditingController();
   bool _sending = false;
@@ -75,8 +76,8 @@ class _ContactPageState extends State<ContactPage> {
 
     setState(() => _sending = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      await FirebaseFirestore.instance.collection('contacts').add({
+      final user = ref.read(firebaseAuthProvider).currentUser;
+      await ref.read(firestoreProvider).collection('contacts').add({
         'uid': user?.uid ?? '',
         'email': user?.email ?? '',
         'category': _categoryValues[_categoryKey] ?? _categoryKey,

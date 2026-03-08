@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_constants.dart';
+import '../core/providers/firebase_providers.dart';
 import '../core/services/chat_image_service.dart';
 import '../core/services/chat_service.dart';
 import '../core/utils/error_handler.dart';
@@ -11,15 +12,15 @@ import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
 import '../presentation/widgets/chat_image_bubble.dart';
 
-class ChatRoomPage extends StatefulWidget {
+class ChatRoomPage extends ConsumerStatefulWidget {
   final String applicationId;
   const ChatRoomPage({super.key, required this.applicationId});
 
   @override
-  State<ChatRoomPage> createState() => _ChatRoomPageState();
+  ConsumerState<ChatRoomPage> createState() => _ChatRoomPageState();
 }
 
-class _ChatRoomPageState extends State<ChatRoomPage> {
+class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
   final _chatService = ChatService();
@@ -32,10 +33,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   String? _readyError;
   bool _isApplicant = false;
 
-  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
+  String get _uid => ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
 
   DocumentReference<Map<String, dynamic>> get _chatRef =>
-      FirebaseFirestore.instance.collection('chats').doc(widget.applicationId);
+      ref.read(firestoreProvider).collection('chats').doc(widget.applicationId);
 
   CollectionReference<Map<String, dynamic>> get _msgRef =>
       _chatRef.collection('messages');

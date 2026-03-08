@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sumple1/core/constants/app_constants.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/constants/app_text_styles.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
@@ -17,14 +19,14 @@ import 'package:sumple1/presentation/widgets/staggered_animation.dart';
 import 'package:sumple1/presentation/widgets/error_retry_widget.dart';
 import 'package:sumple1/core/utils/currency_utils.dart';
 
-class WorkPage extends StatefulWidget {
+class WorkPage extends ConsumerStatefulWidget {
   const WorkPage({super.key});
 
   @override
-  State<WorkPage> createState() => _WorkPageState();
+  ConsumerState<WorkPage> createState() => _WorkPageState();
 }
 
-class _WorkPageState extends State<WorkPage>
+class _WorkPageState extends ConsumerState<WorkPage>
     with SingleTickerProviderStateMixin {
   bool _notAnonymous(User? u) => u != null && !u.isAnonymous;
 
@@ -123,7 +125,7 @@ class _WorkPageState extends State<WorkPage>
 
     final result = <String, int>{};
     const batchSize = 30;
-    final db = FirebaseFirestore.instance;
+    final db = ref.read(firestoreProvider);
     for (var i = 0; i < appIds.length; i += batchSize) {
       final batch = appIds.sublist(i, (i + batchSize).clamp(0, appIds.length));
       final snap = await db.collection('chats')
@@ -146,7 +148,7 @@ class _WorkPageState extends State<WorkPage>
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     final statusTabs = _buildStatusTabs(context);
 
     if (!_notAnonymous(user)) {
@@ -194,7 +196,7 @@ class _WorkPageState extends State<WorkPage>
             Expanded(
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 key: _refreshKey,
-                stream: FirebaseFirestore.instance
+                stream: ref.read(firestoreProvider)
                     .collection('applications')
                     .where('applicantUid', isEqualTo: uid)
                     .orderBy('createdAt', descending: true)
