@@ -22,27 +22,28 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final shadows = elevated
         ? [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: colors.elevatedShadow,
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: colors.cardShadow,
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ]
         : [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: colors.cardShadow,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: colors.cardShadow,
               blurRadius: 2,
               offset: const Offset(0, 1),
             ),

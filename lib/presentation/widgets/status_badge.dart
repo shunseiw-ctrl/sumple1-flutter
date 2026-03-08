@@ -51,7 +51,7 @@ class StatusBadge extends StatelessWidget {
       case 'assigned': return colors.info;
       case 'in_progress': return colors.primary;
       case 'completed': return colors.success;
-      case 'inspection': return const Color(0xFF8B5CF6);
+      case 'inspection': return colors.inspection;
       case 'fixing': return colors.error;
       case 'done': return colors.success;
       default: return colors.textSecondary;
@@ -71,7 +71,7 @@ class StatusBadge extends StatelessWidget {
       case 'completed':
         return StatusBadge(label: label, color: colors.success, icon: Icons.check_circle_outline);
       case 'inspection':
-        return StatusBadge(label: label, color: const Color(0xFF8B5CF6), icon: Icons.visibility);
+        return StatusBadge(label: label, color: colors.inspection, icon: Icons.visibility);
       case 'fixing':
         return StatusBadge(label: label, color: colors.error, icon: Icons.build);
       case 'done':

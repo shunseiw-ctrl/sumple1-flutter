@@ -1,13 +1,15 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sumple1/core/providers/firebase_providers.dart';
 import 'package:sumple1/core/router/route_paths.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/core/services/analytics_service.dart';
+import 'package:sumple1/core/utils/logger.dart';
 import 'package:sumple1/core/services/account_service.dart';
 import 'package:sumple1/core/providers/locale_provider.dart';
 
@@ -29,16 +31,16 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('account_settings');
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     _nameController.text = user?.displayName ?? '';
     _loadNotificationPrefs();
   }
 
   Future<void> _loadNotificationPrefs() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     if (user == null) return;
     try {
-      final doc = await FirebaseFirestore.instance.collection('profiles').doc(user.uid).get();
+      final doc = await ref.read(firestoreProvider).collection('profiles').doc(user.uid).get();
       final data = doc.data() ?? {};
       final prefs = data['notificationPreferences'] as Map<String, dynamic>? ?? {};
       if (mounted) {
@@ -46,18 +48,22 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
           _reengagementEnabled = prefs['reengagement'] != false;
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('通知設定の読み込みに失敗', tag: 'AccountSettings', data: {'error': '$e'});
+    }
   }
 
   Future<void> _toggleReengagement(bool value) async {
     setState(() => _reengagementEnabled = value);
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     if (user == null) return;
     try {
-      await FirebaseFirestore.instance.collection('profiles').doc(user.uid).set({
+      await ref.read(firestoreProvider).collection('profiles').doc(user.uid).set({
         'notificationPreferences': {'reengagement': value},
       }, SetOptions(merge: true));
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning('通知設定の更新に失敗', tag: 'AccountSettings', data: {'error': '$e'});
+    }
   }
 
   @override
@@ -74,12 +80,12 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
     setState(() => _saving = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = ref.read(firebaseAuthProvider).currentUser;
       await user?.updateDisplayName(name);
 
       // Firestoreのprofileも更新
       if (user != null) {
-        await FirebaseFirestore.instance
+        await ref.read(firestoreProvider)
             .collection('profiles')
             .doc(user.uid)
             .set({'displayName': name}, SetOptions(merge: true));
@@ -120,7 +126,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
     setState(() => _saving = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = ref.read(firebaseAuthProvider).currentUser;
       final email = user?.email;
       if (user == null || email == null) throw Exception(context.l10n.accountSettings_loginRequired);
 
@@ -234,7 +240,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
     setState(() => _saving = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = ref.read(firebaseAuthProvider).currentUser;
       final email = user?.email;
       if (user == null || email == null) throw Exception(context.l10n.accountSettings_loginRequired);
 
@@ -247,7 +253,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
       await accountService.deleteAccount();
 
       // Step 4: サインアウト → ゲストホーム画面へ遷移
-      await FirebaseAuth.instance.signOut();
+      await ref.read(firebaseAuthProvider).signOut();
 
       if (mounted) {
         context.go(RoutePaths.home);
@@ -272,7 +278,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
     final email = user?.email ?? context.l10n.accountSettings_notSet;
 
     return Scaffold(
@@ -397,7 +403,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 RadioListTile<Locale>(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('日本語', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  title: Text(context.l10n.language_japanese, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   value: const Locale('ja'),
                   groupValue: ref.watch(localeProvider),
                   activeColor: context.appColors.primary,
@@ -409,7 +415,7 @@ class _AccountSettingsPageState extends ConsumerState<AccountSettingsPage> {
                 RadioListTile<Locale>(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('English', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                  title: Text(context.l10n.language_english, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
                   value: const Locale('en'),
                   groupValue: ref.watch(localeProvider),
                   activeColor: context.appColors.primary,

@@ -3092,5 +3092,7 @@
   "adminIdentityVerification_noBackPhoto": "裏面\nなし",
 
   "common_retry": "リトライ",
-  "common_close": "閉じる"
+  "common_close": "閉じる",
+  "language_japanese": "日本語",
+  "language_english": "English"
 }

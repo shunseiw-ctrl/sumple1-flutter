@@ -17,6 +17,7 @@ import 'package:sumple1/presentation/widgets/cached_image.dart';
 import 'package:sumple1/core/utils/haptic_utils.dart';
 import 'package:sumple1/core/services/in_app_review_service.dart';
 import 'package:sumple1/core/services/share_service.dart';
+import 'package:sumple1/presentation/widgets/job_placeholder_image.dart';
 
 class JobDetailPage extends StatelessWidget {
   final String jobId;
@@ -443,16 +444,16 @@ class JobDetailBody extends StatelessWidget {
                           child: AppCachedImage(
                             imageUrl: imageUrl,
                             fit: BoxFit.cover,
-                            errorWidget: _buildGradientPlaceholder(context),
+                            errorWidget: const JobPlaceholderImage(iconSize: 64),
                           ),
                         )
                       : AppCachedImage(
                           imageUrl: imageUrl,
                           fit: BoxFit.cover,
-                          errorWidget: _buildGradientPlaceholder(context),
+                          errorWidget: const JobPlaceholderImage(iconSize: 64),
                         )
                 else
-                  _buildGradientPlaceholder(context),
+                  const JobPlaceholderImage(iconSize: 64),
                 Positioned(
                   left: 0,
                   right: 0,
@@ -593,31 +594,6 @@ class JobDetailBody extends StatelessWidget {
     );
   }
 
-  Widget _buildGradientPlaceholder(BuildContext context) {
-    return Semantics(
-      excludeSemantics: true,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              context.appColors.primaryPale,
-              const Color(0xFFD0DFFA),
-              const Color(0xFFBDD0F5),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.construction,
-            size: 64,
-            color: context.appColors.primary.withValues(alpha: 0.3),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _ModernCard extends StatelessWidget {

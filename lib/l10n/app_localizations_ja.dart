@@ -4633,4 +4633,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get common_close => '閉じる';
+
+  @override
+  String get language_japanese => '日本語';
+
+  @override
+  String get language_english => 'English';
 }

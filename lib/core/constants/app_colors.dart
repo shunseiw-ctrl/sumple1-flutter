@@ -39,6 +39,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.cardGradient,
     required this.primaryGradient,
     required this.heroGradient,
+    required this.skeletonBase,
+    required this.skeletonHighlight,
+    required this.salaryBadgeBg,
+    required this.salaryBadgeBorder,
+    required this.hintCardBg,
+    required this.hintCardBorder,
+    required this.hintCardTitle,
+    required this.inspection,
+    required this.chatBubbleMine,
+    required this.placeholderGradientEnd,
+    required this.stripeColor,
   });
 
   final Color primary;
@@ -75,6 +86,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final LinearGradient cardGradient;
   final LinearGradient primaryGradient;
   final LinearGradient heroGradient;
+  final Color skeletonBase;
+  final Color skeletonHighlight;
+  final Color salaryBadgeBg;
+  final Color salaryBadgeBorder;
+  final Color hintCardBg;
+  final Color hintCardBorder;
+  final Color hintCardTitle;
+  final Color inspection;
+  final Color chatBubbleMine;
+  final Color placeholderGradientEnd;
+  final Color stripeColor;
 
   static const light = AppColorsExtension(
     primary: AppColors.ruri,
@@ -111,6 +133,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     cardGradient: AppColors.cardGradient,
     primaryGradient: AppColors.primaryGradient,
     heroGradient: AppColors.heroGradient,
+    skeletonBase: AppColors.skeletonBase,
+    skeletonHighlight: AppColors.skeletonHighlight,
+    salaryBadgeBg: AppColors.salaryBadgeBg,
+    salaryBadgeBorder: AppColors.salaryBadgeBorder,
+    hintCardBg: Color(0xFFFFF3E0),
+    hintCardBorder: Color(0xFFFFE0B2),
+    hintCardTitle: Color(0xFFE65100),
+    inspection: Color(0xFF8B5CF6),
+    chatBubbleMine: Color(0xFF7BC67E),
+    placeholderGradientEnd: Color(0xFFE0E7F2),
+    stripeColor: Color(0xFF635BFF),
   );
 
   static const dark = AppColorsExtension(
@@ -148,6 +181,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     cardGradient: AppDarkColors.cardGradient,
     primaryGradient: AppColors.primaryGradient,
     heroGradient: AppColors.heroGradient,
+    skeletonBase: AppDarkColors.skeletonBase,
+    skeletonHighlight: AppDarkColors.skeletonHighlight,
+    salaryBadgeBg: AppDarkColors.salaryBadgeBg,
+    salaryBadgeBorder: AppDarkColors.salaryBadgeBorder,
+    hintCardBg: Color(0xFF3A2A15),
+    hintCardBorder: Color(0xFF6B5030),
+    hintCardTitle: Color(0xFFFF9E80),
+    inspection: Color(0xFF8B5CF6),
+    chatBubbleMine: Color(0xFF2E7D32),
+    placeholderGradientEnd: Color(0xFF1A2D4A),
+    stripeColor: Color(0xFF635BFF),
   );
 
   @override
@@ -186,6 +230,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     LinearGradient? cardGradient,
     LinearGradient? primaryGradient,
     LinearGradient? heroGradient,
+    Color? skeletonBase,
+    Color? skeletonHighlight,
+    Color? salaryBadgeBg,
+    Color? salaryBadgeBorder,
+    Color? hintCardBg,
+    Color? hintCardBorder,
+    Color? hintCardTitle,
+    Color? inspection,
+    Color? chatBubbleMine,
+    Color? placeholderGradientEnd,
+    Color? stripeColor,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
@@ -222,6 +277,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardGradient: cardGradient ?? this.cardGradient,
       primaryGradient: primaryGradient ?? this.primaryGradient,
       heroGradient: heroGradient ?? this.heroGradient,
+      skeletonBase: skeletonBase ?? this.skeletonBase,
+      skeletonHighlight: skeletonHighlight ?? this.skeletonHighlight,
+      salaryBadgeBg: salaryBadgeBg ?? this.salaryBadgeBg,
+      salaryBadgeBorder: salaryBadgeBorder ?? this.salaryBadgeBorder,
+      hintCardBg: hintCardBg ?? this.hintCardBg,
+      hintCardBorder: hintCardBorder ?? this.hintCardBorder,
+      hintCardTitle: hintCardTitle ?? this.hintCardTitle,
+      inspection: inspection ?? this.inspection,
+      chatBubbleMine: chatBubbleMine ?? this.chatBubbleMine,
+      placeholderGradientEnd: placeholderGradientEnd ?? this.placeholderGradientEnd,
+      stripeColor: stripeColor ?? this.stripeColor,
     );
   }
 
@@ -263,6 +329,17 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       cardGradient: LinearGradient.lerp(cardGradient, other.cardGradient, t)!,
       primaryGradient: LinearGradient.lerp(primaryGradient, other.primaryGradient, t)!,
       heroGradient: LinearGradient.lerp(heroGradient, other.heroGradient, t)!,
+      skeletonBase: Color.lerp(skeletonBase, other.skeletonBase, t)!,
+      skeletonHighlight: Color.lerp(skeletonHighlight, other.skeletonHighlight, t)!,
+      salaryBadgeBg: Color.lerp(salaryBadgeBg, other.salaryBadgeBg, t)!,
+      salaryBadgeBorder: Color.lerp(salaryBadgeBorder, other.salaryBadgeBorder, t)!,
+      hintCardBg: Color.lerp(hintCardBg, other.hintCardBg, t)!,
+      hintCardBorder: Color.lerp(hintCardBorder, other.hintCardBorder, t)!,
+      hintCardTitle: Color.lerp(hintCardTitle, other.hintCardTitle, t)!,
+      inspection: Color.lerp(inspection, other.inspection, t)!,
+      chatBubbleMine: Color.lerp(chatBubbleMine, other.chatBubbleMine, t)!,
+      placeholderGradientEnd: Color.lerp(placeholderGradientEnd, other.placeholderGradientEnd, t)!,
+      stripeColor: Color.lerp(stripeColor, other.stripeColor, t)!,
     );
   }
 }
@@ -345,6 +422,14 @@ class AppColors {
   // Card specific
   static const Color salaryHighlight = Color(0xFF1E50A2);
   static const Color salaryBg = Color(0xFFF0F4FA);
+
+  // Skeleton
+  static const Color skeletonBase = Color(0xFFEEEFF1);
+  static const Color skeletonHighlight = Color(0xFFF8F8FA);
+
+  // Salary badge
+  static const Color salaryBadgeBg = Color(0xFFFFF8F0);
+  static const Color salaryBadgeBorder = Color(0xFFFFE0B2);
 }
 
 class AppDarkColors {
@@ -371,6 +456,14 @@ class AppDarkColors {
   static const Color chipTextUnselected = Color(0xFFD0D0D0);
 
   static const Color salaryBg = Color(0xFF1A2D4A);
+
+  // Skeleton
+  static const Color skeletonBase = Color(0xFF2A2A2A);
+  static const Color skeletonHighlight = Color(0xFF363636);
+
+  // Salary badge（ダークモード用: 暖色系でコントラスト確保）
+  static const Color salaryBadgeBg = Color(0xFF3A2A15);
+  static const Color salaryBadgeBorder = Color(0xFF6B5030);
 
   static const LinearGradient cardGradient = LinearGradient(
     colors: [Color(0xFF1E1E1E), Color(0xFF252525)],

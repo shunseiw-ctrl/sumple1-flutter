@@ -23,6 +23,13 @@ service firebase.storage {
       return request.resource.size < 50 * 1024 * 1024;
     }
 
+    function isAllowedDocumentType() {
+      return request.resource.contentType.matches('image/.*')
+          || request.resource.contentType == 'application/pdf'
+          || request.resource.contentType == 'application/msword'
+          || request.resource.contentType.matches('application/vnd\\.openxmlformats.*');
+    }
+
     // === プロフィール写真 ===
     // パス: profile_images/{userId}/...
     match /profile_images/{userId}/{allPaths=**} {
@@ -32,6 +39,7 @@ service firebase.storage {
 
     // === 案件画像 ===
     // パス: job_images/{jobId}/...
+    // TODO: パス構造を job_images/{jobId}/{uploaderId}/... に変更し所有者チェックを追加
     match /job_images/{jobId}/{allPaths=**} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && isImageType() && isUnder10MB();
@@ -39,6 +47,7 @@ service firebase.storage {
 
     // === 現場写真 ===
     // パス: work_photos/{jobId}/...
+    // TODO: パス構造を work_photos/{jobId}/{uploaderId}/... に変更し所有者チェックを追加
     match /work_photos/{jobId}/{allPaths=**} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && isImageType() && isUnder10MB();
@@ -55,7 +64,7 @@ service firebase.storage {
     // パス: work_documents/{applicationId}/...
     match /work_documents/{applicationId}/{allPaths=**} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && isUnder50MB();
+      allow write: if isAuthenticated() && isAllowedDocumentType() && isUnder50MB();
     }
 
     // === 資格証明書写真 ===

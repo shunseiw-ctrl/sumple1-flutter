@@ -11,14 +11,14 @@ class HintCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
+        color: context.appColors.hintCardBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFFFE0B2)),
+        border: Border.all(color: context.appColors.hintCardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFFE65100))),
+          Text(title, style: TextStyle(fontWeight: FontWeight.w900, color: context.appColors.hintCardTitle)),
           const SizedBox(height: 6),
           Text(body, style: TextStyle(color: context.appColors.textPrimary, height: 1.35)),
         ],

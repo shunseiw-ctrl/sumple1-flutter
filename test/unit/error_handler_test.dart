@@ -167,7 +167,7 @@ void main() {
       await tester.tap(find.text('trigger'));
       await tester.pumpAndSettle();
 
-      expect(find.text('エラーが発生しました: some-random-code'), findsOneWidget);
+      expect(find.text('エラーが発生しました。しばらく経ってからお試しください'), findsOneWidget);
     });
   });
 

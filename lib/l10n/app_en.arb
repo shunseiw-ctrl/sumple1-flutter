@@ -2321,5 +2321,7 @@
   "adminIdentityVerification_noBackPhoto": "No back\nphoto",
 
   "common_retry": "Retry",
-  "common_close": "Close"
+  "common_close": "Close",
+  "language_japanese": "日本語",
+  "language_english": "English"
 }

@@ -8848,6 +8848,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'閉じる'**
   String get common_close;
+
+  /// No description provided for @language_japanese.
+  ///
+  /// In ja, this message translates to:
+  /// **'日本語'**
+  String get language_japanese;
+
+  /// No description provided for @language_english.
+  ///
+  /// In ja, this message translates to:
+  /// **'English'**
+  String get language_english;
 }
 
 class _AppLocalizationsDelegate

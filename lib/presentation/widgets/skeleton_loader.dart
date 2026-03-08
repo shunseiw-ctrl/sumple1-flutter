@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sumple1/core/constants/app_colors.dart';
 import 'package:sumple1/core/constants/app_spacing.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 
@@ -43,6 +44,9 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
 
   @override
   Widget build(BuildContext context) {
+    final ext = Theme.of(context).extension<AppColorsExtension>();
+    final base = ext?.skeletonBase ?? const Color(0xFFEEEFF1);
+    final highlight = ext?.skeletonHighlight ?? const Color(0xFFF8F8FA);
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -54,11 +58,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
             gradient: LinearGradient(
               begin: Alignment(_animation.value - 1, 0),
               end: Alignment(_animation.value, 0),
-              colors: const [
-                Color(0xFFEEEFF1),
-                Color(0xFFF8F8FA),
-                Color(0xFFEEEFF1),
-              ],
+              colors: [base, highlight, base],
             ),
           ),
         );
@@ -78,34 +78,34 @@ class SkeletonJobCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Theme.of(context).extension<AppColorsExtension>()?.cardShadow ?? Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SkeletonLoader(height: 160, borderRadius: 16),
+          const SkeletonLoader(height: 160, borderRadius: 16),
           Padding(
-            padding: EdgeInsets.all(AppSpacing.cardPadding),
+            padding: const EdgeInsets.all(AppSpacing.cardPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
                     SkeletonLoader(width: 60, height: 24, borderRadius: 12),
                     SizedBox(width: 8),
                     SkeletonLoader(width: 60, height: 24, borderRadius: 12),
                   ],
                 ),
-                SizedBox(height: 12),
-                SkeletonLoader(height: 20, borderRadius: 6),
-                SizedBox(height: 8),
-                SkeletonLoader(width: 200, height: 16, borderRadius: 6),
-                SizedBox(height: 12),
-                Row(
+                const SizedBox(height: 12),
+                const SkeletonLoader(height: 20, borderRadius: 6),
+                const SizedBox(height: 8),
+                const SkeletonLoader(width: 200, height: 16, borderRadius: 6),
+                const SizedBox(height: 12),
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SkeletonLoader(width: 100, height: 28, borderRadius: 8),

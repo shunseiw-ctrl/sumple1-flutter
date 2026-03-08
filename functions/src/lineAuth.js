@@ -3,7 +3,10 @@ const crypto = require("crypto");
 const https = require("https");
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
+
+const lineChannelSecret = defineSecret("LINE_CHANNEL_SECRET");
 
 const REGION = "asia-northeast1";
 const STATE_TTL_MS = 10 * 60 * 1000; // 10分
@@ -141,7 +144,7 @@ async function createLineTokenAndProfile(lineUser) {
  * LINE OAuth コールバック — token取得→Firebase カスタムトークン生成→交換コード発行
  */
 exports.lineAuthCallback = onRequest(
-  { region: REGION, cors: false },
+  { region: REGION, cors: false, secrets: [lineChannelSecret] },
   async (req, res) => {
     try {
       const code = req.query.code;
@@ -190,7 +193,7 @@ exports.lineAuthCallback = onRequest(
 
       // LINE token 取得
       const lineChannelId = process.env.LINE_CHANNEL_ID || "";
-      const lineChannelSecret = process.env.LINE_CHANNEL_SECRET || "";
+      const lineSecret = lineChannelSecret.value();
       const callbackUrl = stateData.callbackUrl || `${baseUrl}/auth/line/callback`;
 
       const tokenParams = new URLSearchParams({
@@ -198,7 +201,7 @@ exports.lineAuthCallback = onRequest(
         code,
         redirect_uri: callbackUrl,
         client_id: lineChannelId,
-        client_secret: lineChannelSecret,
+        client_secret: lineSecret,
       });
 
       const tokenRes = await httpsRequest("https://api.line.me/oauth2/v2.1/token", {

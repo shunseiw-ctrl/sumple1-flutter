@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:sumple1/core/router/route_paths.dart';
@@ -356,7 +356,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               child: ElevatedButton.icon(
                                 onPressed: _isLoading ? null : _signInWithLine,
-                                icon: const Icon(Icons.chat_bubble, size: 22),
+                                icon: const FaIcon(FontAwesomeIcons.line, size: 24, color: Colors.white),
                                 label: Text(
                                   context.l10n.guestHome_lineLogin,
                                   style: AppTextStyles.button.copyWith(
@@ -393,7 +393,17 @@ class _GuestHomePageState extends State<GuestHomePage> {
                               ),
                               child: ElevatedButton.icon(
                                 onPressed: _isLoading ? null : _signInWithGoogle,
-                                icon: const Icon(Icons.g_mobiledata, size: 28),
+                                icon: Container(
+                                  width: 26,
+                                  height: 26,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: FaIcon(FontAwesomeIcons.google, size: 14, color: Color(0xFF4285F4)),
+                                  ),
+                                ),
                                 label: Text(
                                   context.l10n.guestHome_googleLogin,
                                   style: AppTextStyles.button.copyWith(
@@ -426,7 +436,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 child: ElevatedButton.icon(
                                   onPressed:
                                       _isLoading ? null : _signInWithApple,
-                                  icon: const Icon(Icons.apple, size: 24),
+                                  icon: const FaIcon(FontAwesomeIcons.apple, size: 22, color: Colors.white),
                                   label: Text(
                                     AppLocalizations.of(context)
                                             ?.signInWithApple ??

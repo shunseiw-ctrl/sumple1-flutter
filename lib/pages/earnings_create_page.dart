@@ -1,25 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/services/auth_service.dart';
 import '../core/services/payment_service.dart';
 import '../core/enums/user_role.dart';
 import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import '../core/services/analytics_service.dart';
+import '../core/providers/firebase_providers.dart';
 
-class EarningsCreatePage extends StatefulWidget {
+class EarningsCreatePage extends ConsumerStatefulWidget {
   const EarningsCreatePage({super.key});
 
   @override
-  State<EarningsCreatePage> createState() => _EarningsCreatePageState();
+  ConsumerState<EarningsCreatePage> createState() => _EarningsCreatePageState();
 }
 
-class _EarningsCreatePageState extends State<EarningsCreatePage> {
-  final _db = FirebaseFirestore.instance;
+class _EarningsCreatePageState extends ConsumerState<EarningsCreatePage> {
+  late final FirebaseFirestore _db = ref.read(firestoreProvider);
   final _authService = AuthService();
 
-  String get _myUid => FirebaseAuth.instance.currentUser?.uid ?? '';
+  String get _myUid => ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
   bool _isAdmin = false;
 
   @override
@@ -371,8 +372,8 @@ class _EarningsCreatePageState extends State<EarningsCreatePage> {
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF635BFF),
-                      side: const BorderSide(color: Color(0xFF635BFF)),
+                      foregroundColor: context.appColors.stripeColor,
+                      side: BorderSide(color: context.appColors.stripeColor),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),

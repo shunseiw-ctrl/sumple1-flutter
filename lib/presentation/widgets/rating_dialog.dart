@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/extensions/build_context_extensions.dart';
+import '../../core/providers/firebase_providers.dart';
 
-class RatingDialog extends StatefulWidget {
+class RatingDialog extends ConsumerStatefulWidget {
   final String applicationId;
   final String jobId;
   final String jobTitle;
@@ -35,10 +36,10 @@ class RatingDialog extends StatefulWidget {
   }
 
   @override
-  State<RatingDialog> createState() => _RatingDialogState();
+  ConsumerState<RatingDialog> createState() => _RatingDialogState();
 }
 
-class _RatingDialogState extends State<RatingDialog> {
+class _RatingDialogState extends ConsumerState<RatingDialog> {
   int _stars = 0;
   final _commentController = TextEditingController();
   bool _isSubmitting = false;
@@ -58,8 +59,8 @@ class _RatingDialogState extends State<RatingDialog> {
     }
     setState(() => _isSubmitting = true);
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-      await FirebaseFirestore.instance.collection('ratings').add({
+      final uid = ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
+      await ref.read(firestoreProvider).collection('ratings').add({
         'applicationId': widget.applicationId,
         'jobId': widget.jobId,
         'raterUid': uid,
