@@ -90,6 +90,42 @@ class TestValidator(unittest.TestCase):
         self.assertEqual(result.passed, 500)
 
     @patch("subprocess.run")
+    def test_test_progressive_output_gets_last_count(self, mock_run):
+        """プログレス出力で最後の+Nが正しく取得される"""
+        mock_run.return_value = make_completed_process(
+            stdout="00:01 +2: loading...\r00:10 +500: ...\r00:45 +1105: All tests passed!\n",
+            returncode=0,
+        )
+        result = self.validator.run_test()
+        self.assertTrue(result.all_passed)
+        self.assertEqual(result.total, 1105)
+        self.assertEqual(result.passed, 1105)
+
+    @patch("subprocess.run")
+    def test_test_no_summary_line(self, mock_run):
+        """サマリーなしで+N:のみの出力"""
+        mock_run.return_value = make_completed_process(
+            stdout="00:30 +50: test_something\n",
+            returncode=0,
+        )
+        result = self.validator.run_test()
+        self.assertEqual(result.total, 50)
+        self.assertEqual(result.passed, 50)
+
+    @patch("subprocess.run")
+    def test_test_stderr_with_plus_numbers(self, mock_run):
+        """stderrに+2等が含まれても最終結果行から正確にカウント"""
+        mock_run.return_value = make_completed_process(
+            stdout="00:01 +2: loading...\n00:45 +1225: All tests passed!\n",
+            stderr="Some package version 1.0.0+2 loaded\n",
+            returncode=0,
+        )
+        result = self.validator.run_test()
+        self.assertTrue(result.all_passed)
+        self.assertEqual(result.total, 1225)
+        self.assertEqual(result.passed, 1225)
+
+    @patch("subprocess.run")
     def test_check_commits(self, mock_run):
         mock_run.return_value = make_completed_process(stdout="5\n")
         count = self.validator.check_commits("auto/123")

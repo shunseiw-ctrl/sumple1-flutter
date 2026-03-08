@@ -30,7 +30,6 @@ from lib.config import (
 from lib.lock_manager import LockManager, LockError
 from lib.task_manager import TaskManager, Task
 from lib.report_manager import ReportManager
-from lib.claude_runner import ClaudeRunner
 from lib.git_service import GitService, GitError
 from lib.github_service import GitHubService, GitHubError
 from lib.validator import Validator
@@ -147,7 +146,6 @@ def execute_task(
     task: Task,
     task_manager: TaskManager,
     report_manager: ReportManager,
-    claude_runner: ClaudeRunner,
     git: GitService,
     github: GitHubService,
     validator: Validator,
@@ -584,7 +582,6 @@ def main() -> None:
     # サービス初期化
     task_manager = TaskManager()
     report_manager = ReportManager()
-    claude_runner = ClaudeRunner()
     git = GitService()
     github = GitHubService()
     validator = Validator()
@@ -619,7 +616,7 @@ def main() -> None:
                     break
 
                 if execute_task(
-                    task, task_manager, report_manager, claude_runner,
+                    task, task_manager, report_manager,
                     git, github, validator, notifier, metrics_mgr,
                 ):
                     success_count += 1

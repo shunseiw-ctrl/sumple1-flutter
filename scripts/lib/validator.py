@@ -92,24 +92,38 @@ class Validator:
         passed = 0
         failed = 0
 
-        # パターン例: "All 1105 tests passed!" / "00:45 +1100 -5: Some tests failed."
-        match = re.search(r"All (\d+) tests passed", output)
-        if match:
-            total = int(match.group(1))
-            passed = total
+        # flutter testの出力形式:
+        #   成功時: "00:45 +1105: All tests passed!"
+        #   失敗時: "00:45 +1100 -5: Some tests failed."
+        # 注意: 最終結果行から正確にテスト数を抽出する
+
+        # 成功パターン: "+N: All tests passed!" から N を取得
+        all_passed_match = re.search(r"\+(\d+):\s*All tests passed", output)
+        if all_passed_match:
+            passed = int(all_passed_match.group(1))
+            total = passed
         else:
-            # "+N -M" パターン
-            match = re.search(r"\+(\d+)\s+-(\d+)", output)
-            if match:
-                passed = int(match.group(1))
-                failed = int(match.group(2))
+            # 失敗パターン: 最終結果行の "+N -M:" を取得
+            # 最終行（Some tests failed 付近）に最も近い +N -M を使う
+            fail_match = re.search(r"\+(\d+)\s+-(\d+):.*(?:Some tests failed|failed)", output)
+            if fail_match:
+                passed = int(fail_match.group(1))
+                failed = int(fail_match.group(2))
                 total = passed + failed
             else:
-                # "+N" のみ（全テストパス）
-                match = re.search(r"\+(\d+)", output)
-                if match:
-                    passed = int(match.group(1))
-                    total = passed
+                # フォールバック: 最後の "+N -M" を取得
+                fail_matches = re.findall(r"\+(\d+)\s+-(\d+)", output)
+                if fail_matches:
+                    last = fail_matches[-1]
+                    passed = int(last[0])
+                    failed = int(last[1])
+                    total = passed + failed
+                else:
+                    # 最後の "+N:" を取得（結果行のみ、:付きで絞り込み）
+                    pass_matches = re.findall(r"\+(\d+):", output)
+                    if pass_matches:
+                        passed = int(pass_matches[-1])
+                        total = passed
 
         return TestResult(
             exit_code=result.returncode,

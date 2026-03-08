@@ -18,33 +18,21 @@
 - 仕様変更・新機能追加のたびに README.md を更新する
 - 大きな変更（新機能追加、リファクタリング、Phase完了時など）のたびに `/simplify` でコードレビューを実行し、重複・品質・効率の問題を修正する
 
-## 品質パイプライン（実装後に必ず実行）
+## 品質チェック（実装後に必ず実行）
 
-コード変更を伴う実装が完了したら、以下のサブエージェントパイプラインを **毎回** 実行する:
+コード変更を伴う実装が完了したら、以下を **毎回** 実行する:
 
-### Step 1: プラットフォームビルド検証（並列）
-ios-developer と android-developer を **同時に** 起動し、各プラットフォームでビルドが通るか確認:
-- `ios-developer`: `flutter build ios --no-codesign` の成功確認 + ios/ ディレクトリの変更があれば妥当性チェック
-- `android-developer`: `flutter build apk --debug` の成功確認 + android/ ディレクトリの変更があれば妥当性チェック
+1. `flutter analyze` — エラー0件を確認
+2. `flutter test` — 全テストPASSを確認
+3. 大きな変更時は `/simplify` でコードレビューを実行
 
-### Step 2: E2Eテスト
-e2e-tester を起動し、Maestro視覚テストを実行:
-- `bash scripts/e2e_test.sh --no-shutdown`（ビルド済みなら `--skip-build` 追加）
-- スクリーンショットで表示崩れ・リグレッションを確認
-
-### Step 3: コードレビュー
-code-reviewer を起動し、コード品質をチェック
-
-### Step 4: UI/UXレビュー
-general-purpose エージェントを起動し、`.claude/agents/ui-ux-reviewer.md` の指示に従ってUI/UXレビューを実行させる。
-プロンプト例: 「.claude/agents/ui-ux-reviewer.md を読み、その指示に従って今回の変更のUI/UXレビューを実行してください。」
-
-**注意:**
-- Step 1 の2つは並列実行（1つのメッセージで同時にAgent呼び出し）
-- Step 2〜4 は順次実行（前のステップの結果を踏まえて次へ）
-- 各ステップで問題が見つかった場合は修正してから次へ進む
-- テストコードのみの変更（test: タスク）では Step 2 はスキップ可
-- ui-ux-reviewer はカスタムエージェントのため `general-purpose` 型で呼び出すこと
+### 利用可能なレビューエージェント（手動起動）
+必要に応じて `.claude/agents/` のエージェントを手動で起動できる:
+- `code-reviewer`: コード品質レビュー
+- `ios-developer`: iOS ビルド検証
+- `android-developer`: Android ビルド検証
+- `e2e-tester`: Maestro E2Eテスト
+- `ui-ux-reviewer`: UI/UXレビュー（general-purpose型で起動）
 
 ## Git 運用（GitHub Flow）
 
