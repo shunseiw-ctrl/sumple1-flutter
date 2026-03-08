@@ -56,6 +56,27 @@ platform :ios do
     )
   end
 
+  desc "Build and upload to TestFlight (local, skip match)"
+  lane :beta_local do
+    api_key
+
+    # Clean build
+    sh("cd ../.. && flutter clean && flutter pub get")
+    sh("cd ../.. && flutter build ios --release --no-codesign --dart-define=ENV=production")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios/ipa",
+    )
+
+    upload_to_testflight(
+      apple_id: ENV["APPLE_APP_ID"],
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
   desc "Build IPA without uploading (for CI validation)"
   lane :build_only do
     setup_ci if ENV["CI"]
