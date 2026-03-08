@@ -32,7 +32,6 @@ final adminApprovalProvider = AutoDisposeAsyncNotifierProvider.family<
 
 class AdminApprovalNotifier extends AutoDisposeFamilyAsyncNotifier<
     AdminListState<ApprovalItem>, ApprovalType> {
-  static const _pageSize = 20;
   FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   @override

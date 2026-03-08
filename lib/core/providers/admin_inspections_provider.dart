@@ -52,7 +52,6 @@ final adminInspectionsProvider = AutoDisposeAsyncNotifierProvider<
 
 class AdminInspectionsNotifier
     extends AutoDisposeAsyncNotifier<AdminListState<InspectionItem>> {
-  static const _pageSize = 20;
   FirebaseFirestore get _db => FirebaseFirestore.instance;
   String _filterResult = 'all';
 
