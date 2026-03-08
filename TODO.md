@@ -11,5 +11,6 @@
 - [x] #12 test: DistanceUtilsのユニットテスト追加 (手動実行)
 - [x] #17 test: JobModelのfromMap/toMapユニットテスト追加 (PR #18)
 - [x] #16 test: ShareServiceのユニットテスト追加 (PR #19)
+- [x] #15 fix: admin providerの未使用_pageSize定数を削除 (PR #20)
 
 ## FAILED
