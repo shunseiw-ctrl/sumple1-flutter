@@ -1,0 +1,60 @@
+appId: com.albawork.app
+name: "ストア申請用スクリーンショット取得"
+---
+# ストア申請用スクリーンショット取得フロー
+# 5枚の必須スクリーンショットを取得
+
+# ==== 1. ログイン/初期画面 ====
+- clearState: true
+- launchApp
+- assertVisible: "ALBAWORK"
+- assertVisible: "ゲストとして始める"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/store_01_login"
+
+# ==== 2. ゲストホーム（求人一覧） ====
+- tapOn: "ゲストとして始める"
+- assertVisible:
+    text: "仕事を探す"
+    enabled: true
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/store_02_home"
+
+# ==== 3. 求人詳細 ====
+# 求人カードをタップして詳細画面へ
+- scroll:
+    direction: DOWN
+
+- tapOn:
+    index: 0
+    retryTapIfNoChange: true
+
+# 求人詳細画面のスクショ
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/store_03_job_detail"
+
+# 戻る
+- pressKey: back
+
+# ==== 4. 地図検索画面 ====
+- tapOn: "地図"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/store_04_map_search"
+
+# ==== 5. メールログイン画面 ====
+# ホームに戻ってからログイン画面を表示
+- pressKey: back
+- pressKey: back
+
+# アプリ再起動で初期画面に戻る
+- clearState: true
+- launchApp
+- assertVisible: "メールアドレスでログイン"
+- tapOn: "メールアドレスでログイン"
+- assertVisible: "メールアドレス"
+
+- takeScreenshot:
+    path: "${MAESTRO_SCREENSHOT_DIR}/store_05_email_login"
