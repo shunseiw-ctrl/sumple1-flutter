@@ -19,8 +19,8 @@ TASK_PROMPT_TEMPLATE = PROMPTS_DIR / "task_prompt.template"
 # 閾値
 MAX_RETRIES = 2
 MAX_FAIL_TOTAL = 3
-TASK_TIMEOUT = 2700  # 45分（品質パイプライン含む）
-MAX_TURNS = 50  # サブエージェント呼び出し分を加算
+TASK_TIMEOUT = 1800  # 30分（品質パイプライン除去のため短縮）
+MAX_TURNS = 100  # 複雑なタスク+テスト修正ループ用に十分なバッファ
 LOG_RETENTION_DAYS = 7
 REPORT_MAX_ENTRIES = 50
 DEFAULT_MAX_TASKS = 1

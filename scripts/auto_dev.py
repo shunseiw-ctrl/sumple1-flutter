@@ -204,12 +204,11 @@ def execute_task(
     # プロンプト構築
     prompt = build_prompt(issue_num, task_title, issue_body)
 
-    # Claude用のallowedToolsリスト（Agent含む — 品質パイプライン用）
+    # Claude用のallowedToolsリスト（実装+テスト+コミットに集中）
     allowed_tools = (
-        "Read,Grep,Glob,Edit,Write,Agent,"
+        "Read,Grep,Glob,Edit,Write,"
         "Bash(flutter *),Bash(dart *),Bash(git add*),Bash(git commit*),"
-        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*),Bash(cat*),"
-        "Bash(bash scripts/e2e_test.sh*),Bash(xcrun *),Bash(maestro *)"
+        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*)"
     )
 
     retry_count = 0
@@ -247,6 +246,14 @@ def execute_task(
         timed_out = claude_result["timed_out"]
 
         log(f"Claude終了コード: {claude_exit_code}")
+
+        # Claude出力をファイルに保存（デバッグ用）
+        output_file = LOG_DIR / f"claude_output_{issue_num}_{retry_count}.txt"
+        try:
+            output_file.write_text(claude_output, encoding="utf-8")
+            log(f"Claude出力保存: {output_file.name}")
+        except OSError:
+            pass
 
         # タイムアウト
         if timed_out:
