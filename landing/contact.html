@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ - ALBAWORK</title>
+  <meta name="description" content="ALBAWORKへのお問い合わせページ。アプリに関するご質問・ご意見をお寄せください。">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #0F2B5B 0%, #1E50A2 100%);
+      color: #fff;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .header a {
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      color: #111827;
+    }
+
+    .intro {
+      font-size: 16px;
+      color: #6B7280;
+      margin-bottom: 40px;
+      line-height: 1.8;
+    }
+
+    .contact-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .contact-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #1E50A2;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #F8FAFF;
+      border-radius: 12px;
+    }
+
+    .contact-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1E50A2, #3A7BD5);
+      border-radius: 10px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .contact-detail h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    .contact-detail p {
+      font-size: 14px;
+      color: #6B7280;
+    }
+
+    .contact-detail a {
+      color: #1E50A2;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .contact-detail a:hover {
+      text-decoration: underline;
+    }
+
+    .faq-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .faq-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #1E50A2;
+    }
+
+    .faq-item {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .faq-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .faq-item h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .faq-item p {
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 1.7;
+    }
+
+    .response-note {
+      text-align: center;
+      font-size: 13px;
+      color: #9CA3AF;
+      margin-top: 32px;
+    }
+
+    .footer {
+      background: #0F2B5B;
+      color: #fff;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .footer a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .footer a:hover {
+      color: #fff;
+    }
+
+    .footer-links {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 640px) {
+      h1 {
+        font-size: 32px;
+      }
+
+      .contact-section,
+      .faq-section {
+        padding: 40px;
+      }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="header">
+    <a href="/">ALBAWORK</a>
+  </header>
+
+  <main class="content">
+    <h1>お問い合わせ</h1>
+    <p class="intro">ALBAWORKに関するご質問、不具合の報告、ご意見・ご要望がございましたら、以下の方法でお気軽にお問い合わせください。</p>
+
+    <div class="contact-section">
+      <h2>お問い合わせ方法</h2>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="contact-detail">
+          <h3>メール</h3>
+          <p><a href="mailto:support@albawork.app">support@albawork.app</a></p>
+          <p>営業時間：平日 10:00〜18:00</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="contact-detail">
+          <h3>アプリ内お問い合わせ</h3>
+          <p>ALBAWORKアプリの「設定」>「お問い合わせ」からもご連絡いただけます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2>よくあるご質問</h2>
+
+      <div class="faq-item">
+        <h3>アカウント登録に必要なものは？</h3>
+        <p>メールアドレス、LINEアカウント、またはApple IDのいずれかがあれば登録できます。本人確認には身分証明書と顔写真が必要です。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>求人はゲストでも閲覧できますか？</h3>
+        <p>はい、アカウント登録なしでも求人の閲覧・検索・地図検索が可能です。応募やチャットにはログインが必要です。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>アプリが正しく動作しません</h3>
+        <p>アプリを最新バージョンに更新してください。問題が解決しない場合は、上記のメールアドレスまでお使いの端末情報とともにご連絡ください。</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>退会したい場合は？</h3>
+        <p>アプリ内の「設定」>「アカウント設定」から退会手続きが可能です。退会後、個人情報はプライバシーポリシーに基づき適切に処理されます。</p>
+      </div>
+    </div>
+
+    <p class="response-note">※ お問い合わせへの回答には、2〜3営業日ほどいただく場合がございます。</p>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/">トップページ</a>
+      <a href="privacy-policy.html">プライバシーポリシー</a>
+      <a href="terms-of-service.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ALBAWORK. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
