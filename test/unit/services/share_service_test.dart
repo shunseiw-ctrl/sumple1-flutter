@@ -4,9 +4,11 @@ import 'package:sumple1/core/services/share_service.dart';
 void main() {
   group('ShareService.shareJobText', () {
     test('正常な引数_正しいフォーマットのテキストを生成する', () {
-      final text =
-          ShareService.shareJobText('job1', 'テスト案件', '15000', '東京都');
-      expect(text, '【ALBAWORK】テスト案件\n場所: 東京都\n日給: 15000円\nhttps://alba-work.web.app/jobs/job1');
+      final text = ShareService.shareJobText('job1', 'テスト案件', '15000', '東京都');
+      expect(
+        text,
+        '【ALBAWORK】テスト案件\n場所: 東京都\n日給: 15000円\nhttps://alba-work.web.app/jobs/job1',
+      );
     });
 
     test('空文字の引数_空値を含むテキストを生成する', () {
@@ -19,7 +21,11 @@ void main() {
 
     test('特殊文字を含む引数_エスケープせずそのまま出力する', () {
       final text = ShareService.shareJobText(
-          'job-123', '内装工事【急募】', '20,000', '東京都渋谷区（駅近）');
+        'job-123',
+        '内装工事【急募】',
+        '20,000',
+        '東京都渋谷区（駅近）',
+      );
       expect(text, contains('【ALBAWORK】内装工事【急募】'));
       expect(text, contains('場所: 東京都渋谷区（駅近）'));
       expect(text, contains('日給: 20,000円'));
@@ -27,8 +33,7 @@ void main() {
     });
 
     test('URLにjobIdが正しく埋め込まれる', () {
-      final text =
-          ShareService.shareJobText('abc_456', 'タイトル', '10000', '大阪');
+      final text = ShareService.shareJobText('abc_456', 'タイトル', '10000', '大阪');
       expect(text, endsWith('https://alba-work.web.app/jobs/abc_456'));
     });
   });
@@ -36,8 +41,7 @@ void main() {
   group('ShareService.shareReferralText', () {
     test('正常なコード_紹介コードを含むテキストを生成する', () {
       final text = ShareService.shareReferralText('ABC123');
-      expect(text,
-          'ALBAWORKで一緒に働こう！紹介コード: ABC123\nhttps://alba-work.web.app');
+      expect(text, 'ALBAWORKで一緒に働こう！紹介コード: ABC123\nhttps://alba-work.web.app');
     });
 
     test('空文字のコード_コード部分が空のテキストを生成する', () {
@@ -56,8 +60,7 @@ void main() {
   group('ShareService.shareAppText', () {
     test('引数なし_固定のアプリ紹介テキストを返す', () {
       final text = ShareService.shareAppText();
-      expect(
-          text, 'ALBAWORKで建設業の仕事を見つけよう！\nhttps://alba-work.web.app');
+      expect(text, 'ALBAWORKで建設業の仕事を見つけよう！\nhttps://alba-work.web.app');
     });
 
     test('複数回呼び出し_同一のテキストを返す', () {
