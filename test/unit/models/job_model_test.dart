@@ -157,9 +157,7 @@ void main() {
     });
 
     test('imageUrlが空文字の場合はimageUrlsは空リスト', () {
-      final job = JobModel.fromMap('id', {
-        'imageUrl': '',
-      });
+      final job = JobModel.fromMap('id', {'imageUrl': ''});
 
       expect(job.imageUrls, isEmpty);
     });
@@ -175,10 +173,7 @@ void main() {
   group('JobModel.fromMap Timestamp処理', () {
     test('Timestamp型がDateTimeに正しく変換される', () {
       final ts = Timestamp.fromDate(DateTime(2025, 6, 15, 9, 30));
-      final job = JobModel.fromMap('id', {
-        'createdAt': ts,
-        'updatedAt': ts,
-      });
+      final job = JobModel.fromMap('id', {'createdAt': ts, 'updatedAt': ts});
 
       expect(job.createdAt, DateTime(2025, 6, 15, 9, 30));
       expect(job.updatedAt, DateTime(2025, 6, 15, 9, 30));
@@ -186,10 +181,7 @@ void main() {
 
     test('DateTime型はそのまま保持される', () {
       final dt = DateTime(2025, 3, 1);
-      final job = JobModel.fromMap('id', {
-        'createdAt': dt,
-        'updatedAt': dt,
-      });
+      final job = JobModel.fromMap('id', {'createdAt': dt, 'updatedAt': dt});
 
       expect(job.createdAt, dt);
       expect(job.updatedAt, dt);
