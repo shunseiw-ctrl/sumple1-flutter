@@ -9,6 +9,7 @@
       "Bash(flutter pub get*)",
       "Bash(dart format*)",
       "Bash(dart run build_runner*)",
+      "Bash(dart analyze*)",
       "Bash(cd functions && npm test*)",
       "Bash(cd functions && npm run lint*)",
       "Bash(cd functions && npm install*)",
@@ -36,6 +37,41 @@
       "Bash(xcrun *)",
       "Bash(pod *)",
       "Bash(cd android && ./gradlew *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-edit-protect.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-analyze.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "コード変更(.dartファイル)があった場合、以下の品質チェックが完了しているか確認してください:\n1. flutter analyze — エラー0件\n2. flutter test — 全テストPASS\n未完了のチェックがあれば、ユーザーに通知してから終了してください。"
+          }
+        ]
+      }
     ]
   }
 }
