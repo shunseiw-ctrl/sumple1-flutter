@@ -31,6 +31,16 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        val keystorePropertiesFile = rootProject.file("key.properties")
+        val mapsApiKey = if (keystorePropertiesFile.exists()) {
+            val props = Properties()
+            props.load(FileInputStream(keystorePropertiesFile))
+            props["mapsApiKey"] as? String ?: ""
+        } else {
+            System.getenv("MAPS_API_KEY") ?: ""
+        }
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     signingConfigs {
