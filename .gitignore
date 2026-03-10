@@ -53,6 +53,12 @@ functions/node_modules/
 functions/.env
 functions/.env.local
 
+# Android 署名
+android/key.properties
+android/app/upload-keystore.jks
+android/app/*.jks
+android/google-play-key.json
+
 # E2Eテスト結果
 test-results/
 
@@ -73,3 +79,6 @@ logs/
 
 # Claude Code エージェントメモリ
 .claude/agent-memory/
+
+# Shorebird
+.shorebird/

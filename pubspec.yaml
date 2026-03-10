@@ -87,6 +87,9 @@ dependencies:
   google_mlkit_face_detection: ^0.12.0
   font_awesome_flutter: ^10.12.0
 
+  # Shorebird Code Push (OTAアップデート)
+  shorebird_code_push: ^2.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

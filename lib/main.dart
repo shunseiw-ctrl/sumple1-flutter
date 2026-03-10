@@ -43,6 +43,7 @@ import 'core/services/force_update_service.dart';
 import 'presentation/widgets/force_update_dialog.dart';
 import 'core/services/analytics_service.dart';
 import 'presentation/widgets/app_error_boundary.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 /// FCMバックグラウンドメッセージハンドラ（トップレベル関数である必要あり）
 @pragma('vm:entry-point')
@@ -185,6 +186,17 @@ Future<void> main() async {
         .timeout(const Duration(seconds: 10));
   } catch (e) {
     Logger.error('LINE callback handling failed', tag: 'main', error: e);
+  }
+
+  // Shorebird Code Push: アップデートチェック（非Shorebirdビルドでは自動的にno-op）
+  try {
+    final updater = ShorebirdUpdater();
+    final status = await updater.checkForUpdate();
+    if (status == UpdateStatus.outdated) {
+      await updater.update();
+    }
+  } catch (e) {
+    Logger.error('Shorebird update check failed', tag: 'main', error: e);
   }
 
   runApp(const ProviderScope(child: MyApp()));
