@@ -5,10 +5,7 @@ jest.mock("firebase-admin", () => {
   const firestoreMock = {
     doc: jest.fn(),
     collection: jest.fn(),
-  };
-  const firestoreFn = jest.fn(() => firestoreMock);
-  firestoreFn.FieldValue = {
-    serverTimestamp: jest.fn(() => ({ __serverTimestamp: true })),
+    batch: jest.fn(),
   };
 
   const authMock = {
@@ -20,7 +17,11 @@ jest.mock("firebase-admin", () => {
 
   return {
     initializeApp: jest.fn(),
-    firestore: firestoreFn,
+    firestore: Object.assign(jest.fn(() => firestoreMock), {
+      FieldValue: {
+        serverTimestamp: jest.fn(() => ({ __serverTimestamp: true })),
+      },
+    }),
     auth: jest.fn(() => authMock),
   };
 });
@@ -86,6 +87,7 @@ describe("lineAuth", () => {
       const req = {
         protocol: "https",
         hostname: "alba-work.web.app",
+        query: {},
       };
       const res = {
         redirect: jest.fn(),
