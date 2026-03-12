@@ -100,6 +100,9 @@ jobs:
       - name: Install CocoaPods
         run: cd ios && pod install --repo-update
 
+      - name: Create API key file
+        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ios/AuthKey.p8
+
       - name: Build and upload to TestFlight
         working-directory: ios
         env:
@@ -108,7 +111,7 @@ jobs:
           APPLE_APP_ID: ${{ secrets.APPLE_APP_ID }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APP_STORE_CONNECT_API_KEY_PATH: AuthKey.p8
         run: bundle exec fastlane beta
 
       - name: Upload IPA artifact
