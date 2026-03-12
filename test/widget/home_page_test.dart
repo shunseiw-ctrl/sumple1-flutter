@@ -27,19 +27,20 @@ void main() {
   }
 
   group('HomePage UI Components', () {
-    testWidgets('ボトムナビゲーションバーに5つのアイテムが正しいアイコンで表示される',
-        (tester) async {
+    testWidgets('ボトムナビゲーションバーに5つのアイテムが正しいアイコンで表示される', (tester) async {
       // _ModernBottomNavの構造を再現（5つのナビアイテム）
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          body: const SizedBox(),
-          bottomNavigationBar: _TestBottomNav(
-            currentIndex: 0,
-            unreadCount: 0,
-            onTap: (_) {},
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            body: const SizedBox(),
+            bottomNavigationBar: _TestBottomNav(
+              currentIndex: 0,
+              unreadCount: 0,
+              onTap: (_) {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // 5つのナビゲーションラベルが表示される
@@ -59,19 +60,21 @@ void main() {
 
     testWidgets('通知ベルアイコンが表示される', (tester) async {
       // AppBarの通知アイコン構造を再現
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          appBar: AppBar(
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined, size: 26),
-                onPressed: () {},
-              ),
-            ],
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            appBar: AppBar(
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined, size: 26),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            body: const SizedBox(),
           ),
-          body: const SizedBox(),
         ),
-      ));
+      );
 
       expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
     });
@@ -79,22 +82,24 @@ void main() {
     testWidgets('ボトムナビアイテムタップで選択状態が変わる', (tester) async {
       int selectedIndex = 0;
 
-      await tester.pumpWidget(buildLocalizedApp(
-        StatefulBuilder(
-          builder: (context, setState) {
-            return Scaffold(
-              body: const SizedBox(),
-              bottomNavigationBar: _TestBottomNav(
-                currentIndex: selectedIndex,
-                unreadCount: 0,
-                onTap: (index) {
-                  setState(() => selectedIndex = index);
-                },
-              ),
-            );
-          },
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          StatefulBuilder(
+            builder: (context, setState) {
+              return Scaffold(
+                body: const SizedBox(),
+                bottomNavigationBar: _TestBottomNav(
+                  currentIndex: selectedIndex,
+                  unreadCount: 0,
+                  onTap: (index) {
+                    setState(() => selectedIndex = index);
+                  },
+                ),
+              );
+            },
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // 初期状態: 検索タブが選択
@@ -111,40 +116,47 @@ void main() {
 
     testWidgets('AppBarが正しくレンダリングされる', (tester) async {
       // HomePageのAppBar構造を再現（検索バー付き）
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          appBar: AppBar(
-            titleSpacing: 12,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            appBar: AppBar(
+              titleSpacing: 12,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.grey[400], size: 20),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'エリア・条件で検索',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ),
+                    Icon(Icons.tune_rounded, color: Colors.grey[600], size: 20),
+                  ],
+                ),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.search, color: Colors.grey[400], size: 20),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text('エリア・条件で検索',
-                        style: TextStyle(fontSize: 14, color: Colors.grey)),
-                  ),
-                  Icon(Icons.tune_rounded, color: Colors.grey[600], size: 20),
-                ],
-              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined, size: 26),
+                  onPressed: () {},
+                ),
+              ],
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined, size: 26),
-                onPressed: () {},
-              ),
-            ],
+            body: const SizedBox(),
           ),
-          body: const SizedBox(),
         ),
-      ));
+      );
 
       // 検索バーのテキストが表示される
       expect(find.text('エリア・条件で検索'), findsOneWidget);
@@ -157,16 +169,18 @@ void main() {
     });
 
     testWidgets('メッセージタブに未読バッジが表示される', (tester) async {
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          body: const SizedBox(),
-          bottomNavigationBar: _TestBottomNav(
-            currentIndex: 0,
-            unreadCount: 5,
-            onTap: (_) {},
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            body: const SizedBox(),
+            bottomNavigationBar: _TestBottomNav(
+              currentIndex: 0,
+              unreadCount: 5,
+              onTap: (_) {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // 未読バッジが表示される
@@ -176,16 +190,18 @@ void main() {
     });
 
     testWidgets('未読数0の場合バッジが非表示', (tester) async {
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          body: const SizedBox(),
-          bottomNavigationBar: _TestBottomNav(
-            currentIndex: 0,
-            unreadCount: 0,
-            onTap: (_) {},
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            body: const SizedBox(),
+            bottomNavigationBar: _TestBottomNav(
+              currentIndex: 0,
+              unreadCount: 0,
+              onTap: (_) {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // 未読バッジは非表示
@@ -193,16 +209,18 @@ void main() {
     });
 
     testWidgets('未読数99超の場合99+と表示される', (tester) async {
-      await tester.pumpWidget(buildLocalizedApp(
-        Scaffold(
-          body: const SizedBox(),
-          bottomNavigationBar: _TestBottomNav(
-            currentIndex: 0,
-            unreadCount: 150,
-            onTap: (_) {},
+      await tester.pumpWidget(
+        buildLocalizedApp(
+          Scaffold(
+            body: const SizedBox(),
+            bottomNavigationBar: _TestBottomNav(
+              currentIndex: 0,
+              unreadCount: 150,
+              onTap: (_) {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('unread-badge')), findsOneWidget);
@@ -226,7 +244,7 @@ class _TestBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = [
+    const items = [
       _NavItemData(
         selectedIcon: Icons.search,
         unselectedIcon: Icons.search_outlined,
@@ -285,15 +303,15 @@ class _TestBottomNav extends StatelessWidget {
                           child: Container(
                             key: const Key('unread-badge'),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 1),
+                              horizontal: 4,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              unreadCount > 99
-                                  ? '99+'
-                                  : unreadCount.toString(),
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
                               style: const TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
@@ -309,7 +327,9 @@ class _TestBottomNav extends StatelessWidget {
                     item.label,
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
                       color: isSelected ? Colors.blue : Colors.grey,
                     ),
                   ),
