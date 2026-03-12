@@ -60,6 +60,7 @@ class _AdminApplicantsTabState extends ConsumerState<AdminApplicantsTab>
     super.dispose();
   }
 
+  // ignore: unused_element
   Future<void> _updateStatus(
       String appId, String newStatus, String jobTitle) async {
     final confirmed = await showDialog<bool>(

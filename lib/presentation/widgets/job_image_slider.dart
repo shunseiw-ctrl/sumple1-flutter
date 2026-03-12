@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sumple1/core/extensions/build_context_extensions.dart';
 import 'package:sumple1/presentation/widgets/animated_page_indicator.dart';
 import 'package:sumple1/presentation/widgets/cached_image.dart';
-import 'package:sumple1/presentation/widgets/job_card.dart';
 import 'package:sumple1/presentation/widgets/job_placeholder_image.dart';
 
 /// 案件画像スライダー

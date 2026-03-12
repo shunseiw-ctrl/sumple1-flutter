@@ -61,7 +61,6 @@ final adminWorkReportsProvider = AutoDisposeAsyncNotifierProvider<
 
 class AdminWorkReportsNotifier
     extends AutoDisposeAsyncNotifier<AdminListState<WorkReportItem>> {
-  static const _pageSize = 20;
   FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   @override
