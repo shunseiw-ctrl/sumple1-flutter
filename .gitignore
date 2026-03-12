@@ -84,3 +84,4 @@ logs/
 
 # テストカバレッジ
 functions/coverage/
+ios/api_key.json

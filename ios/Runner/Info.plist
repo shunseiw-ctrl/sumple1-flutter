@@ -53,8 +53,6 @@
 		<string>出退勤時の現場位置確認（GPS打刻）および近くの求人検索に位置情報を使用します。Location is used for worksite verification during check-in/check-out and nearby job search.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 		<string>出退勤時の現場位置確認（GPS打刻）および近くの求人検索に位置情報を使用します。Location is used for worksite verification during check-in/check-out and nearby job search.</string>
-		<key>NSUserTrackingUsageDescription</key>
-		<string>広告の最適化のためにトラッキング情報を使用します。This app uses tracking data to optimize advertisements.</string>
 		<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 		<key>UIStatusBarHidden</key>
