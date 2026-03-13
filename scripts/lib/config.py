@@ -31,6 +31,10 @@ RETRY_BASE_INTERVAL = 10
 RETRY_BACKOFF_FACTOR = 2
 RETRY_MAX_INTERVAL = 60
 
+# エラー分類によるリトライ制御
+NETWORK_RETRY_WAIT = 300  # 5分（ネットワークエラー時の待機秒数）
+SKIP_ERRORS = ["flutter analyze", "test failed"]  # コードエラー → リトライせずスキップ
+
 # 通知（環境変数から）
 LINE_CHANNEL_TOKEN = os.environ.get("LINE_CHANNEL_TOKEN", "")
 LINE_USER_ID = os.environ.get("LINE_USER_ID", "")

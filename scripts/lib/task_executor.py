@@ -9,6 +9,7 @@ from lib.config import (
     SYSTEM_PROMPT_FILE,
     AUTO_MERGE_PREFIXES,
     RETRY_BASE_INTERVAL, RETRY_BACKOFF_FACTOR, RETRY_MAX_INTERVAL,
+    NETWORK_RETRY_WAIT,
 )
 from lib.log_utils import log
 from lib.prompt_builder import build_prompt, make_branch_name
@@ -26,6 +27,33 @@ _logger = logging.getLogger("auto_dev")
 
 def _stage(name: str) -> None:
     print(f"##STAGE:{name}##", flush=True)
+
+
+def classify_error(error_message: str) -> str:
+    """エラーメッセージを分類してリトライ戦略を決定する
+
+    Returns:
+        "network" — ネットワーク系エラー（長時間待機してリトライ）
+        "auth" — 認証系エラー（リトライ不可、即失敗）
+        "code" — コード品質エラー（リトライ不可、次タスクへスキップ）
+        "unknown" — 不明（通常の指数バックオフでリトライ）
+    """
+    msg = error_message.lower()
+
+    network_keywords = ["timeout", "connection", "network", "etimedout",
+                        "rate limit", "503", "429"]
+    if any(kw in msg for kw in network_keywords):
+        return "network"
+
+    auth_keywords = ["auth", "permission", "denied", "401", "403"]
+    if any(kw in msg for kw in auth_keywords):
+        return "auth"
+
+    code_keywords = ["analyze", "test failed", "compile", "build failed"]
+    if any(kw in msg for kw in code_keywords):
+        return "code"
+
+    return "unknown"
 
 
 def retry_sleep(retry_count: int) -> None:
@@ -271,15 +299,72 @@ def execute_task(
 
         # Claude実行失敗
         if claude_exit_code != 0:
-            log(f"ERROR: Claude実行失敗 (exit: {claude_exit_code})")
+            error_msg = f"Claude実行エラー (exit: {claude_exit_code})"
+            error_type = classify_error(claude_output + " " + error_msg)
+            log(f"ERROR: {error_msg} [分類: {error_type}]")
+
+            # auth エラー: リトライ不可、即失敗
+            if error_type == "auth":
+                log("認証エラー: リトライせず即終了")
+                report_manager.write_report(
+                    issue_num, task_title, "失敗", notes=f"{error_msg} (認証エラー)",
+                )
+                increment_fail_count(issue_num)
+                notifier.notify("認証エラー", f"#{issue_num} {task_title}（要対応）")
+                duration = time.time() - start_time
+                metrics.record(
+                    issue_number=issue_num, task_type=task.task_type, success=False,
+                    retries=retry_count, duration_seconds=duration,
+                    claude_exit_code=claude_exit_code,
+                    analyze_pass=False, test_pass=False,
+                    error_message=f"{error_msg} [auth]",
+                )
+                try:
+                    _cleanup_branch(git, branch_name, stash_pop=stashed)
+                except GitError as e:
+                    log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                    notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
+                _stage("task_failed")
+                return False
+
+            # code エラー: リトライ不可、次タスクへスキップ
+            if error_type == "code":
+                log("コードエラー: リトライせずスキップ")
+                report_manager.write_report(
+                    issue_num, task_title, "スキップ", notes=f"{error_msg} (コードエラー)",
+                )
+                increment_fail_count(issue_num)
+                notifier.notify("スキップ", f"#{issue_num} {task_title}（コードエラー）")
+                duration = time.time() - start_time
+                metrics.record(
+                    issue_number=issue_num, task_type=task.task_type, success=False,
+                    retries=retry_count, duration_seconds=duration,
+                    claude_exit_code=claude_exit_code,
+                    analyze_pass=False, test_pass=False,
+                    error_message=f"{error_msg} [code]",
+                )
+                try:
+                    _cleanup_branch(git, branch_name, stash_pop=stashed)
+                except GitError as e:
+                    log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                    notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
+                _stage("task_skipped")
+                return False
+
+            # network エラー: 長時間待機してリトライ
             retry_count += 1
             if retry_count < MAX_RETRIES:
-                log("リトライします...")
-                retry_sleep(retry_count)
+                if error_type == "network":
+                    log(f"ネットワークエラー: {NETWORK_RETRY_WAIT}秒待機してリトライ...")
+                    time.sleep(NETWORK_RETRY_WAIT)
+                else:
+                    log("リトライします...")
+                    retry_sleep(retry_count)
                 continue
+
             report_manager.write_report(
                 issue_num, task_title, "失敗",
-                notes=f"Claude実行エラー (exit: {claude_exit_code})",
+                notes=f"{error_msg} [{error_type}]",
             )
             increment_fail_count(issue_num)
 
@@ -290,7 +375,7 @@ def execute_task(
                 retries=retry_count, duration_seconds=duration,
                 claude_exit_code=claude_exit_code,
                 analyze_pass=False, test_pass=False,
-                error_message=f"Claude exit {claude_exit_code}",
+                error_message=f"Claude exit {claude_exit_code} [{error_type}]",
             )
             try:
                 _cleanup_branch(git, branch_name, stash_pop=stashed)
