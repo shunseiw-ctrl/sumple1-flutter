@@ -99,6 +99,17 @@ class GitService:
         """ローカルブランチを削除"""
         self._run(["branch", "-D", branch], check=False)
 
+    def add(self, *paths: str) -> None:
+        """指定パスをステージングに追加"""
+        self._run(["add"] + list(paths))
+
+    def commit(self, message: str, allow_empty: bool = False) -> None:
+        """コミットを作成"""
+        cmd = ["commit", "-m", message]
+        if allow_empty:
+            cmd.append("--allow-empty")
+        self._run(cmd)
+
     def branch_exists(self, branch: str) -> bool:
         """ブランチが存在するか"""
         result = self._run(

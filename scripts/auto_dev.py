@@ -9,6 +9,7 @@ auto_dev.shのPython書き換え版
 """
 
 import argparse
+import logging
 import os
 import re
 import subprocess
@@ -26,6 +27,7 @@ from lib.config import (
     REPORT_MAX_ENTRIES, LOG_RETENTION_DAYS, DEFAULT_MAX_TASKS,
     PROMPTS_DIR, SYSTEM_PROMPT_FILE, TASK_PROMPT_TEMPLATE,
     AUTO_MERGE_PREFIXES,
+    RETRY_BASE_INTERVAL, RETRY_BACKOFF_FACTOR, RETRY_MAX_INTERVAL,
 )
 from lib.lock_manager import LockManager, LockError
 from lib.task_manager import TaskManager, Task
@@ -35,25 +37,34 @@ from lib.github_service import GitHubService, GitHubError
 from lib.validator import Validator
 from lib.notifier import Notifier
 from lib.metrics import MetricsManager
+from lib.claude_runner import ClaudeRunner, ClaudeResult
 
 # PATH設定（launchd環境用）
 os.environ["PATH"] = f"/opt/homebrew/bin:/Users/albalize/flutter/bin:{os.environ.get('PATH', '')}"
 
-# ~/.zshrcからexport環境変数を補完（launchd/サブプロセスでは.zshrcが読まれないため）
+# ~/.zshrcから環境変数を補完（launchd/サブプロセスでは.zshrcが読まれないため）
+# Issue 28: 自前パースを廃止し、zshでsource+env出力を使用
 _zshrc = Path.home() / ".zshrc"
 if _zshrc.exists():
-    for _line in _zshrc.read_text().splitlines():
-        _line = _line.strip()
-        if _line.startswith("export ") and "=" in _line:
-            _kv = _line[7:]
-            _key, _, _val = _kv.partition("=")
-            _key = _key.strip()
-            _val = _val.strip().strip('"').strip("'")
-            if _key and not os.environ.get(_key):
-                os.environ[_key] = _val
+    try:
+        _result = subprocess.run(
+            ["zsh", "-c", "source ~/.zshrc 2>/dev/null && env -0"],
+            capture_output=True, text=True, timeout=10,
+        )
+        if _result.returncode == 0 and _result.stdout:
+            for _entry in _result.stdout.split("\0"):
+                if "=" in _entry:
+                    _key, _, _val = _entry.partition("=")
+                    if _key and not os.environ.get(_key):
+                        os.environ[_key] = _val
+    except (subprocess.TimeoutExpired, OSError):
+        pass
 
 # ネストされたClaudeセッション防止を回避
 os.environ.pop("CLAUDECODE", None)
+
+# ロガー設定
+_logger = logging.getLogger("auto_dev")
 
 
 def timestamp() -> str:
@@ -73,17 +84,29 @@ def log(message: str) -> None:
 
 
 def rotate_logs() -> None:
-    """古いログファイルを削除"""
+    """古いログファイルを削除（*.log + claude_output_*.txt）"""
     if not LOG_DIR.exists():
         return
     cutoff = time.time() - LOG_RETENTION_DAYS * 86400
-    for log_file in LOG_DIR.glob("*.log"):
-        try:
-            if log_file.stat().st_mtime < cutoff:
-                log_file.unlink()
-        except OSError:
-            pass
-    log(f"ログローテーション完了（{LOG_RETENTION_DAYS}日以上前のログを削除）")
+    deleted = 0
+    for pattern in ("*.log", "claude_output_*.txt"):
+        for log_file in LOG_DIR.glob(pattern):
+            try:
+                if log_file.stat().st_mtime < cutoff:
+                    log_file.unlink()
+                    deleted += 1
+            except OSError:
+                pass
+    log(f"ログローテーション完了（{LOG_RETENTION_DAYS}日以上前のログを{deleted}件削除）")
+
+
+def retry_sleep(retry_count: int) -> None:
+    """指数バックオフ付きリトライスリープ"""
+    interval = min(
+        RETRY_BASE_INTERVAL * (RETRY_BACKOFF_FACTOR ** retry_count),
+        RETRY_MAX_INTERVAL,
+    )
+    time.sleep(interval)
 
 
 def get_fail_count(issue_num: int) -> int:
@@ -136,10 +159,10 @@ def make_branch_name(issue_num: int, task_title: str) -> str:
 def _commit_todo(git: "GitService", message: str) -> None:
     """TODO.mdの変更をmainにコミット（git pullによる上書き防止）"""
     try:
-        git._run(["add", "TODO.md"])
-        git._run(["commit", "-m", message], check=False)
-    except Exception:
-        pass
+        git.add("TODO.md")
+        git.commit(message)
+    except Exception as e:
+        _logger.warning("_commit_todo失敗: %s", e)
 
 
 def execute_task(
@@ -181,6 +204,10 @@ def execute_task(
     log(f"タスク開始: #{issue_num} {task_title} (累計失敗: {total_fails}/{MAX_FAIL_TOTAL})")
     notifier.notify("タスク開始", f"#{issue_num} {task_title}")
 
+    # Issue 4: タスクをIN_PROGRESSに移動
+    task_manager.move_to_in_progress(task, session_id)
+    _commit_todo(git, f"chore: #{issue_num} IN_PROGRESS")
+
     # Issue本文を取得
     try:
         issue_body = github.get_issue_body(issue_num)
@@ -188,8 +215,9 @@ def execute_task(
         issue_body = ""
 
     # git stash + ブランチ作成
+    stashed = False
     try:
-        git.stash_if_dirty()
+        stashed = git.stash_if_dirty()
         git.create_branch(branch_name)
     except GitError as e:
         # ブランチが既存の場合はチェックアウト
@@ -206,8 +234,12 @@ def execute_task(
     allowed_tools = (
         "Read,Grep,Glob,Edit,Write,"
         "Bash(flutter *),Bash(dart *),Bash(git add*),Bash(git commit*),"
-        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*)"
+        "Bash(git status*),Bash(git diff*),Bash(git log*),Bash(ls*),Bash(mkdir*),"
+        "Bash(cat*)"
     )
+
+    # ClaudeRunner初期化
+    runner = ClaudeRunner()
 
     retry_count = 0
     claude_exit_code = -1
@@ -223,7 +255,7 @@ def execute_task(
             log("リトライ前: ブランチをmainベースにリセット")
             git.reset_hard("main")
 
-        # Claude実行（subprocess直接）
+        # Claude実行
         system_prompt = ""
         if SYSTEM_PROMPT_FILE.exists():
             system_prompt = SYSTEM_PROMPT_FILE.read_text()
@@ -238,10 +270,10 @@ def execute_task(
             cmd.extend(["--append-system-prompt", system_prompt])
 
         log("Claude実行開始...")
-        claude_result = _run_claude_with_timeout(cmd, TASK_TIMEOUT)
-        claude_exit_code = claude_result["exit_code"]
-        claude_output = claude_result["stdout"]
-        timed_out = claude_result["timed_out"]
+        claude_result = runner.run(cmd)
+        claude_exit_code = claude_result.exit_code
+        claude_output = claude_result.stdout
+        timed_out = claude_result.timed_out
 
         log(f"Claude終了コード: {claude_exit_code}")
 
@@ -280,7 +312,11 @@ def execute_task(
                 analyze_pass=False, test_pass=False,
                 error_message="要確認事項あり",
             )
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
             return False
 
         # Claude実行失敗
@@ -289,7 +325,7 @@ def execute_task(
             retry_count += 1
             if retry_count < MAX_RETRIES:
                 log("リトライします...")
-                time.sleep(10)
+                retry_sleep(retry_count)
                 continue
             report_manager.write_report(
                 issue_num, task_title, "失敗",
@@ -306,7 +342,11 @@ def execute_task(
                 analyze_pass=False, test_pass=False,
                 error_message=f"Claude exit {claude_exit_code}",
             )
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
             return False
 
         # コミット有無チェック
@@ -316,7 +356,7 @@ def execute_task(
             retry_count += 1
             if retry_count < MAX_RETRIES:
                 log("リトライします...")
-                time.sleep(10)
+                retry_sleep(retry_count)
                 continue
             report_manager.write_report(
                 issue_num, task_title, "失敗", changed_files="0件",
@@ -333,7 +373,11 @@ def execute_task(
                 analyze_pass=False, test_pass=False,
                 error_message="コミットなし",
             )
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
             return False
 
         # ─── 検証フェーズ ───
@@ -362,7 +406,11 @@ def execute_task(
                 analyze_pass=False, test_pass=False,
                 error_message="flutter analyze失敗",
             )
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
             return False
 
         log("flutter analyze: OK")
@@ -393,7 +441,11 @@ def execute_task(
                 analyze_pass=True, test_pass=False,
                 error_message="flutter test失敗",
             )
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
             return False
 
         test_pass_text = f"All {test_count} tests passed"
@@ -417,7 +469,11 @@ def execute_task(
             increment_fail_count(issue_num)
 
             notifier.notify("失敗", f"#{issue_num} git push失敗（ネットワーク確認要）")
-            _cleanup_branch(git, branch_name)
+            try:
+                _cleanup_branch(git, branch_name, stash_pop=stashed)
+            except GitError as cleanup_e:
+                log(f"ERROR: ブランチクリーンアップ失敗: {cleanup_e}")
+                notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {cleanup_e}")
             duration = time.time() - start_time
             metrics.record(
                 issue_number=issue_num, task_type=task.task_type, success=False,
@@ -468,7 +524,12 @@ Generated by ALBAWORK Auto Dev System"""
         log(f"PR作成: #{pr_number}")
 
         # mainに戻してからTODO.mdを更新（ブランチ上で更新するとmain復帰時に失われる）
-        _cleanup_branch(git, branch_name, delete=False)
+        try:
+            _cleanup_branch(git, branch_name, delete=False, stash_pop=stashed)
+        except GitError as e:
+            log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+            notifier.notify("ERROR", f"#{issue_num} クリーンアップ失敗: {e}")
+            return False
 
         task_manager.move_to_done(task, pr_number)
         _commit_todo(git, f"chore: #{issue_num} DONE → PR #{pr_number}")
@@ -496,66 +557,52 @@ Generated by ALBAWORK Auto Dev System"""
         return True
 
     # whileが完走（全リトライ失敗）— ここには来ないはずだが安全策
-    _cleanup_branch(git, branch_name)
+    try:
+        _cleanup_branch(git, branch_name, stash_pop=stashed)
+    except GitError as e:
+        log(f"ERROR: ブランチクリーンアップ失敗: {e}")
+        notifier.notify("ERROR", f"クリーンアップ失敗: {e}")
     return False
 
 
-def _run_claude_with_timeout(cmd: list, timeout: int) -> dict:
-    """タイムアウト付きでClaudeを実行"""
+def _cleanup_branch(
+    git: GitService,
+    branch_name: str,
+    delete: bool = True,
+    stash_pop: bool = False,
+) -> None:
+    """mainに戻してブランチをクリーンアップ
+
+    Issue 3: 例外握りつぶし修正
+    Issue 10: stash汚染防止（checkout -- . + clean -fdで破棄）
+    """
+    # ブランチ上の変更を破棄（stashスタックを汚さない）
     try:
-        proc = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=str(PROJECT_DIR),
-        )
+        git._run(["checkout", "--", "."], check=False)
+        git._run(["clean", "-fd"], check=False)
+    except GitError as e:
+        _logger.warning("ブランチ上の変更破棄失敗（続行）: %s", e)
 
-        timed_out = False
-
-        def kill_proc():
-            nonlocal timed_out
-            timed_out = True
-            try:
-                proc.terminate()
-                try:
-                    proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    proc.kill()
-            except OSError:
-                pass
-
-        timer = __import__("threading").Timer(timeout, kill_proc)
-        timer.start()
-
-        try:
-            stdout_bytes, stderr_bytes = proc.communicate()
-        finally:
-            timer.cancel()
-
-        return {
-            "exit_code": proc.returncode if not timed_out else 124,
-            "stdout": stdout_bytes.decode("utf-8", errors="replace"),
-            "stderr": stderr_bytes.decode("utf-8", errors="replace"),
-            "timed_out": timed_out,
-        }
-    except FileNotFoundError:
-        return {
-            "exit_code": 127,
-            "stdout": "",
-            "stderr": "claude: command not found",
-            "timed_out": False,
-        }
-
-
-def _cleanup_branch(git: GitService, branch_name: str, delete: bool = True) -> None:
-    """mainに戻してブランチをクリーンアップ"""
+    # mainに戻る
     try:
-        git.stash_if_dirty()
         git.checkout("main")
-        if delete:
+    except GitError as e:
+        _logger.critical("checkout mainに失敗: %s", e)
+        raise
+
+    # ブランチ削除
+    if delete:
+        try:
             git.delete_branch(branch_name)
-    except GitError:
-        pass
+        except GitError as e:
+            _logger.warning("ブランチ削除失敗（続行）: %s", e)
+
+    # 元のstashを復元
+    if stash_pop:
+        try:
+            git.stash_pop()
+        except GitError as e:
+            _logger.warning("stash pop失敗（続行）: %s", e)
 
 
 def parse_args() -> argparse.Namespace:

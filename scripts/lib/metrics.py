@@ -1,6 +1,8 @@
 """成功率・コスト計測モジュール"""
 
 import json
+import os
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -134,8 +136,18 @@ class MetricsManager:
             return {"runs": [], "summary": {}}
 
     def _save(self, data: dict) -> None:
-        """メトリクスファイルに保存"""
+        """メトリクスファイルにアトミック書き込み"""
         self.metrics_file.parent.mkdir(parents=True, exist_ok=True)
-        self.metrics_file.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(self.metrics_file.parent), suffix=".tmp"
         )
+        try:
+            with os.fdopen(fd, "w") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            Path(tmp_path).replace(self.metrics_file)
+        except BaseException:
+            try:
+                Path(tmp_path).unlink()
+            except OSError:
+                pass
+            raise

@@ -3,11 +3,11 @@
 import subprocess
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
-from .config import TASK_TIMEOUT, MAX_TURNS, PROJECT_DIR, SYSTEM_PROMPT_FILE
+from .config import TASK_TIMEOUT, PROJECT_DIR
 
 
 @dataclass
@@ -17,34 +17,26 @@ class ClaudeResult:
     stdout: str
     stderr: str
     duration: float
-    needs_clarification: bool = False
     timed_out: bool = False
 
     @property
     def success(self) -> bool:
-        return self.exit_code == 0 and not self.needs_clarification and not self.timed_out
+        return self.exit_code == 0 and not self.timed_out
 
 
 class ClaudeRunner:
     """claude CLIのラッパー"""
 
-    CLARIFICATION_MARKER = "要確認:"
-
     def __init__(
         self,
         project_dir: Path = PROJECT_DIR,
-        system_prompt_file: Path = SYSTEM_PROMPT_FILE,
         timeout: int = TASK_TIMEOUT,
-        max_turns: int = MAX_TURNS,
     ):
         self.project_dir = project_dir
-        self.system_prompt_file = system_prompt_file
         self.timeout = timeout
-        self.max_turns = max_turns
 
-    def run(self, prompt: str, output_file: Optional[Path] = None) -> ClaudeResult:
-        """claude -p を実行してタイムアウト管理"""
-        cmd = self._build_command(prompt)
+    def run(self, cmd: List[str], output_file: Optional[Path] = None) -> ClaudeResult:
+        """コマンドリストを受け取り、タイムアウト管理付きで実行"""
         start_time = time.time()
         timed_out = False
 
@@ -73,15 +65,11 @@ class ClaudeRunner:
             if proc.returncode == -9 or proc.returncode == -15:
                 timed_out = True
 
-            # 「要確認:」検出
-            needs_clarification = self.CLARIFICATION_MARKER in stdout
-
             result = ClaudeResult(
                 exit_code=proc.returncode,
                 stdout=stdout,
                 stderr=stderr,
                 duration=duration,
-                needs_clarification=needs_clarification,
                 timed_out=timed_out,
             )
 
@@ -102,18 +90,6 @@ class ClaudeRunner:
                 stderr="claude: command not found",
                 duration=duration,
             )
-
-    def _build_command(self, prompt: str) -> list:
-        """claudeコマンドを構築"""
-        cmd = ["claude", "-p", "--verbose"]
-
-        if self.system_prompt_file.exists():
-            cmd.extend(["--system-prompt", self.system_prompt_file.read_text()])
-
-        cmd.extend(["--max-turns", str(self.max_turns)])
-        cmd.append(prompt)
-
-        return cmd
 
     @staticmethod
     def _kill_process(proc: subprocess.Popen) -> None:
