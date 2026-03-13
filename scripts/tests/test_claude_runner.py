@@ -84,6 +84,33 @@ class TestClaudeRunner(unittest.TestCase):
         # 例外が出ないことを確認
         ClaudeRunner._kill_process(mock_proc)
 
+    @patch("subprocess.Popen")
+    def test_run_UTF8デコード不能なバイナリ出力(self, mock_popen_cls):
+        mock_proc = MagicMock()
+        mock_proc.communicate.return_value = (b"\xff\xfe invalid", b"")
+        mock_proc.returncode = 0
+        mock_popen_cls.return_value = mock_proc
+
+        result = self.runner.run(["claude", "-p", "テスト"])
+
+        # 例外が発生しないこと
+        self.assertEqual(result.exit_code, 0)
+        # replacement charsが含まれること（errors="replace"による）
+        self.assertIn("\ufffd", result.stdout)
+
+    @patch("subprocess.Popen")
+    def test_run_returncode_minus9_タイムアウト判定(self, mock_popen_cls):
+        mock_proc = MagicMock()
+        mock_proc.communicate.return_value = (b"", b"")
+        mock_proc.returncode = -9
+        mock_popen_cls.return_value = mock_proc
+
+        result = self.runner.run(["claude", "-p", "テスト"])
+
+        self.assertTrue(result.timed_out)
+        self.assertFalse(result.success)
+        self.assertEqual(result.exit_code, -9)
+
 
 if __name__ == "__main__":
     unittest.main()

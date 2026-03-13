@@ -94,6 +94,26 @@ class TestGitHubService(unittest.TestCase):
         self.assertIn("--add-label", args)
         self.assertIn("auto-dev", args)
 
+    @patch("subprocess.run")
+    def test_list_auto_issues_不正なJSON応答_429_HTML(self, mock_run):
+        mock_run.return_value = make_completed_process(
+            returncode=0,
+            stdout="<html>429 Too Many Requests</html>"
+        )
+        issues = self.gh.list_auto_issues()
+        self.assertEqual(issues, [])
+
+    @patch("subprocess.run")
+    def test_create_issue_空のstdoutでも例外なし(self, mock_run):
+        # close_issueは check=False で呼ぶので例外なし
+        mock_run.return_value = make_completed_process(
+            returncode=0, stdout=""
+        )
+        # close_issueが空のstdoutでも例外を出さないことを確認
+        self.gh.close_issue(999)
+        # add_labelも同様
+        self.gh.add_label(999, "test-label")
+
 
 if __name__ == "__main__":
     unittest.main()

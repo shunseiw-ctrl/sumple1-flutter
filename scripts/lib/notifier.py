@@ -3,8 +3,6 @@
 import json
 import subprocess
 import urllib.request
-import urllib.error
-from typing import Optional
 
 from .config import LINE_CHANNEL_TOKEN, LINE_USER_ID, SLACK_WEBHOOK_URL
 

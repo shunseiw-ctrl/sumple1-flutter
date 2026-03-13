@@ -154,6 +154,33 @@ class TestAnalyzeResult(unittest.TestCase):
         self.assertTrue(r.passed)
 
 
+class TestValidatorFailureScenarios(unittest.TestCase):
+
+    def setUp(self):
+        self.validator = Validator(project_dir=Path("/tmp/test_project"))
+
+    @patch("subprocess.run")
+    def test_analyze_完全に空の出力(self, mock_run):
+        mock_run.return_value = make_completed_process(
+            stdout="", returncode=1
+        )
+        result = self.validator.run_analyze()
+        self.assertEqual(result.error_count, 0)
+        self.assertEqual(result.warning_count, 0)
+        self.assertEqual(result.exit_code, 1)
+
+    @patch("subprocess.run")
+    def test_test_完全に空の出力(self, mock_run):
+        mock_run.return_value = make_completed_process(
+            stdout="", returncode=1
+        )
+        result = self.validator.run_test()
+        self.assertEqual(result.total, 0)
+        self.assertEqual(result.passed, 0)
+        self.assertEqual(result.failed, 0)
+        self.assertEqual(result.exit_code, 1)
+
+
 class TestTestResult(unittest.TestCase):
 
     def test_all_passed(self):
