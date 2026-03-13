@@ -3,12 +3,13 @@
 import os
 from pathlib import Path
 
-# パス
-PROJECT_DIR = Path("/Users/albalize/Desktop/sumple1-flutter-main")
+# パス（PROJECT_PATH環境変数でオーバーライド可能）
+_project_path = os.environ.get("PROJECT_PATH")
+PROJECT_DIR = Path(_project_path) if _project_path else Path("/Users/albalize/Desktop/sumple1-flutter-main")
 SCRIPTS_DIR = PROJECT_DIR / "scripts"
 TODO_FILE = PROJECT_DIR / "TODO.md"
 REPORT_FILE = PROJECT_DIR / "REPORT.md"
-LOCK_FILE = Path("/tmp/albawork_auto_dev.lock")
+LOCK_FILE = Path(f"/tmp/{PROJECT_DIR.name}_auto_dev.lock")
 FAIL_COUNT_DIR = PROJECT_DIR / ".auto_dev" / "fail_counts"
 METRICS_FILE = PROJECT_DIR / ".auto_dev" / "metrics.json"
 LOG_DIR = PROJECT_DIR / "logs"
