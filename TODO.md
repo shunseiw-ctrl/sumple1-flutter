@@ -3,6 +3,7 @@
 ## PENDING
 
 ## IN_PROGRESS
+- [ ] #32 READMEの最終更新日を今日の日付に更新する [type:feature] (session: 3458454)
 
 ## DONE
 - [x] #9 test: AppCachedImageウィジェットのユニットテスト追加 (PR #13)
